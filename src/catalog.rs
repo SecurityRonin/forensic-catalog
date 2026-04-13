@@ -5874,4 +5874,112 @@ mod tests_batch_d {
             assert!(ids.contains(expected), "CATALOG missing: {expected}");
         }
     }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Batch H — Jump List / LNK / Prefetch / SRUM tables / EVTX channels
+    // ═══════════════════════════════════════════════════════════════════════
+
+    // ── Jump Lists ────────────────────────────────────────────────────────
+
+    #[test] fn jump_list_system_md() {
+        assert_eq!(JUMP_LIST_SYSTEM.id, "jump_list_system");
+        assert_eq!(JUMP_LIST_SYSTEM.artifact_type, ArtifactType::Directory);
+        assert_eq!(JUMP_LIST_SYSTEM.scope, DataScope::System);
+        assert!(JUMP_LIST_SYSTEM.mitre_techniques.contains(&"T1547.009"));
+    }
+
+    // ── LNK Files ─────────────────────────────────────────────────────────
+
+    #[test] fn lnk_files_office_md() {
+        assert_eq!(LNK_FILES_OFFICE.id, "lnk_files_office");
+        assert_eq!(LNK_FILES_OFFICE.artifact_type, ArtifactType::Directory);
+        assert_eq!(LNK_FILES_OFFICE.scope, DataScope::User);
+        assert!(LNK_FILES_OFFICE.mitre_techniques.contains(&"T1547.009"));
+    }
+
+    // ── Prefetch ──────────────────────────────────────────────────────────
+
+    #[test] fn prefetch_file_md() {
+        assert_eq!(PREFETCH_FILE.id, "prefetch_file");
+        assert_eq!(PREFETCH_FILE.artifact_type, ArtifactType::File);
+        assert_eq!(PREFETCH_FILE.scope, DataScope::System);
+        assert_eq!(PREFETCH_FILE.os_scope, OsScope::Win7Plus);
+        assert!(PREFETCH_FILE.mitre_techniques.contains(&"T1059"));
+    }
+
+    // ── SRUM tables ───────────────────────────────────────────────────────
+
+    #[test] fn srum_network_usage_md() {
+        assert_eq!(SRUM_NETWORK_USAGE.id, "srum_network_usage");
+        assert_eq!(SRUM_NETWORK_USAGE.artifact_type, ArtifactType::File);
+        assert_eq!(SRUM_NETWORK_USAGE.scope, DataScope::System);
+        assert_eq!(SRUM_NETWORK_USAGE.os_scope, OsScope::Win8Plus);
+        assert!(SRUM_NETWORK_USAGE.mitre_techniques.contains(&"T1049"));
+    }
+    #[test] fn srum_app_resource_md() {
+        assert_eq!(SRUM_APP_RESOURCE.id, "srum_app_resource");
+        assert_eq!(SRUM_APP_RESOURCE.artifact_type, ArtifactType::File);
+        assert_eq!(SRUM_APP_RESOURCE.scope, DataScope::System);
+        assert_eq!(SRUM_APP_RESOURCE.os_scope, OsScope::Win8Plus);
+        assert!(SRUM_APP_RESOURCE.mitre_techniques.contains(&"T1059"));
+    }
+    #[test] fn srum_energy_usage_md() {
+        assert_eq!(SRUM_ENERGY_USAGE.id, "srum_energy_usage");
+        assert_eq!(SRUM_ENERGY_USAGE.artifact_type, ArtifactType::File);
+        assert_eq!(SRUM_ENERGY_USAGE.scope, DataScope::System);
+        assert_eq!(SRUM_ENERGY_USAGE.os_scope, OsScope::Win8Plus);
+        assert!(SRUM_ENERGY_USAGE.mitre_techniques.contains(&"T1059"));
+    }
+    #[test] fn srum_push_notification_md() {
+        assert_eq!(SRUM_PUSH_NOTIFICATION.id, "srum_push_notification");
+        assert_eq!(SRUM_PUSH_NOTIFICATION.artifact_type, ArtifactType::File);
+        assert_eq!(SRUM_PUSH_NOTIFICATION.scope, DataScope::System);
+        assert_eq!(SRUM_PUSH_NOTIFICATION.os_scope, OsScope::Win10Plus);
+        assert!(SRUM_PUSH_NOTIFICATION.mitre_techniques.contains(&"T1059"));
+    }
+
+    // ── EVTX channels ─────────────────────────────────────────────────────
+
+    #[test] fn evtx_security_md() {
+        assert_eq!(EVTX_SECURITY.id, "evtx_security");
+        assert_eq!(EVTX_SECURITY.artifact_type, ArtifactType::File);
+        assert_eq!(EVTX_SECURITY.scope, DataScope::System);
+        assert!(EVTX_SECURITY.mitre_techniques.contains(&"T1070.001"));
+    }
+    #[test] fn evtx_system_md() {
+        assert_eq!(EVTX_SYSTEM.id, "evtx_system");
+        assert_eq!(EVTX_SYSTEM.artifact_type, ArtifactType::File);
+        assert_eq!(EVTX_SYSTEM.scope, DataScope::System);
+        assert!(EVTX_SYSTEM.mitre_techniques.contains(&"T1543.003"));
+    }
+    #[test] fn evtx_powershell_md() {
+        assert_eq!(EVTX_POWERSHELL.id, "evtx_powershell");
+        assert_eq!(EVTX_POWERSHELL.artifact_type, ArtifactType::File);
+        assert_eq!(EVTX_POWERSHELL.scope, DataScope::System);
+        assert!(EVTX_POWERSHELL.mitre_techniques.contains(&"T1059.001"));
+    }
+    #[test] fn evtx_sysmon_md() {
+        assert_eq!(EVTX_SYSMON.id, "evtx_sysmon");
+        assert_eq!(EVTX_SYSMON.artifact_type, ArtifactType::File);
+        assert_eq!(EVTX_SYSMON.scope, DataScope::System);
+        assert!(EVTX_SYSMON.mitre_techniques.contains(&"T1059"));
+    }
+
+    // ── CATALOG completeness (batch H) ────────────────────────────────────
+
+    #[test]
+    fn catalog_contains_batch_h() {
+        let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
+        for expected in &[
+            "jump_list_system",
+            "lnk_files_office",
+            "prefetch_file",
+            "srum_network_usage", "srum_app_resource",
+            "srum_energy_usage", "srum_push_notification",
+            "evtx_security", "evtx_system",
+            "evtx_powershell", "evtx_sysmon",
+        ] {
+            assert!(ids.contains(expected), "CATALOG missing: {expected}");
+        }
+    }
 }

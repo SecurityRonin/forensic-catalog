@@ -3867,6 +3867,266 @@ pub static LINUX_APT_HOOKS: ArtifactDescriptor = ArtifactDescriptor {
     fields: PERSIST_CMD_FIELDS,
 };
 
+// ── Batch H — Jump List / LNK / Prefetch / SRUM tables / EVTX channels ──────
+
+pub static JUMP_LIST_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
+    id: "jump_list_system",
+    name: "Jump Lists — System AutomaticDestinations",
+    artifact_type: ArtifactType::Directory,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"C:\ProgramData\Microsoft\Windows\Recent\AutomaticDestinations\"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "System-scope jump lists shared across all users; distinct from per-user \
+              %APPDATA% copies. Each .automaticDestinations-ms is an OLE CFB containing \
+              a DestList stream (AppID → target MRU) plus embedded LNK blocks.",
+    mitre_techniques: &["T1547.009", "T1070.004"],
+    fields: DIR_ENTRY_FIELDS,
+};
+
+pub static LNK_FILES_OFFICE: ArtifactDescriptor = ArtifactDescriptor {
+    id: "lnk_files_office",
+    name: "Office Recent LNK Files",
+    artifact_type: ArtifactType::Directory,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"%APPDATA%\Microsoft\Office\Recent\"),
+    scope: DataScope::User,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "Office-specific shell link files created for every document opened via Office. \
+              Separate from Windows Recent; survives clearing of Windows Recent Items. \
+              Reveals document access including network shares and USB paths.",
+    mitre_techniques: &["T1547.009", "T1070.004"],
+    fields: DIR_ENTRY_FIELDS,
+};
+
+static PREFETCH_FIELDS: &[FieldSchema] = &[
+    FieldSchema { name: "executable_name", description: "Name of the prefetched executable (up to 29 chars)", value_type: ValueType::Text, is_uid_component: true },
+    FieldSchema { name: "run_count", description: "Number of times the executable has run", value_type: ValueType::UnsignedInt, is_uid_component: false },
+    FieldSchema { name: "last_run_time", description: "Most recent execution timestamp (FILETIME)", value_type: ValueType::Timestamp, is_uid_component: false },
+    FieldSchema { name: "previous_run_times", description: "Up to 7 prior execution timestamps (Win 8+)", value_type: ValueType::Text, is_uid_component: false },
+    FieldSchema { name: "volume_path", description: "Volume device path at time of execution", value_type: ValueType::Text, is_uid_component: false },
+    FieldSchema { name: "referenced_files", description: "DLLs and files loaded during first 10 seconds", value_type: ValueType::Text, is_uid_component: false },
+    FieldSchema { name: "prefetch_hash", description: "8-hex path hash appended to filename", value_type: ValueType::Text, is_uid_component: true },
+];
+
+pub static PREFETCH_FILE: ArtifactDescriptor = ArtifactDescriptor {
+    id: "prefetch_file",
+    name: "Prefetch File (.pf)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"C:\Windows\Prefetch\*.pf"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "Binary execution record: executable name, 8-run-timestamp history (Win8+), \
+              run count, path hash, and referenced DLL list. Win10+ files are MAM-compressed \
+              (4-byte magic 0x4D 0x41 0x4D 0x04) — decompress with xpress_huff before parsing. \
+              Versions: v17 (XP), v23 (Vista/7), v26 (Win8), v30/v31 (Win10+).",
+    mitre_techniques: &["T1059", "T1070.004"],
+    fields: PREFETCH_FIELDS,
+};
+
+static SRUM_NET_FIELDS: &[FieldSchema] = &[
+    FieldSchema { name: "app_id", description: "Application identifier (path or service name)", value_type: ValueType::Text, is_uid_component: true },
+    FieldSchema { name: "user_id", description: "SID of the user account", value_type: ValueType::Text, is_uid_component: true },
+    FieldSchema { name: "timestamp", description: "ESE column TimeStamp (UTC)", value_type: ValueType::Timestamp, is_uid_component: false },
+    FieldSchema { name: "bytes_sent", description: "Total bytes sent by this app in the interval", value_type: ValueType::UnsignedInt, is_uid_component: false },
+    FieldSchema { name: "bytes_received", description: "Total bytes received by this app in the interval", value_type: ValueType::UnsignedInt, is_uid_component: false },
+    FieldSchema { name: "interface_luid", description: "Network interface LUID", value_type: ValueType::UnsignedInt, is_uid_component: false },
+];
+
+pub static SRUM_NETWORK_USAGE: ArtifactDescriptor = ArtifactDescriptor {
+    id: "srum_network_usage",
+    name: "SRUM Network Data Usage Table",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"C:\Windows\System32\sru\SRUDB.dat:{973F5D5C-1D90-11D3-AE08-00A0C90F57DA}"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win8Plus,
+    decoder: Decoder::Identity,
+    meaning: "ESE table {973F5D5C-1D90-11D3-AE08-00A0C90F57DA} records per-app bytes sent/received \
+              per network interface per hour. ~30-day retention. Proves data exfiltration volume \
+              even after log deletion; correlate AppId + UserId + BytesSent for exfil attribution.",
+    mitre_techniques: &["T1049", "T1048"],
+    fields: SRUM_NET_FIELDS,
+};
+
+static SRUM_APP_FIELDS: &[FieldSchema] = &[
+    FieldSchema { name: "app_id", description: "Application path or service name", value_type: ValueType::Text, is_uid_component: true },
+    FieldSchema { name: "user_id", description: "SID of the user account", value_type: ValueType::Text, is_uid_component: true },
+    FieldSchema { name: "timestamp", description: "Interval timestamp (UTC)", value_type: ValueType::Timestamp, is_uid_component: false },
+    FieldSchema { name: "foreground_cpu_time", description: "CPU time used in foreground (100ns units)", value_type: ValueType::UnsignedInt, is_uid_component: false },
+    FieldSchema { name: "background_cpu_time", description: "CPU time used in background (100ns units)", value_type: ValueType::UnsignedInt, is_uid_component: false },
+    FieldSchema { name: "foreground_cycles", description: "CPU cycle count in foreground", value_type: ValueType::UnsignedInt, is_uid_component: false },
+    FieldSchema { name: "background_cycles", description: "CPU cycle count in background", value_type: ValueType::UnsignedInt, is_uid_component: false },
+];
+
+pub static SRUM_APP_RESOURCE: ArtifactDescriptor = ArtifactDescriptor {
+    id: "srum_app_resource",
+    name: "SRUM Application Resource Usage Table",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"C:\Windows\System32\sru\SRUDB.dat:{D10CA2FE-6FCF-4F6D-848E-B2E99266FA89}"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win8Plus,
+    decoder: Decoder::Identity,
+    meaning: "ESE table {D10CA2FE-6FCF-4F6D-848E-B2E99266FA89} records per-app CPU cycles \
+              (foreground + background) per hour per user. Proves execution even without Prefetch \
+              or Event Log entries — CPU cycles are non-zero only if the process actually ran.",
+    mitre_techniques: &["T1059", "T1070.004"],
+    fields: SRUM_APP_FIELDS,
+};
+
+static SRUM_ENERGY_FIELDS: &[FieldSchema] = &[
+    FieldSchema { name: "app_id", description: "Application path", value_type: ValueType::Text, is_uid_component: true },
+    FieldSchema { name: "user_id", description: "SID of the user account", value_type: ValueType::Text, is_uid_component: true },
+    FieldSchema { name: "timestamp", description: "Interval timestamp (UTC)", value_type: ValueType::Timestamp, is_uid_component: false },
+    FieldSchema { name: "charge_level", description: "Battery charge level at sample time", value_type: ValueType::UnsignedInt, is_uid_component: false },
+    FieldSchema { name: "designed_capacity", description: "Battery designed capacity (mWh)", value_type: ValueType::UnsignedInt, is_uid_component: false },
+    FieldSchema { name: "full_charge_capacity", description: "Current full charge capacity (mWh)", value_type: ValueType::UnsignedInt, is_uid_component: false },
+];
+
+pub static SRUM_ENERGY_USAGE: ArtifactDescriptor = ArtifactDescriptor {
+    id: "srum_energy_usage",
+    name: "SRUM Energy Usage Table",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"C:\Windows\System32\sru\SRUDB.dat:{FEE4E14F-02A9-4550-B5CE-5FA2DA202E37}"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win8Plus,
+    decoder: Decoder::Identity,
+    meaning: "ESE table {FEE4E14F-02A9-4550-B5CE-5FA2DA202E37} records battery charge levels \
+              at each sampling interval — enables timeline reconstruction of device on/off events \
+              and correlates app activity with physical device presence.",
+    mitre_techniques: &["T1059"],
+    fields: SRUM_ENERGY_FIELDS,
+};
+
+static SRUM_PUSH_FIELDS: &[FieldSchema] = &[
+    FieldSchema { name: "app_id", description: "Application that received notification", value_type: ValueType::Text, is_uid_component: true },
+    FieldSchema { name: "user_id", description: "SID of the user account", value_type: ValueType::Text, is_uid_component: true },
+    FieldSchema { name: "timestamp", description: "Notification timestamp (UTC)", value_type: ValueType::Timestamp, is_uid_component: false },
+    FieldSchema { name: "notification_type", description: "WNS notification type code", value_type: ValueType::UnsignedInt, is_uid_component: false },
+    FieldSchema { name: "payload_size", description: "Notification payload size in bytes", value_type: ValueType::UnsignedInt, is_uid_component: false },
+];
+
+pub static SRUM_PUSH_NOTIFICATION: ArtifactDescriptor = ArtifactDescriptor {
+    id: "srum_push_notification",
+    name: "SRUM Push Notification Activity Table",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"C:\Windows\System32\sru\SRUDB.dat:{D10CA2FE-6FCF-4F6D-848E-B2E99266FA86}"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win10Plus,
+    decoder: Decoder::Identity,
+    meaning: "ESE table {D10CA2FE-6FCF-4F6D-848E-B2E99266FA86} records Windows Push Notification \
+              (WNS) activity per app — reveals C2-style notification-triggered execution in \
+              malicious UWP/PWA apps and confirms app network activity.",
+    mitre_techniques: &["T1059"],
+    fields: SRUM_PUSH_FIELDS,
+};
+
+static EVTX_FIELDS: &[FieldSchema] = &[
+    FieldSchema { name: "event_id", description: "Windows Event ID", value_type: ValueType::UnsignedInt, is_uid_component: true },
+    FieldSchema { name: "timestamp", description: "Event timestamp (UTC)", value_type: ValueType::Timestamp, is_uid_component: false },
+    FieldSchema { name: "computer", description: "Source computer name", value_type: ValueType::Text, is_uid_component: false },
+    FieldSchema { name: "subject_user_sid", description: "SID of the subject user", value_type: ValueType::Text, is_uid_component: false },
+    FieldSchema { name: "subject_user_name", description: "Username of the subject", value_type: ValueType::Text, is_uid_component: false },
+    FieldSchema { name: "message", description: "Full event message XML", value_type: ValueType::Text, is_uid_component: false },
+];
+
+pub static EVTX_SECURITY: ArtifactDescriptor = ArtifactDescriptor {
+    id: "evtx_security",
+    name: "Security Event Log (Security.evtx)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"C:\Windows\System32\winevt\Logs\Security.evtx"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "Primary security audit log. Key event IDs: 4624/4625 (logon success/fail), \
+              4634/4647 (logoff), 4648 (explicit-cred logon), 4688/4689 (process create/exit), \
+              4698/4702 (scheduled task create/modify), 4720/4732 (account create/group add), \
+              1102 (audit log cleared — high-priority anti-forensics indicator).",
+    mitre_techniques: &["T1070.001", "T1059", "T1078"],
+    fields: EVTX_FIELDS,
+};
+
+pub static EVTX_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
+    id: "evtx_system",
+    name: "System Event Log (System.evtx)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"C:\Windows\System32\winevt\Logs\System.evtx"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "System-level events. Key IDs: 7045 (service installed), 7036 (service state change), \
+              6005/6006 (event log start/stop — boot/shutdown boundary), \
+              104 (System log cleared). Service installation (7045) is a primary \
+              lateral-movement and persistence indicator.",
+    mitre_techniques: &["T1543.003", "T1070.001"],
+    fields: EVTX_FIELDS,
+};
+
+pub static EVTX_POWERSHELL: ArtifactDescriptor = ArtifactDescriptor {
+    id: "evtx_powershell",
+    name: "PowerShell Operational Log",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"C:\Windows\System32\winevt\Logs\Microsoft-Windows-PowerShell%4Operational.evtx"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "PowerShell script execution telemetry. Event 4103 (module logging — pipeline output), \
+              4104 (ScriptBlock logging — full script text including deobfuscated content). \
+              4104 captures AMSI-deobfuscated scripts even when encoded; \
+              highest-fidelity PS forensic source when enabled.",
+    mitre_techniques: &["T1059.001", "T1027"],
+    fields: EVTX_FIELDS,
+};
+
+pub static EVTX_SYSMON: ArtifactDescriptor = ArtifactDescriptor {
+    id: "evtx_sysmon",
+    name: "Sysmon Operational Log",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"C:\Windows\System32\winevt\Logs\Microsoft-Windows-Sysmon%4Operational.evtx"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "Sysmon telemetry (requires deployment). Event 1 (process create + hashes + cmdline), \
+              3 (network connection), 7 (image load), 8 (CreateRemoteThread), \
+              10 (ProcessAccess — LSASS reads), 11 (file create), 22 (DNS query). \
+              Gold standard for EDR-quality forensics without commercial tooling.",
+    mitre_techniques: &["T1059", "T1055", "T1003.001"],
+    fields: EVTX_FIELDS,
+};
+
 // ── Global catalog ───────────────────────────────────────────────────────────
 
 /// The global forensic artifact catalog containing all known artifact descriptors.
@@ -4028,6 +4288,18 @@ pub static CATALOG: ForensicCatalog = ForensicCatalog::new(&[
     LINUX_XDG_AUTOSTART_SYSTEM,
     LINUX_NETWORKMANAGER_DISPATCHER,
     LINUX_APT_HOOKS,
+    // Batch H — JL / LNK / Prefetch / SRUM / EVTX
+    JUMP_LIST_SYSTEM,
+    LNK_FILES_OFFICE,
+    PREFETCH_FILE,
+    SRUM_NETWORK_USAGE,
+    SRUM_APP_RESOURCE,
+    SRUM_ENERGY_USAGE,
+    SRUM_PUSH_NOTIFICATION,
+    EVTX_SECURITY,
+    EVTX_SYSTEM,
+    EVTX_POWERSHELL,
+    EVTX_SYSMON,
 ]);
 
 // ── Tests ────────────────────────────────────────────────────────────────────
@@ -4095,7 +4367,7 @@ mod tests {
     #[test]
     fn catalog_has_entries() {
         assert!(!CATALOG.list().is_empty());
-        assert_eq!(CATALOG.list().len(), 140);
+        assert_eq!(CATALOG.list().len(), 151);
     }
 
     #[test]

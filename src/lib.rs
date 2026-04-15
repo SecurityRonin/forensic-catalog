@@ -1,4 +1,4 @@
-//! forensic-indicators — static indicator tables for memory-forensic analysis.
+//! forensic-catalog — static indicator tables for forensic analysis.
 //!
 //! Provides zero-dependency, `std`-only lookup functions and constants covering:
 //! suspicious network ports, trusted/suspicious filesystem paths, persistence

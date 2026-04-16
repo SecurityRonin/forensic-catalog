@@ -61,10 +61,8 @@ pub const ACTION1_PATHS: &[&str] = &[
 
 /// ManageEngine ServiceDesk Plus registry indicator paths.
 /// Source: lolrmm-registry-paths-complete.md §ManageEngine (1 path)
-pub const MANAGEENGINE_PATHS: &[&str] = &[
-    r"SOFTWARE\ManageEngine",
-    r"SOFTWARE\AdventNet\ManageEngine",
-];
+pub const MANAGEENGINE_PATHS: &[&str] =
+    &[r"SOFTWARE\ManageEngine", r"SOFTWARE\AdventNet\ManageEngine"];
 
 /// All LOLRMM remote access tool paths combined (for bulk scanning).
 pub const ALL_LOLRMM_PATHS: &[&str] = &[
@@ -153,7 +151,10 @@ mod tests {
 
     #[test]
     fn teamviewer_paths_not_empty() {
-        assert!(!TEAMVIEWER_PATHS.is_empty(), "TEAMVIEWER_PATHS must not be empty");
+        assert!(
+            !TEAMVIEWER_PATHS.is_empty(),
+            "TEAMVIEWER_PATHS must not be empty"
+        );
     }
 
     #[test]
@@ -163,7 +164,10 @@ mod tests {
 
     #[test]
     fn all_lolrmm_paths_not_empty() {
-        assert!(!ALL_LOLRMM_PATHS.is_empty(), "ALL_LOLRMM_PATHS must not be empty");
+        assert!(
+            !ALL_LOLRMM_PATHS.is_empty(),
+            "ALL_LOLRMM_PATHS must not be empty"
+        );
     }
 
     #[test]

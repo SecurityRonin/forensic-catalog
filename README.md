@@ -135,11 +135,6 @@ let record = CATALOG.decode(descriptor, value_name, raw_bytes)?;
 
 ## Used by
 
-- [`forensic-pivot`](https://github.com/SecurityRonin/forensic-pivot) — correlation engine that cross-references artifacts across evidence sources
 - [`RapidTriage`](https://github.com/SecurityRonin/RapidTriage) — live incident response triage tool
 
-## License
 
-Apache-2.0 — see [LICENSE](LICENSE).
-
-Sponsored by [@h4x0r](https://github.com/sponsors/h4x0r).

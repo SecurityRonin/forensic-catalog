@@ -35,12 +35,16 @@ mod tests {
     // --- is_trusted_windows_lib_path ---
     #[test]
     fn trusts_system32_lowercase() {
-        assert!(is_trusted_windows_lib_path(r"C:\Windows\System32\ntdll.dll"));
+        assert!(is_trusted_windows_lib_path(
+            r"C:\Windows\System32\ntdll.dll"
+        ));
     }
 
     #[test]
     fn trusts_syswow64_mixed_case() {
-        assert!(is_trusted_windows_lib_path(r"C:\Windows\SysWOW64\kernel32.dll"));
+        assert!(is_trusted_windows_lib_path(
+            r"C:\Windows\SysWOW64\kernel32.dll"
+        ));
     }
 
     #[test]
@@ -57,12 +61,16 @@ mod tests {
 
     #[test]
     fn untrusts_temp_path() {
-        assert!(!is_trusted_windows_lib_path(r"C:\Users\user\AppData\Local\Temp\evil.dll"));
+        assert!(!is_trusted_windows_lib_path(
+            r"C:\Users\user\AppData\Local\Temp\evil.dll"
+        ));
     }
 
     #[test]
     fn untrusts_random_path() {
-        assert!(!is_trusted_windows_lib_path(r"C:\Users\user\Downloads\payload.dll"));
+        assert!(!is_trusted_windows_lib_path(
+            r"C:\Users\user\Downloads\payload.dll"
+        ));
     }
 
     // --- is_trusted_linux_lib_path ---
@@ -73,7 +81,9 @@ mod tests {
 
     #[test]
     fn trusts_usr_lib() {
-        assert!(is_trusted_linux_lib_path("/usr/lib/x86_64-linux-gnu/libssl.so"));
+        assert!(is_trusted_linux_lib_path(
+            "/usr/lib/x86_64-linux-gnu/libssl.so"
+        ));
     }
 
     #[test]
@@ -99,7 +109,9 @@ mod tests {
 
     #[test]
     fn flags_appdata_local_temp() {
-        assert!(is_suspicious_temp_path(r"C:\Users\user\AppData\Local\Temp\x.exe"));
+        assert!(is_suspicious_temp_path(
+            r"C:\Users\user\AppData\Local\Temp\x.exe"
+        ));
     }
 
     #[test]

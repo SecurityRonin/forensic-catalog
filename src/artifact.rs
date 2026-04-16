@@ -213,6 +213,10 @@ pub struct ArtifactDescriptor {
     pub triage_priority: TriagePriority,
     /// IDs of related catalog descriptors useful for cross-correlation.
     pub related_artifacts: &'static [&'static str],
+    /// Authoritative external references for this artifact (SANS, Harlan Carvey,
+    /// Brian Carrier, Red Canary, Microsoft docs, MITRE ATT&CK, etc.).
+    /// Every production entry should have at least one URL.
+    pub sources: &'static [&'static str],
 }
 
 // ── ArtifactValue (universal decoded value) ──────────────────────────────────
@@ -386,7 +390,10 @@ impl ForensicCatalog {
 
     /// Return all descriptors associated with the given MITRE ATT&CK technique ID.
     pub fn by_mitre(&self, technique: &str) -> Vec<&ArtifactDescriptor> {
-        self.entries.iter().filter(|d| d.mitre_techniques.contains(&technique)).collect()
+        self.entries
+            .iter()
+            .filter(|d| d.mitre_techniques.contains(&technique))
+            .collect()
     }
 
     /// Return all descriptors sorted by triage priority descending (Critical first).
@@ -566,8 +573,12 @@ fn decode_binary_field(field: &BinaryField, raw: &[u8]) -> Result<ArtifactValue,
         });
     }
     Ok(match field.field_type {
-        BinaryFieldType::U16Le => ArtifactValue::UnsignedInt(u64::from(read_u16_le(raw, field.offset))),
-        BinaryFieldType::U32Le => ArtifactValue::UnsignedInt(u64::from(read_u32_le(raw, field.offset))),
+        BinaryFieldType::U16Le => {
+            ArtifactValue::UnsignedInt(u64::from(read_u16_le(raw, field.offset)))
+        }
+        BinaryFieldType::U32Le => {
+            ArtifactValue::UnsignedInt(u64::from(read_u32_le(raw, field.offset)))
+        }
         BinaryFieldType::U64Le => ArtifactValue::UnsignedInt(read_u64_le(raw, field.offset)),
         BinaryFieldType::I32Le => ArtifactValue::Integer(i64::from(read_i32_le(raw, field.offset))),
         BinaryFieldType::I64Le => ArtifactValue::Integer(read_i64_le(raw, field.offset)),
@@ -695,7 +706,9 @@ fn decode_artifact(
             (vec![("value", ArtifactValue::Text(text))], None)
         }
 
-        Decoder::PipeDelimited { fields: field_names } => {
+        Decoder::PipeDelimited {
+            fields: field_names,
+        } => {
             // Try name first; fall back to raw as UTF-8.
             let source = if name.is_empty() {
                 std::str::from_utf8(raw)
@@ -727,7 +740,10 @@ fn decode_artifact(
                 });
             }
             let val = read_u32_le(raw, 0);
-            (vec![("value", ArtifactValue::UnsignedInt(u64::from(val)))], None)
+            (
+                vec![("value", ArtifactValue::UnsignedInt(u64::from(val)))],
+                None,
+            )
         }
 
         Decoder::MultiSz => {
@@ -751,9 +767,7 @@ fn decode_artifact(
             let strings: Vec<ArtifactValue> = u16s
                 .split(|&c| c == 0)
                 .filter(|s| !s.is_empty())
-                .map(|s| {
-                    ArtifactValue::Text(String::from_utf16_lossy(s))
-                })
+                .map(|s| ArtifactValue::Text(String::from_utf16_lossy(s)))
                 .collect();
             (vec![("values", ArtifactValue::List(strings))], None)
         }
@@ -896,6 +910,14 @@ pub static USERASSIST_EXE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &["prefetch_dir", "shimcache", "srum_app_resource"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1059/",
+        "https://attack.mitre.org/techniques/T1204/002/",
+        "https://www.sans.org/blog/computer-forensic-artifacts-windows-7-userassist/",
+        "https://windowsir.blogspot.com/2004/02/userassist.html",
+        "http://windowsir.blogspot.com/2007/09/more-on-userassist-keys.html",
+        "https://www.magnetforensics.com/blog/artifact-profile-userassist/",
+    ],
 };
 
 /// Run key field schema.
@@ -923,7 +945,16 @@ pub static RUN_KEY_HKLM_RUN: ArtifactDescriptor = ArtifactDescriptor {
     fields: RUN_KEY_FIELDS,
     retention: None,
     triage_priority: TriagePriority::High,
-    related_artifacts: &["run_key_hklm_run", "services_imagepath", "scheduled_tasks_dir"],
+    related_artifacts: &[
+        "run_key_hklm_run",
+        "services_imagepath",
+        "scheduled_tasks_dir",
+    ],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/001/",
+        "https://learn.microsoft.com/en-us/windows/win32/setupapi/run-and-runonce-registry-keys",
+        "https://windowsir.blogspot.com/2013/01/run-mru.html",
+    ],
 };
 
 /// TypedURLs field schema.
@@ -952,6 +983,12 @@ pub static TYPED_URLS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1071/001/",
+        "https://www.sans.org/blog/digital-forensics-windows-registry-forensics-part-6-internet-explorer-user-typed-urls/",
+        "https://windowsir.blogspot.com/2006/04/typed-urls.html",
+        "https://crucialsecurity.wordpress.com/2011/03/14/typedurls-part-1/",
+    ],
 };
 
 /// PCA AppLaunch.dic pipe-delimited fields.
@@ -994,6 +1031,13 @@ pub static PCA_APPLAUNCH_DIC: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1059/",
+        "https://attack.mitre.org/techniques/T1204/002/",
+        "https://aboutdfir.com/new-windows-11-pro-22h2-evidence-of-execution-artifact/",
+        "https://www.sygnia.co/blog/new-windows-11-pca-artifact/",
+        "https://github.com/Psmths/windows-forensic-artifacts/blob/main/execution/program-compatibility-assistant.md",
+    ],
 };
 
 // ── Run key HKCU variants ────────────────────────────────────────────────────
@@ -1018,6 +1062,11 @@ pub static RUN_KEY_HKCU_RUN: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &["run_key_hklm_run", "startup_folder_user"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/001/",
+        "https://learn.microsoft.com/en-us/windows/win32/setupapi/run-and-runonce-registry-keys",
+        "https://windowsir.blogspot.com/2013/01/run-mru.html",
+    ],
 };
 
 /// HKCU RunOnce — per-user one-shot autostart (deleted after execution).
@@ -1038,6 +1087,10 @@ pub static RUN_KEY_HKCU_RUNONCE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/001/",
+        "https://learn.microsoft.com/en-us/windows/win32/setupapi/run-and-runonce-registry-keys",
+    ],
 };
 
 /// HKLM RunOnce — system-wide one-shot autostart.
@@ -1058,6 +1111,10 @@ pub static RUN_KEY_HKLM_RUNONCE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/001/",
+        "https://learn.microsoft.com/en-us/windows/win32/setupapi/run-and-runonce-registry-keys",
+    ],
 };
 
 // ── IFEO ──────────────────────────────────────────────────────────────────────
@@ -1090,6 +1147,11 @@ pub static IFEO_DEBUGGER: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/012/",
+        "https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/enabling-postmortem-debugging",
+        "https://www.sans.org/blog/malware-persistence-without-the-windows-registry/",
+    ],
 };
 
 // ── UserAssist (Folder GUID) ─────────────────────────────────────────────────
@@ -1114,6 +1176,13 @@ pub static USERASSIST_FOLDER: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1083/",
+        "https://www.sans.org/blog/computer-forensic-artifacts-windows-7-userassist/",
+        "https://windowsir.blogspot.com/2004/02/userassist.html",
+        "http://windowsir.blogspot.com/2007/09/more-on-userassist-keys.html",
+        "https://www.magnetforensics.com/blog/artifact-profile-userassist/",
+    ],
 };
 
 // ── ShellBags ─────────────────────────────────────────────────────────────────
@@ -1146,6 +1215,15 @@ pub static SHELLBAGS_USER: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1083/",
+        "https://attack.mitre.org/techniques/T1005/",
+        "https://www.sans.org/blog/shell-bag-forensics/",
+        "https://windowsir.blogspot.com/2009/07/shellbag-analysis.html",
+        "https://ericzimmerman.github.io/#!index.md",
+        "https://www.sans.org/white-papers/34545/",
+        "https://www.magnetforensics.com/blog/forensic-analysis-of-windows-shellbags/",
+    ],
 };
 
 // ── Amcache ───────────────────────────────────────────────────────────────────
@@ -1183,6 +1261,14 @@ pub static AMCACHE_APP_FILE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &["shimcache", "prefetch_dir", "srum_app_resource"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1218/",
+        "https://attack.mitre.org/techniques/T1204/002/",
+        "https://www.sans.org/blog/new-amcache-hve-in-windows-8-1-update-1/",
+        "https://www.sansforensics.com/blog/amcache-hive-forensics/",
+        "https://www.researchgate.net/publication/317258237_Leveraging_the_Windows_Amcachehve_File_in_Forensic_Investigations",
+        "https://www.magnetforensics.com/blog/shimcache-vs-amcache-key-windows-forensic-artifacts/",
+    ],
 };
 
 // ── ShimCache (AppCompatCache) ────────────────────────────────────────────────
@@ -1216,6 +1302,14 @@ pub static SHIMCACHE: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("written at clean shutdown only; lost on crash/hard-power-off"),
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["amcache_app_file", "prefetch_dir", "bam_user"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1218/",
+        "https://attack.mitre.org/techniques/T1059/",
+        "https://www.sans.org/blog/digital-forensics-shimcache/",
+        "https://redcanary.com/blog/threat-detection/appcompatcache/",
+        "https://www.sans.org/blog/mass-triage-part-4-processing-returned-files-appcache-shimcache/",
+        "https://www.magnetforensics.com/blog/shimcache-vs-amcache-key-windows-forensic-artifacts/",
+    ],
 };
 
 // ── BAM / DAM ─────────────────────────────────────────────────────────────────
@@ -1248,6 +1342,14 @@ pub static BAM_USER: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("~7 days rolling window"),
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["dam_user", "shimcache", "prefetch_dir"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1059/",
+        "https://attack.mitre.org/techniques/T1204/",
+        "https://www.sans.org/blog/background-activity-moderator-bam-forensics/",
+        "https://www.13cubed.com/downloads/windows10_forensics_cheat_sheet.pdf",
+        "https://forensafe.com/blogs/bam.html",
+        "https://github.com/Psmths/windows-forensic-artifacts/blob/main/execution/bam-dam.md",
+    ],
 };
 
 static DAM_FIELDS: &[FieldSchema] = &[FieldSchema {
@@ -1275,6 +1377,13 @@ pub static DAM_USER: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("~7 days rolling window"),
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["bam_user", "shimcache"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1059/",
+        "https://attack.mitre.org/techniques/T1204/",
+        "https://www.sans.org/blog/background-activity-moderator-bam-forensics/",
+        "https://forensafe.com/blogs/bam.html",
+        "https://github.com/Psmths/windows-forensic-artifacts/blob/main/execution/bam-dam.md",
+    ],
 };
 
 // ── SAM ───────────────────────────────────────────────────────────────────────
@@ -1307,6 +1416,13 @@ pub static SAM_USERS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["lsa_secrets", "dcc2_cache"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1003/002/",
+        "https://attack.mitre.org/techniques/T1087/001/",
+        "https://www.sans.org/blog/windows-credential-storage-for-penetration-testers/",
+        "https://windowsir.blogspot.com/2010/11/recovering-passwords.html",
+        "http://windowsir.blogspot.com/2013/07/howto-determine-users-on-system.html",
+    ],
 };
 
 // ── LSA Secrets / DCC2 ───────────────────────────────────────────────────────
@@ -1336,6 +1452,11 @@ pub static LSA_SECRETS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["sam_users", "dpapi_system_masterkey", "dcc2_cache"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1003/004/",
+        "https://attack.mitre.org/techniques/T1552/002/",
+        "https://www.sans.org/blog/lsa-secrets/",
+    ],
 };
 
 static DCC2_FIELDS: &[FieldSchema] = &[FieldSchema {
@@ -1366,6 +1487,10 @@ pub static DCC2_CACHE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1003/005/",
+        "https://www.sans.org/blog/windows-credential-storage-for-penetration-testers/",
+    ],
 };
 
 // ── TypedURLsTime ─────────────────────────────────────────────────────────────
@@ -1395,6 +1520,10 @@ pub static TYPED_URLS_TIME: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1071/001/",
+        "https://www.sans.org/blog/digital-forensics-windows-registry-forensics-part-6-internet-explorer-user-typed-urls/",
+    ],
 };
 
 // ── MRU RecentDocs ────────────────────────────────────────────────────────────
@@ -1424,6 +1553,14 @@ pub static MRU_RECENT_DOCS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1005/",
+        "https://attack.mitre.org/techniques/T1083/",
+        "https://windowsir.blogspot.com/2006/11/recent-docs-mru.html",
+        "https://www.sans.org/blog/windows-mru-registry-keys/",
+        "https://www.sans.org/blog/opensavemru-and-lastvisitedmru/",
+        "https://forensics.wiki/opensavemru/",
+    ],
 };
 
 // ── USB device enumeration ────────────────────────────────────────────────────
@@ -1455,6 +1592,13 @@ pub static USB_ENUM: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1200/",
+        "https://attack.mitre.org/techniques/T1052/001/",
+        "https://www.sans.org/blog/computer-forensic-artifacts-windows-7-usb-device-tracking/",
+        "https://windowsir.blogspot.com/2013/07/usb-device-tracking-in-windows-7.html",
+        "https://www.magnetforensics.com/blog/artifact-profile-usb-devices/",
+    ],
 };
 
 // ── MUICache ──────────────────────────────────────────────────────────────────
@@ -1487,6 +1631,15 @@ pub static MUICACHE: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("persists until registry cleanup"),
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1059/",
+        "https://attack.mitre.org/techniques/T1204/002/",
+        "https://windowsir.blogspot.com/2012/08/no-more-mr-nice-guy.html",
+        "https://www.sans.org/blog/digital-forensics-windows-muicache/",
+        "http://windowsir.blogspot.com/2005/12/mystery-of-muicachesolved.html",
+        "https://www.magnetforensics.com/blog/forensic-analysis-of-muicache-files-in-windows/",
+        "https://forensafe.com/blogs/muicache.html",
+    ],
 };
 
 // ── AppInit_DLLs ──────────────────────────────────────────────────────────────
@@ -1518,6 +1671,10 @@ pub static APPINIT_DLLS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/010/",
+        "https://learn.microsoft.com/en-us/windows/win32/dlls/registry-keys-for-appinit-dlls",
+    ],
 };
 
 // ── Winlogon Userinit ─────────────────────────────────────────────────────────
@@ -1550,6 +1707,10 @@ pub static WINLOGON_USERINIT: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/004/",
+        "https://learn.microsoft.com/en-us/windows/win32/secauthn/winlogon-and-gina",
+    ],
 };
 
 // ── Screensaver persistence ───────────────────────────────────────────────────
@@ -1582,6 +1743,10 @@ pub static SCREENSAVER_EXE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/002/",
+        "https://www.sans.org/blog/screensaver-registry-key-for-persistence/",
+    ],
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1645,6 +1810,10 @@ pub static WINLOGON_SHELL: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/004/",
+        "https://learn.microsoft.com/en-us/windows/win32/secauthn/winlogon-and-gina",
+    ],
 };
 
 /// Windows Services — ImagePath value indicates binary launched as a service.
@@ -1668,6 +1837,11 @@ pub static SERVICES_IMAGEPATH: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1543/003/",
+        "https://learn.microsoft.com/en-us/windows/win32/services/service-control-manager",
+        "https://redcanary.com/threat-detection-report/techniques/t1543/",
+    ],
 };
 
 static ACTIVE_SETUP_FIELDS: &[FieldSchema] = &[FieldSchema {
@@ -1698,6 +1872,10 @@ pub static ACTIVE_SETUP_HKLM: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/014/",
+        "https://www.sans.org/blog/active-setup-registry-persistence/",
+    ],
 };
 
 /// Active Setup HKCU — user-side Active Setup version tracking.
@@ -1720,6 +1898,9 @@ pub static ACTIVE_SETUP_HKCU: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/014/",
+    ],
 };
 
 /// COM Hijacking via HKCU CLSID registration (T1546.015).
@@ -1744,6 +1925,10 @@ pub static COM_HIJACK_CLSID_HKCU: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/015/",
+        "https://redcanary.com/threat-detection-report/techniques/t1546/",
+    ],
 };
 
 /// AppCert DLLs — DLL injected into every process calling CreateProcess (T1546.009).
@@ -1767,6 +1952,10 @@ pub static APPCERT_DLLS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/009/",
+        "https://learn.microsoft.com/en-us/windows/win32/devnotes/appcertdlls",
+    ],
 };
 
 static BOOT_EXECUTE_FIELDS: &[FieldSchema] = &[FieldSchema {
@@ -1797,6 +1986,10 @@ pub static BOOT_EXECUTE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/001/",
+        "https://learn.microsoft.com/en-us/windows-hardware/drivers/kernel/boot-time-global-flag-settings",
+    ],
 };
 
 /// LSA Security Support Providers — SSPs injected into LSASS (T1547.005).
@@ -1820,6 +2013,10 @@ pub static LSA_SECURITY_PKGS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/005/",
+        "https://learn.microsoft.com/en-us/windows/win32/secauthn/lsa-authentication",
+    ],
 };
 
 /// LSA Authentication Packages — loaded by LSASS for auth (T1547.002).
@@ -1840,6 +2037,11 @@ pub static LSA_AUTH_PKGS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/002/",
+        "https://attack.mitre.org/techniques/T1547/005/",
+        "https://learn.microsoft.com/en-us/windows/win32/secauthn/lsa-authentication",
+    ],
 };
 
 /// Print Monitors — DLL loaded by the spooler service (T1547.010).
@@ -1862,6 +2064,10 @@ pub static PRINT_MONITORS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/010/",
+        "https://learn.microsoft.com/en-us/windows-hardware/drivers/print/print-monitor",
+    ],
 };
 
 /// Time Provider DLLs — loaded into svchost as part of W32Time (T1547.003).
@@ -1882,6 +2088,10 @@ pub static TIME_PROVIDERS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/003/",
+        "https://learn.microsoft.com/en-us/windows/win32/sysinfo/time-provider",
+    ],
 };
 
 /// Netsh Helper DLLs — COM-like DLLs loaded by netsh.exe (T1546.007).
@@ -1902,6 +2112,10 @@ pub static NETSH_HELPER_DLLS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/007/",
+        "https://learn.microsoft.com/en-us/windows/win32/netmgmt/network-management-functions",
+    ],
 };
 
 static BHO_FIELDS: &[FieldSchema] = &[FieldSchema {
@@ -1932,6 +2146,10 @@ pub static BROWSER_HELPER_OBJECTS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1176/",
+        "https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/platform-apis/aa753582(v=vs.85)",
+    ],
 };
 
 // ── Windows persistence: filesystem ──────────────────────────────────────
@@ -1954,6 +2172,10 @@ pub static STARTUP_FOLDER_USER: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/001/",
+        "https://learn.microsoft.com/en-us/windows/win32/shell/csidl",
+    ],
 };
 
 /// System Startup Folder — files/LNKs here execute for all users at logon.
@@ -1974,6 +2196,10 @@ pub static STARTUP_FOLDER_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/001/",
+        "https://learn.microsoft.com/en-us/windows/win32/shell/csidl",
+    ],
 };
 
 /// Windows Task Scheduler task XML files (T1053.005).
@@ -1997,6 +2223,11 @@ pub static SCHEDULED_TASKS_DIR: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1053/005/",
+        "https://learn.microsoft.com/en-us/windows/win32/taskschd/task-scheduler-start-page",
+        "https://redcanary.com/threat-detection-report/techniques/t1053/",
+    ],
 };
 
 /// WDigest credential caching control (T1003.001).
@@ -2014,12 +2245,17 @@ pub static WDIGEST_CACHING: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::System,
     os_scope: OsScope::All,
     decoder: Decoder::DwordLe,
-    meaning: "1 = cleartext creds in LSASS; attackers set this before Mimikatz to harvest passwords",
+    meaning:
+        "1 = cleartext creds in LSASS; attackers set this before Mimikatz to harvest passwords",
     mitre_techniques: &["T1003.001"],
     fields: RUN_KEY_FIELDS,
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1003/001/",
+        "https://redcanary.com/threat-detection-report/techniques/t1003/",
+    ],
 };
 
 // ── Windows execution evidence ────────────────────────────────────────────
@@ -2036,12 +2272,17 @@ pub static WORDWHEEL_QUERY: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::User,
     os_scope: OsScope::Win7Plus,
     decoder: Decoder::MruListEx,
-    meaning: "Search terms entered into Windows Explorer search bar; reveals attacker reconnaissance",
+    meaning:
+        "Search terms entered into Windows Explorer search bar; reveals attacker reconnaissance",
     mitre_techniques: &["T1083"],
     fields: MRU_RECENT_DOCS_FIELDS,
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1083/",
+        "https://windowsir.blogspot.com/2012/08/wordwheelquery.html",
+    ],
 };
 
 /// OpenSaveMRU — files opened/saved via Windows common dialog (T1083).
@@ -2065,6 +2306,12 @@ pub static OPENSAVE_MRU: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1083/",
+        "https://windowsir.blogspot.com/2006/11/recent-docs-mru.html",
+        "https://www.sans.org/blog/opensavemru-and-lastvisitedmru/",
+        "https://forensics.wiki/opensavemru/",
+    ],
 };
 
 /// LastVisitedMRU — last folder visited in common dialog per-application.
@@ -2085,6 +2332,11 @@ pub static LASTVISITED_MRU: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1083/",
+        "https://windowsir.blogspot.com/2006/11/recent-docs-mru.html",
+        "https://www.sans.org/blog/opensavemru-and-lastvisitedmru/",
+    ],
 };
 
 /// Windows Prefetch files directory — execution evidence (T1204.002).
@@ -2108,6 +2360,14 @@ pub static PREFETCH_DIR: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("128 entries; oldest evicted"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["shimcache", "amcache_app_file", "bam_user"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1204/002/",
+        "https://www.sans.org/blog/computer-forensic-artifacts-windows-7-prefetch-files/",
+        "https://13cubed.com/downloads/Windows_Forensic_Analysis_Poster.pdf",
+        "https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/application-verifier",
+        "https://isc.sans.edu/diary/Forensic+Value+of+Prefetch/29168",
+        "https://www.magnetforensics.com/blog/forensic-analysis-of-prefetch-files-in-windows/",
+    ],
 };
 
 static SRUM_FIELDS: &[FieldSchema] = &[
@@ -2141,12 +2401,20 @@ pub static SRUM_DB: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::System,
     os_scope: OsScope::Win8Plus,
     decoder: Decoder::Identity,
-    meaning: "Per-app CPU, network, and energy usage records; execution timeline survives log clearing",
+    meaning:
+        "Per-app CPU, network, and energy usage records; execution timeline survives log clearing",
     mitre_techniques: &["T1204.002"],
     fields: SRUM_FIELDS,
     retention: Some("~30 days"),
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1204/002/",
+        "https://www.sans.org/white-papers/36660/",
+        "https://www.sans.org/blog/srum-forensics/",
+        "https://www.magnetforensics.com/blog/srum-forensic-analysis-of-windows-system-resource-utilization-monitor/",
+        "https://github.com/MarkBaggett/srum-dump",
+    ],
 };
 
 /// Windows Timeline / Activities Cache — cross-device activity history (Win10+).
@@ -2164,12 +2432,21 @@ pub static WINDOWS_TIMELINE: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::User,
     os_scope: OsScope::Win10Plus,
     decoder: Decoder::Identity,
-    meaning: "Application activity timeline including focus time, file access, and clipboard events",
+    meaning:
+        "Application activity timeline including focus time, file access, and clipboard events",
     mitre_techniques: &["T1059", "T1204.002"],
     fields: SRUM_FIELDS,
     retention: Some("~30 days"),
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1059/",
+        "https://attack.mitre.org/techniques/T1204/002/",
+        "https://www.sans.org/blog/windows-10-timeline-forensic-artifacts/",
+        "https://aboutdfir.com/windows-10-timeline/",
+        "http://windowsir.blogspot.com/2019/11/activitescachedb-vs-ntuserdat.html",
+        "https://kacos2000.github.io/WindowsTimeline/",
+    ],
 };
 
 /// PowerShell PSReadLine command history (T1059.001).
@@ -2183,7 +2460,9 @@ pub static POWERSHELL_HISTORY: ArtifactDescriptor = ArtifactDescriptor {
     hive: None,
     key_path: "",
     value_name: None,
-    file_path: Some(r"C:\Users\*\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt"),
+    file_path: Some(
+        r"C:\Users\*\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt",
+    ),
     scope: DataScope::User,
     os_scope: OsScope::Win10Plus,
     decoder: Decoder::Identity,
@@ -2193,6 +2472,13 @@ pub static POWERSHELL_HISTORY: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("4096 commands; oldest evicted when limit reached"),
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1059/001/",
+        "https://attack.mitre.org/techniques/T1552/",
+        "https://www.sans.org/blog/powershell-forensics/",
+        "https://redcanary.com/threat-detection-report/techniques/t1059.001/",
+        "https://community.sophos.com/sophos-labs/b/blog/posts/powershell-command-history-forensics",
+    ],
 };
 
 /// Recycle Bin ($I metadata files) — deletion evidence (T1070.004).
@@ -2216,6 +2502,14 @@ pub static RECYCLE_BIN: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1070/004/",
+        "https://attack.mitre.org/techniques/T1083/",
+        "https://www.sans.org/blog/digital-forensics-recycle-bin-forensics/",
+        "https://windowsir.blogspot.com/2010/02/more-on-recycle-bin.html",
+        "https://www.magnetforensics.com/blog/artifact-profile-recycle-bin/",
+        "https://andreafortuna.org/2019/09/26/windows-forensics-analysis-of-recycle-bin-artifacts/",
+    ],
 };
 
 /// Windows Explorer Thumbnail Cache — file-access and image evidence.
@@ -2239,6 +2533,14 @@ pub static THUMBCACHE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1083/",
+        "https://www.sans.org/blog/thumbnail-cache-forensics/",
+        "https://www.nirsoft.net/utils/thumbcache_viewer.html",
+        "https://www.pentestpartners.com/security-blog/thumbnail-forensics-dfir-techniques-for-analysing-windows-thumbcache/",
+        "https://thumbcacheviewer.github.io/",
+        "https://forensics.wiki/windows_thumbcache/",
+    ],
 };
 
 /// Windows Search database — indexed file/content search history.
@@ -2256,12 +2558,19 @@ pub static SEARCH_DB_USER: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::System,
     os_scope: OsScope::All,
     decoder: Decoder::Identity,
-    meaning: "ESE database of indexed file metadata; reveals filenames and content even after deletion",
+    meaning:
+        "ESE database of indexed file metadata; reveals filenames and content even after deletion",
     mitre_techniques: &["T1083"],
     fields: FILE_PATH_FIELDS,
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1083/",
+        "https://www.sans.org/blog/windows-search-index-forensics/",
+        "https://learn.microsoft.com/en-us/windows/win32/search/windows-search",
+        "https://cyber.aon.com/aon_cyber_labs/windows-search-index-the-forensic-artifact-youve-been-searching-for/",
+    ],
 };
 
 // ── Windows credential artifacts ──────────────────────────────────────────
@@ -2294,6 +2603,12 @@ pub static DPAPI_MASTERKEY_USER: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["dpapi_cred_user", "dpapi_credhist", "chrome_login_data"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1555/004/",
+        "https://www.sans.org/blog/dpapi-forensics-credentials-stored-in-windows/",
+        "https://posts.specterops.io/operational-guidance-for-offensive-user-dpapi-abuse-1fb7fac8b107",
+        "https://www.sygnia.co/blog/the-downfall-of-dpapis-top-secret-weapon/",
+    ],
 };
 
 /// DPAPI Credential Blobs (Local) — encrypted credential store entries.
@@ -2311,12 +2626,19 @@ pub static DPAPI_CRED_USER: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::User,
     os_scope: OsScope::All,
     decoder: Decoder::Identity,
-    meaning: "DPAPI-encrypted credential blobs for network resources; decryptable with DPAPI master key",
+    meaning:
+        "DPAPI-encrypted credential blobs for network resources; decryptable with DPAPI master key",
     mitre_techniques: &["T1555.004"],
     fields: DPAPI_FIELDS,
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &["dpapi_masterkey_user", "windows_vault_user"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1555/004/",
+        "https://www.sans.org/blog/dpapi-forensics-credentials-stored-in-windows/",
+        "https://posts.specterops.io/operational-guidance-for-offensive-user-dpapi-abuse-1fb7fac8b107",
+        "https://www.sygnia.co/blog/the-downfall-of-dpapis-top-secret-weapon/",
+    ],
 };
 
 /// DPAPI Credential Blobs (Roaming) — roaming profile credential store.
@@ -2331,12 +2653,18 @@ pub static DPAPI_CRED_ROAMING: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::User,
     os_scope: OsScope::All,
     decoder: Decoder::Identity,
-    meaning: "Roaming DPAPI credential blobs; same structure as Local, synced across domain machines",
+    meaning:
+        "Roaming DPAPI credential blobs; same structure as Local, synced across domain machines",
     mitre_techniques: &["T1555.004"],
     fields: DPAPI_FIELDS,
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1555/004/",
+        "https://www.sans.org/blog/dpapi-forensics-credentials-stored-in-windows/",
+        "https://posts.specterops.io/operational-guidance-for-offensive-user-dpapi-abuse-1fb7fac8b107",
+    ],
 };
 
 static VAULT_FIELDS: &[FieldSchema] = &[
@@ -2375,6 +2703,11 @@ pub static WINDOWS_VAULT_USER: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1555/004/",
+        "https://learn.microsoft.com/en-us/windows/win32/secauthn/credential-manager",
+        "https://blog.digital-forensics.it/2016/01/windows-revaulting.html",
+    ],
 };
 
 /// Windows Vault (System) — system-wide Windows Credential Manager vault.
@@ -2395,6 +2728,11 @@ pub static WINDOWS_VAULT_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1555/004/",
+        "https://learn.microsoft.com/en-us/windows/win32/secauthn/credential-manager",
+        "https://blog.digital-forensics.it/2016/01/windows-revaulting.html",
+    ],
 };
 
 static RDP_FIELDS: &[FieldSchema] = &[FieldSchema {
@@ -2419,12 +2757,19 @@ pub static RDP_CLIENT_SERVERS: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::User,
     os_scope: OsScope::All,
     decoder: Decoder::Identity,
-    meaning: "Hostnames and usernames of previously-connected RDP servers; lateral movement evidence",
+    meaning:
+        "Hostnames and usernames of previously-connected RDP servers; lateral movement evidence",
     mitre_techniques: &["T1021.001"],
     fields: RDP_FIELDS,
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1021/001/",
+        "https://www.sans.org/blog/windows-rdp-forensics/",
+        "https://forensafe.com/blogs/rdc.html",
+        "https://www.magnetforensics.com/blog/rdp-artifacts-in-incident-response/",
+    ],
 };
 
 static RDP_MRU_FIELDS: &[FieldSchema] = &[FieldSchema {
@@ -2446,12 +2791,19 @@ pub static RDP_CLIENT_DEFAULT: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::User,
     os_scope: OsScope::All,
     decoder: Decoder::Identity,
-    meaning: "MRU0-MRU9 ordered list of RDP server addresses; confirms specific hosts were targeted",
+    meaning:
+        "MRU0-MRU9 ordered list of RDP server addresses; confirms specific hosts were targeted",
     mitre_techniques: &["T1021.001"],
     fields: RDP_MRU_FIELDS,
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1021/001/",
+        "https://www.sans.org/blog/windows-rdp-forensics/",
+        "https://forensafe.com/blogs/rdc.html",
+        "https://www.magnetforensics.com/blog/rdp-artifacts-in-incident-response/",
+    ],
 };
 
 static NTDS_FIELDS: &[FieldSchema] = &[FieldSchema {
@@ -2482,6 +2834,10 @@ pub static NTDS_DIT: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1003/003/",
+        "https://www.sans.org/blog/protecting-ad-from-credential-theft/",
+    ],
 };
 
 static BROWSER_CRED_FIELDS: &[FieldSchema] = &[
@@ -2517,6 +2873,12 @@ pub static CHROME_LOGIN_DATA: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["chrome_cookies", "dpapi_masterkey_user"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1555/003/",
+        "https://redcanary.com/threat-detection-report/techniques/t1555/",
+        "https://atropos4n6.com/windows/chrome-login-data-forensics/",
+        "https://www.foxtonforensics.com/blog/post/analysing-chrome-login-data",
+    ],
 };
 
 static FIREFOX_CRED_FIELDS: &[FieldSchema] = &[FieldSchema {
@@ -2540,12 +2902,18 @@ pub static FIREFOX_LOGINS: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::User,
     os_scope: OsScope::All,
     decoder: Decoder::Identity,
-    meaning: "NSS3-encrypted Firefox saved credentials; decryptable with key4.db and master password",
+    meaning:
+        "NSS3-encrypted Firefox saved credentials; decryptable with key4.db and master password",
     mitre_techniques: &["T1555.003"],
     fields: FIREFOX_CRED_FIELDS,
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1555/003/",
+        "https://redcanary.com/threat-detection-report/techniques/t1555/",
+        "https://atropos4n6.com/windows/chrome-login-data-forensics/",
+    ],
 };
 
 static WIFI_FIELDS: &[FieldSchema] = &[
@@ -2584,6 +2952,11 @@ pub static WIFI_PROFILES: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1552/001/",
+        "https://www.sans.org/blog/wireless-forensics/",
+        "https://forensafe.com/blogs/winwirelessnetworks.html",
+    ],
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2655,6 +3028,12 @@ pub static LINUX_CRONTAB_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1053/003/",
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://linux.die.net/man/5/crontab",
+        "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
+    ],
 };
 
 /// Drop-in cron jobs directory `/etc/cron.d/` (T1053.003).
@@ -2678,6 +3057,11 @@ pub static LINUX_CRON_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1053/003/",
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
+    ],
 };
 
 /// Periodic cron directories (daily/hourly/weekly/monthly) (T1053.003).
@@ -2701,6 +3085,9 @@ pub static LINUX_CRON_PERIODIC: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1053/003/",
+    ],
 };
 
 /// Per-user crontab spool at `/var/spool/cron/crontabs/{user}` (T1053.003).
@@ -2724,6 +3111,11 @@ pub static LINUX_USER_CRONTAB: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1053/003/",
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
+    ],
 };
 
 /// Anacron configuration at `/etc/anacrontab`.
@@ -2747,6 +3139,10 @@ pub static LINUX_ANACRONTAB: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1053/003/",
+        "https://linux.die.net/man/8/anacron",
+    ],
 };
 
 // ── Linux persistence: systemd ────────────────────────────────────────────
@@ -2767,12 +3163,20 @@ pub static LINUX_SYSTEMD_SYSTEM_UNIT: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::System,
     os_scope: OsScope::LinuxSystemd,
     decoder: Decoder::Identity,
-    meaning: "Service definitions executed as root at boot; WantedBy=multi-user.target = auto-start",
+    meaning:
+        "Service definitions executed as root at boot; WantedBy=multi-user.target = auto-start",
     mitre_techniques: &["T1543.002"],
     fields: DIR_ENTRY_FIELDS,
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1543/002/",
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://www.freedesktop.org/software/systemd/man/systemd.unit.html",
+        "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
+        "https://www.elastic.co/security-labs/primer-on-persistence-mechanisms",
+    ],
 };
 
 /// Per-user systemd service units (T1543.002).
@@ -2796,6 +3200,11 @@ pub static LINUX_SYSTEMD_USER_UNIT: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1543/002/",
+        "https://www.freedesktop.org/software/systemd/man/systemd.unit.html",
+        "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
+    ],
 };
 
 /// systemd timer units — cron-like scheduling (T1053.006).
@@ -2819,6 +3228,11 @@ pub static LINUX_SYSTEMD_TIMER: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1053/006/",
+        "https://www.freedesktop.org/software/systemd/man/systemd.timer.html",
+        "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
+    ],
 };
 
 // ── Linux persistence: init / rc.local ───────────────────────────────────
@@ -2844,6 +3258,12 @@ pub static LINUX_RC_LOCAL: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1037/004/",
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://pberba.github.io/security/2022/02/06/linux-threat-hunting-for-persistence-initialization-scripts-and-shell-configuration/",
+        "https://www.elastic.co/security-labs/sequel-on-persistence-mechanisms",
+    ],
 };
 
 /// SysV init scripts directory `/etc/init.d/`.
@@ -2867,6 +3287,11 @@ pub static LINUX_INIT_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1543/002/",
+        "https://attack.mitre.org/techniques/T1037/004/",
+        "https://pberba.github.io/security/2022/02/06/linux-threat-hunting-for-persistence-initialization-scripts-and-shell-configuration/",
+    ],
 };
 
 // ── Linux persistence: shell startup files ────────────────────────────────
@@ -2892,6 +3317,12 @@ pub static LINUX_BASHRC_USER: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/004/",
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://pberba.github.io/security/2022/02/06/linux-threat-hunting-for-persistence-initialization-scripts-and-shell-configuration/",
+        "https://www.elastic.co/guide/en/security/current/bash-shell-profile-modification.html",
+    ],
 };
 
 /// `~/.bash_profile` — Bash login shell startup (T1546.004).
@@ -2912,6 +3343,10 @@ pub static LINUX_BASH_PROFILE_USER: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/004/",
+        "https://pberba.github.io/security/2022/02/06/linux-threat-hunting-for-persistence-initialization-scripts-and-shell-configuration/",
+    ],
 };
 
 /// `~/.profile` — POSIX login shell startup.
@@ -2932,6 +3367,10 @@ pub static LINUX_PROFILE_USER: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/004/",
+        "https://pberba.github.io/security/2022/02/06/linux-threat-hunting-for-persistence-initialization-scripts-and-shell-configuration/",
+    ],
 };
 
 /// `~/.zshrc` — per-user Zsh interactive startup (T1546.004).
@@ -2952,6 +3391,10 @@ pub static LINUX_ZSHRC_USER: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/004/",
+        "https://pberba.github.io/security/2022/02/06/linux-threat-hunting-for-persistence-initialization-scripts-and-shell-configuration/",
+    ],
 };
 
 /// `/etc/profile` — system-wide login shell startup.
@@ -2972,6 +3415,11 @@ pub static LINUX_PROFILE_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/004/",
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://pberba.github.io/security/2022/02/06/linux-threat-hunting-for-persistence-initialization-scripts-and-shell-configuration/",
+    ],
 };
 
 /// `/etc/profile.d/` — drop-in system-wide shell startup scripts.
@@ -2992,6 +3440,10 @@ pub static LINUX_PROFILE_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/004/",
+        "https://pberba.github.io/security/2022/02/06/linux-threat-hunting-for-persistence-initialization-scripts-and-shell-configuration/",
+    ],
 };
 
 // ── Linux persistence: dynamic linker ────────────────────────────────────
@@ -3012,12 +3464,19 @@ pub static LINUX_LD_SO_PRELOAD: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::System,
     os_scope: OsScope::Linux,
     decoder: Decoder::Identity,
-    meaning: "Libraries preloaded into EVERY process system-wide; standard rootkit hiding mechanism",
+    meaning:
+        "Libraries preloaded into EVERY process system-wide; standard rootkit hiding mechanism",
     mitre_techniques: &["T1574.006"],
     fields: CRON_LINE_FIELDS,
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1574/006/",
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://www.wiz.io/blog/linux-rootkits-explained-part-1-dynamic-linker-hijacking",
+        "https://www.sentinelone.com/labs/leveraging-ld_audit-to-beat-the-traditional-linux-library-preloading-technique/",
+    ],
 };
 
 /// `/etc/ld.so.conf.d/` — linker search path configuration (T1574.006).
@@ -3035,12 +3494,16 @@ pub static LINUX_LD_SO_CONF_D: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::System,
     os_scope: OsScope::Linux,
     decoder: Decoder::Identity,
-    meaning: "Library search path config; malicious entry adds attacker directory to ldconfig paths",
+    meaning:
+        "Library search path config; malicious entry adds attacker directory to ldconfig paths",
     mitre_techniques: &["T1574.006"],
     fields: DIR_ENTRY_FIELDS,
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1574/006/",
+    ],
 };
 
 // ── Linux persistence: SSH ────────────────────────────────────────────────
@@ -3066,6 +3529,11 @@ pub static LINUX_SSH_AUTHORIZED_KEYS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1098/004/",
+        "https://www.sans.org/blog/ssh-backdoors/",
+        "https://sandflysecurity.com/blog/detecting-unauthorized-ssh-keys-in-linux/",
+    ],
 };
 
 // ── Linux persistence: PAM / privilege / kernel ───────────────────────────
@@ -3092,6 +3560,9 @@ pub static LINUX_PAM_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1556/003/",
+    ],
 };
 
 /// `/etc/sudoers.d/` — drop-in sudoers rules (T1548.003).
@@ -3109,12 +3580,16 @@ pub static LINUX_SUDOERS_D: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::System,
     os_scope: OsScope::Linux,
     decoder: Decoder::Identity,
-    meaning: "Drop-in sudoers rules; NOPASSWD entries enable privilege escalation without credentials",
+    meaning:
+        "Drop-in sudoers rules; NOPASSWD entries enable privilege escalation without credentials",
     mitre_techniques: &["T1548.003"],
     fields: DIR_ENTRY_FIELDS,
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1548/003/",
+    ],
 };
 
 /// `/etc/modules-load.d/` — kernel modules loaded at boot (T1547.006).
@@ -3138,6 +3613,9 @@ pub static LINUX_MODULES_LOAD_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/006/",
+    ],
 };
 
 /// `/etc/update-motd.d/` — dynamic MOTD scripts executed on login (Debian/Ubuntu).
@@ -3161,6 +3639,9 @@ pub static LINUX_MOTD_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1037/004/",
+    ],
 };
 
 /// `/etc/udev/rules.d/` — udev device event rules (T1546).
@@ -3185,6 +3666,9 @@ pub static LINUX_UDEV_RULES_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/",
+    ],
 };
 
 // ── Linux execution evidence ──────────────────────────────────────────────
@@ -3205,12 +3689,17 @@ pub static LINUX_BASH_HISTORY: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::User,
     os_scope: OsScope::Linux,
     decoder: Decoder::Identity,
-    meaning: "Interactive Bash command history; reveals lateral movement, exfil, and recon commands",
+    meaning:
+        "Interactive Bash command history; reveals lateral movement, exfil, and recon commands",
     mitre_techniques: &["T1059.004", "T1552"],
     fields: CRON_LINE_FIELDS,
     retention: Some("HISTSIZE limit; default 500-2000 commands"),
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1059/004/",
+        "https://attack.mitre.org/techniques/T1552/",
+    ],
 };
 
 /// `~/.zsh_history` — Zsh interactive command history.
@@ -3231,6 +3720,10 @@ pub static LINUX_ZSH_HISTORY: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("HISTSIZE limit; default 500-2000 commands"),
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1059/004/",
+        "https://attack.mitre.org/techniques/T1552/",
+    ],
 };
 
 /// `/var/log/wtmp` — binary successful login history (T1078).
@@ -3248,12 +3741,21 @@ pub static LINUX_WTMP: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::System,
     os_scope: OsScope::Linux,
     decoder: Decoder::Identity,
-    meaning: "Binary record of all successful logins/logouts/reboots; evidence of valid-account abuse",
+    meaning:
+        "Binary record of all successful logins/logouts/reboots; evidence of valid-account abuse",
     mitre_techniques: &["T1078", "T1021.004"],
     fields: LOG_LINE_FIELDS,
     retention: Some("until rotated by logrotate"),
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1078/",
+        "https://attack.mitre.org/techniques/T1021/004/",
+        "https://linux.die.net/man/5/wtmp",
+        "https://www.sans.org/blog/linux-forensics-artifacts/",
+        "https://bromiley.medium.com/torvalds-tuesday-logon-history-in-the-tmp-files-83530b2acc28",
+        "https://sandflysecurity.com/blog/using-linux-utmpdump-for-forensics-and-detecting-log-file-tampering",
+    ],
 };
 
 /// `/var/log/btmp` — binary failed login attempts.
@@ -3276,6 +3778,12 @@ pub static LINUX_BTMP: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("until rotated by logrotate"),
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1110/",
+        "https://linux.die.net/man/5/wtmp",
+        "https://bromiley.medium.com/torvalds-tuesday-logon-history-in-the-tmp-files-83530b2acc28",
+        "https://sandflysecurity.com/blog/using-linux-utmpdump-for-forensics-and-detecting-log-file-tampering",
+    ],
 };
 
 /// `/var/log/lastlog` — binary last-login-per-UID database.
@@ -3299,6 +3807,9 @@ pub static LINUX_LASTLOG: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1078/",
+    ],
 };
 
 /// `/var/log/auth.log` — authentication and sudo event log (Debian/Ubuntu).
@@ -3322,6 +3833,10 @@ pub static LINUX_AUTH_LOG: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("until rotated by logrotate"),
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1078/",
+        "https://attack.mitre.org/techniques/T1548/003/",
+    ],
 };
 
 /// systemd journal directory `/var/log/journal/`.
@@ -3339,12 +3854,17 @@ pub static LINUX_JOURNAL_DIR: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::System,
     os_scope: OsScope::LinuxSystemd,
     decoder: Decoder::Identity,
-    meaning: "Structured binary system journal; includes boot IDs, service crashes, and audit events",
+    meaning:
+        "Structured binary system journal; includes boot IDs, service crashes, and audit events",
     mitre_techniques: &["T1078", "T1059.004"],
     fields: DIR_ENTRY_FIELDS,
     retention: Some("50MB or 1 month default; configurable in journald.conf"),
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1078/",
+        "https://attack.mitre.org/techniques/T1059/004/",
+    ],
 };
 
 // ── Linux credential artifacts ────────────────────────────────────────────
@@ -3365,12 +3885,19 @@ pub static LINUX_PASSWD: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::System,
     os_scope: OsScope::Linux,
     decoder: Decoder::Identity,
-    meaning: "Local user enumeration; UID=0 duplicates or unusual shells indicate backdoor accounts",
+    meaning:
+        "Local user enumeration; UID=0 duplicates or unusual shells indicate backdoor accounts",
     mitre_techniques: &["T1087.001", "T1136.001"],
     fields: ACCOUNT_FIELDS,
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1087/001/",
+        "https://attack.mitre.org/techniques/T1136/001/",
+        "https://linux.die.net/man/5/passwd",
+        "https://bromiley.medium.com/torvalds-tuesday-user-accounts-597b4ca9dcaf",
+    ],
 };
 
 /// `/etc/shadow` — password hash database (T1003.008).
@@ -3394,6 +3921,11 @@ pub static LINUX_SHADOW: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1003/008/",
+        "https://www.sans.org/blog/linux-password-security/",
+        "https://bromiley.medium.com/torvalds-tuesday-user-accounts-597b4ca9dcaf",
+    ],
 };
 
 /// SSH private key files — stolen keys enable impersonation (T1552.004).
@@ -3411,12 +3943,16 @@ pub static LINUX_SSH_PRIVATE_KEY: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::User,
     os_scope: OsScope::Linux,
     decoder: Decoder::Identity,
-    meaning: "Private key material for SSH authentication; unencrypted keys = immediate lateral movement",
+    meaning:
+        "Private key material for SSH authentication; unencrypted keys = immediate lateral movement",
     mitre_techniques: &["T1552.004"],
     fields: SSH_KEY_FIELDS,
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1552/004/",
+    ],
 };
 
 /// `~/.ssh/known_hosts` — previously connected SSH server fingerprints (T1021.004).
@@ -3440,6 +3976,10 @@ pub static LINUX_SSH_KNOWN_HOSTS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1021/004/",
+        "https://attack.mitre.org/techniques/T1083/",
+    ],
 };
 
 /// `~/.gnupg/private-keys-v1.d/` — GnuPG private key store (T1552.004).
@@ -3463,6 +4003,9 @@ pub static LINUX_GNUPG_PRIVATE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1552/004/",
+    ],
 };
 
 /// `~/.aws/credentials` — AWS access key material (T1552.001).
@@ -3486,6 +4029,9 @@ pub static LINUX_AWS_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1552/001/",
+    ],
 };
 
 /// `~/.docker/config.json` — Docker registry auth tokens (T1552.001).
@@ -3509,6 +4055,9 @@ pub static LINUX_DOCKER_CONFIG: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1552/001/",
+    ],
 };
 
 // ── Batch E — Windows execution / persistence / credential ───────────────────
@@ -3533,6 +4082,10 @@ pub static LNK_FILES: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &["jump_list_auto", "mru_recent_docs"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/009/",
+        "https://attack.mitre.org/techniques/T1070/004/",
+    ],
 };
 
 pub static JUMP_LIST_AUTO: ArtifactDescriptor = ArtifactDescriptor {
@@ -3553,6 +4106,10 @@ pub static JUMP_LIST_AUTO: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &["lnk_files", "mru_recent_docs"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/009/",
+        "https://attack.mitre.org/techniques/T1070/004/",
+    ],
 };
 
 pub static JUMP_LIST_CUSTOM: ArtifactDescriptor = ArtifactDescriptor {
@@ -3573,6 +4130,10 @@ pub static JUMP_LIST_CUSTOM: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &["lnk_files", "jump_list_auto"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/009/",
+        "https://attack.mitre.org/techniques/T1070/004/",
+    ],
 };
 
 pub static EVTX_DIR: ArtifactDescriptor = ArtifactDescriptor {
@@ -3593,6 +4154,10 @@ pub static EVTX_DIR: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("configurable; default ~20MB rolling per channel"),
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1070/001/",
+        "https://attack.mitre.org/techniques/T1059/001/",
+    ],
 };
 
 pub static USN_JOURNAL: ArtifactDescriptor = ArtifactDescriptor {
@@ -3613,6 +4178,10 @@ pub static USN_JOURNAL: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1070/004/",
+        "https://attack.mitre.org/techniques/T1059/",
+    ],
 };
 
 // ── Persistence ───────────────────────────────────────────────────────────────
@@ -3635,6 +4204,9 @@ pub static WMI_MOF_DIR: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/003/",
+    ],
 };
 
 pub static BITS_DB: ArtifactDescriptor = ArtifactDescriptor {
@@ -3655,13 +4227,36 @@ pub static BITS_DB: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1197/",
+    ],
 };
 
 static WMI_SUB_FIELDS: &[FieldSchema] = &[
-    FieldSchema { name: "filter_name", description: "WMI EventFilter name", value_type: ValueType::Text, is_uid_component: true },
-    FieldSchema { name: "consumer_type", description: "Consumer type (Script/CommandLine)", value_type: ValueType::Text, is_uid_component: false },
-    FieldSchema { name: "consumer_value", description: "Script or command executed on trigger", value_type: ValueType::Text, is_uid_component: false },
-    FieldSchema { name: "query", description: "WQL query that triggers the subscription", value_type: ValueType::Text, is_uid_component: false },
+    FieldSchema {
+        name: "filter_name",
+        description: "WMI EventFilter name",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "consumer_type",
+        description: "Consumer type (Script/CommandLine)",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "consumer_value",
+        description: "Script or command executed on trigger",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "query",
+        description: "WQL query that triggers the subscription",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
 ];
 
 pub static WMI_SUBSCRIPTIONS: ArtifactDescriptor = ArtifactDescriptor {
@@ -3682,6 +4277,9 @@ pub static WMI_SUBSCRIPTIONS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/003/",
+    ],
 };
 
 pub static LOGON_SCRIPTS: ArtifactDescriptor = ArtifactDescriptor {
@@ -3702,6 +4300,9 @@ pub static LOGON_SCRIPTS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1037/001/",
+    ],
 };
 
 pub static WINSOCK_LSP: ArtifactDescriptor = ArtifactDescriptor {
@@ -3722,6 +4323,9 @@ pub static WINSOCK_LSP: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/010/",
+    ],
 };
 
 pub static APPSHIM_DB: ArtifactDescriptor = ArtifactDescriptor {
@@ -3742,6 +4346,9 @@ pub static APPSHIM_DB: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/011/",
+    ],
 };
 
 pub static PASSWORD_FILTER_DLL: ArtifactDescriptor = ArtifactDescriptor {
@@ -3762,6 +4369,9 @@ pub static PASSWORD_FILTER_DLL: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1556/002/",
+    ],
 };
 
 pub static OFFICE_NORMAL_DOTM: ArtifactDescriptor = ArtifactDescriptor {
@@ -3782,6 +4392,9 @@ pub static OFFICE_NORMAL_DOTM: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1137/001/",
+    ],
 };
 
 pub static POWERSHELL_PROFILE_ALL: ArtifactDescriptor = ArtifactDescriptor {
@@ -3802,6 +4415,9 @@ pub static POWERSHELL_PROFILE_ALL: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/013/",
+    ],
 };
 
 // ── Credentials ───────────────────────────────────────────────────────────────
@@ -3824,6 +4440,9 @@ pub static DPAPI_SYSTEM_MASTERKEY: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["lsa_secrets", "dpapi_masterkey_user"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1555/004/",
+    ],
 };
 
 pub static DPAPI_CREDHIST: ArtifactDescriptor = ArtifactDescriptor {
@@ -3844,6 +4463,9 @@ pub static DPAPI_CREDHIST: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &["dpapi_masterkey_user"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1555/004/",
+    ],
 };
 
 pub static CHROME_COOKIES: ArtifactDescriptor = ArtifactDescriptor {
@@ -3864,6 +4486,10 @@ pub static CHROME_COOKIES: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &["chrome_login_data"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1539/",
+        "https://attack.mitre.org/techniques/T1185/",
+    ],
 };
 
 pub static EDGE_WEBCACHE: ArtifactDescriptor = ArtifactDescriptor {
@@ -3884,6 +4510,10 @@ pub static EDGE_WEBCACHE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Low,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1539/",
+        "https://attack.mitre.org/techniques/T1217/",
+    ],
 };
 
 pub static VPN_RAS_PHONEBOOK: ArtifactDescriptor = ArtifactDescriptor {
@@ -3904,6 +4534,9 @@ pub static VPN_RAS_PHONEBOOK: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Low,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1552/001/",
+    ],
 };
 
 pub static WINDOWS_HELLO_NGC: ArtifactDescriptor = ArtifactDescriptor {
@@ -3924,6 +4557,9 @@ pub static WINDOWS_HELLO_NGC: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1555/",
+    ],
 };
 
 pub static USER_CERT_PRIVATE_KEY: ArtifactDescriptor = ArtifactDescriptor {
@@ -3944,6 +4580,9 @@ pub static USER_CERT_PRIVATE_KEY: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1552/004/",
+    ],
 };
 
 pub static MACHINE_CERT_STORE: ArtifactDescriptor = ArtifactDescriptor {
@@ -3964,6 +4603,9 @@ pub static MACHINE_CERT_STORE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1552/004/",
+    ],
 };
 
 // ── Batch F — Linux extended credentials / execution ─────────────────────────
@@ -3986,6 +4628,9 @@ pub static LINUX_AT_QUEUE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1053/001/",
+    ],
 };
 
 pub static LINUX_SSHD_CONFIG: ArtifactDescriptor = ArtifactDescriptor {
@@ -4006,6 +4651,10 @@ pub static LINUX_SSHD_CONFIG: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1098/004/",
+        "https://attack.mitre.org/techniques/T1021/004/",
+    ],
 };
 
 pub static LINUX_ETC_GROUP: ArtifactDescriptor = ArtifactDescriptor {
@@ -4026,6 +4675,10 @@ pub static LINUX_ETC_GROUP: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1087/001/",
+        "https://attack.mitre.org/techniques/T1078/003/",
+    ],
 };
 
 pub static LINUX_GNOME_KEYRING: ArtifactDescriptor = ArtifactDescriptor {
@@ -4046,6 +4699,9 @@ pub static LINUX_GNOME_KEYRING: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1555/003/",
+    ],
 };
 
 pub static LINUX_KDE_KWALLET: ArtifactDescriptor = ArtifactDescriptor {
@@ -4066,6 +4722,9 @@ pub static LINUX_KDE_KWALLET: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1555/003/",
+    ],
 };
 
 pub static LINUX_CHROME_LOGIN_LINUX: ArtifactDescriptor = ArtifactDescriptor {
@@ -4086,6 +4745,9 @@ pub static LINUX_CHROME_LOGIN_LINUX: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1555/003/",
+    ],
 };
 
 pub static LINUX_FIREFOX_LOGINS_LINUX: ArtifactDescriptor = ArtifactDescriptor {
@@ -4099,13 +4761,17 @@ pub static LINUX_FIREFOX_LOGINS_LINUX: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::User,
     os_scope: OsScope::Linux,
     decoder: Decoder::Identity,
-    meaning: "JSON-encoded saved Firefox credentials protected by NSS (key4.db); \
+    meaning:
+        "JSON-encoded saved Firefox credentials protected by NSS (key4.db); \
               can be decrypted with master password or via memory forensics of the Firefox process.",
     mitre_techniques: &["T1555.003"],
     fields: FILE_PATH_FIELDS,
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1555/003/",
+    ],
 };
 
 pub static LINUX_UTMP: ArtifactDescriptor = ArtifactDescriptor {
@@ -4126,6 +4792,13 @@ pub static LINUX_UTMP: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1078/",
+        "https://linux.die.net/man/5/utmp",
+        "https://www.sans.org/blog/linux-forensics-artifacts/",
+        "https://bromiley.medium.com/torvalds-tuesday-logon-history-in-the-tmp-files-83530b2acc28",
+        "https://sandflysecurity.com/blog/using-linux-utmpdump-for-forensics-and-detecting-log-file-tampering",
+    ],
 };
 
 pub static LINUX_GCP_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
@@ -4146,6 +4819,9 @@ pub static LINUX_GCP_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1552/001/",
+    ],
 };
 
 pub static LINUX_AZURE_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
@@ -4166,6 +4842,9 @@ pub static LINUX_AZURE_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1552/001/",
+    ],
 };
 
 pub static LINUX_KUBE_CONFIG: ArtifactDescriptor = ArtifactDescriptor {
@@ -4186,6 +4865,9 @@ pub static LINUX_KUBE_CONFIG: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1552/001/",
+    ],
 };
 
 pub static LINUX_GIT_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
@@ -4206,6 +4888,9 @@ pub static LINUX_GIT_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1552/001/",
+    ],
 };
 
 pub static LINUX_NETRC: ArtifactDescriptor = ArtifactDescriptor {
@@ -4226,6 +4911,9 @@ pub static LINUX_NETRC: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1552/001/",
+    ],
 };
 
 // ── Batch G — LinuxPersist-sourced persistence artifacts ─────────────────────
@@ -4242,7 +4930,8 @@ pub static LINUX_ETC_ENVIRONMENT: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::System,
     os_scope: OsScope::Linux,
     decoder: Decoder::Identity,
-    meaning: "System-wide environment variable definitions loaded for every login session and \
+    meaning:
+        "System-wide environment variable definitions loaded for every login session and \
               PAM-based authentication. Attackers inject PATH hijacks or LD_PRELOAD values here \
               to redirect binary execution system-wide without modifying shell configuration files.",
     mitre_techniques: &["T1546.004"],
@@ -4250,6 +4939,10 @@ pub static LINUX_ETC_ENVIRONMENT: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/004/",
+        "https://linux.die.net/man/7/environ",
+    ],
 };
 
 pub static LINUX_XDG_AUTOSTART_USER: ArtifactDescriptor = ArtifactDescriptor {
@@ -4271,6 +4964,10 @@ pub static LINUX_XDG_AUTOSTART_USER: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/014/",
+        "https://specifications.freedesktop.org/autostart-spec/autostart-spec-latest.html",
+    ],
 };
 
 pub static LINUX_XDG_AUTOSTART_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
@@ -4284,13 +4981,18 @@ pub static LINUX_XDG_AUTOSTART_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::System,
     os_scope: OsScope::Linux,
     decoder: Decoder::Identity,
-    meaning: "System-wide XDG autostart .desktop entries executed for all users at desktop session \
+    meaning:
+        "System-wide XDG autostart .desktop entries executed for all users at desktop session \
               start. Provides privileged persistence targeting all GUI logins on a workstation.",
     mitre_techniques: &["T1547.014"],
     fields: PERSIST_CMD_FIELDS,
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/014/",
+        "https://specifications.freedesktop.org/autostart-spec/autostart-spec-latest.html",
+    ],
 };
 
 pub static LINUX_NETWORKMANAGER_DISPATCHER: ArtifactDescriptor = ArtifactDescriptor {
@@ -4312,6 +5014,10 @@ pub static LINUX_NETWORKMANAGER_DISPATCHER: ArtifactDescriptor = ArtifactDescrip
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/013/",
+        "https://networkmanager.dev/docs/api/latest/NetworkManager-dispatcher.html",
+    ],
 };
 
 pub static LINUX_APT_HOOKS: ArtifactDescriptor = ArtifactDescriptor {
@@ -4333,6 +5039,11 @@ pub static LINUX_APT_HOOKS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/004/",
+        "https://attack.mitre.org/techniques/T1546/016/",
+        "https://wiki.debian.org/DpkgTriggers",
+    ],
 };
 
 // ── Batch H — Jump List / LNK / Prefetch / SRUM tables / EVTX channels ──────
@@ -4356,6 +5067,14 @@ pub static JUMP_LIST_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &["jump_list_auto", "jump_list_custom"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/009/",
+        "https://attack.mitre.org/techniques/T1070/004/",
+        "https://www.sans.org/blog/computer-forensics-windows-7-jump-lists/",
+        "https://windowsir.blogspot.com/2011/05/jump-lists-in-win7.html",
+        "https://github.com/EricZimmerman/JLECmd",
+        "https://forensics.wiki/jump_lists/",
+    ],
 };
 
 pub static LNK_FILES_OFFICE: ArtifactDescriptor = ArtifactDescriptor {
@@ -4377,16 +5096,60 @@ pub static LNK_FILES_OFFICE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &["lnk_files", "mru_recent_docs"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/009/",
+        "https://attack.mitre.org/techniques/T1070/004/",
+        "https://www.sans.org/blog/lnk-files-analysis-in-windows/",
+        "https://windowsir.blogspot.com/2009/01/lnk-files-are-your-friends.html",
+        "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-shllink/",
+        "https://www.magnetforensics.com/blog/forensic-analysis-of-lnk-files/",
+        "https://forensics.wiki/lnk/",
+    ],
 };
 
 static PREFETCH_FIELDS: &[FieldSchema] = &[
-    FieldSchema { name: "executable_name", description: "Name of the prefetched executable (up to 29 chars)", value_type: ValueType::Text, is_uid_component: true },
-    FieldSchema { name: "run_count", description: "Number of times the executable has run", value_type: ValueType::UnsignedInt, is_uid_component: false },
-    FieldSchema { name: "last_run_time", description: "Most recent execution timestamp (FILETIME)", value_type: ValueType::Timestamp, is_uid_component: false },
-    FieldSchema { name: "previous_run_times", description: "Up to 7 prior execution timestamps (Win 8+)", value_type: ValueType::Text, is_uid_component: false },
-    FieldSchema { name: "volume_path", description: "Volume device path at time of execution", value_type: ValueType::Text, is_uid_component: false },
-    FieldSchema { name: "referenced_files", description: "DLLs and files loaded during first 10 seconds", value_type: ValueType::Text, is_uid_component: false },
-    FieldSchema { name: "prefetch_hash", description: "8-hex path hash appended to filename", value_type: ValueType::Text, is_uid_component: true },
+    FieldSchema {
+        name: "executable_name",
+        description: "Name of the prefetched executable (up to 29 chars)",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "run_count",
+        description: "Number of times the executable has run",
+        value_type: ValueType::UnsignedInt,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "last_run_time",
+        description: "Most recent execution timestamp (FILETIME)",
+        value_type: ValueType::Timestamp,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "previous_run_times",
+        description: "Up to 7 prior execution timestamps (Win 8+)",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "volume_path",
+        description: "Volume device path at time of execution",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "referenced_files",
+        description: "DLLs and files loaded during first 10 seconds",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "prefetch_hash",
+        description: "8-hex path hash appended to filename",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
 ];
 
 pub static PREFETCH_FILE: ArtifactDescriptor = ArtifactDescriptor {
@@ -4408,16 +5171,59 @@ pub static PREFETCH_FILE: ArtifactDescriptor = ArtifactDescriptor {
     fields: PREFETCH_FIELDS,
     retention: Some("128 entries; oldest evicted"),
     triage_priority: TriagePriority::High,
-    related_artifacts: &["shimcache", "amcache_app_file", "evtx_security", "srum_app_resource"],
+    related_artifacts: &[
+        "shimcache",
+        "amcache_app_file",
+        "evtx_security",
+        "srum_app_resource",
+    ],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1059/",
+        "https://attack.mitre.org/techniques/T1070/004/",
+        "https://www.sans.org/blog/computer-forensic-artifacts-windows-7-prefetch-files/",
+        "https://13cubed.com/downloads/Windows_Forensic_Analysis_Poster.pdf",
+        "https://isc.sans.edu/diary/Forensic+Value+of+Prefetch/29168",
+        "https://www.magnetforensics.com/blog/forensic-analysis-of-prefetch-files-in-windows/",
+    ],
 };
 
 static SRUM_NET_FIELDS: &[FieldSchema] = &[
-    FieldSchema { name: "app_id", description: "Application identifier (path or service name)", value_type: ValueType::Text, is_uid_component: true },
-    FieldSchema { name: "user_id", description: "SID of the user account", value_type: ValueType::Text, is_uid_component: true },
-    FieldSchema { name: "timestamp", description: "ESE column TimeStamp (UTC)", value_type: ValueType::Timestamp, is_uid_component: false },
-    FieldSchema { name: "bytes_sent", description: "Total bytes sent by this app in the interval", value_type: ValueType::UnsignedInt, is_uid_component: false },
-    FieldSchema { name: "bytes_received", description: "Total bytes received by this app in the interval", value_type: ValueType::UnsignedInt, is_uid_component: false },
-    FieldSchema { name: "interface_luid", description: "Network interface LUID", value_type: ValueType::UnsignedInt, is_uid_component: false },
+    FieldSchema {
+        name: "app_id",
+        description: "Application identifier (path or service name)",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "user_id",
+        description: "SID of the user account",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "timestamp",
+        description: "ESE column TimeStamp (UTC)",
+        value_type: ValueType::Timestamp,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "bytes_sent",
+        description: "Total bytes sent by this app in the interval",
+        value_type: ValueType::UnsignedInt,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "bytes_received",
+        description: "Total bytes received by this app in the interval",
+        value_type: ValueType::UnsignedInt,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "interface_luid",
+        description: "Network interface LUID",
+        value_type: ValueType::UnsignedInt,
+        is_uid_component: false,
+    },
 ];
 
 pub static SRUM_NETWORK_USAGE: ArtifactDescriptor = ArtifactDescriptor {
@@ -4431,7 +5237,8 @@ pub static SRUM_NETWORK_USAGE: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::System,
     os_scope: OsScope::Win8Plus,
     decoder: Decoder::Identity,
-    meaning: "ESE table {973F5D5C-1D90-11D3-AE08-00A0C90F57DA} records per-app bytes sent/received \
+    meaning:
+        "ESE table {973F5D5C-1D90-11D3-AE08-00A0C90F57DA} records per-app bytes sent/received \
               per network interface per hour. ~30-day retention. Proves data exfiltration volume \
               even after log deletion; correlate AppId + UserId + BytesSent for exfil attribution.",
     mitre_techniques: &["T1049", "T1048"],
@@ -4439,16 +5246,58 @@ pub static SRUM_NETWORK_USAGE: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("~30 days"),
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["evtx_security", "srum_app_resource", "prefetch_file"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1049/",
+        "https://attack.mitre.org/techniques/T1048/",
+        "https://www.sans.org/white-papers/36660/",
+        "https://www.sans.org/blog/srum-forensics/",
+        "https://www.magnetforensics.com/blog/srum-forensic-analysis-of-windows-system-resource-utilization-monitor/",
+    ],
 };
 
 static SRUM_APP_FIELDS: &[FieldSchema] = &[
-    FieldSchema { name: "app_id", description: "Application path or service name", value_type: ValueType::Text, is_uid_component: true },
-    FieldSchema { name: "user_id", description: "SID of the user account", value_type: ValueType::Text, is_uid_component: true },
-    FieldSchema { name: "timestamp", description: "Interval timestamp (UTC)", value_type: ValueType::Timestamp, is_uid_component: false },
-    FieldSchema { name: "foreground_cpu_time", description: "CPU time used in foreground (100ns units)", value_type: ValueType::UnsignedInt, is_uid_component: false },
-    FieldSchema { name: "background_cpu_time", description: "CPU time used in background (100ns units)", value_type: ValueType::UnsignedInt, is_uid_component: false },
-    FieldSchema { name: "foreground_cycles", description: "CPU cycle count in foreground", value_type: ValueType::UnsignedInt, is_uid_component: false },
-    FieldSchema { name: "background_cycles", description: "CPU cycle count in background", value_type: ValueType::UnsignedInt, is_uid_component: false },
+    FieldSchema {
+        name: "app_id",
+        description: "Application path or service name",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "user_id",
+        description: "SID of the user account",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "timestamp",
+        description: "Interval timestamp (UTC)",
+        value_type: ValueType::Timestamp,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "foreground_cpu_time",
+        description: "CPU time used in foreground (100ns units)",
+        value_type: ValueType::UnsignedInt,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "background_cpu_time",
+        description: "CPU time used in background (100ns units)",
+        value_type: ValueType::UnsignedInt,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "foreground_cycles",
+        description: "CPU cycle count in foreground",
+        value_type: ValueType::UnsignedInt,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "background_cycles",
+        description: "CPU cycle count in background",
+        value_type: ValueType::UnsignedInt,
+        is_uid_component: false,
+    },
 ];
 
 pub static SRUM_APP_RESOURCE: ArtifactDescriptor = ArtifactDescriptor {
@@ -4470,15 +5319,52 @@ pub static SRUM_APP_RESOURCE: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("~30 days"),
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["srum_network_usage", "prefetch_file", "evtx_security"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1059/",
+        "https://attack.mitre.org/techniques/T1070/004/",
+        "https://www.sans.org/white-papers/36660/",
+        "https://www.sans.org/blog/srum-forensics/",
+        "https://www.magnetforensics.com/blog/srum-forensic-analysis-of-windows-system-resource-utilization-monitor/",
+    ],
 };
 
 static SRUM_ENERGY_FIELDS: &[FieldSchema] = &[
-    FieldSchema { name: "app_id", description: "Application path", value_type: ValueType::Text, is_uid_component: true },
-    FieldSchema { name: "user_id", description: "SID of the user account", value_type: ValueType::Text, is_uid_component: true },
-    FieldSchema { name: "timestamp", description: "Interval timestamp (UTC)", value_type: ValueType::Timestamp, is_uid_component: false },
-    FieldSchema { name: "charge_level", description: "Battery charge level at sample time", value_type: ValueType::UnsignedInt, is_uid_component: false },
-    FieldSchema { name: "designed_capacity", description: "Battery designed capacity (mWh)", value_type: ValueType::UnsignedInt, is_uid_component: false },
-    FieldSchema { name: "full_charge_capacity", description: "Current full charge capacity (mWh)", value_type: ValueType::UnsignedInt, is_uid_component: false },
+    FieldSchema {
+        name: "app_id",
+        description: "Application path",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "user_id",
+        description: "SID of the user account",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "timestamp",
+        description: "Interval timestamp (UTC)",
+        value_type: ValueType::Timestamp,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "charge_level",
+        description: "Battery charge level at sample time",
+        value_type: ValueType::UnsignedInt,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "designed_capacity",
+        description: "Battery designed capacity (mWh)",
+        value_type: ValueType::UnsignedInt,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "full_charge_capacity",
+        description: "Current full charge capacity (mWh)",
+        value_type: ValueType::UnsignedInt,
+        is_uid_component: false,
+    },
 ];
 
 pub static SRUM_ENERGY_USAGE: ArtifactDescriptor = ArtifactDescriptor {
@@ -4500,14 +5386,43 @@ pub static SRUM_ENERGY_USAGE: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("~30 days"),
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1059/",
+        "https://www.sans.org/white-papers/36660/",
+    ],
 };
 
 static SRUM_PUSH_FIELDS: &[FieldSchema] = &[
-    FieldSchema { name: "app_id", description: "Application that received notification", value_type: ValueType::Text, is_uid_component: true },
-    FieldSchema { name: "user_id", description: "SID of the user account", value_type: ValueType::Text, is_uid_component: true },
-    FieldSchema { name: "timestamp", description: "Notification timestamp (UTC)", value_type: ValueType::Timestamp, is_uid_component: false },
-    FieldSchema { name: "notification_type", description: "WNS notification type code", value_type: ValueType::UnsignedInt, is_uid_component: false },
-    FieldSchema { name: "payload_size", description: "Notification payload size in bytes", value_type: ValueType::UnsignedInt, is_uid_component: false },
+    FieldSchema {
+        name: "app_id",
+        description: "Application that received notification",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "user_id",
+        description: "SID of the user account",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "timestamp",
+        description: "Notification timestamp (UTC)",
+        value_type: ValueType::Timestamp,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "notification_type",
+        description: "WNS notification type code",
+        value_type: ValueType::UnsignedInt,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "payload_size",
+        description: "Notification payload size in bytes",
+        value_type: ValueType::UnsignedInt,
+        is_uid_component: false,
+    },
 ];
 
 pub static SRUM_PUSH_NOTIFICATION: ArtifactDescriptor = ArtifactDescriptor {
@@ -4529,15 +5444,49 @@ pub static SRUM_PUSH_NOTIFICATION: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("~30 days"),
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1059/",
+        "https://www.sans.org/white-papers/36660/",
+    ],
 };
 
 static EVTX_FIELDS: &[FieldSchema] = &[
-    FieldSchema { name: "event_id", description: "Windows Event ID", value_type: ValueType::UnsignedInt, is_uid_component: true },
-    FieldSchema { name: "timestamp", description: "Event timestamp (UTC)", value_type: ValueType::Timestamp, is_uid_component: false },
-    FieldSchema { name: "computer", description: "Source computer name", value_type: ValueType::Text, is_uid_component: false },
-    FieldSchema { name: "subject_user_sid", description: "SID of the subject user", value_type: ValueType::Text, is_uid_component: false },
-    FieldSchema { name: "subject_user_name", description: "Username of the subject", value_type: ValueType::Text, is_uid_component: false },
-    FieldSchema { name: "message", description: "Full event message XML", value_type: ValueType::Text, is_uid_component: false },
+    FieldSchema {
+        name: "event_id",
+        description: "Windows Event ID",
+        value_type: ValueType::UnsignedInt,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "timestamp",
+        description: "Event timestamp (UTC)",
+        value_type: ValueType::Timestamp,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "computer",
+        description: "Source computer name",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "subject_user_sid",
+        description: "SID of the subject user",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "subject_user_name",
+        description: "Username of the subject",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "message",
+        description: "Full event message XML",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
 ];
 
 pub static EVTX_SECURITY: ArtifactDescriptor = ArtifactDescriptor {
@@ -4559,7 +5508,21 @@ pub static EVTX_SECURITY: ArtifactDescriptor = ArtifactDescriptor {
     fields: EVTX_FIELDS,
     retention: Some("configurable; default ~20MB rolling per channel"),
     triage_priority: TriagePriority::Critical,
-    related_artifacts: &["srum_network_usage", "srum_app_resource", "prefetch_file", "shimcache"],
+    related_artifacts: &[
+        "srum_network_usage",
+        "srum_app_resource",
+        "prefetch_file",
+        "shimcache",
+    ],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1070/001/",
+        "https://attack.mitre.org/techniques/T1059/",
+        "https://attack.mitre.org/techniques/T1078/",
+        "https://www.sans.org/posters/windows-forensic-analysis/",
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/basic-security-audit-policies",
+        "https://www.13cubed.com/downloads/windows_event_log_cheat_sheet.pdf",
+        "https://www.magnetforensics.com/blog/the-importance-of-powershell-logs-in-digital-forensics/",
+    ],
 };
 
 pub static EVTX_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
@@ -4573,7 +5536,8 @@ pub static EVTX_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::System,
     os_scope: OsScope::Win7Plus,
     decoder: Decoder::Identity,
-    meaning: "System-level events. Key IDs: 7045 (service installed), 7036 (service state change), \
+    meaning:
+        "System-level events. Key IDs: 7045 (service installed), 7036 (service state change), \
               6005/6006 (event log start/stop — boot/shutdown boundary), \
               104 (System log cleared). Service installation (7045) is a primary \
               lateral-movement and persistence indicator.",
@@ -4582,6 +5546,12 @@ pub static EVTX_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("configurable; default ~20MB rolling per channel"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["evtx_security", "scheduled_tasks_dir", "services_imagepath"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1543/003/",
+        "https://attack.mitre.org/techniques/T1070/001/",
+        "https://www.sans.org/posters/windows-forensic-analysis/",
+        "https://learn.microsoft.com/en-us/windows/win32/eventlog/event-logging",
+    ],
 };
 
 pub static EVTX_POWERSHELL: ArtifactDescriptor = ArtifactDescriptor {
@@ -4591,11 +5561,14 @@ pub static EVTX_POWERSHELL: ArtifactDescriptor = ArtifactDescriptor {
     hive: None,
     key_path: "",
     value_name: None,
-    file_path: Some(r"C:\Windows\System32\winevt\Logs\Microsoft-Windows-PowerShell%4Operational.evtx"),
+    file_path: Some(
+        r"C:\Windows\System32\winevt\Logs\Microsoft-Windows-PowerShell%4Operational.evtx",
+    ),
     scope: DataScope::System,
     os_scope: OsScope::Win7Plus,
     decoder: Decoder::Identity,
-    meaning: "PowerShell script execution telemetry. Event 4103 (module logging — pipeline output), \
+    meaning:
+        "PowerShell script execution telemetry. Event 4103 (module logging — pipeline output), \
               4104 (ScriptBlock logging — full script text including deobfuscated content). \
               4104 captures AMSI-deobfuscated scripts even when encoded; \
               highest-fidelity PS forensic source when enabled.",
@@ -4603,7 +5576,17 @@ pub static EVTX_POWERSHELL: ArtifactDescriptor = ArtifactDescriptor {
     fields: EVTX_FIELDS,
     retention: Some("configurable; default ~20MB rolling per channel"),
     triage_priority: TriagePriority::High,
-    related_artifacts: &["evtx_security", "powershell_history", "powershell_profile_all"],
+    related_artifacts: &[
+        "evtx_security",
+        "powershell_history",
+        "powershell_profile_all",
+    ],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1059/001/",
+        "https://attack.mitre.org/techniques/T1027/",
+        "https://www.sans.org/blog/detecting-malicious-powershell/",
+        "https://redcanary.com/threat-detection-report/techniques/t1059.001/",
+    ],
 };
 
 pub static EVTX_SYSMON: ArtifactDescriptor = ArtifactDescriptor {
@@ -4617,7 +5600,8 @@ pub static EVTX_SYSMON: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::System,
     os_scope: OsScope::Win7Plus,
     decoder: Decoder::Identity,
-    meaning: "Sysmon telemetry (requires deployment). Event 1 (process create + hashes + cmdline), \
+    meaning:
+        "Sysmon telemetry (requires deployment). Event 1 (process create + hashes + cmdline), \
               3 (network connection), 7 (image load), 8 (CreateRemoteThread), \
               10 (ProcessAccess — LSASS reads), 11 (file create), 22 (DNS query). \
               Gold standard for EDR-quality forensics without commercial tooling.",
@@ -4626,6 +5610,14 @@ pub static EVTX_SYSMON: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("configurable; default ~20MB rolling per channel"),
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["evtx_security", "prefetch_file", "srum_app_resource"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1059/",
+        "https://attack.mitre.org/techniques/T1055/",
+        "https://attack.mitre.org/techniques/T1003/001/",
+        "https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon",
+        "https://www.sans.org/blog/threat-hunting-using-sysmon/",
+        "https://www.thedfirspot.com/post/sysmon-when-visibility-is-key",
+    ],
 };
 
 // ── Global catalog ───────────────────────────────────────────────────────────
@@ -4913,7 +5905,9 @@ mod tests {
         };
         let results = CATALOG.filter(&q);
         assert!(!results.is_empty());
-        assert!(results.iter().all(|d| d.mitre_techniques.contains(&"T1547.001")));
+        assert!(results
+            .iter()
+            .all(|d| d.mitre_techniques.contains(&"T1547.001")));
     }
 
     #[test]
@@ -5020,10 +6014,7 @@ mod tests {
                 ArtifactValue::Text("C:\\Program Files\\notepad.exe".to_string())
             )
         );
-        assert_eq!(
-            rec.fields[1],
-            ("run_count", ArtifactValue::UnsignedInt(5))
-        );
+        assert_eq!(rec.fields[1], ("run_count", ArtifactValue::UnsignedInt(5)));
         assert_eq!(
             rec.fields[2],
             ("focus_count", ArtifactValue::UnsignedInt(3))
@@ -5039,18 +6030,13 @@ mod tests {
                 ArtifactValue::Timestamp("2023-01-15T10:30:00Z".to_string())
             )
         );
-        assert_eq!(
-            rec.timestamp,
-            Some("2023-01-15T10:30:00Z".to_string())
-        );
+        assert_eq!(rec.timestamp, Some("2023-01-15T10:30:00Z".to_string()));
     }
 
     #[test]
     fn decode_userassist_buffer_too_short() {
         let raw = vec![0u8; 16]; // need at least 68 for last_run field
-        let err = CATALOG
-            .decode(&USERASSIST_EXE, "test", &raw)
-            .unwrap_err();
+        let err = CATALOG.decode(&USERASSIST_EXE, "test", &raw).unwrap_err();
         match err {
             DecodeError::FieldOutOfBounds { field, .. } => {
                 assert_eq!(field, "last_run");
@@ -5116,10 +6102,7 @@ mod tests {
         let rec = CATALOG.decode(&PCA_APPLAUNCH_DIC, "", raw).unwrap();
         assert_eq!(
             rec.fields[0],
-            (
-                "exe_path",
-                ArtifactValue::Text("C:\\tool.exe".to_string())
-            )
+            ("exe_path", ArtifactValue::Text("C:\\tool.exe".to_string()))
         );
     }
 
@@ -5145,6 +6128,7 @@ mod tests {
             retention: None,
             triage_priority: TriagePriority::Low,
             related_artifacts: &[],
+            sources: &[],
         };
         let raw = 42u32.to_le_bytes();
         let rec = CATALOG.decode(&DWORD_DESC, "val", &raw).unwrap();
@@ -5170,6 +6154,7 @@ mod tests {
             retention: None,
             triage_priority: TriagePriority::Low,
             related_artifacts: &[],
+            sources: &[],
         };
         let err = CATALOG.decode(&DWORD_DESC, "v", &[1, 2]).unwrap_err();
         assert_eq!(
@@ -5202,6 +6187,7 @@ mod tests {
             retention: None,
             triage_priority: TriagePriority::Low,
             related_artifacts: &[],
+            sources: &[],
         };
         // "Hi" in UTF-16LE + NUL terminator
         let raw: &[u8] = &[0x48, 0x00, 0x69, 0x00, 0x00, 0x00];
@@ -5231,8 +6217,11 @@ mod tests {
             retention: None,
             triage_priority: TriagePriority::Low,
             related_artifacts: &[],
+            sources: &[],
         };
-        let err = CATALOG.decode(&UTF16_DESC, "", &[0x48, 0x00, 0x69]).unwrap_err();
+        let err = CATALOG
+            .decode(&UTF16_DESC, "", &[0x48, 0x00, 0x69])
+            .unwrap_err();
         assert_eq!(err, DecodeError::InvalidUtf16);
     }
 
@@ -5257,6 +6246,7 @@ mod tests {
             retention: None,
             triage_priority: TriagePriority::Low,
             related_artifacts: &[],
+            sources: &[],
         };
         // "AB\0CD\0\0" in UTF-16LE
         let raw: &[u8] = &[
@@ -5298,12 +6288,10 @@ mod tests {
             retention: None,
             triage_priority: TriagePriority::Low,
             related_artifacts: &[],
+            sources: &[],
         };
         let rec = CATALOG.decode(&MSZ_DESC, "", &[]).unwrap();
-        assert_eq!(
-            rec.fields,
-            vec![("values", ArtifactValue::List(vec![]))]
-        );
+        assert_eq!(rec.fields, vec![("values", ArtifactValue::List(vec![]))]);
     }
 
     // ── Decoder: MruListEx ───────────────────────────────────────────────
@@ -5327,6 +6315,7 @@ mod tests {
             retention: None,
             triage_priority: TriagePriority::Low,
             related_artifacts: &[],
+            sources: &[],
         };
         // [2, 0, 1, 0xFFFFFFFF]
         let mut raw = Vec::new();
@@ -5367,12 +6356,10 @@ mod tests {
             retention: None,
             triage_priority: TriagePriority::Low,
             related_artifacts: &[],
+            sources: &[],
         };
         let rec = CATALOG.decode(&MRU_DESC, "", &[]).unwrap();
-        assert_eq!(
-            rec.fields,
-            vec![("indices", ArtifactValue::List(vec![]))]
-        );
+        assert_eq!(rec.fields, vec![("indices", ArtifactValue::List(vec![]))]);
     }
 
     // ── Decoder: FiletimeAt ──────────────────────────────────────────────
@@ -5396,6 +6383,7 @@ mod tests {
             retention: None,
             triage_priority: TriagePriority::Low,
             related_artifacts: &[],
+            sources: &[],
         };
         let ft: u64 = 116_444_736_000_000_000; // Unix epoch
         let raw = ft.to_le_bytes();
@@ -5429,6 +6417,7 @@ mod tests {
             retention: None,
             triage_priority: TriagePriority::Low,
             related_artifacts: &[],
+            sources: &[],
         };
         let err = CATALOG.decode(&FT_DESC, "", &[0; 8]).unwrap_err();
         assert_eq!(
@@ -5453,9 +6442,7 @@ mod tests {
 
     #[test]
     fn uid_file_artifact() {
-        let rec = CATALOG
-            .decode(&PCA_APPLAUNCH_DIC, "line1", b"")
-            .unwrap();
+        let rec = CATALOG.decode(&PCA_APPLAUNCH_DIC, "line1", b"").unwrap();
         assert!(rec.uid.starts_with("file://"));
         assert!(rec.uid.contains("AppLaunch.dic"));
     }
@@ -5546,6 +6533,7 @@ mod tests {
             retention: None,
             triage_priority: TriagePriority::Low,
             related_artifacts: &[],
+            sources: &[],
         };
         let raw = 99u32.to_le_bytes();
         let rec = CATALOG.decode(&DESC, "", &raw).unwrap();
@@ -5577,15 +6565,13 @@ mod tests {
             retention: None,
             triage_priority: TriagePriority::Low,
             related_artifacts: &[],
+            sources: &[],
         };
         let raw = [0xDE, 0xAD, 0xBE, 0xEF];
         let rec = CATALOG.decode(&DESC, "", &raw).unwrap();
         assert_eq!(
             rec.fields,
-            vec![(
-                "header",
-                ArtifactValue::Bytes(vec![0xDE, 0xAD, 0xBE, 0xEF])
-            )]
+            vec![("header", ArtifactValue::Bytes(vec![0xDE, 0xAD, 0xBE, 0xEF]))]
         );
     }
 }
@@ -5631,7 +6617,9 @@ mod tests_new_descriptors {
         assert_eq!(IFEO_DEBUGGER.hive, Some(HiveTarget::HklmSoftware));
         assert_eq!(IFEO_DEBUGGER.scope, DataScope::System);
         assert!(IFEO_DEBUGGER.mitre_techniques.contains(&"T1546.012"));
-        assert!(IFEO_DEBUGGER.key_path.contains("Image File Execution Options"));
+        assert!(IFEO_DEBUGGER
+            .key_path
+            .contains("Image File Execution Options"));
     }
 
     // ── UserAssist folder GUID ────────────────────────────────────────────
@@ -5840,104 +6828,125 @@ mod tests_batch_c {
 
     // ── Windows persistence ───────────────────────────────────────────────
 
-    #[test] fn winlogon_shell_md() {
+    #[test]
+    fn winlogon_shell_md() {
         assert_eq!(WINLOGON_SHELL.id, "winlogon_shell");
         assert_eq!(WINLOGON_SHELL.hive, Some(HiveTarget::HklmSoftware));
         assert_eq!(WINLOGON_SHELL.scope, DataScope::System);
         assert!(WINLOGON_SHELL.mitre_techniques.contains(&"T1547.004"));
         assert!(WINLOGON_SHELL.key_path.contains("Winlogon"));
     }
-    #[test] fn services_imagepath_md() {
+    #[test]
+    fn services_imagepath_md() {
         assert_eq!(SERVICES_IMAGEPATH.id, "services_imagepath");
         assert_eq!(SERVICES_IMAGEPATH.hive, Some(HiveTarget::HklmSystem));
         assert_eq!(SERVICES_IMAGEPATH.scope, DataScope::System);
         assert!(SERVICES_IMAGEPATH.mitre_techniques.contains(&"T1543.003"));
     }
-    #[test] fn active_setup_hklm_md() {
+    #[test]
+    fn active_setup_hklm_md() {
         assert_eq!(ACTIVE_SETUP_HKLM.id, "active_setup_hklm");
         assert_eq!(ACTIVE_SETUP_HKLM.hive, Some(HiveTarget::HklmSoftware));
         assert_eq!(ACTIVE_SETUP_HKLM.scope, DataScope::System);
         assert!(ACTIVE_SETUP_HKLM.mitre_techniques.contains(&"T1547.014"));
     }
-    #[test] fn active_setup_hkcu_md() {
+    #[test]
+    fn active_setup_hkcu_md() {
         assert_eq!(ACTIVE_SETUP_HKCU.id, "active_setup_hkcu");
         assert_eq!(ACTIVE_SETUP_HKCU.hive, Some(HiveTarget::NtUser));
         assert_eq!(ACTIVE_SETUP_HKCU.scope, DataScope::User);
     }
-    #[test] fn com_hijack_clsid_hkcu_md() {
+    #[test]
+    fn com_hijack_clsid_hkcu_md() {
         assert_eq!(COM_HIJACK_CLSID_HKCU.id, "com_hijack_clsid_hkcu");
         assert_eq!(COM_HIJACK_CLSID_HKCU.hive, Some(HiveTarget::UsrClass));
         assert_eq!(COM_HIJACK_CLSID_HKCU.scope, DataScope::User);
-        assert!(COM_HIJACK_CLSID_HKCU.mitre_techniques.contains(&"T1546.015"));
+        assert!(COM_HIJACK_CLSID_HKCU
+            .mitre_techniques
+            .contains(&"T1546.015"));
     }
-    #[test] fn appcert_dlls_md() {
+    #[test]
+    fn appcert_dlls_md() {
         assert_eq!(APPCERT_DLLS.id, "appcert_dlls");
         assert_eq!(APPCERT_DLLS.hive, Some(HiveTarget::HklmSystem));
         assert_eq!(APPCERT_DLLS.scope, DataScope::System);
         assert!(APPCERT_DLLS.mitre_techniques.contains(&"T1546.009"));
     }
-    #[test] fn boot_execute_md() {
+    #[test]
+    fn boot_execute_md() {
         assert_eq!(BOOT_EXECUTE.id, "boot_execute");
         assert_eq!(BOOT_EXECUTE.hive, Some(HiveTarget::HklmSystem));
         assert_eq!(BOOT_EXECUTE.scope, DataScope::System);
         assert!(BOOT_EXECUTE.mitre_techniques.contains(&"T1547.001"));
         assert!(BOOT_EXECUTE.key_path.contains("Session Manager"));
     }
-    #[test] fn lsa_security_pkgs_md() {
+    #[test]
+    fn lsa_security_pkgs_md() {
         assert_eq!(LSA_SECURITY_PKGS.id, "lsa_security_pkgs");
         assert_eq!(LSA_SECURITY_PKGS.hive, Some(HiveTarget::HklmSystem));
         assert_eq!(LSA_SECURITY_PKGS.scope, DataScope::System);
         assert!(LSA_SECURITY_PKGS.mitre_techniques.contains(&"T1547.005"));
     }
-    #[test] fn lsa_auth_pkgs_md() {
+    #[test]
+    fn lsa_auth_pkgs_md() {
         assert_eq!(LSA_AUTH_PKGS.id, "lsa_auth_pkgs");
         assert_eq!(LSA_AUTH_PKGS.hive, Some(HiveTarget::HklmSystem));
         assert_eq!(LSA_AUTH_PKGS.scope, DataScope::System);
         assert!(LSA_AUTH_PKGS.mitre_techniques.contains(&"T1547.002"));
     }
-    #[test] fn print_monitors_md() {
+    #[test]
+    fn print_monitors_md() {
         assert_eq!(PRINT_MONITORS.id, "print_monitors");
         assert_eq!(PRINT_MONITORS.hive, Some(HiveTarget::HklmSystem));
         assert_eq!(PRINT_MONITORS.scope, DataScope::System);
         assert!(PRINT_MONITORS.mitre_techniques.contains(&"T1547.010"));
     }
-    #[test] fn time_providers_md() {
+    #[test]
+    fn time_providers_md() {
         assert_eq!(TIME_PROVIDERS.id, "time_providers");
         assert_eq!(TIME_PROVIDERS.hive, Some(HiveTarget::HklmSystem));
         assert_eq!(TIME_PROVIDERS.scope, DataScope::System);
         assert!(TIME_PROVIDERS.mitre_techniques.contains(&"T1547.003"));
     }
-    #[test] fn netsh_helper_dlls_md() {
+    #[test]
+    fn netsh_helper_dlls_md() {
         assert_eq!(NETSH_HELPER_DLLS.id, "netsh_helper_dlls");
         assert_eq!(NETSH_HELPER_DLLS.hive, Some(HiveTarget::HklmSoftware));
         assert_eq!(NETSH_HELPER_DLLS.scope, DataScope::System);
         assert!(NETSH_HELPER_DLLS.mitre_techniques.contains(&"T1546.007"));
     }
-    #[test] fn browser_helper_objects_md() {
+    #[test]
+    fn browser_helper_objects_md() {
         assert_eq!(BROWSER_HELPER_OBJECTS.id, "browser_helper_objects");
         assert_eq!(BROWSER_HELPER_OBJECTS.hive, Some(HiveTarget::HklmSoftware));
         assert_eq!(BROWSER_HELPER_OBJECTS.scope, DataScope::System);
         assert!(BROWSER_HELPER_OBJECTS.mitre_techniques.contains(&"T1176"));
     }
-    #[test] fn startup_folder_user_md() {
+    #[test]
+    fn startup_folder_user_md() {
         assert_eq!(STARTUP_FOLDER_USER.id, "startup_folder_user");
         assert_eq!(STARTUP_FOLDER_USER.artifact_type, ArtifactType::Directory);
         assert_eq!(STARTUP_FOLDER_USER.scope, DataScope::User);
         assert!(STARTUP_FOLDER_USER.mitre_techniques.contains(&"T1547.001"));
     }
-    #[test] fn startup_folder_system_md() {
+    #[test]
+    fn startup_folder_system_md() {
         assert_eq!(STARTUP_FOLDER_SYSTEM.id, "startup_folder_system");
         assert_eq!(STARTUP_FOLDER_SYSTEM.artifact_type, ArtifactType::Directory);
         assert_eq!(STARTUP_FOLDER_SYSTEM.scope, DataScope::System);
-        assert!(STARTUP_FOLDER_SYSTEM.mitre_techniques.contains(&"T1547.001"));
+        assert!(STARTUP_FOLDER_SYSTEM
+            .mitre_techniques
+            .contains(&"T1547.001"));
     }
-    #[test] fn scheduled_tasks_dir_md() {
+    #[test]
+    fn scheduled_tasks_dir_md() {
         assert_eq!(SCHEDULED_TASKS_DIR.id, "scheduled_tasks_dir");
         assert_eq!(SCHEDULED_TASKS_DIR.artifact_type, ArtifactType::Directory);
         assert_eq!(SCHEDULED_TASKS_DIR.scope, DataScope::System);
         assert!(SCHEDULED_TASKS_DIR.mitre_techniques.contains(&"T1053.005"));
     }
-    #[test] fn wdigest_caching_md() {
+    #[test]
+    fn wdigest_caching_md() {
         assert_eq!(WDIGEST_CACHING.id, "wdigest_caching");
         assert_eq!(WDIGEST_CACHING.hive, Some(HiveTarget::HklmSystem));
         assert_eq!(WDIGEST_CACHING.scope, DataScope::System);
@@ -5946,60 +6955,70 @@ mod tests_batch_c {
 
     // ── Windows execution evidence ────────────────────────────────────────
 
-    #[test] fn wordwheel_query_md() {
+    #[test]
+    fn wordwheel_query_md() {
         assert_eq!(WORDWHEEL_QUERY.id, "wordwheel_query");
         assert_eq!(WORDWHEEL_QUERY.hive, Some(HiveTarget::NtUser));
         assert_eq!(WORDWHEEL_QUERY.scope, DataScope::User);
         assert!(WORDWHEEL_QUERY.key_path.contains("WordWheelQuery"));
     }
-    #[test] fn opensave_mru_md() {
+    #[test]
+    fn opensave_mru_md() {
         assert_eq!(OPENSAVE_MRU.id, "opensave_mru");
         assert_eq!(OPENSAVE_MRU.hive, Some(HiveTarget::NtUser));
         assert_eq!(OPENSAVE_MRU.scope, DataScope::User);
         assert!(OPENSAVE_MRU.key_path.contains("OpenSaveMRU"));
     }
-    #[test] fn lastvisited_mru_md() {
+    #[test]
+    fn lastvisited_mru_md() {
         assert_eq!(LASTVISITED_MRU.id, "lastvisited_mru");
         assert_eq!(LASTVISITED_MRU.hive, Some(HiveTarget::NtUser));
         assert_eq!(LASTVISITED_MRU.scope, DataScope::User);
         assert!(LASTVISITED_MRU.key_path.contains("LastVisitedMRU"));
     }
-    #[test] fn prefetch_dir_md() {
+    #[test]
+    fn prefetch_dir_md() {
         assert_eq!(PREFETCH_DIR.id, "prefetch_dir");
         assert_eq!(PREFETCH_DIR.artifact_type, ArtifactType::Directory);
         assert_eq!(PREFETCH_DIR.scope, DataScope::System);
         assert!(PREFETCH_DIR.mitre_techniques.contains(&"T1204.002"));
     }
-    #[test] fn srum_db_md() {
+    #[test]
+    fn srum_db_md() {
         assert_eq!(SRUM_DB.id, "srum_db");
         assert_eq!(SRUM_DB.artifact_type, ArtifactType::File);
         assert_eq!(SRUM_DB.scope, DataScope::System);
         assert!(SRUM_DB.os_scope == OsScope::Win8Plus);
     }
-    #[test] fn windows_timeline_md() {
+    #[test]
+    fn windows_timeline_md() {
         assert_eq!(WINDOWS_TIMELINE.id, "windows_timeline");
         assert_eq!(WINDOWS_TIMELINE.artifact_type, ArtifactType::File);
         assert_eq!(WINDOWS_TIMELINE.scope, DataScope::User);
         assert_eq!(WINDOWS_TIMELINE.os_scope, OsScope::Win10Plus);
     }
-    #[test] fn powershell_history_md() {
+    #[test]
+    fn powershell_history_md() {
         assert_eq!(POWERSHELL_HISTORY.id, "powershell_history");
         assert_eq!(POWERSHELL_HISTORY.artifact_type, ArtifactType::File);
         assert_eq!(POWERSHELL_HISTORY.scope, DataScope::User);
         assert!(POWERSHELL_HISTORY.mitre_techniques.contains(&"T1059.001"));
     }
-    #[test] fn recycle_bin_md() {
+    #[test]
+    fn recycle_bin_md() {
         assert_eq!(RECYCLE_BIN.id, "recycle_bin");
         assert_eq!(RECYCLE_BIN.artifact_type, ArtifactType::Directory);
         assert_eq!(RECYCLE_BIN.scope, DataScope::User);
         assert!(RECYCLE_BIN.mitre_techniques.contains(&"T1070.004"));
     }
-    #[test] fn thumbcache_md() {
+    #[test]
+    fn thumbcache_md() {
         assert_eq!(THUMBCACHE.id, "thumbcache");
         assert_eq!(THUMBCACHE.artifact_type, ArtifactType::Directory);
         assert_eq!(THUMBCACHE.scope, DataScope::User);
     }
-    #[test] fn search_db_user_md() {
+    #[test]
+    fn search_db_user_md() {
         assert_eq!(SEARCH_DB_USER.id, "search_db_user");
         assert_eq!(SEARCH_DB_USER.artifact_type, ArtifactType::File);
         assert_eq!(SEARCH_DB_USER.scope, DataScope::System);
@@ -6007,64 +7026,75 @@ mod tests_batch_c {
 
     // ── Windows credentials ───────────────────────────────────────────────
 
-    #[test] fn dpapi_masterkey_user_md() {
+    #[test]
+    fn dpapi_masterkey_user_md() {
         assert_eq!(DPAPI_MASTERKEY_USER.id, "dpapi_masterkey_user");
         assert_eq!(DPAPI_MASTERKEY_USER.artifact_type, ArtifactType::Directory);
         assert_eq!(DPAPI_MASTERKEY_USER.scope, DataScope::User);
         assert!(DPAPI_MASTERKEY_USER.mitre_techniques.contains(&"T1555.004"));
     }
-    #[test] fn dpapi_cred_user_md() {
+    #[test]
+    fn dpapi_cred_user_md() {
         assert_eq!(DPAPI_CRED_USER.id, "dpapi_cred_user");
         assert_eq!(DPAPI_CRED_USER.artifact_type, ArtifactType::Directory);
         assert_eq!(DPAPI_CRED_USER.scope, DataScope::User);
     }
-    #[test] fn dpapi_cred_roaming_md() {
+    #[test]
+    fn dpapi_cred_roaming_md() {
         assert_eq!(DPAPI_CRED_ROAMING.id, "dpapi_cred_roaming");
         assert_eq!(DPAPI_CRED_ROAMING.artifact_type, ArtifactType::Directory);
         assert_eq!(DPAPI_CRED_ROAMING.scope, DataScope::User);
     }
-    #[test] fn windows_vault_user_md() {
+    #[test]
+    fn windows_vault_user_md() {
         assert_eq!(WINDOWS_VAULT_USER.id, "windows_vault_user");
         assert_eq!(WINDOWS_VAULT_USER.artifact_type, ArtifactType::Directory);
         assert_eq!(WINDOWS_VAULT_USER.scope, DataScope::User);
         assert!(WINDOWS_VAULT_USER.mitre_techniques.contains(&"T1555.004"));
     }
-    #[test] fn windows_vault_system_md() {
+    #[test]
+    fn windows_vault_system_md() {
         assert_eq!(WINDOWS_VAULT_SYSTEM.id, "windows_vault_system");
         assert_eq!(WINDOWS_VAULT_SYSTEM.artifact_type, ArtifactType::Directory);
         assert_eq!(WINDOWS_VAULT_SYSTEM.scope, DataScope::System);
     }
-    #[test] fn rdp_client_servers_md() {
+    #[test]
+    fn rdp_client_servers_md() {
         assert_eq!(RDP_CLIENT_SERVERS.id, "rdp_client_servers");
         assert_eq!(RDP_CLIENT_SERVERS.hive, Some(HiveTarget::NtUser));
         assert_eq!(RDP_CLIENT_SERVERS.scope, DataScope::User);
         assert!(RDP_CLIENT_SERVERS.mitre_techniques.contains(&"T1021.001"));
     }
-    #[test] fn rdp_client_default_md() {
+    #[test]
+    fn rdp_client_default_md() {
         assert_eq!(RDP_CLIENT_DEFAULT.id, "rdp_client_default");
         assert_eq!(RDP_CLIENT_DEFAULT.hive, Some(HiveTarget::NtUser));
         assert_eq!(RDP_CLIENT_DEFAULT.scope, DataScope::User);
         assert!(RDP_CLIENT_DEFAULT.mitre_techniques.contains(&"T1021.001"));
     }
-    #[test] fn ntds_dit_md() {
+    #[test]
+    fn ntds_dit_md() {
         assert_eq!(NTDS_DIT.id, "ntds_dit");
         assert_eq!(NTDS_DIT.artifact_type, ArtifactType::File);
         assert_eq!(NTDS_DIT.scope, DataScope::System);
         assert!(NTDS_DIT.mitre_techniques.contains(&"T1003.003"));
     }
-    #[test] fn chrome_login_data_md() {
+    #[test]
+    fn chrome_login_data_md() {
         assert_eq!(CHROME_LOGIN_DATA.id, "chrome_login_data");
         assert_eq!(CHROME_LOGIN_DATA.artifact_type, ArtifactType::File);
         assert_eq!(CHROME_LOGIN_DATA.scope, DataScope::User);
         assert!(CHROME_LOGIN_DATA.mitre_techniques.contains(&"T1555.003"));
     }
-    #[test] fn firefox_logins_md() {
+    #[test]
+    fn firefox_logins_md() {
         assert_eq!(FIREFOX_LOGINS.id, "firefox_logins");
         assert_eq!(FIREFOX_LOGINS.artifact_type, ArtifactType::File);
         assert_eq!(FIREFOX_LOGINS.scope, DataScope::User);
         assert!(FIREFOX_LOGINS.mitre_techniques.contains(&"T1555.003"));
     }
-    #[test] fn wifi_profiles_md() {
+    #[test]
+    fn wifi_profiles_md() {
         assert_eq!(WIFI_PROFILES.id, "wifi_profiles");
         assert_eq!(WIFI_PROFILES.artifact_type, ArtifactType::Directory);
         assert_eq!(WIFI_PROFILES.scope, DataScope::System);
@@ -6077,18 +7107,44 @@ mod tests_batch_c {
     fn catalog_contains_batch_c() {
         let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
         for expected in &[
-            "winlogon_shell", "services_imagepath", "active_setup_hklm",
-            "active_setup_hkcu", "com_hijack_clsid_hkcu", "appcert_dlls",
-            "boot_execute", "lsa_security_pkgs", "lsa_auth_pkgs",
-            "print_monitors", "time_providers", "netsh_helper_dlls",
-            "browser_helper_objects", "startup_folder_user", "startup_folder_system",
-            "scheduled_tasks_dir", "wdigest_caching", "wordwheel_query",
-            "opensave_mru", "lastvisited_mru", "prefetch_dir", "srum_db",
-            "windows_timeline", "powershell_history", "recycle_bin", "thumbcache",
-            "search_db_user", "dpapi_masterkey_user", "dpapi_cred_user",
-            "dpapi_cred_roaming", "windows_vault_user", "windows_vault_system",
-            "rdp_client_servers", "rdp_client_default", "ntds_dit",
-            "chrome_login_data", "firefox_logins", "wifi_profiles",
+            "winlogon_shell",
+            "services_imagepath",
+            "active_setup_hklm",
+            "active_setup_hkcu",
+            "com_hijack_clsid_hkcu",
+            "appcert_dlls",
+            "boot_execute",
+            "lsa_security_pkgs",
+            "lsa_auth_pkgs",
+            "print_monitors",
+            "time_providers",
+            "netsh_helper_dlls",
+            "browser_helper_objects",
+            "startup_folder_user",
+            "startup_folder_system",
+            "scheduled_tasks_dir",
+            "wdigest_caching",
+            "wordwheel_query",
+            "opensave_mru",
+            "lastvisited_mru",
+            "prefetch_dir",
+            "srum_db",
+            "windows_timeline",
+            "powershell_history",
+            "recycle_bin",
+            "thumbcache",
+            "search_db_user",
+            "dpapi_masterkey_user",
+            "dpapi_cred_user",
+            "dpapi_cred_roaming",
+            "windows_vault_user",
+            "windows_vault_system",
+            "rdp_client_servers",
+            "rdp_client_default",
+            "ntds_dit",
+            "chrome_login_data",
+            "firefox_logins",
+            "wifi_profiles",
         ] {
             assert!(ids.contains(expected), "CATALOG missing: {expected}");
         }
@@ -6103,31 +7159,36 @@ mod tests_batch_d {
 
     // ── Linux persistence: cron ───────────────────────────────────────────
 
-    #[test] fn linux_crontab_system_md() {
+    #[test]
+    fn linux_crontab_system_md() {
         assert_eq!(LINUX_CRONTAB_SYSTEM.id, "linux_crontab_system");
         assert_eq!(LINUX_CRONTAB_SYSTEM.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_CRONTAB_SYSTEM.scope, DataScope::System);
         assert_eq!(LINUX_CRONTAB_SYSTEM.os_scope, OsScope::Linux);
         assert!(LINUX_CRONTAB_SYSTEM.mitre_techniques.contains(&"T1053.003"));
     }
-    #[test] fn linux_cron_d_md() {
+    #[test]
+    fn linux_cron_d_md() {
         assert_eq!(LINUX_CRON_D.id, "linux_cron_d");
         assert_eq!(LINUX_CRON_D.artifact_type, ArtifactType::Directory);
         assert_eq!(LINUX_CRON_D.scope, DataScope::System);
         assert_eq!(LINUX_CRON_D.os_scope, OsScope::Linux);
     }
-    #[test] fn linux_cron_periodic_md() {
+    #[test]
+    fn linux_cron_periodic_md() {
         assert_eq!(LINUX_CRON_PERIODIC.id, "linux_cron_periodic");
         assert_eq!(LINUX_CRON_PERIODIC.artifact_type, ArtifactType::Directory);
         assert_eq!(LINUX_CRON_PERIODIC.scope, DataScope::System);
     }
-    #[test] fn linux_user_crontab_md() {
+    #[test]
+    fn linux_user_crontab_md() {
         assert_eq!(LINUX_USER_CRONTAB.id, "linux_user_crontab");
         assert_eq!(LINUX_USER_CRONTAB.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_USER_CRONTAB.scope, DataScope::User);
         assert!(LINUX_USER_CRONTAB.mitre_techniques.contains(&"T1053.003"));
     }
-    #[test] fn linux_anacrontab_md() {
+    #[test]
+    fn linux_anacrontab_md() {
         assert_eq!(LINUX_ANACRONTAB.id, "linux_anacrontab");
         assert_eq!(LINUX_ANACRONTAB.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_ANACRONTAB.scope, DataScope::System);
@@ -6135,20 +7196,31 @@ mod tests_batch_d {
 
     // ── Linux persistence: systemd ────────────────────────────────────────
 
-    #[test] fn linux_systemd_system_unit_md() {
+    #[test]
+    fn linux_systemd_system_unit_md() {
         assert_eq!(LINUX_SYSTEMD_SYSTEM_UNIT.id, "linux_systemd_system_unit");
-        assert_eq!(LINUX_SYSTEMD_SYSTEM_UNIT.artifact_type, ArtifactType::Directory);
+        assert_eq!(
+            LINUX_SYSTEMD_SYSTEM_UNIT.artifact_type,
+            ArtifactType::Directory
+        );
         assert_eq!(LINUX_SYSTEMD_SYSTEM_UNIT.scope, DataScope::System);
         assert_eq!(LINUX_SYSTEMD_SYSTEM_UNIT.os_scope, OsScope::LinuxSystemd);
-        assert!(LINUX_SYSTEMD_SYSTEM_UNIT.mitre_techniques.contains(&"T1543.002"));
+        assert!(LINUX_SYSTEMD_SYSTEM_UNIT
+            .mitre_techniques
+            .contains(&"T1543.002"));
     }
-    #[test] fn linux_systemd_user_unit_md() {
+    #[test]
+    fn linux_systemd_user_unit_md() {
         assert_eq!(LINUX_SYSTEMD_USER_UNIT.id, "linux_systemd_user_unit");
-        assert_eq!(LINUX_SYSTEMD_USER_UNIT.artifact_type, ArtifactType::Directory);
+        assert_eq!(
+            LINUX_SYSTEMD_USER_UNIT.artifact_type,
+            ArtifactType::Directory
+        );
         assert_eq!(LINUX_SYSTEMD_USER_UNIT.scope, DataScope::User);
         assert_eq!(LINUX_SYSTEMD_USER_UNIT.os_scope, OsScope::LinuxSystemd);
     }
-    #[test] fn linux_systemd_timer_md() {
+    #[test]
+    fn linux_systemd_timer_md() {
         assert_eq!(LINUX_SYSTEMD_TIMER.id, "linux_systemd_timer");
         assert_eq!(LINUX_SYSTEMD_TIMER.artifact_type, ArtifactType::Directory);
         assert_eq!(LINUX_SYSTEMD_TIMER.os_scope, OsScope::LinuxSystemd);
@@ -6157,13 +7229,15 @@ mod tests_batch_d {
 
     // ── Linux persistence: init / rc.local ───────────────────────────────
 
-    #[test] fn linux_rc_local_md() {
+    #[test]
+    fn linux_rc_local_md() {
         assert_eq!(LINUX_RC_LOCAL.id, "linux_rc_local");
         assert_eq!(LINUX_RC_LOCAL.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_RC_LOCAL.scope, DataScope::System);
         assert!(LINUX_RC_LOCAL.mitre_techniques.contains(&"T1037.004"));
     }
-    #[test] fn linux_init_d_md() {
+    #[test]
+    fn linux_init_d_md() {
         assert_eq!(LINUX_INIT_D.id, "linux_init_d");
         assert_eq!(LINUX_INIT_D.artifact_type, ArtifactType::Directory);
         assert_eq!(LINUX_INIT_D.scope, DataScope::System);
@@ -6171,31 +7245,39 @@ mod tests_batch_d {
 
     // ── Linux persistence: shell startup ─────────────────────────────────
 
-    #[test] fn linux_bashrc_user_md() {
+    #[test]
+    fn linux_bashrc_user_md() {
         assert_eq!(LINUX_BASHRC_USER.id, "linux_bashrc_user");
         assert_eq!(LINUX_BASHRC_USER.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_BASHRC_USER.scope, DataScope::User);
         assert!(LINUX_BASHRC_USER.mitre_techniques.contains(&"T1546.004"));
     }
-    #[test] fn linux_bash_profile_user_md() {
+    #[test]
+    fn linux_bash_profile_user_md() {
         assert_eq!(LINUX_BASH_PROFILE_USER.id, "linux_bash_profile_user");
         assert_eq!(LINUX_BASH_PROFILE_USER.scope, DataScope::User);
-        assert!(LINUX_BASH_PROFILE_USER.mitre_techniques.contains(&"T1546.004"));
+        assert!(LINUX_BASH_PROFILE_USER
+            .mitre_techniques
+            .contains(&"T1546.004"));
     }
-    #[test] fn linux_profile_user_md() {
+    #[test]
+    fn linux_profile_user_md() {
         assert_eq!(LINUX_PROFILE_USER.id, "linux_profile_user");
         assert_eq!(LINUX_PROFILE_USER.scope, DataScope::User);
     }
-    #[test] fn linux_zshrc_user_md() {
+    #[test]
+    fn linux_zshrc_user_md() {
         assert_eq!(LINUX_ZSHRC_USER.id, "linux_zshrc_user");
         assert_eq!(LINUX_ZSHRC_USER.scope, DataScope::User);
         assert!(LINUX_ZSHRC_USER.mitre_techniques.contains(&"T1546.004"));
     }
-    #[test] fn linux_profile_system_md() {
+    #[test]
+    fn linux_profile_system_md() {
         assert_eq!(LINUX_PROFILE_SYSTEM.id, "linux_profile_system");
         assert_eq!(LINUX_PROFILE_SYSTEM.scope, DataScope::System);
     }
-    #[test] fn linux_profile_d_md() {
+    #[test]
+    fn linux_profile_d_md() {
         assert_eq!(LINUX_PROFILE_D.id, "linux_profile_d");
         assert_eq!(LINUX_PROFILE_D.artifact_type, ArtifactType::Directory);
         assert_eq!(LINUX_PROFILE_D.scope, DataScope::System);
@@ -6203,13 +7285,15 @@ mod tests_batch_d {
 
     // ── Linux persistence: LD_PRELOAD / linker ────────────────────────────
 
-    #[test] fn linux_ld_so_preload_md() {
+    #[test]
+    fn linux_ld_so_preload_md() {
         assert_eq!(LINUX_LD_SO_PRELOAD.id, "linux_ld_so_preload");
         assert_eq!(LINUX_LD_SO_PRELOAD.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_LD_SO_PRELOAD.scope, DataScope::System);
         assert!(LINUX_LD_SO_PRELOAD.mitre_techniques.contains(&"T1574.006"));
     }
-    #[test] fn linux_ld_so_conf_d_md() {
+    #[test]
+    fn linux_ld_so_conf_d_md() {
         assert_eq!(LINUX_LD_SO_CONF_D.id, "linux_ld_so_conf_d");
         assert_eq!(LINUX_LD_SO_CONF_D.artifact_type, ArtifactType::Directory);
         assert_eq!(LINUX_LD_SO_CONF_D.scope, DataScope::System);
@@ -6217,39 +7301,47 @@ mod tests_batch_d {
 
     // ── Linux persistence: SSH ────────────────────────────────────────────
 
-    #[test] fn linux_ssh_authorized_keys_md() {
+    #[test]
+    fn linux_ssh_authorized_keys_md() {
         assert_eq!(LINUX_SSH_AUTHORIZED_KEYS.id, "linux_ssh_authorized_keys");
         assert_eq!(LINUX_SSH_AUTHORIZED_KEYS.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_SSH_AUTHORIZED_KEYS.scope, DataScope::User);
-        assert!(LINUX_SSH_AUTHORIZED_KEYS.mitre_techniques.contains(&"T1098.004"));
+        assert!(LINUX_SSH_AUTHORIZED_KEYS
+            .mitre_techniques
+            .contains(&"T1098.004"));
     }
 
     // ── Linux persistence: PAM / sudo / kernel ────────────────────────────
 
-    #[test] fn linux_pam_d_md() {
+    #[test]
+    fn linux_pam_d_md() {
         assert_eq!(LINUX_PAM_D.id, "linux_pam_d");
         assert_eq!(LINUX_PAM_D.artifact_type, ArtifactType::Directory);
         assert_eq!(LINUX_PAM_D.scope, DataScope::System);
         assert!(LINUX_PAM_D.mitre_techniques.contains(&"T1556.003"));
     }
-    #[test] fn linux_sudoers_d_md() {
+    #[test]
+    fn linux_sudoers_d_md() {
         assert_eq!(LINUX_SUDOERS_D.id, "linux_sudoers_d");
         assert_eq!(LINUX_SUDOERS_D.artifact_type, ArtifactType::Directory);
         assert_eq!(LINUX_SUDOERS_D.scope, DataScope::System);
         assert!(LINUX_SUDOERS_D.mitre_techniques.contains(&"T1548.003"));
     }
-    #[test] fn linux_modules_load_d_md() {
+    #[test]
+    fn linux_modules_load_d_md() {
         assert_eq!(LINUX_MODULES_LOAD_D.id, "linux_modules_load_d");
         assert_eq!(LINUX_MODULES_LOAD_D.artifact_type, ArtifactType::Directory);
         assert_eq!(LINUX_MODULES_LOAD_D.scope, DataScope::System);
         assert!(LINUX_MODULES_LOAD_D.mitre_techniques.contains(&"T1547.006"));
     }
-    #[test] fn linux_motd_d_md() {
+    #[test]
+    fn linux_motd_d_md() {
         assert_eq!(LINUX_MOTD_D.id, "linux_motd_d");
         assert_eq!(LINUX_MOTD_D.artifact_type, ArtifactType::Directory);
         assert_eq!(LINUX_MOTD_D.scope, DataScope::System);
     }
-    #[test] fn linux_udev_rules_d_md() {
+    #[test]
+    fn linux_udev_rules_d_md() {
         assert_eq!(LINUX_UDEV_RULES_D.id, "linux_udev_rules_d");
         assert_eq!(LINUX_UDEV_RULES_D.artifact_type, ArtifactType::Directory);
         assert_eq!(LINUX_UDEV_RULES_D.scope, DataScope::System);
@@ -6258,39 +7350,46 @@ mod tests_batch_d {
 
     // ── Linux execution evidence ──────────────────────────────────────────
 
-    #[test] fn linux_bash_history_md() {
+    #[test]
+    fn linux_bash_history_md() {
         assert_eq!(LINUX_BASH_HISTORY.id, "linux_bash_history");
         assert_eq!(LINUX_BASH_HISTORY.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_BASH_HISTORY.scope, DataScope::User);
         assert!(LINUX_BASH_HISTORY.mitre_techniques.contains(&"T1059.004"));
     }
-    #[test] fn linux_zsh_history_md() {
+    #[test]
+    fn linux_zsh_history_md() {
         assert_eq!(LINUX_ZSH_HISTORY.id, "linux_zsh_history");
         assert_eq!(LINUX_ZSH_HISTORY.scope, DataScope::User);
     }
-    #[test] fn linux_wtmp_md() {
+    #[test]
+    fn linux_wtmp_md() {
         assert_eq!(LINUX_WTMP.id, "linux_wtmp");
         assert_eq!(LINUX_WTMP.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_WTMP.scope, DataScope::System);
         assert!(LINUX_WTMP.mitre_techniques.contains(&"T1078"));
     }
-    #[test] fn linux_btmp_md() {
+    #[test]
+    fn linux_btmp_md() {
         assert_eq!(LINUX_BTMP.id, "linux_btmp");
         assert_eq!(LINUX_BTMP.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_BTMP.scope, DataScope::System);
     }
-    #[test] fn linux_lastlog_md() {
+    #[test]
+    fn linux_lastlog_md() {
         assert_eq!(LINUX_LASTLOG.id, "linux_lastlog");
         assert_eq!(LINUX_LASTLOG.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_LASTLOG.scope, DataScope::System);
     }
-    #[test] fn linux_auth_log_md() {
+    #[test]
+    fn linux_auth_log_md() {
         assert_eq!(LINUX_AUTH_LOG.id, "linux_auth_log");
         assert_eq!(LINUX_AUTH_LOG.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_AUTH_LOG.scope, DataScope::System);
         assert!(LINUX_AUTH_LOG.mitre_techniques.contains(&"T1078"));
     }
-    #[test] fn linux_journal_dir_md() {
+    #[test]
+    fn linux_journal_dir_md() {
         assert_eq!(LINUX_JOURNAL_DIR.id, "linux_journal_dir");
         assert_eq!(LINUX_JOURNAL_DIR.artifact_type, ArtifactType::Directory);
         assert_eq!(LINUX_JOURNAL_DIR.os_scope, OsScope::LinuxSystemd);
@@ -6298,42 +7397,55 @@ mod tests_batch_d {
 
     // ── Linux credentials ─────────────────────────────────────────────────
 
-    #[test] fn linux_passwd_md() {
+    #[test]
+    fn linux_passwd_md() {
         assert_eq!(LINUX_PASSWD.id, "linux_passwd");
         assert_eq!(LINUX_PASSWD.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_PASSWD.scope, DataScope::System);
         assert!(LINUX_PASSWD.mitre_techniques.contains(&"T1087.001"));
     }
-    #[test] fn linux_shadow_md() {
+    #[test]
+    fn linux_shadow_md() {
         assert_eq!(LINUX_SHADOW.id, "linux_shadow");
         assert_eq!(LINUX_SHADOW.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_SHADOW.scope, DataScope::System);
         assert!(LINUX_SHADOW.mitre_techniques.contains(&"T1003.008"));
     }
-    #[test] fn linux_ssh_private_key_md() {
+    #[test]
+    fn linux_ssh_private_key_md() {
         assert_eq!(LINUX_SSH_PRIVATE_KEY.id, "linux_ssh_private_key");
         assert_eq!(LINUX_SSH_PRIVATE_KEY.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_SSH_PRIVATE_KEY.scope, DataScope::User);
-        assert!(LINUX_SSH_PRIVATE_KEY.mitre_techniques.contains(&"T1552.004"));
+        assert!(LINUX_SSH_PRIVATE_KEY
+            .mitre_techniques
+            .contains(&"T1552.004"));
     }
-    #[test] fn linux_ssh_known_hosts_md() {
+    #[test]
+    fn linux_ssh_known_hosts_md() {
         assert_eq!(LINUX_SSH_KNOWN_HOSTS.id, "linux_ssh_known_hosts");
         assert_eq!(LINUX_SSH_KNOWN_HOSTS.scope, DataScope::User);
-        assert!(LINUX_SSH_KNOWN_HOSTS.mitre_techniques.contains(&"T1021.004"));
+        assert!(LINUX_SSH_KNOWN_HOSTS
+            .mitre_techniques
+            .contains(&"T1021.004"));
     }
-    #[test] fn linux_gnupg_private_md() {
+    #[test]
+    fn linux_gnupg_private_md() {
         assert_eq!(LINUX_GNUPG_PRIVATE.id, "linux_gnupg_private");
         assert_eq!(LINUX_GNUPG_PRIVATE.artifact_type, ArtifactType::Directory);
         assert_eq!(LINUX_GNUPG_PRIVATE.scope, DataScope::User);
         assert!(LINUX_GNUPG_PRIVATE.mitre_techniques.contains(&"T1552.004"));
     }
-    #[test] fn linux_aws_credentials_md() {
+    #[test]
+    fn linux_aws_credentials_md() {
         assert_eq!(LINUX_AWS_CREDENTIALS.id, "linux_aws_credentials");
         assert_eq!(LINUX_AWS_CREDENTIALS.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_AWS_CREDENTIALS.scope, DataScope::User);
-        assert!(LINUX_AWS_CREDENTIALS.mitre_techniques.contains(&"T1552.001"));
+        assert!(LINUX_AWS_CREDENTIALS
+            .mitre_techniques
+            .contains(&"T1552.001"));
     }
-    #[test] fn linux_docker_config_md() {
+    #[test]
+    fn linux_docker_config_md() {
         assert_eq!(LINUX_DOCKER_CONFIG.id, "linux_docker_config");
         assert_eq!(LINUX_DOCKER_CONFIG.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_DOCKER_CONFIG.scope, DataScope::User);
@@ -6346,22 +7458,44 @@ mod tests_batch_d {
     fn catalog_contains_batch_d() {
         let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
         for expected in &[
-            "linux_crontab_system", "linux_cron_d", "linux_cron_periodic",
-            "linux_user_crontab", "linux_anacrontab",
-            "linux_systemd_system_unit", "linux_systemd_user_unit", "linux_systemd_timer",
-            "linux_rc_local", "linux_init_d",
-            "linux_bashrc_user", "linux_bash_profile_user", "linux_profile_user",
-            "linux_zshrc_user", "linux_profile_system", "linux_profile_d",
-            "linux_ld_so_preload", "linux_ld_so_conf_d",
+            "linux_crontab_system",
+            "linux_cron_d",
+            "linux_cron_periodic",
+            "linux_user_crontab",
+            "linux_anacrontab",
+            "linux_systemd_system_unit",
+            "linux_systemd_user_unit",
+            "linux_systemd_timer",
+            "linux_rc_local",
+            "linux_init_d",
+            "linux_bashrc_user",
+            "linux_bash_profile_user",
+            "linux_profile_user",
+            "linux_zshrc_user",
+            "linux_profile_system",
+            "linux_profile_d",
+            "linux_ld_so_preload",
+            "linux_ld_so_conf_d",
             "linux_ssh_authorized_keys",
-            "linux_pam_d", "linux_sudoers_d", "linux_modules_load_d",
-            "linux_motd_d", "linux_udev_rules_d",
-            "linux_bash_history", "linux_zsh_history",
-            "linux_wtmp", "linux_btmp", "linux_lastlog",
-            "linux_auth_log", "linux_journal_dir",
-            "linux_passwd", "linux_shadow",
-            "linux_ssh_private_key", "linux_ssh_known_hosts",
-            "linux_gnupg_private", "linux_aws_credentials", "linux_docker_config",
+            "linux_pam_d",
+            "linux_sudoers_d",
+            "linux_modules_load_d",
+            "linux_motd_d",
+            "linux_udev_rules_d",
+            "linux_bash_history",
+            "linux_zsh_history",
+            "linux_wtmp",
+            "linux_btmp",
+            "linux_lastlog",
+            "linux_auth_log",
+            "linux_journal_dir",
+            "linux_passwd",
+            "linux_shadow",
+            "linux_ssh_private_key",
+            "linux_ssh_known_hosts",
+            "linux_gnupg_private",
+            "linux_aws_credentials",
+            "linux_docker_config",
         ] {
             assert!(ids.contains(expected), "CATALOG missing: {expected}");
         }
@@ -6373,31 +7507,36 @@ mod tests_batch_d {
 
     // ── Windows execution evidence ────────────────────────────────────────
 
-    #[test] fn lnk_files_md() {
+    #[test]
+    fn lnk_files_md() {
         assert_eq!(LNK_FILES.id, "lnk_files");
         assert_eq!(LNK_FILES.artifact_type, ArtifactType::Directory);
         assert_eq!(LNK_FILES.scope, DataScope::User);
         assert!(LNK_FILES.mitre_techniques.contains(&"T1547.009"));
     }
-    #[test] fn jump_list_auto_md() {
+    #[test]
+    fn jump_list_auto_md() {
         assert_eq!(JUMP_LIST_AUTO.id, "jump_list_auto");
         assert_eq!(JUMP_LIST_AUTO.artifact_type, ArtifactType::Directory);
         assert_eq!(JUMP_LIST_AUTO.scope, DataScope::User);
         assert!(JUMP_LIST_AUTO.mitre_techniques.contains(&"T1547.009"));
     }
-    #[test] fn jump_list_custom_md() {
+    #[test]
+    fn jump_list_custom_md() {
         assert_eq!(JUMP_LIST_CUSTOM.id, "jump_list_custom");
         assert_eq!(JUMP_LIST_CUSTOM.artifact_type, ArtifactType::Directory);
         assert_eq!(JUMP_LIST_CUSTOM.scope, DataScope::User);
         assert!(JUMP_LIST_CUSTOM.mitre_techniques.contains(&"T1547.009"));
     }
-    #[test] fn evtx_dir_md() {
+    #[test]
+    fn evtx_dir_md() {
         assert_eq!(EVTX_DIR.id, "evtx_dir");
         assert_eq!(EVTX_DIR.artifact_type, ArtifactType::Directory);
         assert_eq!(EVTX_DIR.scope, DataScope::System);
         assert!(EVTX_DIR.mitre_techniques.contains(&"T1070.001"));
     }
-    #[test] fn usn_journal_md() {
+    #[test]
+    fn usn_journal_md() {
         assert_eq!(USN_JOURNAL.id, "usn_journal");
         assert_eq!(USN_JOURNAL.artifact_type, ArtifactType::File);
         assert_eq!(USN_JOURNAL.scope, DataScope::System);
@@ -6406,106 +7545,135 @@ mod tests_batch_d {
 
     // ── Windows persistence ───────────────────────────────────────────────
 
-    #[test] fn wmi_mof_dir_md() {
+    #[test]
+    fn wmi_mof_dir_md() {
         assert_eq!(WMI_MOF_DIR.id, "wmi_mof_dir");
         assert_eq!(WMI_MOF_DIR.artifact_type, ArtifactType::Directory);
         assert_eq!(WMI_MOF_DIR.scope, DataScope::System);
         assert!(WMI_MOF_DIR.mitre_techniques.contains(&"T1546.003"));
     }
-    #[test] fn bits_db_md() {
+    #[test]
+    fn bits_db_md() {
         assert_eq!(BITS_DB.id, "bits_db");
         assert_eq!(BITS_DB.artifact_type, ArtifactType::Directory);
         assert_eq!(BITS_DB.scope, DataScope::System);
         assert!(BITS_DB.mitre_techniques.contains(&"T1197"));
     }
-    #[test] fn wmi_subscriptions_md() {
+    #[test]
+    fn wmi_subscriptions_md() {
         assert_eq!(WMI_SUBSCRIPTIONS.id, "wmi_subscriptions");
         assert_eq!(WMI_SUBSCRIPTIONS.artifact_type, ArtifactType::RegistryKey);
         assert_eq!(WMI_SUBSCRIPTIONS.scope, DataScope::System);
         assert!(WMI_SUBSCRIPTIONS.mitre_techniques.contains(&"T1546.003"));
     }
-    #[test] fn logon_scripts_md() {
+    #[test]
+    fn logon_scripts_md() {
         assert_eq!(LOGON_SCRIPTS.id, "logon_scripts");
         assert_eq!(LOGON_SCRIPTS.artifact_type, ArtifactType::RegistryValue);
         assert_eq!(LOGON_SCRIPTS.scope, DataScope::User);
         assert!(LOGON_SCRIPTS.mitre_techniques.contains(&"T1037.001"));
     }
-    #[test] fn winsock_lsp_md() {
+    #[test]
+    fn winsock_lsp_md() {
         assert_eq!(WINSOCK_LSP.id, "winsock_lsp");
         assert_eq!(WINSOCK_LSP.artifact_type, ArtifactType::RegistryKey);
         assert_eq!(WINSOCK_LSP.scope, DataScope::System);
         assert!(WINSOCK_LSP.mitre_techniques.contains(&"T1547.010"));
     }
-    #[test] fn appshim_db_md() {
+    #[test]
+    fn appshim_db_md() {
         assert_eq!(APPSHIM_DB.id, "appshim_db");
         assert_eq!(APPSHIM_DB.artifact_type, ArtifactType::Directory);
         assert_eq!(APPSHIM_DB.scope, DataScope::System);
         assert!(APPSHIM_DB.mitre_techniques.contains(&"T1546.011"));
     }
-    #[test] fn password_filter_dll_md() {
+    #[test]
+    fn password_filter_dll_md() {
         assert_eq!(PASSWORD_FILTER_DLL.id, "password_filter_dll");
-        assert_eq!(PASSWORD_FILTER_DLL.artifact_type, ArtifactType::RegistryValue);
+        assert_eq!(
+            PASSWORD_FILTER_DLL.artifact_type,
+            ArtifactType::RegistryValue
+        );
         assert_eq!(PASSWORD_FILTER_DLL.scope, DataScope::System);
         assert!(PASSWORD_FILTER_DLL.mitre_techniques.contains(&"T1556.002"));
     }
-    #[test] fn office_normal_dotm_md() {
+    #[test]
+    fn office_normal_dotm_md() {
         assert_eq!(OFFICE_NORMAL_DOTM.id, "office_normal_dotm");
         assert_eq!(OFFICE_NORMAL_DOTM.artifact_type, ArtifactType::File);
         assert_eq!(OFFICE_NORMAL_DOTM.scope, DataScope::User);
         assert!(OFFICE_NORMAL_DOTM.mitre_techniques.contains(&"T1137.001"));
     }
-    #[test] fn powershell_profile_all_md() {
+    #[test]
+    fn powershell_profile_all_md() {
         assert_eq!(POWERSHELL_PROFILE_ALL.id, "powershell_profile_all");
         assert_eq!(POWERSHELL_PROFILE_ALL.artifact_type, ArtifactType::File);
         assert_eq!(POWERSHELL_PROFILE_ALL.scope, DataScope::System);
-        assert!(POWERSHELL_PROFILE_ALL.mitre_techniques.contains(&"T1546.013"));
+        assert!(POWERSHELL_PROFILE_ALL
+            .mitre_techniques
+            .contains(&"T1546.013"));
     }
 
     // ── Windows credentials ───────────────────────────────────────────────
 
-    #[test] fn dpapi_system_masterkey_md() {
+    #[test]
+    fn dpapi_system_masterkey_md() {
         assert_eq!(DPAPI_SYSTEM_MASTERKEY.id, "dpapi_system_masterkey");
-        assert_eq!(DPAPI_SYSTEM_MASTERKEY.artifact_type, ArtifactType::Directory);
+        assert_eq!(
+            DPAPI_SYSTEM_MASTERKEY.artifact_type,
+            ArtifactType::Directory
+        );
         assert_eq!(DPAPI_SYSTEM_MASTERKEY.scope, DataScope::System);
-        assert!(DPAPI_SYSTEM_MASTERKEY.mitre_techniques.contains(&"T1555.004"));
+        assert!(DPAPI_SYSTEM_MASTERKEY
+            .mitre_techniques
+            .contains(&"T1555.004"));
     }
-    #[test] fn dpapi_credhist_md() {
+    #[test]
+    fn dpapi_credhist_md() {
         assert_eq!(DPAPI_CREDHIST.id, "dpapi_credhist");
         assert_eq!(DPAPI_CREDHIST.artifact_type, ArtifactType::File);
         assert_eq!(DPAPI_CREDHIST.scope, DataScope::User);
         assert!(DPAPI_CREDHIST.mitre_techniques.contains(&"T1555.004"));
     }
-    #[test] fn chrome_cookies_md() {
+    #[test]
+    fn chrome_cookies_md() {
         assert_eq!(CHROME_COOKIES.id, "chrome_cookies");
         assert_eq!(CHROME_COOKIES.artifact_type, ArtifactType::File);
         assert_eq!(CHROME_COOKIES.scope, DataScope::User);
         assert!(CHROME_COOKIES.mitre_techniques.contains(&"T1539"));
     }
-    #[test] fn edge_webcache_md() {
+    #[test]
+    fn edge_webcache_md() {
         assert_eq!(EDGE_WEBCACHE.id, "edge_webcache");
         assert_eq!(EDGE_WEBCACHE.artifact_type, ArtifactType::Directory);
         assert_eq!(EDGE_WEBCACHE.scope, DataScope::User);
         assert!(EDGE_WEBCACHE.mitre_techniques.contains(&"T1539"));
     }
-    #[test] fn vpn_ras_phonebook_md() {
+    #[test]
+    fn vpn_ras_phonebook_md() {
         assert_eq!(VPN_RAS_PHONEBOOK.id, "vpn_ras_phonebook");
         assert_eq!(VPN_RAS_PHONEBOOK.artifact_type, ArtifactType::File);
         assert_eq!(VPN_RAS_PHONEBOOK.scope, DataScope::User);
         assert!(VPN_RAS_PHONEBOOK.mitre_techniques.contains(&"T1552.001"));
     }
-    #[test] fn windows_hello_ngc_md() {
+    #[test]
+    fn windows_hello_ngc_md() {
         assert_eq!(WINDOWS_HELLO_NGC.id, "windows_hello_ngc");
         assert_eq!(WINDOWS_HELLO_NGC.artifact_type, ArtifactType::Directory);
         assert_eq!(WINDOWS_HELLO_NGC.scope, DataScope::System);
         assert!(WINDOWS_HELLO_NGC.mitre_techniques.contains(&"T1555"));
     }
-    #[test] fn user_cert_private_key_md() {
+    #[test]
+    fn user_cert_private_key_md() {
         assert_eq!(USER_CERT_PRIVATE_KEY.id, "user_cert_private_key");
         assert_eq!(USER_CERT_PRIVATE_KEY.artifact_type, ArtifactType::Directory);
         assert_eq!(USER_CERT_PRIVATE_KEY.scope, DataScope::User);
-        assert!(USER_CERT_PRIVATE_KEY.mitre_techniques.contains(&"T1552.004"));
+        assert!(USER_CERT_PRIVATE_KEY
+            .mitre_techniques
+            .contains(&"T1552.004"));
     }
-    #[test] fn machine_cert_store_md() {
+    #[test]
+    fn machine_cert_store_md() {
         assert_eq!(MACHINE_CERT_STORE.id, "machine_cert_store");
         assert_eq!(MACHINE_CERT_STORE.artifact_type, ArtifactType::Directory);
         assert_eq!(MACHINE_CERT_STORE.scope, DataScope::System);
@@ -6518,14 +7686,28 @@ mod tests_batch_d {
     fn catalog_contains_batch_e() {
         let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
         for expected in &[
-            "lnk_files", "jump_list_auto", "jump_list_custom",
-            "evtx_dir", "usn_journal",
-            "wmi_mof_dir", "bits_db", "wmi_subscriptions",
-            "logon_scripts", "winsock_lsp", "appshim_db",
-            "password_filter_dll", "office_normal_dotm", "powershell_profile_all",
-            "dpapi_system_masterkey", "dpapi_credhist",
-            "chrome_cookies", "edge_webcache", "vpn_ras_phonebook",
-            "windows_hello_ngc", "user_cert_private_key", "machine_cert_store",
+            "lnk_files",
+            "jump_list_auto",
+            "jump_list_custom",
+            "evtx_dir",
+            "usn_journal",
+            "wmi_mof_dir",
+            "bits_db",
+            "wmi_subscriptions",
+            "logon_scripts",
+            "winsock_lsp",
+            "appshim_db",
+            "password_filter_dll",
+            "office_normal_dotm",
+            "powershell_profile_all",
+            "dpapi_system_masterkey",
+            "dpapi_credhist",
+            "chrome_cookies",
+            "edge_webcache",
+            "vpn_ras_phonebook",
+            "windows_hello_ngc",
+            "user_cert_private_key",
+            "machine_cert_store",
         ] {
             assert!(ids.contains(expected), "CATALOG missing: {expected}");
         }
@@ -6535,79 +7717,105 @@ mod tests_batch_d {
     // Batch F — Linux extended credential / execution artifacts (RED)
     // ═══════════════════════════════════════════════════════════════════════
 
-    #[test] fn linux_at_queue_md() {
+    #[test]
+    fn linux_at_queue_md() {
         assert_eq!(LINUX_AT_QUEUE.id, "linux_at_queue");
         assert_eq!(LINUX_AT_QUEUE.artifact_type, ArtifactType::Directory);
         assert_eq!(LINUX_AT_QUEUE.scope, DataScope::System);
         assert!(LINUX_AT_QUEUE.mitre_techniques.contains(&"T1053.001"));
     }
-    #[test] fn linux_sshd_config_md() {
+    #[test]
+    fn linux_sshd_config_md() {
         assert_eq!(LINUX_SSHD_CONFIG.id, "linux_sshd_config");
         assert_eq!(LINUX_SSHD_CONFIG.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_SSHD_CONFIG.scope, DataScope::System);
         assert!(LINUX_SSHD_CONFIG.mitre_techniques.contains(&"T1098.004"));
     }
-    #[test] fn linux_etc_group_md() {
+    #[test]
+    fn linux_etc_group_md() {
         assert_eq!(LINUX_ETC_GROUP.id, "linux_etc_group");
         assert_eq!(LINUX_ETC_GROUP.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_ETC_GROUP.scope, DataScope::System);
         assert!(LINUX_ETC_GROUP.mitre_techniques.contains(&"T1087.001"));
     }
-    #[test] fn linux_gnome_keyring_md() {
+    #[test]
+    fn linux_gnome_keyring_md() {
         assert_eq!(LINUX_GNOME_KEYRING.id, "linux_gnome_keyring");
         assert_eq!(LINUX_GNOME_KEYRING.artifact_type, ArtifactType::Directory);
         assert_eq!(LINUX_GNOME_KEYRING.scope, DataScope::User);
         assert!(LINUX_GNOME_KEYRING.mitre_techniques.contains(&"T1555.003"));
     }
-    #[test] fn linux_kde_kwallet_md() {
+    #[test]
+    fn linux_kde_kwallet_md() {
         assert_eq!(LINUX_KDE_KWALLET.id, "linux_kde_kwallet");
         assert_eq!(LINUX_KDE_KWALLET.artifact_type, ArtifactType::Directory);
         assert_eq!(LINUX_KDE_KWALLET.scope, DataScope::User);
         assert!(LINUX_KDE_KWALLET.mitre_techniques.contains(&"T1555.003"));
     }
-    #[test] fn linux_chrome_login_linux_md() {
+    #[test]
+    fn linux_chrome_login_linux_md() {
         assert_eq!(LINUX_CHROME_LOGIN_LINUX.id, "linux_chrome_login_linux");
         assert_eq!(LINUX_CHROME_LOGIN_LINUX.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_CHROME_LOGIN_LINUX.scope, DataScope::User);
-        assert!(LINUX_CHROME_LOGIN_LINUX.mitre_techniques.contains(&"T1555.003"));
+        assert!(LINUX_CHROME_LOGIN_LINUX
+            .mitre_techniques
+            .contains(&"T1555.003"));
     }
-    #[test] fn linux_firefox_logins_linux_md() {
+    #[test]
+    fn linux_firefox_logins_linux_md() {
         assert_eq!(LINUX_FIREFOX_LOGINS_LINUX.id, "linux_firefox_logins_linux");
         assert_eq!(LINUX_FIREFOX_LOGINS_LINUX.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_FIREFOX_LOGINS_LINUX.scope, DataScope::User);
-        assert!(LINUX_FIREFOX_LOGINS_LINUX.mitre_techniques.contains(&"T1555.003"));
+        assert!(LINUX_FIREFOX_LOGINS_LINUX
+            .mitre_techniques
+            .contains(&"T1555.003"));
     }
-    #[test] fn linux_utmp_md() {
+    #[test]
+    fn linux_utmp_md() {
         assert_eq!(LINUX_UTMP.id, "linux_utmp");
         assert_eq!(LINUX_UTMP.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_UTMP.scope, DataScope::System);
         assert!(LINUX_UTMP.mitre_techniques.contains(&"T1078"));
     }
-    #[test] fn linux_gcp_credentials_md() {
+    #[test]
+    fn linux_gcp_credentials_md() {
         assert_eq!(LINUX_GCP_CREDENTIALS.id, "linux_gcp_credentials");
         assert_eq!(LINUX_GCP_CREDENTIALS.artifact_type, ArtifactType::Directory);
         assert_eq!(LINUX_GCP_CREDENTIALS.scope, DataScope::User);
-        assert!(LINUX_GCP_CREDENTIALS.mitre_techniques.contains(&"T1552.001"));
+        assert!(LINUX_GCP_CREDENTIALS
+            .mitre_techniques
+            .contains(&"T1552.001"));
     }
-    #[test] fn linux_azure_credentials_md() {
+    #[test]
+    fn linux_azure_credentials_md() {
         assert_eq!(LINUX_AZURE_CREDENTIALS.id, "linux_azure_credentials");
-        assert_eq!(LINUX_AZURE_CREDENTIALS.artifact_type, ArtifactType::Directory);
+        assert_eq!(
+            LINUX_AZURE_CREDENTIALS.artifact_type,
+            ArtifactType::Directory
+        );
         assert_eq!(LINUX_AZURE_CREDENTIALS.scope, DataScope::User);
-        assert!(LINUX_AZURE_CREDENTIALS.mitre_techniques.contains(&"T1552.001"));
+        assert!(LINUX_AZURE_CREDENTIALS
+            .mitre_techniques
+            .contains(&"T1552.001"));
     }
-    #[test] fn linux_kube_config_md() {
+    #[test]
+    fn linux_kube_config_md() {
         assert_eq!(LINUX_KUBE_CONFIG.id, "linux_kube_config");
         assert_eq!(LINUX_KUBE_CONFIG.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_KUBE_CONFIG.scope, DataScope::User);
         assert!(LINUX_KUBE_CONFIG.mitre_techniques.contains(&"T1552.001"));
     }
-    #[test] fn linux_git_credentials_md() {
+    #[test]
+    fn linux_git_credentials_md() {
         assert_eq!(LINUX_GIT_CREDENTIALS.id, "linux_git_credentials");
         assert_eq!(LINUX_GIT_CREDENTIALS.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_GIT_CREDENTIALS.scope, DataScope::User);
-        assert!(LINUX_GIT_CREDENTIALS.mitre_techniques.contains(&"T1552.001"));
+        assert!(LINUX_GIT_CREDENTIALS
+            .mitre_techniques
+            .contains(&"T1552.001"));
     }
-    #[test] fn linux_netrc_md() {
+    #[test]
+    fn linux_netrc_md() {
         assert_eq!(LINUX_NETRC.id, "linux_netrc");
         assert_eq!(LINUX_NETRC.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_NETRC.scope, DataScope::User);
@@ -6620,12 +7828,19 @@ mod tests_batch_d {
     fn catalog_contains_batch_f() {
         let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
         for expected in &[
-            "linux_at_queue", "linux_sshd_config", "linux_etc_group",
-            "linux_gnome_keyring", "linux_kde_kwallet",
-            "linux_chrome_login_linux", "linux_firefox_logins_linux",
+            "linux_at_queue",
+            "linux_sshd_config",
+            "linux_etc_group",
+            "linux_gnome_keyring",
+            "linux_kde_kwallet",
+            "linux_chrome_login_linux",
+            "linux_firefox_logins_linux",
             "linux_utmp",
-            "linux_gcp_credentials", "linux_azure_credentials",
-            "linux_kube_config", "linux_git_credentials", "linux_netrc",
+            "linux_gcp_credentials",
+            "linux_azure_credentials",
+            "linux_kube_config",
+            "linux_git_credentials",
+            "linux_netrc",
         ] {
             assert!(ids.contains(expected), "CATALOG missing: {expected}");
         }
@@ -6636,31 +7851,56 @@ mod tests_batch_d {
     // Source: https://github.com/GuyEldad/LinuxPersist
     // ═══════════════════════════════════════════════════════════════════════
 
-    #[test] fn linux_etc_environment_md() {
+    #[test]
+    fn linux_etc_environment_md() {
         assert_eq!(LINUX_ETC_ENVIRONMENT.id, "linux_etc_environment");
         assert_eq!(LINUX_ETC_ENVIRONMENT.artifact_type, ArtifactType::File);
         assert_eq!(LINUX_ETC_ENVIRONMENT.scope, DataScope::System);
-        assert!(LINUX_ETC_ENVIRONMENT.mitre_techniques.contains(&"T1546.004"));
+        assert!(LINUX_ETC_ENVIRONMENT
+            .mitre_techniques
+            .contains(&"T1546.004"));
     }
-    #[test] fn linux_xdg_autostart_user_md() {
+    #[test]
+    fn linux_xdg_autostart_user_md() {
         assert_eq!(LINUX_XDG_AUTOSTART_USER.id, "linux_xdg_autostart_user");
-        assert_eq!(LINUX_XDG_AUTOSTART_USER.artifact_type, ArtifactType::Directory);
+        assert_eq!(
+            LINUX_XDG_AUTOSTART_USER.artifact_type,
+            ArtifactType::Directory
+        );
         assert_eq!(LINUX_XDG_AUTOSTART_USER.scope, DataScope::User);
-        assert!(LINUX_XDG_AUTOSTART_USER.mitre_techniques.contains(&"T1547.014"));
+        assert!(LINUX_XDG_AUTOSTART_USER
+            .mitre_techniques
+            .contains(&"T1547.014"));
     }
-    #[test] fn linux_xdg_autostart_system_md() {
+    #[test]
+    fn linux_xdg_autostart_system_md() {
         assert_eq!(LINUX_XDG_AUTOSTART_SYSTEM.id, "linux_xdg_autostart_system");
-        assert_eq!(LINUX_XDG_AUTOSTART_SYSTEM.artifact_type, ArtifactType::Directory);
+        assert_eq!(
+            LINUX_XDG_AUTOSTART_SYSTEM.artifact_type,
+            ArtifactType::Directory
+        );
         assert_eq!(LINUX_XDG_AUTOSTART_SYSTEM.scope, DataScope::System);
-        assert!(LINUX_XDG_AUTOSTART_SYSTEM.mitre_techniques.contains(&"T1547.014"));
+        assert!(LINUX_XDG_AUTOSTART_SYSTEM
+            .mitre_techniques
+            .contains(&"T1547.014"));
     }
-    #[test] fn linux_networkmanager_dispatcher_md() {
-        assert_eq!(LINUX_NETWORKMANAGER_DISPATCHER.id, "linux_networkmanager_dispatcher");
-        assert_eq!(LINUX_NETWORKMANAGER_DISPATCHER.artifact_type, ArtifactType::Directory);
+    #[test]
+    fn linux_networkmanager_dispatcher_md() {
+        assert_eq!(
+            LINUX_NETWORKMANAGER_DISPATCHER.id,
+            "linux_networkmanager_dispatcher"
+        );
+        assert_eq!(
+            LINUX_NETWORKMANAGER_DISPATCHER.artifact_type,
+            ArtifactType::Directory
+        );
         assert_eq!(LINUX_NETWORKMANAGER_DISPATCHER.scope, DataScope::System);
-        assert!(LINUX_NETWORKMANAGER_DISPATCHER.mitre_techniques.contains(&"T1547.013"));
+        assert!(LINUX_NETWORKMANAGER_DISPATCHER
+            .mitre_techniques
+            .contains(&"T1547.013"));
     }
-    #[test] fn linux_apt_hooks_md() {
+    #[test]
+    fn linux_apt_hooks_md() {
         assert_eq!(LINUX_APT_HOOKS.id, "linux_apt_hooks");
         assert_eq!(LINUX_APT_HOOKS.artifact_type, ArtifactType::Directory);
         assert_eq!(LINUX_APT_HOOKS.scope, DataScope::System);
@@ -6690,7 +7930,8 @@ mod tests_batch_d {
 
     // ── Jump Lists ────────────────────────────────────────────────────────
 
-    #[test] fn jump_list_system_md() {
+    #[test]
+    fn jump_list_system_md() {
         assert_eq!(JUMP_LIST_SYSTEM.id, "jump_list_system");
         assert_eq!(JUMP_LIST_SYSTEM.artifact_type, ArtifactType::Directory);
         assert_eq!(JUMP_LIST_SYSTEM.scope, DataScope::System);
@@ -6699,7 +7940,8 @@ mod tests_batch_d {
 
     // ── LNK Files ─────────────────────────────────────────────────────────
 
-    #[test] fn lnk_files_office_md() {
+    #[test]
+    fn lnk_files_office_md() {
         assert_eq!(LNK_FILES_OFFICE.id, "lnk_files_office");
         assert_eq!(LNK_FILES_OFFICE.artifact_type, ArtifactType::Directory);
         assert_eq!(LNK_FILES_OFFICE.scope, DataScope::User);
@@ -6708,7 +7950,8 @@ mod tests_batch_d {
 
     // ── Prefetch ──────────────────────────────────────────────────────────
 
-    #[test] fn prefetch_file_md() {
+    #[test]
+    fn prefetch_file_md() {
         assert_eq!(PREFETCH_FILE.id, "prefetch_file");
         assert_eq!(PREFETCH_FILE.artifact_type, ArtifactType::File);
         assert_eq!(PREFETCH_FILE.scope, DataScope::System);
@@ -6718,28 +7961,32 @@ mod tests_batch_d {
 
     // ── SRUM tables ───────────────────────────────────────────────────────
 
-    #[test] fn srum_network_usage_md() {
+    #[test]
+    fn srum_network_usage_md() {
         assert_eq!(SRUM_NETWORK_USAGE.id, "srum_network_usage");
         assert_eq!(SRUM_NETWORK_USAGE.artifact_type, ArtifactType::File);
         assert_eq!(SRUM_NETWORK_USAGE.scope, DataScope::System);
         assert_eq!(SRUM_NETWORK_USAGE.os_scope, OsScope::Win8Plus);
         assert!(SRUM_NETWORK_USAGE.mitre_techniques.contains(&"T1049"));
     }
-    #[test] fn srum_app_resource_md() {
+    #[test]
+    fn srum_app_resource_md() {
         assert_eq!(SRUM_APP_RESOURCE.id, "srum_app_resource");
         assert_eq!(SRUM_APP_RESOURCE.artifact_type, ArtifactType::File);
         assert_eq!(SRUM_APP_RESOURCE.scope, DataScope::System);
         assert_eq!(SRUM_APP_RESOURCE.os_scope, OsScope::Win8Plus);
         assert!(SRUM_APP_RESOURCE.mitre_techniques.contains(&"T1059"));
     }
-    #[test] fn srum_energy_usage_md() {
+    #[test]
+    fn srum_energy_usage_md() {
         assert_eq!(SRUM_ENERGY_USAGE.id, "srum_energy_usage");
         assert_eq!(SRUM_ENERGY_USAGE.artifact_type, ArtifactType::File);
         assert_eq!(SRUM_ENERGY_USAGE.scope, DataScope::System);
         assert_eq!(SRUM_ENERGY_USAGE.os_scope, OsScope::Win8Plus);
         assert!(SRUM_ENERGY_USAGE.mitre_techniques.contains(&"T1059"));
     }
-    #[test] fn srum_push_notification_md() {
+    #[test]
+    fn srum_push_notification_md() {
         assert_eq!(SRUM_PUSH_NOTIFICATION.id, "srum_push_notification");
         assert_eq!(SRUM_PUSH_NOTIFICATION.artifact_type, ArtifactType::File);
         assert_eq!(SRUM_PUSH_NOTIFICATION.scope, DataScope::System);
@@ -6749,25 +7996,29 @@ mod tests_batch_d {
 
     // ── EVTX channels ─────────────────────────────────────────────────────
 
-    #[test] fn evtx_security_md() {
+    #[test]
+    fn evtx_security_md() {
         assert_eq!(EVTX_SECURITY.id, "evtx_security");
         assert_eq!(EVTX_SECURITY.artifact_type, ArtifactType::File);
         assert_eq!(EVTX_SECURITY.scope, DataScope::System);
         assert!(EVTX_SECURITY.mitre_techniques.contains(&"T1070.001"));
     }
-    #[test] fn evtx_system_md() {
+    #[test]
+    fn evtx_system_md() {
         assert_eq!(EVTX_SYSTEM.id, "evtx_system");
         assert_eq!(EVTX_SYSTEM.artifact_type, ArtifactType::File);
         assert_eq!(EVTX_SYSTEM.scope, DataScope::System);
         assert!(EVTX_SYSTEM.mitre_techniques.contains(&"T1543.003"));
     }
-    #[test] fn evtx_powershell_md() {
+    #[test]
+    fn evtx_powershell_md() {
         assert_eq!(EVTX_POWERSHELL.id, "evtx_powershell");
         assert_eq!(EVTX_POWERSHELL.artifact_type, ArtifactType::File);
         assert_eq!(EVTX_POWERSHELL.scope, DataScope::System);
         assert!(EVTX_POWERSHELL.mitre_techniques.contains(&"T1059.001"));
     }
-    #[test] fn evtx_sysmon_md() {
+    #[test]
+    fn evtx_sysmon_md() {
         assert_eq!(EVTX_SYSMON.id, "evtx_sysmon");
         assert_eq!(EVTX_SYSMON.artifact_type, ArtifactType::File);
         assert_eq!(EVTX_SYSMON.scope, DataScope::System);
@@ -6783,8 +8034,8 @@ mod tests_batch_d {
     #[test]
     fn triage_priority_ordering() {
         assert!(TriagePriority::Critical > TriagePriority::High);
-        assert!(TriagePriority::High    > TriagePriority::Medium);
-        assert!(TriagePriority::Medium  > TriagePriority::Low);
+        assert!(TriagePriority::High > TriagePriority::Medium);
+        assert!(TriagePriority::Medium > TriagePriority::Low);
     }
 
     // ── ArtifactDescriptor has new fields ─────────────────────────────────
@@ -6878,12 +8129,16 @@ mod tests_batch_d {
 
     #[test]
     fn srum_network_related_includes_evtx_security() {
-        assert!(SRUM_NETWORK_USAGE.related_artifacts.contains(&"evtx_security"));
+        assert!(SRUM_NETWORK_USAGE
+            .related_artifacts
+            .contains(&"evtx_security"));
     }
 
     #[test]
     fn evtx_security_related_includes_srum() {
-        assert!(EVTX_SECURITY.related_artifacts.contains(&"srum_network_usage"));
+        assert!(EVTX_SECURITY
+            .related_artifacts
+            .contains(&"srum_network_usage"));
     }
 
     #[test]
@@ -6893,7 +8148,9 @@ mod tests_batch_d {
 
     #[test]
     fn dpapi_masterkey_related_includes_dpapi_cred() {
-        assert!(DPAPI_MASTERKEY_USER.related_artifacts.contains(&"dpapi_cred_user"));
+        assert!(DPAPI_MASTERKEY_USER
+            .related_artifacts
+            .contains(&"dpapi_cred_user"));
     }
 
     // ── New catalog API ──────────────────────────────────────────────────
@@ -6945,6 +8202,96 @@ mod tests_batch_d {
 
     // ── CATALOG completeness (batch H) ────────────────────────────────────
 
+    // ── sources field — every high-value descriptor must cite at least one
+    //    authoritative external reference (SANS, Harlan Carvey, Brian Carrier,
+    //    Red Canary, Microsoft docs, MITRE ATT&CK, etc.)  ────────────────────
+
+    #[test]
+    fn userassist_has_authoritative_sources() {
+        assert!(
+            !USERASSIST_EXE.sources.is_empty(),
+            "USERASSIST_EXE must cite at least one authoritative source"
+        );
+    }
+
+    #[test]
+    fn run_key_hklm_has_authoritative_sources() {
+        assert!(
+            !RUN_KEY_HKLM_RUN.sources.is_empty(),
+            "RUN_KEY_HKLM_RUN must cite at least one authoritative source"
+        );
+    }
+
+    #[test]
+    fn shimcache_has_authoritative_sources() {
+        assert!(
+            !SHIMCACHE.sources.is_empty(),
+            "SHIMCACHE must cite at least one authoritative source"
+        );
+    }
+
+    #[test]
+    fn prefetch_dir_has_authoritative_sources() {
+        assert!(
+            !PREFETCH_DIR.sources.is_empty(),
+            "PREFETCH_DIR must cite at least one authoritative source"
+        );
+    }
+
+    #[test]
+    fn amcache_has_authoritative_sources() {
+        assert!(
+            !AMCACHE_APP_FILE.sources.is_empty(),
+            "AMCACHE_APP_FILE must cite at least one authoritative source"
+        );
+    }
+
+    #[test]
+    fn evtx_security_has_authoritative_sources() {
+        assert!(
+            !EVTX_SECURITY.sources.is_empty(),
+            "EVTX_SECURITY must cite at least one authoritative source"
+        );
+    }
+
+    #[test]
+    fn srum_app_resource_has_authoritative_sources() {
+        assert!(
+            !SRUM_APP_RESOURCE.sources.is_empty(),
+            "SRUM_APP_RESOURCE must cite at least one authoritative source"
+        );
+    }
+
+    #[test]
+    fn sam_users_has_authoritative_sources() {
+        assert!(
+            !SAM_USERS.sources.is_empty(),
+            "SAM_USERS must cite at least one authoritative source"
+        );
+    }
+
+    #[test]
+    fn shellbags_has_authoritative_sources() {
+        assert!(
+            !SHELLBAGS_USER.sources.is_empty(),
+            "SHELLBAGS_USER must cite at least one authoritative source"
+        );
+    }
+
+    #[test]
+    fn no_descriptor_in_catalog_has_empty_sources() {
+        let empty: Vec<&str> = CATALOG
+            .list()
+            .iter()
+            .filter(|d| d.sources.is_empty())
+            .map(|d| d.id)
+            .collect();
+        assert!(
+            empty.is_empty(),
+            "These catalog entries have no authoritative sources: {empty:?}"
+        );
+    }
+
     #[test]
     fn catalog_contains_batch_h() {
         let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
@@ -6952,10 +8299,14 @@ mod tests_batch_d {
             "jump_list_system",
             "lnk_files_office",
             "prefetch_file",
-            "srum_network_usage", "srum_app_resource",
-            "srum_energy_usage", "srum_push_notification",
-            "evtx_security", "evtx_system",
-            "evtx_powershell", "evtx_sysmon",
+            "srum_network_usage",
+            "srum_app_resource",
+            "srum_energy_usage",
+            "srum_push_notification",
+            "evtx_security",
+            "evtx_system",
+            "evtx_powershell",
+            "evtx_sysmon",
         ] {
             assert!(ids.contains(expected), "CATALOG missing: {expected}");
         }

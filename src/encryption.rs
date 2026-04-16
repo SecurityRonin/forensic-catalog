@@ -42,10 +42,7 @@ pub const WINRAR_PATHS: &[&str] = &[
 
 /// Tor Browser / Tor Project registry paths.
 /// Source: third-party-app-registry-forensics.md §3.7 Tor Browser
-pub const TOR_PATHS: &[&str] = &[
-    r"SOFTWARE\Tor Project",
-    r"SOFTWARE\Wow6432Node\Tor Project",
-];
+pub const TOR_PATHS: &[&str] = &[r"SOFTWARE\Tor Project", r"SOFTWARE\Wow6432Node\Tor Project"];
 
 /// All encryption tool indicator paths combined (for bulk scanning).
 pub const ALL_ENCRYPTION_PATHS: &[&str] = &[
@@ -91,17 +88,26 @@ mod tests {
 
     #[test]
     fn veracrypt_paths_not_empty() {
-        assert!(!VERACRYPT_PATHS.is_empty(), "VERACRYPT_PATHS must not be empty");
+        assert!(
+            !VERACRYPT_PATHS.is_empty(),
+            "VERACRYPT_PATHS must not be empty"
+        );
     }
 
     #[test]
     fn bitlocker_paths_not_empty() {
-        assert!(!BITLOCKER_PATHS.is_empty(), "BITLOCKER_PATHS must not be empty");
+        assert!(
+            !BITLOCKER_PATHS.is_empty(),
+            "BITLOCKER_PATHS must not be empty"
+        );
     }
 
     #[test]
     fn sevenzip_paths_not_empty() {
-        assert!(!SEVENZIP_PATHS.is_empty(), "SEVENZIP_PATHS must not be empty");
+        assert!(
+            !SEVENZIP_PATHS.is_empty(),
+            "SEVENZIP_PATHS must not be empty"
+        );
     }
 
     #[test]

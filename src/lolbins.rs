@@ -26,44 +26,25 @@ pub const WINDOWS_LOLBINS: &[&str] = &[
 
 /// Linux Living-Off-the-Land binaries.
 pub const LINUX_LOLBINS: &[&str] = &[
-    "bash",
-    "sh",
-    "python",
-    "python3",
-    "perl",
-    "ruby",
-    "php",
-    "nc",
-    "ncat",
-    "socat",
-    "tclsh",
-    "openssl",
-    "curl",
-    "wget",
-    "lua",
-    "awk",
-    "find",
-    "vim",
-    "less",
-    "git",
-    "env",
-    "node",
-    "dd",
-    "strace",
-    "gdb",
-    "nmap",
+    "bash", "sh", "python", "python3", "perl", "ruby", "php", "nc", "ncat", "socat", "tclsh",
+    "openssl", "curl", "wget", "lua", "awk", "find", "vim", "less", "git", "env", "node", "dd",
+    "strace", "gdb", "nmap",
 ];
 
 /// Returns `true` if `name` matches a known Windows LOLBin (case-insensitive).
 pub fn is_windows_lolbin(name: &str) -> bool {
     let lower = name.to_ascii_lowercase();
-    WINDOWS_LOLBINS.iter().any(|b| b.to_ascii_lowercase() == lower)
+    WINDOWS_LOLBINS
+        .iter()
+        .any(|b| b.to_ascii_lowercase() == lower)
 }
 
 /// Returns `true` if `name` matches a known Linux LOLBin (case-insensitive).
 pub fn is_linux_lolbin(name: &str) -> bool {
     let lower = name.to_ascii_lowercase();
-    LINUX_LOLBINS.iter().any(|b| b.to_ascii_lowercase() == lower)
+    LINUX_LOLBINS
+        .iter()
+        .any(|b| b.to_ascii_lowercase() == lower)
 }
 
 #[cfg(test)]

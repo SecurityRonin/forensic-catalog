@@ -104,10 +104,7 @@ pub fn decode_pca_utf16le(bytes: &[u8]) -> Vec<(String, String)> {
 
     let decoded = String::from_utf16_lossy(&utf16);
 
-    decoded
-        .lines()
-        .filter_map(parse_pca_line)
-        .collect()
+    decoded.lines().filter_map(parse_pca_line).collect()
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -135,9 +132,7 @@ mod tests {
 
     #[test]
     fn is_pca_file_case_insensitive() {
-        assert!(is_pca_file(
-            r"c:\windows\appcompat\pca\pcaapplaunchdic.txt"
-        ));
+        assert!(is_pca_file(r"c:\windows\appcompat\pca\pcaapplaunchdic.txt"));
     }
 
     #[test]
@@ -151,8 +146,7 @@ mod tests {
 
     #[test]
     fn parse_pca_line_valid() {
-        let (path, ts) =
-            parse_pca_line(r"C:\Windows\notepad.exe|2024-01-15 10:30:00").unwrap();
+        let (path, ts) = parse_pca_line(r"C:\Windows\notepad.exe|2024-01-15 10:30:00").unwrap();
         assert_eq!(path, r"C:\Windows\notepad.exe");
         assert_eq!(ts, "2024-01-15 10:30:00");
     }
@@ -182,8 +176,7 @@ mod tests {
     fn parse_pca_line_trims_whitespace() {
         // trim() strips both leading and trailing whitespace from the full line
         // before splitting, so the timestamp carries no trailing spaces.
-        let (path, ts) =
-            parse_pca_line("  C:\\app.exe|2024-06-01 09:00:00  ").unwrap();
+        let (path, ts) = parse_pca_line("  C:\\app.exe|2024-06-01 09:00:00  ").unwrap();
         assert_eq!(path, r"C:\app.exe");
         assert_eq!(ts, "2024-06-01 09:00:00");
     }
@@ -191,8 +184,7 @@ mod tests {
     #[test]
     fn parse_pca_line_path_with_pipe_uses_first_split() {
         // If the exe path somehow contained a pipe, only split on the first.
-        let (path, ts) =
-            parse_pca_line(r"C:\app.exe|2024-01-01 00:00:00|extra").unwrap();
+        let (path, ts) = parse_pca_line(r"C:\app.exe|2024-01-01 00:00:00|extra").unwrap();
         assert_eq!(path, r"C:\app.exe");
         assert_eq!(ts, "2024-01-01 00:00:00|extra");
     }
@@ -200,9 +192,7 @@ mod tests {
     // ── decode_pca_utf16le ───────────────────────────────────────────────
 
     fn encode_utf16le(s: &str) -> Vec<u8> {
-        s.encode_utf16()
-            .flat_map(|c| c.to_le_bytes())
-            .collect()
+        s.encode_utf16().flat_map(|c| c.to_le_bytes()).collect()
     }
 
     #[test]

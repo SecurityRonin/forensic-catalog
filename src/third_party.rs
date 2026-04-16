@@ -128,12 +128,18 @@ mod tests {
 
     #[test]
     fn onedrive_paths_not_empty() {
-        assert!(!ONEDRIVE_PATHS.is_empty(), "ONEDRIVE_PATHS must not be empty");
+        assert!(
+            !ONEDRIVE_PATHS.is_empty(),
+            "ONEDRIVE_PATHS must not be empty"
+        );
     }
 
     #[test]
     fn all_third_party_paths_not_empty() {
-        assert!(!ALL_THIRD_PARTY_PATHS.is_empty(), "ALL_THIRD_PARTY_PATHS must not be empty");
+        assert!(
+            !ALL_THIRD_PARTY_PATHS.is_empty(),
+            "ALL_THIRD_PARTY_PATHS must not be empty"
+        );
     }
 
     #[test]

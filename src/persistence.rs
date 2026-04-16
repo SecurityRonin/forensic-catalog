@@ -48,9 +48,8 @@ pub const MACOS_PERSISTENCE_PATHS: &[&str] = &[
 ];
 
 /// IFEO (Image File Execution Options) debugger hijack paths — T1546.012
-pub const IFEO_PATHS: &[&str] = &[
-    r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options",
-];
+pub const IFEO_PATHS: &[&str] =
+    &[r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options"];
 
 /// AppInit_DLLs — loaded into every user-mode process — T1546.010
 pub const APPINIT_PATHS: &[&str] = &[
@@ -72,9 +71,7 @@ pub const ACTIVE_SETUP_PATHS: &[&str] = &[
 ];
 
 /// Screensaver abuse — T1546.002
-pub const SCREENSAVER_PATHS: &[&str] = &[
-    r"Control Panel\Desktop",
-];
+pub const SCREENSAVER_PATHS: &[&str] = &[r"Control Panel\Desktop"];
 
 /// Winlogon notification and helper DLLs — T1547.004
 pub const WINLOGON_PATHS: &[&str] = &[
@@ -88,46 +85,27 @@ pub const COM_HIJACK_PATHS: &[&str] = &[
     r"SOFTWARE\Classes\WOW6432Node\CLSID",
 ];
 
-/// All Windows persistence paths combined (for bulk scanning).
-pub const ALL_WINDOWS_PERSISTENCE_PATHS: &[&str] = &[
-    // WINDOWS_RUN_KEYS entries
-    r"Software\Microsoft\Windows\CurrentVersion\Run",
-    r"Software\Microsoft\Windows\CurrentVersion\RunOnce",
-    r"Software\Microsoft\Windows\CurrentVersion\RunServices",
-    r"SYSTEM\CurrentControlSet\Services",
-    r"Software\Microsoft\Windows NT\CurrentVersion\Winlogon",
-    r"Software\Microsoft\Windows NT\CurrentVersion\Image File Execution Options",
-    r"Software\Classes\exefile\shell\open\command",
-    r"SYSTEM\CurrentControlSet\Control\Session Manager\AppCertDlls",
-    r"SYSTEM\CurrentControlSet\Control\Lsa",
-    r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows",
-    // IFEO_PATHS
-    r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options",
-    // APPINIT_PATHS
-    r"SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Windows",
-    // SESSION_MANAGER_PATHS
-    r"SYSTEM\CurrentControlSet\Control\Session Manager",
-    r"SYSTEM\CurrentControlSet\Control\Session Manager\BootExecute",
-    r"SYSTEM\CurrentControlSet\Control\Session Manager\KnownDLLs",
-    // ACTIVE_SETUP_PATHS
-    r"SOFTWARE\Microsoft\Active Setup\Installed Components",
-    r"SOFTWARE\Wow6432Node\Microsoft\Active Setup\Installed Components",
-    // SCREENSAVER_PATHS
-    r"Control Panel\Desktop",
-    // WINLOGON_PATHS
-    r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\Notify",
-    // COM_HIJACK_PATHS
-    r"SOFTWARE\Classes\CLSID",
-    r"SOFTWARE\Classes\WOW6432Node\CLSID",
-];
+/// Returns an iterator over every known Windows persistence path, computed by
+/// chaining the individual sub-group slices. No data is duplicated — each path
+/// string lives in exactly one sub-group constant.
+pub fn all_windows_persistence_paths() -> impl Iterator<Item = &'static str> {
+    WINDOWS_RUN_KEYS
+        .iter()
+        .chain(IFEO_PATHS.iter())
+        .chain(APPINIT_PATHS.iter())
+        .chain(SESSION_MANAGER_PATHS.iter())
+        .chain(ACTIVE_SETUP_PATHS.iter())
+        .chain(SCREENSAVER_PATHS.iter())
+        .chain(WINLOGON_PATHS.iter())
+        .chain(COM_HIJACK_PATHS.iter())
+        .copied()
+}
 
 /// Returns true if the given registry path is a known Windows persistence location
-/// (case-insensitive prefix/contains match against ALL_WINDOWS_PERSISTENCE_PATHS).
+/// (case-insensitive contains match across all sub-group constants).
 pub fn is_persistence_path(path: &str) -> bool {
     let lower = path.to_ascii_lowercase();
-    ALL_WINDOWS_PERSISTENCE_PATHS
-        .iter()
-        .any(|entry| lower.contains(&entry.to_ascii_lowercase()))
+    all_windows_persistence_paths().any(|entry| lower.contains(&entry.to_ascii_lowercase()))
 }
 
 /// Returns true if the IFEO debugger value looks like an attacker-controlled binary.
@@ -224,7 +202,9 @@ mod tests {
 
     #[test]
     fn detects_macos_launch_agents() {
-        assert!(is_persistence_location("/Library/LaunchAgents/com.evil.plist"));
+        assert!(is_persistence_location(
+            "/Library/LaunchAgents/com.evil.plist"
+        ));
     }
 
     #[test]
@@ -256,15 +236,18 @@ mod tests {
 
     #[test]
     fn session_manager_paths_not_empty() {
-        assert!(!SESSION_MANAGER_PATHS.is_empty(), "SESSION_MANAGER_PATHS must not be empty");
+        assert!(
+            !SESSION_MANAGER_PATHS.is_empty(),
+            "SESSION_MANAGER_PATHS must not be empty"
+        );
     }
 
     #[test]
     fn all_windows_persistence_paths_contains_run_keys() {
         assert!(
-            ALL_WINDOWS_PERSISTENCE_PATHS
-                .contains(&r"Software\Microsoft\Windows\CurrentVersion\Run"),
-            "ALL_WINDOWS_PERSISTENCE_PATHS must include the Run key"
+            all_windows_persistence_paths()
+                .any(|p| p == r"Software\Microsoft\Windows\CurrentVersion\Run"),
+            "all_windows_persistence_paths() must include the Run key"
         );
     }
 

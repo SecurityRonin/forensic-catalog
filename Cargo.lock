@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "forensic-indicators"
+name = "forensic-catalog"
 version = "0.1.0"

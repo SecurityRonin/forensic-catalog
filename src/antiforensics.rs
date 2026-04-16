@@ -135,7 +135,9 @@ mod tests {
 
     #[test]
     fn does_not_flag_benign_command() {
-        assert!(!is_log_wipe_command("Get-EventLog -LogName Application -Newest 10"));
+        assert!(!is_log_wipe_command(
+            "Get-EventLog -LogName Application -Newest 10"
+        ));
     }
 
     // Edge: empty
@@ -174,7 +176,9 @@ mod tests {
     // --- is_timestomp_indicator ---
     #[test]
     fn detects_timestomp_tool() {
-        assert!(is_timestomp_indicator("timestomp C:\\secret.doc -z \"01/01/2000 00:00:00\""));
+        assert!(is_timestomp_indicator(
+            "timestomp C:\\secret.doc -z \"01/01/2000 00:00:00\""
+        ));
     }
 
     #[test]

@@ -1,0 +1,44 @@
+[graph]
+targets = []
+all-features = true
+
+# ── Advisories ────────────────────────────────────────────────────────────────
+[advisories]
+version = 2
+# Deny all vulnerabilities and unmaintained crates by default.
+# Add specific IDs to `ignore` only with a comment explaining why.
+ignore = []
+
+# ── Licenses ──────────────────────────────────────────────────────────────────
+[licenses]
+version = 2
+# Allowlist of SPDX identifiers we accept in the dependency tree.
+allow = [
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "MIT",
+    "MIT-0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Unicode-3.0",
+    "Unicode-DFS-2016",
+    "Zlib",
+    "CC0-1.0",
+]
+confidence-threshold = 0.8
+
+# ── Bans ─────────────────────────────────────────────────────────────────────
+[bans]
+# Warn on duplicate versions; error if a crate appears more than twice.
+multiple-versions = "warn"
+wildcards = "deny"
+highlight = "all"
+workspace-default-features = "allow"
+external-default-features = "allow"
+
+# ── Sources ───────────────────────────────────────────────────────────────────
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

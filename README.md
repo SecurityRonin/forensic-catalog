@@ -1,8 +1,8 @@
-[![crates.io](https://img.shields.io/badge/crates.io-forensic--catalog-orange?style=for-the-badge)](https://crates.io/crates/forensic-catalog)
-[![docs](https://img.shields.io/badge/docs-docs.rs-blue?style=for-the-badge)](https://docs.rs/forensic-catalog)
-[![license](https://img.shields.io/badge/license-Apache--2.0-blue?style=for-the-badge)](LICENSE)
+[![crates.io](https://img.shields.io/crates/v/forensic-catalog?style=for-the-badge&logo=rust)](https://crates.io/crates/forensic-catalog)
+[![docs.rs](https://img.shields.io/docsrs/forensic-catalog?style=for-the-badge)](https://docs.rs/forensic-catalog)
+[![CI](https://img.shields.io/github/actions/workflow/status/SecurityRonin/forensic-catalog/ci.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/SecurityRonin/forensic-catalog/actions/workflows/ci.yml)
+[![license](https://img.shields.io/crates/l/forensic-catalog?style=for-the-badge)](LICENSE)
 [![rust](https://img.shields.io/badge/rust-1.75+-orange?style=for-the-badge&logo=rust)](https://www.rust-lang.org)
-[![sponsor](https://img.shields.io/badge/sponsor-h4x0r-ff69b4?style=for-the-badge&logo=github-sponsors)](https://github.com/sponsors/h4x0r)
 
 # forensic-catalog
 

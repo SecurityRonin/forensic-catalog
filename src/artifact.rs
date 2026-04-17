@@ -400,7 +400,7 @@ impl ForensicCatalog {
     /// Within the same priority, original catalog order is preserved.
     pub fn for_triage(&self) -> Vec<&ArtifactDescriptor> {
         let mut v: Vec<&ArtifactDescriptor> = self.entries.iter().collect();
-        v.sort_by(|a, b| b.triage_priority.cmp(&a.triage_priority));
+        v.sort_by_key(|d| std::cmp::Reverse(d.triage_priority));
         v
     }
 

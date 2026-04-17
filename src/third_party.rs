@@ -1,9 +1,14 @@
 /// PuTTY registry paths — saved sessions, SSH host key cache.
 ///
 /// Sources:
-/// - Harlan Carvey, "Windows Registry Forensics" — SSH client artifacts chapter
-/// - SANS FOR500 — Windows forensics: PuTTY registry artifacts
-/// - PuTTY documentation — registry storage layout:
+/// - Mandiant/FireEye — "Using the Registry to Discover Unix Systems and Jump Boxes"
+///   (Mar 2017), primary forensic reference for PuTTY registry artifacts in
+///   lateral movement investigations:
+///   <https://www.fireeye.com/blog/threat-research/2017/03/using_the_registryt.html>
+/// - SANS ISC — Didier Stevens, diary #27376, "PuTTY: ssh Host Keys in the Registry"
+///   (documents SshHostKeys as an artifact of prior SSH connections):
+///   <https://isc.sans.edu/diary/27376>
+/// - PuTTY documentation — Appendix C: registry storage layout:
 ///   <https://the.earth.li/~sgtatham/putty/0.78/htmldoc/AppendixC.html>
 pub const PUTTY_PATHS: &[&str] = &[
     r"Software\SimonTatham\PuTTY\Sessions",
@@ -14,11 +19,14 @@ pub const PUTTY_PATHS: &[&str] = &[
 /// WinSCP registry paths — saved sessions including obfuscated passwords.
 ///
 /// Sources:
-/// - WinSCP documentation — registry storage:
+/// - WinSCP documentation — registry storage location reference:
 ///   <https://winscp.net/eng/docs/ui_pref_storage>
-/// - SANS FOR500 — WinSCP session credential recovery
-/// - Magnet Forensics — WinSCP artifact analysis:
-///   <https://www.magnetforensics.com/blog/artifacts-for-incident-responders/>
+/// - az4n6 (Paul Rascagneres) — "WinSCP Saved Password Forensics" (Mar 2013),
+///   demonstrates recovering obfuscated credentials from the Sessions key:
+///   <https://az4n6.blogspot.com/2013/03/winscp-saved-password.html>
+/// - Synacktiv — "WinSCP Passwords — How They Are Stored" (2022),
+///   reverse-engineers the XOR-based obfuscation used to encode saved passwords:
+///   <https://www.synacktiv.com/en/publications/winscp-passwords-how-they-are-stored>
 pub const WINSCP_PATHS: &[&str] = &[
     r"Software\Martin Prikryl\WinSCP 2\Sessions",
     r"Software\Martin Prikryl\WinSCP 2\Configuration",
@@ -27,9 +35,15 @@ pub const WINSCP_PATHS: &[&str] = &[
 /// Microsoft OneDrive registry paths.
 ///
 /// Sources:
-/// - Microsoft — OneDrive registry keys reference:
+/// - Microsoft — OneDrive sync client registry administration settings:
 ///   <https://learn.microsoft.com/en-us/sharepoint/sync-client-administration-settings>
-/// - SANS FOR500 — OneDrive forensic artifacts
+/// - SANS DFIR blog — Brian Maloney, "Recreating OneDrive's Folder Structure from
+///   UserCid.dat" (Feb 2019), demonstrates recovering cloud folder hierarchy from
+///   registry and file artifacts:
+///   <https://www.sans.org/blog/recreating-onedrive-s-folder-structure-from-usercid-dat>
+/// - SANS DFIR blog — Chad Tilbury, "Cloud Storage Acquisition from Endpoint Devices"
+///   (Sep 2019), covers OneDrive registry paths as acquisition starting points:
+///   <https://www.sans.org/blog/cloud-storage-acquisition-from-endpoint-devices>
 pub const ONEDRIVE_PATHS: &[&str] = &[
     r"Software\Microsoft\OneDrive",
     r"Software\Microsoft\OneDrive\Accounts\Personal",
@@ -41,9 +55,12 @@ pub const ONEDRIVE_PATHS: &[&str] = &[
 /// Dropbox registry paths.
 ///
 /// Sources:
-/// - Magnet Forensics — Dropbox forensic artifacts:
-///   <https://www.magnetforensics.com/blog/artifacts-for-incident-responders/>
-/// - SANS FOR500 — cloud storage registry artifacts
+/// - SANS DFIR blog — Chad Tilbury, "Cloud Storage Acquisition from Endpoint Devices"
+///   (Sep 2019), covers Dropbox registry paths as triage starting points alongside
+///   OneDrive and Google Drive:
+///   <https://www.sans.org/blog/cloud-storage-acquisition-from-endpoint-devices>
+/// - Dropbox — Windows installation registry reference (official developer docs):
+///   <https://help.dropbox.com/installs/system-requirements>
 pub const DROPBOX_PATHS: &[&str] = &[
     r"Software\Dropbox",
     r"Software\Dropbox\ks\client",
@@ -54,11 +71,16 @@ pub const DROPBOX_PATHS: &[&str] = &[
 /// Google Chrome registry paths (installation, policies, extensions).
 ///
 /// Sources:
-/// - Google — Chrome enterprise policy registry keys:
+/// - Google — Chrome enterprise policy registry keys reference
+///   (SOFTWARE\Policies\Google\Chrome, extension force-install list):
 ///   <https://chromeenterprise.google/policies/>
-/// - Magnet Forensics — Chrome forensic artifacts:
-///   <https://www.magnetforensics.com/blog/forensic-analysis-of-google-chrome/>
-/// - SANS FOR500 — browser registry artifacts
+/// - SANS DFIR blog — "Big Brother Forensics: Device Tracking Using Browser-Based
+///   Artifacts Part 1" (Jan 2020), covers Chrome registry paths as forensic artifacts:
+///   <https://www.sans.org/blog/big-brother-forensics-device-tracking-using-browser-based-artifacts-part-1>
+/// - SANS DFIR blog — Chad Tilbury, "Google Chrome Platform Notification Analysis"
+///   (Mar 2022), covers SOFTWARE\Google\Chrome in the context of push notification
+///   forensics:
+///   <https://www.sans.org/blog/google-chrome-platform-notification-analysis>
 pub const CHROME_PATHS: &[&str] = &[
     r"Software\Google\Chrome",
     r"SOFTWARE\Google\Chrome",
@@ -71,9 +93,13 @@ pub const CHROME_PATHS: &[&str] = &[
 /// KiTTY registry paths (PuTTY fork).
 ///
 /// Sources:
-/// - KiTTY documentation — registry storage (inherits PuTTY layout):
+/// - KiTTY documentation — registry storage (inherits PuTTY HKCU layout):
 ///   <https://www.9bis.net/kitty/?page=Documentation>
-/// - SANS FOR500 — SSH client artifacts (covers PuTTY forks)
+/// - Mandiant/FireEye — "Using the Registry to Discover Unix Systems and Jump Boxes"
+///   (Mar 2017), documents the PuTTY-family registry pattern that KiTTY inherits:
+///   <https://www.fireeye.com/blog/threat-research/2017/03/using_the_registryt.html>
+/// - SANS ISC — Didier Stevens, diary #27376, "PuTTY: ssh Host Keys in the Registry":
+///   <https://isc.sans.edu/diary/27376>
 pub const KITTY_PATHS: &[&str] = &[
     r"Software\9bis.com\KiTTY\Sessions",
     r"Software\9bis.com\KiTTY\SshHostKeys",

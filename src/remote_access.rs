@@ -33,7 +33,7 @@ pub const ANYDESK_PATHS: &[&str] = &[
 /// Splashtop registry indicator paths.
 ///
 /// Sources:
-/// - LOLRMM project: <https://lolrmm.io/tools/splashtop>
+/// - LOLRMM project: <https://lolrmm.io/tools/splashtop_remote>
 /// - Huntress RMM abuse research:
 ///   <https://www.huntress.com/blog/no-longer-low-hanging-fruit-hunting-for-risky-rmm-tools>
 pub const SPLASHTOP_PATHS: &[&str] = &[

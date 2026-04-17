@@ -154,17 +154,6 @@ let desc = CATALOG.by_id("userassist_exe").unwrap();
 assert!(!desc.sources.is_empty());
 ```
 
-## Blog Archive Ingestion
-
-The repo also includes a dependency-free blog scraper for building a local DFIR
-research corpus from archive pages, sitemaps, or Blogger feeds:
-
-```bash
-python3 scripts/scrape_blog.py \
-  --url https://windowsir.blogspot.com \
-  --output research/windowsir
-```
-
 ## Used by
 
 - [`RapidTriage`](https://github.com/SecurityRonin/RapidTriage) — live incident response triage tool

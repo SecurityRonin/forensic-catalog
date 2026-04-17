@@ -1898,9 +1898,7 @@ pub static ACTIVE_SETUP_HKCU: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1547/014/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1547/014/"],
 };
 
 /// COM Hijacking via HKCU CLSID registration (T1546.015).
@@ -3085,9 +3083,7 @@ pub static LINUX_CRON_PERIODIC: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1053/003/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1053/003/"],
 };
 
 /// Per-user crontab spool at `/var/spool/cron/crontabs/{user}` (T1053.003).
@@ -3501,9 +3497,7 @@ pub static LINUX_LD_SO_CONF_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1574/006/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1574/006/"],
 };
 
 // ── Linux persistence: SSH ────────────────────────────────────────────────
@@ -3560,9 +3554,7 @@ pub static LINUX_PAM_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1556/003/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1556/003/"],
 };
 
 /// `/etc/sudoers.d/` — drop-in sudoers rules (T1548.003).
@@ -3587,9 +3579,7 @@ pub static LINUX_SUDOERS_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1548/003/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1548/003/"],
 };
 
 /// `/etc/modules-load.d/` — kernel modules loaded at boot (T1547.006).
@@ -3613,9 +3603,7 @@ pub static LINUX_MODULES_LOAD_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1547/006/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1547/006/"],
 };
 
 /// `/etc/update-motd.d/` — dynamic MOTD scripts executed on login (Debian/Ubuntu).
@@ -3639,9 +3627,7 @@ pub static LINUX_MOTD_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1037/004/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1037/004/"],
 };
 
 /// `/etc/udev/rules.d/` — udev device event rules (T1546).
@@ -3666,9 +3652,7 @@ pub static LINUX_UDEV_RULES_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1546/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1546/"],
 };
 
 // ── Linux execution evidence ──────────────────────────────────────────────
@@ -3807,9 +3791,7 @@ pub static LINUX_LASTLOG: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1078/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1078/"],
 };
 
 /// `/var/log/auth.log` — authentication and sudo event log (Debian/Ubuntu).
@@ -3950,9 +3932,7 @@ pub static LINUX_SSH_PRIVATE_KEY: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1552/004/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1552/004/"],
 };
 
 /// `~/.ssh/known_hosts` — previously connected SSH server fingerprints (T1021.004).
@@ -4003,9 +3983,7 @@ pub static LINUX_GNUPG_PRIVATE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1552/004/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1552/004/"],
 };
 
 /// `~/.aws/credentials` — AWS access key material (T1552.001).
@@ -4029,9 +4007,7 @@ pub static LINUX_AWS_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1552/001/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1552/001/"],
 };
 
 /// `~/.docker/config.json` — Docker registry auth tokens (T1552.001).
@@ -4055,9 +4031,7 @@ pub static LINUX_DOCKER_CONFIG: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1552/001/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1552/001/"],
 };
 
 // ── Batch E — Windows execution / persistence / credential ───────────────────
@@ -4204,9 +4178,7 @@ pub static WMI_MOF_DIR: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1546/003/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1546/003/"],
 };
 
 pub static BITS_DB: ArtifactDescriptor = ArtifactDescriptor {
@@ -4277,9 +4249,7 @@ pub static WMI_SUBSCRIPTIONS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1546/003/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1546/003/"],
 };
 
 pub static LOGON_SCRIPTS: ArtifactDescriptor = ArtifactDescriptor {
@@ -4300,9 +4270,7 @@ pub static LOGON_SCRIPTS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1037/001/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1037/001/"],
 };
 
 pub static WINSOCK_LSP: ArtifactDescriptor = ArtifactDescriptor {
@@ -4323,9 +4291,7 @@ pub static WINSOCK_LSP: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1547/010/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1547/010/"],
 };
 
 pub static APPSHIM_DB: ArtifactDescriptor = ArtifactDescriptor {
@@ -4346,9 +4312,7 @@ pub static APPSHIM_DB: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1546/011/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1546/011/"],
 };
 
 pub static PASSWORD_FILTER_DLL: ArtifactDescriptor = ArtifactDescriptor {
@@ -4369,9 +4333,7 @@ pub static PASSWORD_FILTER_DLL: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1556/002/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1556/002/"],
 };
 
 pub static OFFICE_NORMAL_DOTM: ArtifactDescriptor = ArtifactDescriptor {
@@ -4392,9 +4354,7 @@ pub static OFFICE_NORMAL_DOTM: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1137/001/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1137/001/"],
 };
 
 pub static POWERSHELL_PROFILE_ALL: ArtifactDescriptor = ArtifactDescriptor {
@@ -4415,9 +4375,7 @@ pub static POWERSHELL_PROFILE_ALL: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1546/013/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1546/013/"],
 };
 
 // ── Credentials ───────────────────────────────────────────────────────────────
@@ -4440,9 +4398,7 @@ pub static DPAPI_SYSTEM_MASTERKEY: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["lsa_secrets", "dpapi_masterkey_user"],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1555/004/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1555/004/"],
 };
 
 pub static DPAPI_CREDHIST: ArtifactDescriptor = ArtifactDescriptor {
@@ -4463,9 +4419,7 @@ pub static DPAPI_CREDHIST: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &["dpapi_masterkey_user"],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1555/004/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1555/004/"],
 };
 
 pub static CHROME_COOKIES: ArtifactDescriptor = ArtifactDescriptor {
@@ -4534,9 +4488,7 @@ pub static VPN_RAS_PHONEBOOK: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Low,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1552/001/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1552/001/"],
 };
 
 pub static WINDOWS_HELLO_NGC: ArtifactDescriptor = ArtifactDescriptor {
@@ -4557,9 +4509,7 @@ pub static WINDOWS_HELLO_NGC: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1555/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1555/"],
 };
 
 pub static USER_CERT_PRIVATE_KEY: ArtifactDescriptor = ArtifactDescriptor {
@@ -4603,9 +4553,7 @@ pub static MACHINE_CERT_STORE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1552/004/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1552/004/"],
 };
 
 // ── Batch F — Linux extended credentials / execution ─────────────────────────
@@ -4628,9 +4576,7 @@ pub static LINUX_AT_QUEUE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1053/001/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1053/001/"],
 };
 
 pub static LINUX_SSHD_CONFIG: ArtifactDescriptor = ArtifactDescriptor {
@@ -4699,9 +4645,7 @@ pub static LINUX_GNOME_KEYRING: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1555/003/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1555/003/"],
 };
 
 pub static LINUX_KDE_KWALLET: ArtifactDescriptor = ArtifactDescriptor {
@@ -4722,9 +4666,7 @@ pub static LINUX_KDE_KWALLET: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1555/003/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1555/003/"],
 };
 
 pub static LINUX_CHROME_LOGIN_LINUX: ArtifactDescriptor = ArtifactDescriptor {
@@ -4745,9 +4687,7 @@ pub static LINUX_CHROME_LOGIN_LINUX: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1555/003/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1555/003/"],
 };
 
 pub static LINUX_FIREFOX_LOGINS_LINUX: ArtifactDescriptor = ArtifactDescriptor {
@@ -4769,9 +4709,7 @@ pub static LINUX_FIREFOX_LOGINS_LINUX: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1555/003/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1555/003/"],
 };
 
 pub static LINUX_UTMP: ArtifactDescriptor = ArtifactDescriptor {
@@ -4819,9 +4757,7 @@ pub static LINUX_GCP_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1552/001/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1552/001/"],
 };
 
 pub static LINUX_AZURE_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
@@ -4865,9 +4801,7 @@ pub static LINUX_KUBE_CONFIG: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1552/001/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1552/001/"],
 };
 
 pub static LINUX_GIT_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
@@ -4888,9 +4822,7 @@ pub static LINUX_GIT_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1552/001/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1552/001/"],
 };
 
 pub static LINUX_NETRC: ArtifactDescriptor = ArtifactDescriptor {
@@ -4911,9 +4843,7 @@ pub static LINUX_NETRC: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1552/001/",
-    ],
+    sources: &["https://attack.mitre.org/techniques/T1552/001/"],
 };
 
 // ── Batch G — LinuxPersist-sourced persistence artifacts ─────────────────────

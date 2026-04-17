@@ -1,15 +1,14 @@
-/// Program Compatibility Assistant (PCA) forensic artifact support.
-///
-/// The PCA records Explorer-initiated application launches on Windows 11 22H2+.
-/// Files are UTF-16 LE encoded, pipe-delimited: `<exe_path>|<timestamp>`.
-///
-/// **Critical limitation**: only Explorer shell launches are captured.
-/// CMD, PowerShell, WMI, PsExec, scheduled tasks, and services are NOT recorded.
-/// Absence of a record does NOT imply non-execution.
-///
-/// Source: research/registry-forensic-artifacts-complete-catalog.md §10.0
-///
-/// Reference: <https://andreafortuna.org/2026/03/19/windows11-pca-artifact/>
+//! Program Compatibility Assistant (PCA) forensic artifact support.
+//!
+//! The PCA records Explorer-initiated application launches on Windows 11 22H2+.
+//! Files are UTF-16 LE encoded, pipe-delimited: `<exe_path>|<timestamp>`.
+//!
+//! **Critical limitation**: only Explorer shell launches are captured.
+//! CMD, PowerShell, WMI, PsExec, scheduled tasks, and services are NOT recorded.
+//! Absence of a record does NOT imply non-execution.
+//!
+//! Source: Andrea Fortuna — "Windows 11 PCA Artifact" (2024):
+//! <https://andreafortuna.org/2024/windows11-pca-artifact/>
 
 // ── Path constants ────────────────────────────────────────────────────────────
 

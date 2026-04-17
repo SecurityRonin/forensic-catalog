@@ -99,27 +99,18 @@ mod tests {
     use super::*;
 
     #[test]
-    fn veracrypt_paths_not_empty() {
-        assert!(
-            !VERACRYPT_PATHS.is_empty(),
-            "VERACRYPT_PATHS must not be empty"
-        );
+    fn veracrypt_paths_contains_hklm_key() {
+        assert!(VERACRYPT_PATHS.contains(&r"SOFTWARE\VeraCrypt"));
     }
 
     #[test]
-    fn bitlocker_paths_not_empty() {
-        assert!(
-            !BITLOCKER_PATHS.is_empty(),
-            "BITLOCKER_PATHS must not be empty"
-        );
+    fn bitlocker_paths_contains_fve_policy() {
+        assert!(BITLOCKER_PATHS.contains(&r"SOFTWARE\Policies\Microsoft\FVE"));
     }
 
     #[test]
-    fn sevenzip_paths_not_empty() {
-        assert!(
-            !SEVENZIP_PATHS.is_empty(),
-            "SEVENZIP_PATHS must not be empty"
-        );
+    fn sevenzip_paths_contains_hklm_key() {
+        assert!(SEVENZIP_PATHS.contains(&r"SOFTWARE\7-Zip"));
     }
 
     #[test]

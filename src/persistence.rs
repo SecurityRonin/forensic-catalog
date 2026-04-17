@@ -283,23 +283,23 @@ mod tests {
         assert!(!is_persistence_location(""));
     }
 
-    // --- Module 1 new constants ---
+    // --- sub-group constant membership ---
     #[test]
-    fn ifeo_paths_not_empty() {
-        assert!(!IFEO_PATHS.is_empty(), "IFEO_PATHS must not be empty");
+    fn ifeo_paths_contains_ifeo_key() {
+        assert!(IFEO_PATHS.contains(
+            &r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options"
+        ));
     }
 
     #[test]
-    fn appinit_paths_not_empty() {
-        assert!(!APPINIT_PATHS.is_empty(), "APPINIT_PATHS must not be empty");
+    fn appinit_paths_contains_windows_key() {
+        assert!(APPINIT_PATHS.contains(&r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows"));
     }
 
     #[test]
-    fn session_manager_paths_not_empty() {
-        assert!(
-            !SESSION_MANAGER_PATHS.is_empty(),
-            "SESSION_MANAGER_PATHS must not be empty"
-        );
+    fn session_manager_paths_contains_boot_execute() {
+        assert!(SESSION_MANAGER_PATHS
+            .contains(&r"SYSTEM\CurrentControlSet\Control\Session Manager\BootExecute"));
     }
 
     #[test]

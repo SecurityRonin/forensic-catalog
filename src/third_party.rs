@@ -132,16 +132,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn putty_paths_not_empty() {
-        assert!(!PUTTY_PATHS.is_empty(), "PUTTY_PATHS must not be empty");
+    fn putty_paths_contains_sessions_key() {
+        assert!(PUTTY_PATHS.contains(&r"Software\SimonTatham\PuTTY\Sessions"));
     }
 
     #[test]
-    fn onedrive_paths_not_empty() {
-        assert!(
-            !ONEDRIVE_PATHS.is_empty(),
-            "ONEDRIVE_PATHS must not be empty"
-        );
+    fn onedrive_paths_contains_hkcu_key() {
+        assert!(ONEDRIVE_PATHS.contains(&r"Software\Microsoft\OneDrive"));
     }
 
     #[test]

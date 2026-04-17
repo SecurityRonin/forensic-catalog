@@ -152,16 +152,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn teamviewer_paths_not_empty() {
-        assert!(
-            !TEAMVIEWER_PATHS.is_empty(),
-            "TEAMVIEWER_PATHS must not be empty"
-        );
+    fn teamviewer_paths_contains_hklm_key() {
+        assert!(TEAMVIEWER_PATHS.contains(&r"SOFTWARE\TeamViewer"));
     }
 
     #[test]
-    fn anydesk_paths_not_empty() {
-        assert!(!ANYDESK_PATHS.is_empty(), "ANYDESK_PATHS must not be empty");
+    fn anydesk_paths_contains_service_key() {
+        assert!(ANYDESK_PATHS.contains(&r"SYSTEM\CurrentControlSet\Services\AnyDesk"));
     }
 
     #[test]
@@ -185,7 +182,10 @@ mod tests {
             ACTION1_PATHS[0],
             MANAGEENGINE_PATHS[0],
         ] {
-            assert!(all.contains(&path), "Missing path in all_lolrmm_paths: {path}");
+            assert!(
+                all.contains(&path),
+                "Missing path in all_lolrmm_paths: {path}"
+            );
         }
     }
 

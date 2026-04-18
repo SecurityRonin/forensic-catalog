@@ -12,6 +12,7 @@
 //! analysts. If you are new to the crate, start here:
 //!
 //! - [`catalog::CATALOG`] for the artifact registry
+//! - [`handbook`] for the analyst-facing handbook
 //! - [`references`] for module-level provenance
 //! - [`catalog::all_container_profiles`] for outer parsing layers
 //! - [`catalog::all_container_signatures`] for carving/recognition guidance
@@ -46,6 +47,7 @@ pub mod artifact;
 pub use artifact as catalog;
 pub mod commands;
 pub mod encryption;
+pub mod handbook;
 pub mod lolbins;
 pub mod paths;
 pub mod pca;

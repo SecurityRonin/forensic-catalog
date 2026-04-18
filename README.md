@@ -10,6 +10,7 @@ Forensic knowledge as code — zero-dependency, `std`-only, embeds in any Rust b
 
 ## Docs
 
+- [DFIR Handbook](docs/index.md)
 - [Module Source Map](docs/module-sources.md)
 - [Canonical Source Inventory](archive/sources/source-inventory.md)
 - [Windows IR Archive Index](archive/windowsir/index.json)

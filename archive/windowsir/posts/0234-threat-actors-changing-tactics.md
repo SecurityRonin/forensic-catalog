@@ -1,0 +1,21 @@
+# Threat Actors Changing Tactics
+
+- URL: https://windowsir.blogspot.com/2023/03/threat-actors-changing-tactics.html
+- Published: 2023-03-16T13:31:00.000-05:00
+- Updated: 2023-03-16T13:31:54.554-05:00
+- Labels: none
+
+I've been reading a bit lately on social media about how cyber security is "hard" and it's "expensive", and about how threat actors becoming "increasingly sophisticated".
+ The thing is, going back more than 20 yrs, in fact going back to 1997, when I left military active duty and transitioned to the private sector, I've seen something entirely different.
+ On 7 Feb 2022, Microsoft announced their plans to change how the Windows platform (OS and applications) handled macros in Office files downloaded from the Internet; they were planning to block them, by default. Okay, so why is that? Well, it turns out that weaponized Office docs (Word documents, Excel spreadsheets, etc.) were popular methods for gaining access to systems.
+ As it turns out, even after all of the discussion and activity around this one, single topic, weaponized documents are still in use today. In fact, March 2023 saw the return of Emotet , delivered via an older-style MS Word .doc file that was in excess of 500MB in size. This demonstrates that even with documented incidents and available protections, these attacks will still continue to work, because the necessary steps to help protect organizations are never taken. In addition to using macros in old-style MS Word documents, the actors behind the new Emotet campaigns are also including instructions to the recipient for...essentially... bypassing those protection mechanisms .
+ Following the Feb 2022 announcement from Microsoft, we saw some threat actors shift to using disk image files to deploy their malware, due in large part to the apparent dearth of security measures (at the time) to protect organizations from such attacks. For example, a BumbleBee campaign was observed using IMG files to help spread malware.
+ MS later updated Windows to ensure "mark-of-the-web" (MotW) propagation to files embedded within disk image files downloaded from the Internet, so that protection mechanisms were available for some file types, and that at least warnings would be generated for others.
+ We then saw a shift to the use of macros in MS OneNote files, as apparently these file weren't considered "MS Office files" (wait...what??).
+ So, in the face of this constant shifting in and evolution of tactics, what are organizations to do to address these issues and protect themselves?
+ Well, the solution for the issue of weaponized Office documents existed well prior to the Microsoft announcement in Feb 2022; in fact, MS was simply implementing it where orgs weren't doing so. And the thing is, the solution was absolutely free. Yep. Free, as in "beer". A GPO, or a simple Registry modification. That's it.
+ The issue with the use of disk image files is that when received and a user double-clicks them, they're automatically mounted and the contents accessible to the user. The fix for this ...disabling automatically mounting the image files when the user double-clicks them...is similarly free. With two simple Registry modifications, users are prevented from automatically mounting 4 file types - ISO, IMG, VHD, and VHDX. However, this does not prevent users from programmatically accessing these files, such as via a legitimate business process; all it does is prevent the files from being automatically mounted via double-clicking.
+ And did I mention that it's free?
+ What about OneNote files? Yeah, what about them ?
+ My point is that we very often say, "...security is too expensive..." and "...threat actors are increasing in sophistication...", but even with changes in tactics, is either statement really true? As an incident responder, over the years, I've seen the boots-on-the-ground details of attacks, and a great many of them could have been prevented or at the very least significantly hampered had a few simple, free modifications been made to the infrastructure.
+ The Huntress team posted an article recently that includes Powershell code that you can copy-paste and use immediately, and will address all three of the situations/conditions discussed in this blog post.

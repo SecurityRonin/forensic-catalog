@@ -1,0 +1,28 @@
+# UEPOTB, LNK edition
+
+- URL: https://windowsir.blogspot.com/2024/12/uepotb-lnk-edition.html
+- Published: 2024-12-24T10:47:00.003-05:00
+- Updated: 2024-12-24T10:47:57.734-05:00
+- Labels: none
+
+A while back, Jesse Kornblum published a paper titled, " Using Every Part of the Buffalo in Windows Memory Analysis ". This was, and still is, an excellent paper, based on it's content and how it pertained to the subject (Windows memory analysis). However, what Jesse shared in that paper had additional value, in that it he expressed the idea of using everything available to the analyst.
+ Since then, we've seen more than a few papers, blog posts and articles where the author(s) go only so far with the extent of what they share regarding the data they're looking at, and do not truly use all the parts of the buffalo. Examples of these include blog posts or articles where LNK files are delivered as part of a phishing campaign, and the author only goes so far as to show the basic properties of the LNK file, perhaps up through the command line, but then stopping there.
+ Now and again, we do see articles published by teams that truly do strive to use all the parts of the buffalo, leveraging everything they have available, but those are still few and far between. Perhaps one of the most notable examples is a Mandiant article from 19 Nov 2018 that referred to a phishing campaign (using LNK files) by APT29/"Cozy Bear". In the article, the authors compare activity from a similar campaign from 2016, using LNK files from the previous campaign (see figures 5 & 6).
+ One such example of where the content falls short is a recent blog post from Cyble . The article contains references to three LNK files using in phishing campaigns, each illustrated in the article by opening the file via the Properties tab, as seen in figure 1. This shows specific elements of the LNK file, but only those visible via the Properties tab.
+ Figure 1: LNK Properties
+
+ What we see in figure 1 also shows that the author(s) had access to the LNK files themselves, and could have done so much more with them.
+ Hashes for the LNK files are also listed in the IoCs table at the end of the article, and I was able to find one of the file available for download via another site online, and was able to extract the metadata illustrated in figure 2.
+
+ "christmas-destr" seems to be pretty unique workstation name, and might prove to be interesting in tracking and retro-hunts. And yes, if you do an OUI lookup on the node IDs shown in figure 2, they'll align with "VMWare, Inc.", which isn't surprising.
+ Interestingly enough, the LNK file also contains a fairly well-populated PropertyStoreDataBlock , which isn't something we see in every LNK file, and can provide insight into how the shortcut file was "constructed". Different methodologies and tools for creating LNK files leave different toolmarks .
+ Taking things a step further, in addition to the information in the rest of the LNK file discussed above, we can see from figure 3 that the information within the file header and the shell item ID list can be fairly illuminating.
+
+ The original article was published on 19 Dec 2024, which provides some idea as to the timeframe of when the LNK file would have been deployed in a campaign, collected, and analyzed. Using the information illustrated in figure 3, we get some additional insight as to the timeframe specifically associated with the LNK file, particularly those time stamps within the shell items.
+ In addition to the volume serial number (i.e., "280C-1822"), the time stamps and MFT reference numbers extracted from the shell items provides additional indicators that can be used to align with LNK files from other campaigns.
+ Another such example is a blog from Blackberry that discusses a Pakistani threat group dubbed "Transparent Tribe". I was able to find a couple of the LNK files listed in the appendix available for download, based on the provided hashes. What I found when comparing the metadata extracted from two LNK files was that aside from some minor differences, mostly in the command lines, they were nearly identical. Same volume serial number, same machine ID, same time stamps in the shell items, etc. In this case, the machine ID value was "desktop-e7n7e7f", which (a) should be compared across the other LNK files as well as other data sources, and (b) can be used along with other elements of metadata as part of a VirusTotal retro-hunt to expand the intelligence aperture even further, potentially associating the system with other campaigns.
+ These LNK files also contained a PropertyStoreDataBlock , but rather than being as verbose as the previous example from the Cyble article, these LNK files simply contained a SID:
+ S-1-5-21-3861309104-3271506253-2070734288-1001
+ Okay, but so what? Why does any of this matter?
+ Well, these indicators, when combined and added to other indicators, tell us a good bit about the operational processes of the threat actor, as well as the development environment and processes employed by the threat actor/group.
+ Beyond the basic indicators, the structure of the LNK file itself can tell us a good bit about how the LNK file was constructed, as well as the situational awareness of the actor or group. For example, there have been instances where the time stamps in the shell items have been zero'd out , essentially removing those indicators. However, I'd be careful about any assumptions made regarding a threat group's situational awareness or operational security based on metadata within LNK files; the simple fact is that this information is largely left unused by many firms, so why bother with the extra steps or work to remove the indicators?

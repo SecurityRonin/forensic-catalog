@@ -16,6 +16,39 @@
 //!   This module is purely additive.
 //! - **Single source of truth** -- artifact paths, decode logic, field schemas,
 //!   and MITRE mappings live here. Consumers never hardcode them.
+//!
+//! # Curated source corpus
+//!
+//! Artifact additions in this module are researched from a maintained DFIR source
+//! corpus. The authoritative inventory now lives in machine-readable form under
+//! `archive/sources/`:
+//!
+//! - `catalog-directories.json` for directory-style discovery pages
+//! - `manual-sources.json` for curated manual additions and knowledge bases
+//! - `dfir-feeds.opml` for subscribed RSS/Atom feeds
+//! - `source-inventory.json` for the normalized canonical inventory
+//!
+//! The catalog should prefer primary/vendor documentation and well-cited
+//! practitioner research over generic security blogging. Individual
+//! [`ArtifactDescriptor::sources`] entries should still point to the specific
+//! authoritative references that justify each artifact; the maintained source
+//! corpus is discovery input, not a blanket citation.
+//!
+//! Parser knowledge is layered:
+//!
+//! - [`ContainerProfile`] models how to open and enumerate the outer container
+//!   such as an offline Registry hive, SQLite database, EVTX log, or memory image.
+//! - [`ContainerSignature`] models how to recognize or carve that container
+//!   from raw bytes in unallocated space or memory.
+//! - [`ArtifactDescriptor`] identifies where the artifact lives inside that
+//!   container or on disk.
+//! - [`ArtifactParsingProfile`] captures artifact-specific interpretation rules
+//!   such as "UserAssist names are ROT13" or "BITS jobs must be reconstructed
+//!   from qmgr*.dat records".
+//! - [`RecordSignature`] models how to recognize or validate individual records
+//!   or payloads inside a container when carving or validating fragments.
+//! - [`Decoder`] is reserved for compact, stable transforms we can implement
+//!   safely in-core.
 
 // ── Core enums ───────────────────────────────────────────────────────────────
 
@@ -219,6 +252,91 @@ pub struct ArtifactDescriptor {
     pub sources: &'static [&'static str],
 }
 
+/// How to acquire and enumerate the outer container that holds one or more
+/// forensic artifacts.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerProfile {
+    /// Machine-readable identifier, e.g. `windows_registry_hive`.
+    pub id: &'static str,
+    /// Human-readable display name.
+    pub name: &'static str,
+    /// Summary of what the container represents.
+    pub summary: &'static str,
+    /// High-signal acquisition and enumeration guidance.
+    pub parser_hints: &'static [&'static str],
+    /// Authoritative references that justify the container guidance.
+    pub sources: &'static [&'static str],
+}
+
+/// How to recognize or carve a container format from raw bytes.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerSignature {
+    /// Container id this signature belongs to.
+    pub container_id: &'static str,
+    /// Human-readable name for the signature.
+    pub name: &'static str,
+    /// Expected magic or marker bytes near the start of the structure.
+    pub header_magic: &'static [u8],
+    /// Optional footer or trailer bytes when the format has a stable trailer.
+    pub footer_magic: &'static [u8],
+    /// Byte offset where `header_magic` is expected.
+    pub header_offset: usize,
+    /// Minimum plausible container size.
+    pub min_size: Option<usize>,
+    /// Expected alignment or page/chunk size when applicable.
+    pub alignment: Option<usize>,
+    /// Structural validation rules beyond simple magic bytes.
+    pub invariants: &'static [&'static str],
+    /// Authoritative references for the signature or structure rules.
+    pub sources: &'static [&'static str],
+}
+
+/// Parsing guidance for artifacts whose interpretation requires more than a
+/// flat decoder or field schema.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ArtifactParsingProfile {
+    /// Catalog artifact id this guidance applies to.
+    pub artifact_id: &'static str,
+    /// Storage or serialization format analysts should expect.
+    pub format: &'static str,
+    /// Short summary of the parsing model.
+    pub summary: &'static str,
+    /// High-signal parser notes and workflow guidance.
+    pub parser_hints: &'static [&'static str],
+    /// Semantically important fields or entities to extract.
+    pub extracted_fields: &'static [&'static str],
+    /// Authoritative references that justify the parsing guidance.
+    pub sources: &'static [&'static str],
+}
+
+/// How to recognize or validate individual records or payloads inside a
+/// container, including carved fragments.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct RecordSignature {
+    /// Machine-readable record identifier.
+    pub id: &'static str,
+    /// Parent container id.
+    pub container_id: &'static str,
+    /// Optional artifact id this signature is directly associated with.
+    pub artifact_id: Option<&'static str>,
+    /// Human-readable display name.
+    pub name: &'static str,
+    /// Expected magic or marker bytes near the start of the record.
+    pub header_magic: &'static [u8],
+    /// Optional footer or trailer bytes when present and stable.
+    pub footer_magic: &'static [u8],
+    /// Byte offset where `header_magic` is expected.
+    pub header_offset: usize,
+    /// Minimum plausible record size.
+    pub min_size: Option<usize>,
+    /// Expected alignment or chunking rule.
+    pub alignment: Option<usize>,
+    /// Structural validation rules beyond simple magic bytes.
+    pub invariants: &'static [&'static str],
+    /// Authoritative references for the record structure.
+    pub sources: &'static [&'static str],
+}
+
 // ── ArtifactValue (universal decoded value) ──────────────────────────────────
 
 /// A decoded value produced by the catalog's decode logic. Uses only `std` types.
@@ -347,6 +465,26 @@ impl ForensicCatalog {
         self.entries.iter().find(|d| d.id == id)
     }
 
+    /// Look up parsing guidance for an artifact id.
+    pub fn parsing_profile(&self, id: &str) -> Option<&'static ArtifactParsingProfile> {
+        parsing_profile(id)
+    }
+
+    /// Look up the container parsing layer for an artifact id.
+    pub fn container_profile(&self, id: &str) -> Option<&'static ContainerProfile> {
+        container_profile_for_artifact(id)
+    }
+
+    /// Look up carving/recognition guidance for an artifact's outer container.
+    pub fn container_signature(&self, id: &str) -> Option<&'static ContainerSignature> {
+        container_signature_for_artifact(id)
+    }
+
+    /// Look up carving/recognition guidance for records associated with an artifact.
+    pub fn record_signatures(&self, id: &str) -> Vec<&'static RecordSignature> {
+        record_signatures_for_artifact(id)
+    }
+
     /// Return all descriptors matching the given query. Every `Some` field in
     /// the query must match; `None` fields are wildcards.
     pub fn filter(&self, query: &ArtifactQuery) -> Vec<&ArtifactDescriptor> {
@@ -433,6 +571,682 @@ impl ForensicCatalog {
         decode_artifact(descriptor, name, raw)
     }
 }
+
+/// Returns all container-layer parsing profiles maintained by the catalog.
+pub fn all_container_profiles() -> &'static [ContainerProfile] {
+    CONTAINER_PROFILES
+}
+
+/// Returns the container profile by id.
+pub fn container_profile(id: &str) -> Option<&'static ContainerProfile> {
+    CONTAINER_PROFILES
+        .iter()
+        .find(|profile| profile.id.eq_ignore_ascii_case(id))
+}
+
+/// Returns all container carving/signature profiles maintained by the catalog.
+pub fn all_container_signatures() -> &'static [ContainerSignature] {
+    CONTAINER_SIGNATURES
+}
+
+/// Returns the container signature by container id.
+pub fn container_signature(id: &str) -> Option<&'static ContainerSignature> {
+    CONTAINER_SIGNATURES
+        .iter()
+        .find(|sig| sig.container_id.eq_ignore_ascii_case(id))
+}
+
+/// Returns the outer-container parsing profile for a catalog artifact id.
+pub fn container_profile_for_artifact(id: &str) -> Option<&'static ContainerProfile> {
+    if let Some(binding) = ARTIFACT_CONTAINER_BINDINGS
+        .iter()
+        .find(|binding| binding.artifact_id.eq_ignore_ascii_case(id))
+    {
+        return container_profile(binding.container_id);
+    }
+
+    let desc = CATALOG.by_id(id)?;
+    infer_container_profile(desc)
+}
+
+/// Returns the outer-container carving/signature guidance for a catalog artifact id.
+pub fn container_signature_for_artifact(id: &str) -> Option<&'static ContainerSignature> {
+    let profile = container_profile_for_artifact(id)?;
+    container_signature(profile.id)
+}
+
+/// Returns all parser knowledge profiles maintained by the catalog.
+pub fn all_parsing_profiles() -> &'static [ArtifactParsingProfile] {
+    PARSING_PROFILES
+}
+
+/// Returns parsing guidance for a catalog artifact id.
+pub fn parsing_profile(id: &str) -> Option<&'static ArtifactParsingProfile> {
+    PARSING_PROFILES
+        .iter()
+        .find(|profile| profile.artifact_id.eq_ignore_ascii_case(id))
+}
+
+/// Returns all record signatures maintained by the catalog.
+pub fn all_record_signatures() -> &'static [RecordSignature] {
+    RECORD_SIGNATURES
+}
+
+/// Returns record signatures associated with a container id.
+pub fn record_signatures_for_container(id: &str) -> Vec<&'static RecordSignature> {
+    RECORD_SIGNATURES
+        .iter()
+        .filter(|sig| sig.container_id.eq_ignore_ascii_case(id))
+        .collect()
+}
+
+/// Returns record signatures associated with a catalog artifact id.
+pub fn record_signatures_for_artifact(id: &str) -> Vec<&'static RecordSignature> {
+    let direct: Vec<&'static RecordSignature> = RECORD_SIGNATURES
+        .iter()
+        .filter(|sig| {
+            sig.artifact_id
+                .is_some_and(|artifact_id| artifact_id.eq_ignore_ascii_case(id))
+        })
+        .collect();
+    if !direct.is_empty() {
+        return direct;
+    }
+
+    if let Some(container_sig) = container_profile_for_artifact(id) {
+        return record_signatures_for_container(container_sig.id);
+    }
+    Vec::new()
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct ArtifactContainerBinding {
+    artifact_id: &'static str,
+    container_id: &'static str,
+}
+
+const WINDOWS_REGISTRY_HIVE_HINTS: &[&str] = &[
+    "Open the hive as an offline Registry container and enumerate keys, values, and raw value bytes.",
+    "Replay transaction logs when available before trusting key/value state from a copied hive.",
+    "Preserve the original value name and raw bytes so artifact-specific decoders can interpret them correctly.",
+];
+
+const REGISTRY_HIVE_INVARIANTS: &[&str] = &[
+    "Header begins with the ASCII signature 'regf' at offset 0.",
+    "Primary hive bins normally begin with 'hbin' on 0x1000 boundaries after the 4 KB hive header.",
+    "Cell records use signed size fields; negative values indicate allocated cells.",
+];
+
+const SQLITE_DATABASE_INVARIANTS: &[&str] = &[
+    "Header begins with 'SQLite format 3\\0' at offset 0.",
+    "Database page size is stored in the header and should be a power of two between 512 and 65536.",
+];
+
+const ESE_DATABASE_INVARIANTS: &[&str] = &[
+    "Header begins with the ESE/Jet signature at offset 4.",
+    "Page-based structure should remain consistent with the recorded page size and checksum rules.",
+];
+
+const OLE_COMPOUND_FILE_INVARIANTS: &[&str] = &[
+    "Header begins with the OLE compound file signature at offset 0.",
+    "Sector size and FAT/DIFAT fields must be internally consistent before trusting carved data.",
+];
+
+const EVTX_INVARIANTS: &[&str] = &[
+    "File header begins with 'ElfFile\\0' and chunks begin with 'ElfChnk\\0'.",
+    "Chunk headers and record offsets must be internally consistent before trusting carved events.",
+];
+
+const USERASSIST_RECORD_INVARIANTS: &[&str] = &[
+    "Value name is ROT13-encoded and must be decoded before path interpretation.",
+    "Win7+ Count payload is 72 bytes with last_run FILETIME at offset 60.",
+];
+
+const REGISTRY_NK_INVARIANTS: &[&str] = &[
+    "Record begins with the 'nk' key-cell signature.",
+    "Cell size and subkey/value offsets must remain within the parent hive bin.",
+];
+
+const REGISTRY_VK_INVARIANTS: &[&str] = &[
+    "Record begins with the 'vk' value-cell signature.",
+    "Name length, data length, and data offset must remain within the parent hive bin or data cell.",
+];
+
+const SQLITE_PAGE_INVARIANTS: &[&str] =
+    &["B-tree page header and cell pointers must remain within the declared page size."];
+
+const OLE_DIR_STREAM_INVARIANTS: &[&str] = &[
+    "Directory entries are 128-byte records whose sibling/child references must remain internally consistent.",
+];
+
+const EVTX_CHUNK_INVARIANTS: &[&str] =
+    &["Chunk begins with 'ElfChnk\\0' and normally spans 64 KB."];
+
+const EVTX_RECORD_INVARIANTS: &[&str] = &[
+    "EVTX records begin with the 0x2a 0x2a 0x00 0x00 signature and end with their declared size.",
+];
+
+const MEMORY_FRAGMENT_INVARIANTS: &[&str] = &[
+    "Memory-bearing sources rarely have a stable footer; validate carved fragments by internal structure and cross-artifact corroboration.",
+];
+
+const SQLITE_DATABASE_HINTS: &[&str] = &[
+    "Open the file as a SQLite database and enumerate schema, tables, and rows before applying artifact-specific queries.",
+    "Preserve raw cell values and timestamps so higher-level artifact logic can normalize them safely.",
+];
+
+const ESE_DATABASE_HINTS: &[&str] = &[
+    "Treat the file as an Extensible Storage Engine database and enumerate tables, columns, and records.",
+    "Be prepared for dirty-state handling and page-level recovery when working from copied live systems.",
+];
+
+const OLE_COMPOUND_FILE_HINTS: &[&str] = &[
+    "Open the file as an OLE compound file and enumerate storages and streams before interpreting embedded records.",
+    "Preserve stream names and raw stream bytes so artifact-specific parsers can resolve AppIDs, LNK blocks, or other structured payloads.",
+];
+
+const EVTX_HINTS: &[&str] = &[
+    "Open the file or channel as an EVTX container and enumerate records with their event IDs, providers, timestamps, and XML payloads.",
+    "Keep both rendered and raw event data available so artifact-specific logic can cross-check field extraction.",
+];
+
+const MEMORY_IMAGE_HINTS: &[&str] = &[
+    "Treat the source as a memory-bearing container whose pages must be reconstructed before higher-level artifact interpretation.",
+    "Preserve page-level provenance so extracted processes, sockets, strings, and handles can be tied back to the source image.",
+];
+
+const FLAT_FILE_HINTS: &[&str] = &[
+    "Treat the source as a flat file or directory artifact and preserve raw bytes, filenames, and timestamps before any higher-level interpretation.",
+];
+
+static CONTAINER_PROFILES: &[ContainerProfile] = &[
+    ContainerProfile {
+        id: "windows_registry_hive",
+        name: "Windows Registry Hive",
+        summary: "Offline Windows Registry hive containing keys, values, value names, and raw value bytes.",
+        parser_hints: WINDOWS_REGISTRY_HIVE_HINTS,
+        sources: &[
+            "https://github.com/mkorman90/regipy",
+            "https://github.com/EricZimmerman/Registry",
+            "https://github.com/EricZimmerman/RECmd",
+        ],
+    },
+    ContainerProfile {
+        id: "sqlite_database",
+        name: "SQLite Database",
+        summary: "SQLite database used by browser, timeline, and other application artifacts.",
+        parser_hints: SQLITE_DATABASE_HINTS,
+        sources: &[
+            "https://github.com/EricZimmerman/SQLECmd",
+            "https://github.com/EricZimmerman/WxTCmd",
+            "https://github.com/EricZimmerman/DFIR-SQL-Query-Repo",
+        ],
+    },
+    ContainerProfile {
+        id: "ese_database",
+        name: "ESE Database",
+        summary: "Extensible Storage Engine database used by Windows Search and related Windows subsystems.",
+        parser_hints: ESE_DATABASE_HINTS,
+        sources: &[
+            "https://github.com/EricZimmerman/WinSearchDBAnalyzer",
+            "https://www.sans.org/blog/windows-search-index-forensics/",
+        ],
+    },
+    ContainerProfile {
+        id: "ole_compound_file",
+        name: "OLE Compound File",
+        summary: "Compound file binary format used by Jump Lists and other multi-stream Windows artifacts.",
+        parser_hints: OLE_COMPOUND_FILE_HINTS,
+        sources: &[
+            "https://github.com/EricZimmerman/OleCf",
+            "https://github.com/EricZimmerman/JLECmd",
+            "https://github.com/EricZimmerman/LECmd",
+        ],
+    },
+    ContainerProfile {
+        id: "windows_evtx",
+        name: "Windows EVTX",
+        summary: "Windows Event Log file or channel containing structured event records.",
+        parser_hints: EVTX_HINTS,
+        sources: &[
+            "https://github.com/EricZimmerman/evtx",
+            "https://attack.mitre.org/techniques/T1070/001/",
+        ],
+    },
+    ContainerProfile {
+        id: "memory_image",
+        name: "Memory Image",
+        summary: "Memory-bearing container such as hiberfil.sys or a paging artifact.",
+        parser_hints: MEMORY_IMAGE_HINTS,
+        sources: &[
+            "https://forensics.wiki/hiberfil.sys/",
+            "https://learn.microsoft.com/en-us/troubleshoot/windows-server/performance/memory-dump-file-options",
+        ],
+    },
+    ContainerProfile {
+        id: "flat_file",
+        name: "Flat File",
+        summary: "Standalone file or directory artifact without a richer outer container model.",
+        parser_hints: FLAT_FILE_HINTS,
+        sources: &[
+            "https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file",
+        ],
+    },
+];
+
+static REGF_MAGIC: &[u8] = b"regf";
+static SQLITE_MAGIC: &[u8] = b"SQLite format 3\0";
+static ESE_MAGIC: &[u8] = &[0xef, 0xcd, 0xab, 0x89];
+static OLE_MAGIC: &[u8] = &[0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1];
+static EVTX_FILE_MAGIC: &[u8] = b"ElfFile\0";
+static MEMORY_MAGIC: &[u8] = &[];
+static NK_MAGIC: &[u8] = b"nk";
+static VK_MAGIC: &[u8] = b"vk";
+static EVTX_CHUNK_MAGIC: &[u8] = b"ElfChnk\0";
+static EVTX_RECORD_MAGIC: &[u8] = &[0x2a, 0x2a, 0x00, 0x00];
+
+static CONTAINER_SIGNATURES: &[ContainerSignature] = &[
+    ContainerSignature {
+        container_id: "windows_registry_hive",
+        name: "Windows Registry Hive Signature",
+        header_magic: REGF_MAGIC,
+        footer_magic: &[],
+        header_offset: 0,
+        min_size: Some(4096),
+        alignment: Some(4096),
+        invariants: REGISTRY_HIVE_INVARIANTS,
+        sources: &[
+            "https://github.com/mkorman90/regipy",
+            "https://github.com/EricZimmerman/Registry",
+        ],
+    },
+    ContainerSignature {
+        container_id: "sqlite_database",
+        name: "SQLite Database Header",
+        header_magic: SQLITE_MAGIC,
+        footer_magic: &[],
+        header_offset: 0,
+        min_size: Some(100),
+        alignment: None,
+        invariants: SQLITE_DATABASE_INVARIANTS,
+        sources: &[
+            "https://github.com/EricZimmerman/SQLECmd",
+            "https://github.com/EricZimmerman/DFIR-SQL-Query-Repo",
+        ],
+    },
+    ContainerSignature {
+        container_id: "ese_database",
+        name: "ESE Database Header",
+        header_magic: ESE_MAGIC,
+        footer_magic: &[],
+        header_offset: 4,
+        min_size: Some(4096),
+        alignment: Some(4096),
+        invariants: ESE_DATABASE_INVARIANTS,
+        sources: &[
+            "https://github.com/EricZimmerman/WinSearchDBAnalyzer",
+        ],
+    },
+    ContainerSignature {
+        container_id: "ole_compound_file",
+        name: "OLE Compound File Header",
+        header_magic: OLE_MAGIC,
+        footer_magic: &[],
+        header_offset: 0,
+        min_size: Some(512),
+        alignment: Some(512),
+        invariants: OLE_COMPOUND_FILE_INVARIANTS,
+        sources: &[
+            "https://github.com/EricZimmerman/OleCf",
+        ],
+    },
+    ContainerSignature {
+        container_id: "windows_evtx",
+        name: "Windows EVTX File Header",
+        header_magic: EVTX_FILE_MAGIC,
+        footer_magic: &[],
+        header_offset: 0,
+        min_size: Some(4096),
+        alignment: Some(4096),
+        invariants: EVTX_INVARIANTS,
+        sources: &[
+            "https://github.com/EricZimmerman/evtx",
+        ],
+    },
+    ContainerSignature {
+        container_id: "memory_image",
+        name: "Memory-Bearing Container Signature",
+        header_magic: MEMORY_MAGIC,
+        footer_magic: &[],
+        header_offset: 0,
+        min_size: None,
+        alignment: Some(4096),
+        invariants: MEMORY_FRAGMENT_INVARIANTS,
+        sources: &[
+            "https://forensics.wiki/hiberfil.sys/",
+            "https://learn.microsoft.com/en-us/troubleshoot/windows-server/performance/memory-dump-file-options",
+        ],
+    },
+];
+
+static ARTIFACT_CONTAINER_BINDINGS: &[ArtifactContainerBinding] = &[
+    ArtifactContainerBinding {
+        artifact_id: "windows_timeline",
+        container_id: "sqlite_database",
+    },
+    ArtifactContainerBinding {
+        artifact_id: "chrome_login_data",
+        container_id: "sqlite_database",
+    },
+    ArtifactContainerBinding {
+        artifact_id: "chrome_cookies",
+        container_id: "sqlite_database",
+    },
+    ArtifactContainerBinding {
+        artifact_id: "search_db_user",
+        container_id: "ese_database",
+    },
+    ArtifactContainerBinding {
+        artifact_id: "jump_list_auto",
+        container_id: "ole_compound_file",
+    },
+    ArtifactContainerBinding {
+        artifact_id: "jump_list_custom",
+        container_id: "ole_compound_file",
+    },
+    ArtifactContainerBinding {
+        artifact_id: "jump_list_system",
+        container_id: "ole_compound_file",
+    },
+    ArtifactContainerBinding {
+        artifact_id: "hiberfil_sys",
+        container_id: "memory_image",
+    },
+    ArtifactContainerBinding {
+        artifact_id: "pagefile_sys",
+        container_id: "memory_image",
+    },
+];
+
+static RECORD_SIGNATURES: &[RecordSignature] = &[
+    RecordSignature {
+        id: "registry_nk_cell",
+        container_id: "windows_registry_hive",
+        artifact_id: None,
+        name: "Registry Key Cell (nk)",
+        header_magic: NK_MAGIC,
+        footer_magic: &[],
+        header_offset: 0,
+        min_size: Some(0x4c),
+        alignment: None,
+        invariants: REGISTRY_NK_INVARIANTS,
+        sources: &[
+            "https://github.com/mkorman90/regipy",
+            "https://github.com/EricZimmerman/Registry",
+        ],
+    },
+    RecordSignature {
+        id: "registry_vk_cell",
+        container_id: "windows_registry_hive",
+        artifact_id: None,
+        name: "Registry Value Cell (vk)",
+        header_magic: VK_MAGIC,
+        footer_magic: &[],
+        header_offset: 0,
+        min_size: Some(0x18),
+        alignment: None,
+        invariants: REGISTRY_VK_INVARIANTS,
+        sources: &[
+            "https://github.com/mkorman90/regipy",
+            "https://github.com/EricZimmerman/Registry",
+        ],
+    },
+    RecordSignature {
+        id: "userassist_count_payload",
+        container_id: "windows_registry_hive",
+        artifact_id: Some("userassist_exe"),
+        name: "UserAssist Count Payload",
+        header_magic: &[],
+        footer_magic: &[],
+        header_offset: 0,
+        min_size: Some(72),
+        alignment: None,
+        invariants: USERASSIST_RECORD_INVARIANTS,
+        sources: &[
+            "http://windowsir.blogspot.com/2013/05/userassist-redux.html",
+            "https://github.com/EricZimmerman/RegistryPlugins",
+        ],
+    },
+    RecordSignature {
+        id: "sqlite_btree_page",
+        container_id: "sqlite_database",
+        artifact_id: None,
+        name: "SQLite B-tree Page",
+        header_magic: &[],
+        footer_magic: &[],
+        header_offset: 0,
+        min_size: Some(512),
+        alignment: Some(512),
+        invariants: SQLITE_PAGE_INVARIANTS,
+        sources: &["https://github.com/EricZimmerman/SQLECmd"],
+    },
+    RecordSignature {
+        id: "ole_directory_entry",
+        container_id: "ole_compound_file",
+        artifact_id: None,
+        name: "OLE Directory Entry",
+        header_magic: &[],
+        footer_magic: &[],
+        header_offset: 0,
+        min_size: Some(128),
+        alignment: Some(128),
+        invariants: OLE_DIR_STREAM_INVARIANTS,
+        sources: &["https://github.com/EricZimmerman/OleCf"],
+    },
+    RecordSignature {
+        id: "evtx_chunk",
+        container_id: "windows_evtx",
+        artifact_id: None,
+        name: "EVTX Chunk",
+        header_magic: EVTX_CHUNK_MAGIC,
+        footer_magic: &[],
+        header_offset: 0,
+        min_size: Some(65536),
+        alignment: Some(65536),
+        invariants: EVTX_CHUNK_INVARIANTS,
+        sources: &["https://github.com/EricZimmerman/evtx"],
+    },
+    RecordSignature {
+        id: "evtx_record",
+        container_id: "windows_evtx",
+        artifact_id: None,
+        name: "EVTX Record",
+        header_magic: EVTX_RECORD_MAGIC,
+        footer_magic: &[],
+        header_offset: 0,
+        min_size: Some(24),
+        alignment: None,
+        invariants: EVTX_RECORD_INVARIANTS,
+        sources: &["https://github.com/EricZimmerman/evtx"],
+    },
+];
+
+fn infer_container_profile(descriptor: &ArtifactDescriptor) -> Option<&'static ContainerProfile> {
+    if descriptor.hive.is_some() {
+        return container_profile("windows_registry_hive");
+    }
+
+    match descriptor.artifact_type {
+        ArtifactType::EventLog => container_profile("windows_evtx"),
+        ArtifactType::File | ArtifactType::Directory => container_profile("flat_file"),
+        _ => None,
+    }
+}
+
+const USERASSIST_PARSER_HINTS: &[&str] = &[
+    "Decode the registry value name with ROT13 before treating it as a program or folder path.",
+    "For Win7+ Count values, parse the binary payload as a fixed 72-byte structure rather than plain text.",
+    "Use offset 4 for run_count, 8 for focus_count, 12 for focus_duration_ms, and 60 for the last_run FILETIME.",
+    "Promote the decoded last_run FILETIME to the record timestamp and keep a null when the FILETIME is zeroed.",
+];
+
+const USERASSIST_EXTRACTED_FIELDS: &[&str] = &[
+    "program",
+    "run_count",
+    "focus_count",
+    "focus_duration_ms",
+    "last_run",
+];
+
+const HIBERFIL_PARSER_HINTS: &[&str] = &[
+    "Treat hiberfil.sys as a compressed hibernation snapshot, not as a generic flat file.",
+    "Use a hibernation-aware parser to reconstruct memory pages before extracting processes, sockets, handles, or strings.",
+    "Prioritize command lines, network connections, loaded modules, clipboard fragments, and credential-bearing memory regions.",
+    "Correlate recovered memory state with pagefile.sys and nearby event-log activity to bound execution time.",
+];
+
+const MEMORY_IMAGE_FIELDS: &[&str] = &[
+    "processes",
+    "command_lines",
+    "sockets",
+    "loaded_modules",
+    "clipboard_data",
+    "interesting_strings",
+];
+
+const PAGEFILE_PARSER_HINTS: &[&str] = &[
+    "Treat pagefile.sys as paged-out memory fragments rather than a structured file format with stable records.",
+    "Search for strings, command fragments, URLs, registry paths, and credential residue, then re-anchor those hits to other artifacts.",
+    "Use pagefile hits as corroborating evidence unless you can tie them back to a process, socket, or on-disk artifact.",
+];
+
+const BITS_PARSER_HINTS: &[&str] = &[
+    "Enumerate qmgr*.dat job-store files under the Downloader directory and preserve originals before parsing.",
+    "Parse each job as a durable transfer record with job GUID, owner SID/account, source URL, destination path, and state.",
+    "Extract notify command or callback metadata when present; command-to-notify is the highest-signal execution pivot.",
+    "Correlate parsed jobs with downloaded files, Prefetch, PowerShell, and BITS-related event logs or cmdlet usage.",
+];
+
+const BITS_EXTRACTED_FIELDS: &[&str] = &[
+    "job_id",
+    "owner_sid",
+    "display_name",
+    "source_url",
+    "destination_path",
+    "job_state",
+    "created_time",
+    "modified_time",
+    "notify_command",
+];
+
+const WMI_REPOSITORY_PARSER_HINTS: &[&str] = &[
+    "Treat the repository as a graph of permanent-consumer objects, not a simple directory listing.",
+    "Reconstruct triads of __EventFilter, consumer instance, and __FilterToConsumerBinding for each subscription.",
+    "Normalize standard consumer classes such as CommandLineEventConsumer, ActiveScriptEventConsumer, and NTEventLogEventConsumer.",
+    "Extract WQL query text, consumer payload, referenced namespace, and creator SID to distinguish benign admin automation from persistence.",
+];
+
+const WMI_REPOSITORY_FIELDS: &[&str] = &[
+    "filter_name",
+    "filter_query",
+    "consumer_class",
+    "consumer_payload",
+    "binding_consumer",
+    "binding_filter",
+    "creator_sid",
+    "namespace",
+];
+
+const WMI_REGISTRY_PARSER_HINTS: &[&str] = &[
+    "Treat the registry-side subscription view as a pivot artifact, not the authoritative source of full WMI subscription semantics.",
+    "Use names and paths recovered here to resolve the underlying repository objects in root\\subscription.",
+    "Validate the complete chain by linking EventFilter, consumer object, and FilterToConsumerBinding rather than alerting on a single fragment.",
+];
+
+const WMI_REGISTRY_FIELDS: &[&str] = &["filter_name", "consumer_type", "consumer_value", "query"];
+
+static PARSING_PROFILES: &[ArtifactParsingProfile] = &[
+    ArtifactParsingProfile {
+        artifact_id: "userassist_exe",
+        format: "NTUSER.DAT UserAssist Count binary value",
+        summary: "ROT13-decode the value name, then parse the fixed-layout Count payload.",
+        parser_hints: USERASSIST_PARSER_HINTS,
+        extracted_fields: USERASSIST_EXTRACTED_FIELDS,
+        sources: &[
+            "http://windowsir.blogspot.com/2013/05/userassist-redux.html",
+            "https://github.com/EricZimmerman/RegistryPlugins",
+        ],
+    },
+    ArtifactParsingProfile {
+        artifact_id: "userassist_folder",
+        format: "NTUSER.DAT UserAssist Count binary value",
+        summary: "Folder GUID entries use the same ROT13 name decoding and 72-byte Count layout as EXE entries.",
+        parser_hints: USERASSIST_PARSER_HINTS,
+        extracted_fields: USERASSIST_EXTRACTED_FIELDS,
+        sources: &[
+            "http://windowsir.blogspot.com/2013/05/userassist-redux.html",
+            "https://github.com/EricZimmerman/RegistryPlugins",
+        ],
+    },
+    ArtifactParsingProfile {
+        artifact_id: "pagefile_sys",
+        format: "Windows paging file containing paged-out virtual memory",
+        summary: "Pagefile evidence is memory residue that should be searched and correlated, not row-oriented parsed.",
+        parser_hints: PAGEFILE_PARSER_HINTS,
+        extracted_fields: MEMORY_IMAGE_FIELDS,
+        sources: &[
+            "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/06_Tool_Command_Vault/6.02_Windows_DFIR_Master_Notes.md",
+            "https://learn.microsoft.com/en-us/troubleshoot/windows-server/performance/memory-dump-file-options",
+        ],
+    },
+    ArtifactParsingProfile {
+        artifact_id: "hiberfil_sys",
+        format: "Compressed Windows hibernation memory image",
+        summary: "Reconstruct the memory image before extracting forensic entities from the snapshot.",
+        parser_hints: HIBERFIL_PARSER_HINTS,
+        extracted_fields: MEMORY_IMAGE_FIELDS,
+        sources: &[
+            "https://forensics.wiki/hiberfil.sys/",
+            "https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/storport/nf-storport-storportmarkdumpmemory",
+        ],
+    },
+    ArtifactParsingProfile {
+        artifact_id: "bits_db",
+        format: "BITS qmgr job database",
+        summary: "Parse qmgr*.dat as persisted transfer jobs and pull out transfer metadata plus notify-execution pivots.",
+        parser_hints: BITS_PARSER_HINTS,
+        extracted_fields: BITS_EXTRACTED_FIELDS,
+        sources: &[
+            "https://learn.microsoft.com/en-us/windows/win32/bits/background-intelligent-transfer-service-portal",
+            "https://www.sans.org/white-papers/39195",
+        ],
+    },
+    ArtifactParsingProfile {
+        artifact_id: "wmi_mof_dir",
+        format: "WMI repository containing permanent consumer objects",
+        summary: "Rebuild permanent-event-consumer relationships from repository objects, not just filenames.",
+        parser_hints: WMI_REPOSITORY_PARSER_HINTS,
+        extracted_fields: WMI_REPOSITORY_FIELDS,
+        sources: &[
+            "https://learn.microsoft.com/en-us/windows/win32/wmisdk/receiving-a-wmi-event",
+            "https://learn.microsoft.com/en-us/windows/win32/wmisdk/monitoring-and-responding-to-events-with-standard-consumers",
+            "https://learn.microsoft.com/en-us/windows/win32/wmisdk/commandlineeventconsumer",
+            "https://learn.microsoft.com/en-us/windows/win32/wmisdk/--filtertoconsumerbinding",
+        ],
+    },
+    ArtifactParsingProfile {
+        artifact_id: "wmi_subscriptions",
+        format: "Registry-side WMI subscription index",
+        summary: "Use registry-side subscription data as a pivot into the authoritative WMI repository objects.",
+        parser_hints: WMI_REGISTRY_PARSER_HINTS,
+        extracted_fields: WMI_REGISTRY_FIELDS,
+        sources: &[
+            "https://learn.microsoft.com/en-us/windows/win32/wmisdk/receiving-a-wmi-event",
+            "https://learn.microsoft.com/en-us/windows/win32/wmisdk/monitoring-and-responding-to-events-with-standard-consumers",
+            "https://learn.microsoft.com/en-us/windows/win32/wmisdk/--filtertoconsumerbinding",
+        ],
+    },
+];
 
 // ── Decode implementation ────────────────────────────────────────────────────
 
@@ -917,6 +1731,7 @@ pub static USERASSIST_EXE: ArtifactDescriptor = ArtifactDescriptor {
         "https://windowsir.blogspot.com/2004/02/userassist.html",
         "http://windowsir.blogspot.com/2007/09/more-on-userassist-keys.html",
         "https://www.magnetforensics.com/blog/artifact-profile-userassist/",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
     ],
 };
 
@@ -954,6 +1769,8 @@ pub static RUN_KEY_HKLM_RUN: ArtifactDescriptor = ArtifactDescriptor {
         "https://attack.mitre.org/techniques/T1547/001/",
         "https://learn.microsoft.com/en-us/windows/win32/setupapi/run-and-runonce-registry-keys",
         "https://windowsir.blogspot.com/2013/01/run-mru.html",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/06_Tool_Command_Vault/6.02_Windows_DFIR_Master_Notes.md",
     ],
 };
 
@@ -1066,6 +1883,9 @@ pub static RUN_KEY_HKCU_RUN: ArtifactDescriptor = ArtifactDescriptor {
         "https://attack.mitre.org/techniques/T1547/001/",
         "https://learn.microsoft.com/en-us/windows/win32/setupapi/run-and-runonce-registry-keys",
         "https://windowsir.blogspot.com/2013/01/run-mru.html",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/06_Tool_Command_Vault/6.02_Windows_DFIR_Master_Notes.md",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/02_Detection_Rules/2.2_sigma_rules/HKCU%20Run%20Key%20Written%20by%20Unusual%20Process.yml",
     ],
 };
 
@@ -1221,8 +2041,11 @@ pub static SHELLBAGS_USER: ArtifactDescriptor = ArtifactDescriptor {
         "https://www.sans.org/blog/shell-bag-forensics/",
         "https://windowsir.blogspot.com/2009/07/shellbag-analysis.html",
         "https://ericzimmerman.github.io/#!index.md",
+        "https://github.com/EricZimmerman/RECmd",
+        "https://github.com/EricZimmerman/RegistryPlugins",
         "https://www.sans.org/white-papers/34545/",
         "https://www.magnetforensics.com/blog/forensic-analysis-of-windows-shellbags/",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
     ],
 };
 
@@ -1268,6 +2091,8 @@ pub static AMCACHE_APP_FILE: ArtifactDescriptor = ArtifactDescriptor {
         "https://www.sansforensics.com/blog/amcache-hive-forensics/",
         "https://www.researchgate.net/publication/317258237_Leveraging_the_Windows_Amcachehve_File_in_Forensic_Investigations",
         "https://www.magnetforensics.com/blog/shimcache-vs-amcache-key-windows-forensic-artifacts/",
+        "https://github.com/EricZimmerman/AmcacheParser",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
     ],
 };
 
@@ -1309,6 +2134,9 @@ pub static SHIMCACHE: ArtifactDescriptor = ArtifactDescriptor {
         "https://redcanary.com/blog/threat-detection/appcompatcache/",
         "https://www.sans.org/blog/mass-triage-part-4-processing-returned-files-appcache-shimcache/",
         "https://www.magnetforensics.com/blog/shimcache-vs-amcache-key-windows-forensic-artifacts/",
+        "https://github.com/EricZimmerman/AppCompatCacheParser",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/06_Tool_Command_Vault/6.02_Windows_DFIR_Master_Notes.md",
     ],
 };
 
@@ -1349,6 +2177,7 @@ pub static BAM_USER: ArtifactDescriptor = ArtifactDescriptor {
         "https://www.13cubed.com/downloads/windows10_forensics_cheat_sheet.pdf",
         "https://forensafe.com/blogs/bam.html",
         "https://github.com/Psmths/windows-forensic-artifacts/blob/main/execution/bam-dam.md",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
     ],
 };
 
@@ -1841,6 +2670,8 @@ pub static SERVICES_IMAGEPATH: ArtifactDescriptor = ArtifactDescriptor {
         "https://attack.mitre.org/techniques/T1543/003/",
         "https://learn.microsoft.com/en-us/windows/win32/services/service-control-manager",
         "https://redcanary.com/threat-detection-report/techniques/t1543/",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/06_Tool_Command_Vault/6.02_Windows_DFIR_Master_Notes.md",
     ],
 };
 
@@ -2173,6 +3004,7 @@ pub static STARTUP_FOLDER_USER: ArtifactDescriptor = ArtifactDescriptor {
     sources: &[
         "https://attack.mitre.org/techniques/T1547/001/",
         "https://learn.microsoft.com/en-us/windows/win32/shell/csidl",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
     ],
 };
 
@@ -2225,6 +3057,8 @@ pub static SCHEDULED_TASKS_DIR: ArtifactDescriptor = ArtifactDescriptor {
         "https://attack.mitre.org/techniques/T1053/005/",
         "https://learn.microsoft.com/en-us/windows/win32/taskschd/task-scheduler-start-page",
         "https://redcanary.com/threat-detection-report/techniques/t1053/",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/06_Tool_Command_Vault/6.02_Windows_DFIR_Master_Notes.md",
     ],
 };
 
@@ -2280,6 +3114,8 @@ pub static WORDWHEEL_QUERY: ArtifactDescriptor = ArtifactDescriptor {
     sources: &[
         "https://attack.mitre.org/techniques/T1083/",
         "https://windowsir.blogspot.com/2012/08/wordwheelquery.html",
+        "https://github.com/EricZimmerman/RECmd",
+        "https://github.com/EricZimmerman/RegistryPlugins",
     ],
 };
 
@@ -2309,6 +3145,8 @@ pub static OPENSAVE_MRU: ArtifactDescriptor = ArtifactDescriptor {
         "https://windowsir.blogspot.com/2006/11/recent-docs-mru.html",
         "https://www.sans.org/blog/opensavemru-and-lastvisitedmru/",
         "https://forensics.wiki/opensavemru/",
+        "https://github.com/EricZimmerman/RECmd",
+        "https://github.com/EricZimmerman/RegistryPlugins",
     ],
 };
 
@@ -2334,6 +3172,8 @@ pub static LASTVISITED_MRU: ArtifactDescriptor = ArtifactDescriptor {
         "https://attack.mitre.org/techniques/T1083/",
         "https://windowsir.blogspot.com/2006/11/recent-docs-mru.html",
         "https://www.sans.org/blog/opensavemru-and-lastvisitedmru/",
+        "https://github.com/EricZimmerman/RECmd",
+        "https://github.com/EricZimmerman/RegistryPlugins",
     ],
 };
 
@@ -2365,6 +3205,8 @@ pub static PREFETCH_DIR: ArtifactDescriptor = ArtifactDescriptor {
         "https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/application-verifier",
         "https://isc.sans.edu/diary/Forensic+Value+of+Prefetch/29168",
         "https://www.magnetforensics.com/blog/forensic-analysis-of-prefetch-files-in-windows/",
+        "https://github.com/EricZimmerman/PECmd",
+        "https://github.com/EricZimmerman/Prefetch",
     ],
 };
 
@@ -2444,6 +3286,7 @@ pub static WINDOWS_TIMELINE: ArtifactDescriptor = ArtifactDescriptor {
         "https://aboutdfir.com/windows-10-timeline/",
         "http://windowsir.blogspot.com/2019/11/activitescachedb-vs-ntuserdat.html",
         "https://kacos2000.github.io/WindowsTimeline/",
+        "https://github.com/EricZimmerman/WxTCmd",
     ],
 };
 
@@ -2476,6 +3319,7 @@ pub static POWERSHELL_HISTORY: ArtifactDescriptor = ArtifactDescriptor {
         "https://www.sans.org/blog/powershell-forensics/",
         "https://redcanary.com/threat-detection-report/techniques/t1059.001/",
         "https://community.sophos.com/sophos-labs/b/blog/posts/powershell-command-history-forensics",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
     ],
 };
 
@@ -2507,6 +3351,8 @@ pub static RECYCLE_BIN: ArtifactDescriptor = ArtifactDescriptor {
         "https://windowsir.blogspot.com/2010/02/more-on-recycle-bin.html",
         "https://www.magnetforensics.com/blog/artifact-profile-recycle-bin/",
         "https://andreafortuna.org/2019/09/26/windows-forensics-analysis-of-recycle-bin-artifacts/",
+        "https://github.com/EricZimmerman/RBCmd",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
     ],
 };
 
@@ -2568,6 +3414,7 @@ pub static SEARCH_DB_USER: ArtifactDescriptor = ArtifactDescriptor {
         "https://www.sans.org/blog/windows-search-index-forensics/",
         "https://learn.microsoft.com/en-us/windows/win32/search/windows-search",
         "https://cyber.aon.com/aon_cyber_labs/windows-search-index-the-forensic-artifact-youve-been-searching-for/",
+        "https://github.com/EricZimmerman/SQLECmd",
     ],
 };
 
@@ -2876,6 +3723,7 @@ pub static CHROME_LOGIN_DATA: ArtifactDescriptor = ArtifactDescriptor {
         "https://redcanary.com/threat-detection-report/techniques/t1555/",
         "https://atropos4n6.com/windows/chrome-login-data-forensics/",
         "https://www.foxtonforensics.com/blog/post/analysing-chrome-login-data",
+        "https://github.com/EricZimmerman/SQLECmd",
     ],
 };
 
@@ -4059,6 +4907,8 @@ pub static LNK_FILES: ArtifactDescriptor = ArtifactDescriptor {
     sources: &[
         "https://attack.mitre.org/techniques/T1547/009/",
         "https://attack.mitre.org/techniques/T1070/004/",
+        "https://github.com/EricZimmerman/LECmd",
+        "https://github.com/EricZimmerman/Lnk",
     ],
 };
 
@@ -4083,6 +4933,8 @@ pub static JUMP_LIST_AUTO: ArtifactDescriptor = ArtifactDescriptor {
     sources: &[
         "https://attack.mitre.org/techniques/T1547/009/",
         "https://attack.mitre.org/techniques/T1070/004/",
+        "https://github.com/EricZimmerman/JLECmd",
+        "https://github.com/EricZimmerman/JumpList",
     ],
 };
 
@@ -4107,6 +4959,8 @@ pub static JUMP_LIST_CUSTOM: ArtifactDescriptor = ArtifactDescriptor {
     sources: &[
         "https://attack.mitre.org/techniques/T1547/009/",
         "https://attack.mitre.org/techniques/T1070/004/",
+        "https://github.com/EricZimmerman/JLECmd",
+        "https://github.com/EricZimmerman/JumpList",
     ],
 };
 
@@ -4131,6 +4985,31 @@ pub static EVTX_DIR: ArtifactDescriptor = ArtifactDescriptor {
     sources: &[
         "https://attack.mitre.org/techniques/T1070/001/",
         "https://attack.mitre.org/techniques/T1059/001/",
+        "https://github.com/EricZimmerman/evtx",
+    ],
+};
+
+pub static MFT_FILE: ArtifactDescriptor = ArtifactDescriptor {
+    id: "mft_file",
+    name: "Master File Table ($MFT)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"C:\$MFT"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "Primary NTFS metadata file containing timestamps, attributes, parent-child relationships, and deleted-entry evidence for every file record on the volume.",
+    mitre_techniques: &["T1070.004", "T1083"],
+    fields: DIR_ENTRY_FIELDS,
+    retention: None,
+    triage_priority: TriagePriority::Critical,
+    related_artifacts: &["usn_journal", "recycle_bin", "prefetch_file"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1070/004/",
+        "https://attack.mitre.org/techniques/T1083/",
+        "https://github.com/EricZimmerman/MFTECmd",
     ],
 };
 
@@ -4155,6 +5034,7 @@ pub static USN_JOURNAL: ArtifactDescriptor = ArtifactDescriptor {
     sources: &[
         "https://attack.mitre.org/techniques/T1070/004/",
         "https://attack.mitre.org/techniques/T1059/",
+        "https://github.com/EricZimmerman/MFTECmd",
     ],
 };
 
@@ -4178,7 +5058,13 @@ pub static WMI_MOF_DIR: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1546/003/"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/003/",
+        "https://learn.microsoft.com/en-us/windows/win32/wmisdk/receiving-a-wmi-event",
+        "https://learn.microsoft.com/en-us/windows/win32/wmisdk/monitoring-and-responding-to-events-with-standard-consumers",
+        "https://learn.microsoft.com/en-us/windows/win32/wmisdk/commandlineeventconsumer",
+        "https://learn.microsoft.com/en-us/windows/win32/wmisdk/--filtertoconsumerbinding",
+    ],
 };
 
 pub static BITS_DB: ArtifactDescriptor = ArtifactDescriptor {
@@ -4201,6 +5087,9 @@ pub static BITS_DB: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &[],
     sources: &[
         "https://attack.mitre.org/techniques/T1197/",
+        "https://learn.microsoft.com/en-us/windows/win32/bits/background-intelligent-transfer-service-portal",
+        "https://learn.microsoft.com/en-us/powershell/module/bitstransfer/get-bitstransfer?view=windowsserver2025-ps",
+        "https://www.sans.org/white-papers/39195",
     ],
 };
 
@@ -4249,7 +5138,12 @@ pub static WMI_SUBSCRIPTIONS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1546/003/"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1546/003/",
+        "https://learn.microsoft.com/en-us/windows/win32/wmisdk/receiving-a-wmi-event",
+        "https://learn.microsoft.com/en-us/windows/win32/wmisdk/monitoring-and-responding-to-events-with-standard-consumers",
+        "https://learn.microsoft.com/en-us/windows/win32/wmisdk/--filtertoconsumerbinding",
+    ],
 };
 
 pub static LOGON_SCRIPTS: ArtifactDescriptor = ArtifactDescriptor {
@@ -4443,6 +5337,7 @@ pub static CHROME_COOKIES: ArtifactDescriptor = ArtifactDescriptor {
     sources: &[
         "https://attack.mitre.org/techniques/T1539/",
         "https://attack.mitre.org/techniques/T1185/",
+        "https://github.com/EricZimmerman/SQLECmd",
     ],
 };
 
@@ -5003,6 +5898,7 @@ pub static JUMP_LIST_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
         "https://www.sans.org/blog/computer-forensics-windows-7-jump-lists/",
         "https://windowsir.blogspot.com/2011/05/jump-lists-in-win7.html",
         "https://github.com/EricZimmerman/JLECmd",
+        "https://github.com/EricZimmerman/JumpList",
         "https://forensics.wiki/jump_lists/",
     ],
 };
@@ -5033,6 +5929,8 @@ pub static LNK_FILES_OFFICE: ArtifactDescriptor = ArtifactDescriptor {
         "https://windowsir.blogspot.com/2009/01/lnk-files-are-your-friends.html",
         "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-shllink/",
         "https://www.magnetforensics.com/blog/forensic-analysis-of-lnk-files/",
+        "https://github.com/EricZimmerman/LECmd",
+        "https://github.com/EricZimmerman/Lnk",
         "https://forensics.wiki/lnk/",
     ],
 };
@@ -5114,6 +6012,10 @@ pub static PREFETCH_FILE: ArtifactDescriptor = ArtifactDescriptor {
         "https://13cubed.com/downloads/Windows_Forensic_Analysis_Poster.pdf",
         "https://isc.sans.edu/diary/Forensic+Value+of+Prefetch/29168",
         "https://www.magnetforensics.com/blog/forensic-analysis-of-prefetch-files-in-windows/",
+        "https://github.com/EricZimmerman/PECmd",
+        "https://github.com/EricZimmerman/Prefetch",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/06_Tool_Command_Vault/6.02_Windows_DFIR_Master_Notes.md",
     ],
 };
 
@@ -5182,6 +6084,8 @@ pub static SRUM_NETWORK_USAGE: ArtifactDescriptor = ArtifactDescriptor {
         "https://www.sans.org/white-papers/36660/",
         "https://www.sans.org/blog/srum-forensics/",
         "https://www.magnetforensics.com/blog/srum-forensic-analysis-of-windows-system-resource-utilization-monitor/",
+        "https://github.com/EricZimmerman/Srum",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
     ],
 };
 
@@ -5255,6 +6159,7 @@ pub static SRUM_APP_RESOURCE: ArtifactDescriptor = ArtifactDescriptor {
         "https://www.sans.org/white-papers/36660/",
         "https://www.sans.org/blog/srum-forensics/",
         "https://www.magnetforensics.com/blog/srum-forensic-analysis-of-windows-system-resource-utilization-monitor/",
+        "https://github.com/EricZimmerman/Srum",
     ],
 };
 
@@ -5319,6 +6224,7 @@ pub static SRUM_ENERGY_USAGE: ArtifactDescriptor = ArtifactDescriptor {
     sources: &[
         "https://attack.mitre.org/techniques/T1059/",
         "https://www.sans.org/white-papers/36660/",
+        "https://github.com/EricZimmerman/Srum",
     ],
 };
 
@@ -5377,6 +6283,7 @@ pub static SRUM_PUSH_NOTIFICATION: ArtifactDescriptor = ArtifactDescriptor {
     sources: &[
         "https://attack.mitre.org/techniques/T1059/",
         "https://www.sans.org/white-papers/36660/",
+        "https://github.com/EricZimmerman/Srum",
     ],
 };
 
@@ -5452,6 +6359,8 @@ pub static EVTX_SECURITY: ArtifactDescriptor = ArtifactDescriptor {
         "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/basic-security-audit-policies",
         "https://www.13cubed.com/downloads/windows_event_log_cheat_sheet.pdf",
         "https://www.magnetforensics.com/blog/the-importance-of-powershell-logs-in-digital-forensics/",
+        "https://github.com/EricZimmerman/evtx",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.3_Windows_Event_Core.md",
     ],
 };
 
@@ -5481,6 +6390,7 @@ pub static EVTX_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
         "https://attack.mitre.org/techniques/T1070/001/",
         "https://www.sans.org/posters/windows-forensic-analysis/",
         "https://learn.microsoft.com/en-us/windows/win32/eventlog/event-logging",
+        "https://github.com/EricZimmerman/evtx",
     ],
 };
 
@@ -5516,6 +6426,7 @@ pub static EVTX_POWERSHELL: ArtifactDescriptor = ArtifactDescriptor {
         "https://attack.mitre.org/techniques/T1027/",
         "https://www.sans.org/blog/detecting-malicious-powershell/",
         "https://redcanary.com/threat-detection-report/techniques/t1059.001/",
+        "https://github.com/EricZimmerman/evtx",
     ],
 };
 
@@ -5547,12 +6458,557 @@ pub static EVTX_SYSMON: ArtifactDescriptor = ArtifactDescriptor {
         "https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon",
         "https://www.sans.org/blog/threat-hunting-using-sysmon/",
         "https://www.thedfirspot.com/post/sysmon-when-visibility-is-key",
+        "https://github.com/EricZimmerman/evtx",
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.3_Windows_Event_Core.md",
     ],
+};
+
+static TYPED_PATHS_FIELDS: &[FieldSchema] = &[FieldSchema {
+    name: "typed_path",
+    description: "Path manually entered into Explorer address bar history",
+    value_type: ValueType::Text,
+    is_uid_component: true,
+}];
+
+pub static TYPED_PATHS: ArtifactDescriptor = ArtifactDescriptor {
+    id: "typed_paths",
+    name: "Explorer Typed Paths",
+    artifact_type: ArtifactType::RegistryKey,
+    hive: Some(HiveTarget::NtUser),
+    key_path: r"Software\Microsoft\Windows\CurrentVersion\Explorer\TypedPaths",
+    value_name: None,
+    file_path: None,
+    scope: DataScope::User,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "Explorer address-bar history of manually entered local, removable, UNC, or shell paths; useful for proving interactive navigation to shares and staged locations.",
+    mitre_techniques: &["T1083", "T1135"],
+    fields: TYPED_PATHS_FIELDS,
+    retention: None,
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["typed_urls", "opensave_mru", "lastvisited_mru"],
+    sources: &[
+        "https://github.com/mkorman90/regipy/blob/master/regipy/plugins/ntuser/typed_paths.py",
+        "https://github.com/mkorman90/regipy/blob/master/regipy/plugins/validated_plugins.json",
+        "https://github.com/EricZimmerman/RECmd",
+        "https://github.com/EricZimmerman/RegistryPlugins",
+    ],
+};
+
+static RUN_MRU_FIELDS: &[FieldSchema] = &[
+    FieldSchema {
+        name: "mru_order",
+        description: "Run dialog MRU letter ordering string",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "command",
+        description: "Command line entered via the Run dialog",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+];
+
+pub static RUN_MRU: ArtifactDescriptor = ArtifactDescriptor {
+    id: "run_mru",
+    name: "Run Dialog MRU",
+    artifact_type: ArtifactType::RegistryKey,
+    hive: Some(HiveTarget::NtUser),
+    key_path: r"Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU",
+    value_name: None,
+    file_path: None,
+    scope: DataScope::User,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "History of commands launched from the Windows Run dialog, including the user-maintained MRU ordering string and typed execution targets.",
+    mitre_techniques: &["T1059"],
+    fields: RUN_MRU_FIELDS,
+    retention: None,
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["wordwheel_query", "powershell_history", "prefetch_file"],
+    sources: &[
+        "https://github.com/mkorman90/regipy/blob/master/regipy/plugins/ntuser/runmru.py",
+        "https://github.com/mkorman90/regipy/blob/master/regipy/plugins/validated_plugins.json",
+        "https://github.com/EricZimmerman/RECmd",
+        "https://github.com/EricZimmerman/RegistryPlugins",
+    ],
+};
+
+static NETWORK_DRIVES_FIELDS: &[FieldSchema] = &[
+    FieldSchema {
+        name: "drive_letter",
+        description: "Mapped drive letter under HKCU\\Network",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "remote_path",
+        description: "UNC path of the mapped network drive",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+];
+
+pub static NETWORK_DRIVES: ArtifactDescriptor = ArtifactDescriptor {
+    id: "network_drives",
+    name: "Mapped Network Drives",
+    artifact_type: ArtifactType::RegistryKey,
+    hive: Some(HiveTarget::NtUser),
+    key_path: r"Network",
+    value_name: Some("RemotePath"),
+    file_path: None,
+    scope: DataScope::User,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "Per-user mapped network drives including drive letter to UNC mapping; useful for share-access reconstruction and lateral movement scoping.",
+    mitre_techniques: &["T1135"],
+    fields: NETWORK_DRIVES_FIELDS,
+    retention: None,
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["rdp_client_servers", "networklist_profiles"],
+    sources: &[
+        "https://github.com/mkorman90/regipy/blob/master/regipy/plugins/ntuser/network_drives.py",
+        "https://github.com/mkorman90/regipy/blob/master/regipy/plugins/validated_plugins.json",
+    ],
+};
+
+static APP_PATHS_FIELDS: &[FieldSchema] = &[
+    FieldSchema {
+        name: "application",
+        description: "Executable name registered under App Paths",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "path",
+        description: "Default executable path resolved for the application name",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "architecture",
+        description: "Architecture bucket inferred from x64 or Wow6432Node path",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+];
+
+pub static APP_PATHS: ArtifactDescriptor = ArtifactDescriptor {
+    id: "app_paths",
+    name: "App Paths Registry Entries",
+    artifact_type: ArtifactType::RegistryKey,
+    hive: Some(HiveTarget::HklmSoftware),
+    key_path: r"Microsoft\Windows\CurrentVersion\App Paths",
+    value_name: None,
+    file_path: None,
+    scope: DataScope::System,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "Executable name resolution entries under App Paths and Wow6432Node App Paths; useful for installed-software discovery and hijack-style execution redirection review.",
+    mitre_techniques: &["T1574"],
+    fields: APP_PATHS_FIELDS,
+    retention: None,
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["services_imagepath", "winlogon_shell"],
+    sources: &[
+        "https://github.com/mkorman90/regipy/blob/master/regipy/plugins/software/apppaths.py",
+        "https://github.com/mkorman90/regipy/blob/master/regipy/plugins/validated_plugins.json",
+        "https://github.com/EricZimmerman/RECmd",
+        "https://github.com/EricZimmerman/RegistryPlugins",
+    ],
+};
+
+static MOUNTED_DEVICES_FIELDS: &[FieldSchema] = &[
+    FieldSchema {
+        name: "value_name",
+        description: "MountedDevices value name such as a drive letter or volume GUID",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "mount_point",
+        description: "Resolved drive letter or volume mount point",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "device_path",
+        description: "Decoded device path or partition signature data",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+];
+
+pub static MOUNTED_DEVICES: ArtifactDescriptor = ArtifactDescriptor {
+    id: "mounted_devices",
+    name: "Mounted Devices",
+    artifact_type: ArtifactType::RegistryKey,
+    hive: Some(HiveTarget::HklmSystem),
+    key_path: r"MountedDevices",
+    value_name: None,
+    file_path: None,
+    scope: DataScope::System,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "Drive-letter and volume mappings including device paths, signatures, and removable-media assignments preserved under HKLM\\SYSTEM\\MountedDevices.",
+    mitre_techniques: &["T1091"],
+    fields: MOUNTED_DEVICES_FIELDS,
+    retention: None,
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["usb_enum", "wifi_profiles"],
+    sources: &[
+        "https://github.com/mkorman90/regipy/blob/master/regipy/plugins/system/mountdev.py",
+        "https://github.com/mkorman90/regipy/blob/master/regipy/plugins/validated_plugins.json",
+        "https://github.com/EricZimmerman/RECmd",
+        "https://github.com/EricZimmerman/RegistryPlugins",
+    ],
+};
+
+static NETWORKLIST_FIELDS: &[FieldSchema] = &[
+    FieldSchema {
+        name: "profile_guid",
+        description: "GUID of a network profile under NetworkList",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "profile_name",
+        description: "Human-readable network profile name",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "date_last_connected",
+        description: "Timestamp of the most recent recorded connection",
+        value_type: ValueType::Timestamp,
+        is_uid_component: false,
+    },
+];
+
+pub static NETWORKLIST_PROFILES: ArtifactDescriptor = ArtifactDescriptor {
+    id: "networklist_profiles",
+    name: "Network List Profiles",
+    artifact_type: ArtifactType::RegistryKey,
+    hive: Some(HiveTarget::HklmSoftware),
+    key_path: r"Microsoft\Windows NT\CurrentVersion\NetworkList\Profiles",
+    value_name: None,
+    file_path: None,
+    scope: DataScope::System,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "Network profile history including profile names, categories, and created/last-connected dates for wired and wireless networks.",
+    mitre_techniques: &["T1016"],
+    fields: NETWORKLIST_FIELDS,
+    retention: None,
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["wifi_profiles", "network_drives"],
+    sources: &[
+        "https://github.com/mkorman90/regipy/blob/master/regipy/plugins/software/networklist.py",
+        "https://github.com/mkorman90/regipy/blob/master/regipy/plugins/validated_plugins.json",
+        "https://github.com/EricZimmerman/RECmd",
+        "https://github.com/EricZimmerman/RegistryPlugins",
+    ],
+};
+
+static PUTTY_SESSION_FIELDS: &[FieldSchema] = &[
+    FieldSchema {
+        name: "session_name",
+        description: "Saved PuTTY session name",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "hostname",
+        description: "Target host configured in the PuTTY session",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "username",
+        description: "User name configured for the saved session",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+];
+
+pub static PUTTY_SESSIONS: ArtifactDescriptor = ArtifactDescriptor {
+    id: "putty_sessions",
+    name: "PuTTY Saved Sessions",
+    artifact_type: ArtifactType::RegistryKey,
+    hive: Some(HiveTarget::NtUser),
+    key_path: r"Software\SimonTatham\PuTTY\Sessions",
+    value_name: None,
+    file_path: None,
+    scope: DataScope::User,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "PuTTY saved sessions, including target hostname, port, protocol, and optional proxy or keyfile settings for SSH and other remote connections.",
+    mitre_techniques: &["T1021.004"],
+    fields: PUTTY_SESSION_FIELDS,
+    retention: None,
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["rdp_client_servers", "winscp_saved_sessions"],
+    sources: &[
+        "https://github.com/mkorman90/regipy/blob/master/regipy/plugins/ntuser/putty.py",
+        "https://the.earth.li/~sgtatham/putty/0.78/htmldoc/AppendixC.html",
+        "https://github.com/EricZimmerman/RECmd",
+        "https://github.com/EricZimmerman/RegistryPlugins",
+    ],
+};
+
+static WINSCP_SESSION_FIELDS: &[FieldSchema] = &[
+    FieldSchema {
+        name: "session_name",
+        description: "Saved WinSCP session name",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "host_name",
+        description: "Target host configured in the saved WinSCP session",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "user_name",
+        description: "User name configured for the saved WinSCP session",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+];
+
+pub static WINSCP_SAVED_SESSIONS: ArtifactDescriptor = ArtifactDescriptor {
+    id: "winscp_saved_sessions",
+    name: "WinSCP Saved Sessions",
+    artifact_type: ArtifactType::RegistryKey,
+    hive: Some(HiveTarget::NtUser),
+    key_path: r"Software\Martin Prikryl\WinSCP 2\Sessions",
+    value_name: None,
+    file_path: None,
+    scope: DataScope::User,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "WinSCP saved sessions, including host, username, protocol, and optionally recoverable obfuscated credentials or connection defaults.",
+    mitre_techniques: &["T1021.004", "T1555"],
+    fields: WINSCP_SESSION_FIELDS,
+    retention: None,
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["putty_sessions", "rdp_client_servers"],
+    sources: &[
+        "https://github.com/mkorman90/regipy/blob/master/regipy/plugins/ntuser/winscp_saved_sessions.py",
+        "https://winscp.net/eng/docs/ui_pref_storage",
+        "https://az4n6.blogspot.com/2013/03/winscp-saved-password.html",
+        "https://github.com/EricZimmerman/RECmd",
+        "https://github.com/EricZimmerman/RegistryPlugins",
+    ],
+};
+
+static WINRAR_HISTORY_FIELDS: &[FieldSchema] = &[
+    FieldSchema {
+        name: "operation",
+        description: "Archive opened, created, or extracted",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "file_path",
+        description: "Archive or extraction path from WinRAR history",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+];
+
+pub static WINRAR_HISTORY: ArtifactDescriptor = ArtifactDescriptor {
+    id: "winrar_history",
+    name: "WinRAR Archive History",
+    artifact_type: ArtifactType::RegistryKey,
+    hive: Some(HiveTarget::NtUser),
+    key_path: r"SOFTWARE\WinRAR",
+    value_name: None,
+    file_path: None,
+    scope: DataScope::User,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "WinRAR registry history of archive opens, archive creation targets, and extraction paths; useful for exfiltration staging and archive reconstruction.",
+    mitre_techniques: &["T1560.001"],
+    fields: WINRAR_HISTORY_FIELDS,
+    retention: None,
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["powershell_history", "opensave_mru"],
+    sources: &[
+        "https://github.com/mkorman90/regipy/blob/master/regipy/plugins/ntuser/winrar.py",
+        "https://www.win-rar.com/switches/settings.htm",
+        "https://github.com/EricZimmerman/RECmd",
+        "https://github.com/EricZimmerman/RegistryPlugins",
+    ],
+};
+
+static NETWORK_INTERFACE_FIELDS: &[FieldSchema] = &[
+    FieldSchema {
+        name: "interface_guid",
+        description: "TCP/IP interface GUID under the Interfaces key",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "ip_address",
+        description: "Static or DHCP-assigned address values associated with the interface",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+];
+
+pub static NETWORK_INTERFACES: ArtifactDescriptor = ArtifactDescriptor {
+    id: "network_interfaces",
+    name: "TCP/IP Network Interfaces",
+    artifact_type: ArtifactType::RegistryKey,
+    hive: Some(HiveTarget::HklmSystem),
+    key_path: r"CurrentControlSet\Services\Tcpip\Parameters\Interfaces",
+    value_name: None,
+    file_path: None,
+    scope: DataScope::System,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "Interface GUIDs with DHCP or static addressing details used to tie network activity and lease information back to a host and adapter.",
+    mitre_techniques: &["T1016"],
+    fields: NETWORK_INTERFACE_FIELDS,
+    retention: None,
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["networklist_profiles", "srum_network_usage"],
+    sources: &[
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
+        "https://github.com/EricZimmerman/RECmd",
+        "https://github.com/EricZimmerman/RegistryPlugins",
+    ],
+};
+
+pub static PAGEFILE_SYS: ArtifactDescriptor = ArtifactDescriptor {
+    id: "pagefile_sys",
+    name: "Pagefile.sys",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"C:\pagefile.sys"),
+    scope: DataScope::System,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "Virtual memory paging file containing memory-resident strings and fragments from paged-out processes when full RAM capture is unavailable.",
+    mitre_techniques: &["T1005"],
+    fields: FILE_PATH_FIELDS,
+    retention: None,
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["hiberfil_sys", "evtx_security"],
+    sources: &["https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv", "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/06_Tool_Command_Vault/6.02_Windows_DFIR_Master_Notes.md"],
+};
+
+pub static HIBERFIL_SYS: ArtifactDescriptor = ArtifactDescriptor {
+    id: "hiberfil_sys",
+    name: "Hibernation File (hiberfil.sys)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"C:\hiberfil.sys"),
+    scope: DataScope::System,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "Compressed hibernation snapshot containing a point-in-time copy of system memory, including processes, sockets, and in-memory strings.",
+    mitre_techniques: &["T1005"],
+    fields: FILE_PATH_FIELDS,
+    retention: None,
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["pagefile_sys", "evtx_security"],
+    sources: &[
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
+        "https://forensics.wiki/hiberfil.sys/",
+        "https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/storport/nf-storport-storportmarkdumpmemory",
+        "https://github.com/EricZimmerman/RECmd",
+        "https://github.com/EricZimmerman/RegistryPlugins",
+    ],
+};
+
+static MOUNTPOINTS2_FIELDS: &[FieldSchema] = &[FieldSchema {
+    name: "mount_point",
+    description: "Per-user mount point or device reference cached by Explorer",
+    value_type: ValueType::Text,
+    is_uid_component: true,
+}];
+
+pub static MOUNTPOINTS2: ArtifactDescriptor = ArtifactDescriptor {
+    id: "mountpoints2",
+    name: "MountPoints2",
+    artifact_type: ArtifactType::RegistryKey,
+    hive: Some(HiveTarget::NtUser),
+    key_path: r"Software\Microsoft\Windows\CurrentVersion\Explorer\MountPoints2",
+    value_name: None,
+    file_path: None,
+    scope: DataScope::User,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "Per-user record of mounted removable media and mapped resources, useful for attributing USB or volume interaction to a specific logged-in user.",
+    mitre_techniques: &["T1091"],
+    fields: MOUNTPOINTS2_FIELDS,
+    retention: None,
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["mounted_devices", "usb_enum"],
+    sources: &[
+        "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
+        "https://github.com/EricZimmerman/RECmd",
+        "https://github.com/EricZimmerman/RegistryPlugins",
+    ],
+};
+
+pub static PORTABLE_DEVICES: ArtifactDescriptor = ArtifactDescriptor {
+    id: "portable_devices",
+    name: "Windows Portable Devices Mapping",
+    artifact_type: ArtifactType::RegistryKey,
+    hive: Some(HiveTarget::HklmSoftware),
+    key_path: r"Microsoft\Windows Portable Devices\Devices",
+    value_name: None,
+    file_path: None,
+    scope: DataScope::System,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "Maps portable device identities to user-visible names or drive assignments, helping correlate USB serials and mounted letters during media analysis.",
+    mitre_techniques: &["T1091"],
+    fields: FILE_PATH_FIELDS,
+    retention: None,
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["mounted_devices", "mountpoints2", "usb_enum"],
+    sources: &["https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv"],
+};
+
+pub static RDP_BITMAP_CACHE: ArtifactDescriptor = ArtifactDescriptor {
+    id: "rdp_bitmap_cache",
+    name: "RDP Bitmap Cache",
+    artifact_type: ArtifactType::Directory,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"C:\Users\*\AppData\Local\Microsoft\Terminal Server Client\Cache"),
+    scope: DataScope::User,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "Client-side cached bitmap fragments from RDP sessions that can reveal what was rendered on screen during remote administration or attacker activity.",
+    mitre_techniques: &["T1021.001"],
+    fields: DIR_ENTRY_FIELDS,
+    retention: None,
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["rdp_client_servers", "rdp_client_default"],
+    sources: &["https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv"],
 };
 
 // ── Global catalog ───────────────────────────────────────────────────────────
 
 /// The global forensic artifact catalog containing all known artifact descriptors.
+///
+/// Maintainer note:
+/// New descriptors should be researched against the curated DFIR source corpus
+/// documented in this module header, then anchored with artifact-specific URLs in
+/// the descriptor's `sources` field. Archived source corpora are discovery input;
+/// they do not replace per-artifact attribution.
 pub static CATALOG: ForensicCatalog = ForensicCatalog::new(&[
     USERASSIST_EXE,
     USERASSIST_FOLDER,
@@ -5619,6 +7075,23 @@ pub static CATALOG: ForensicCatalog = ForensicCatalog::new(&[
     CHROME_LOGIN_DATA,
     FIREFOX_LOGINS,
     WIFI_PROFILES,
+    // Batch I — regipy-aligned registry coverage
+    TYPED_PATHS,
+    RUN_MRU,
+    NETWORK_DRIVES,
+    APP_PATHS,
+    MOUNTED_DEVICES,
+    NETWORKLIST_PROFILES,
+    PUTTY_SESSIONS,
+    WINSCP_SAVED_SESSIONS,
+    WINRAR_HISTORY,
+    // Batch J — Blue Team field-note and artifact-map coverage
+    NETWORK_INTERFACES,
+    PAGEFILE_SYS,
+    HIBERFIL_SYS,
+    MOUNTPOINTS2,
+    PORTABLE_DEVICES,
+    RDP_BITMAP_CACHE,
     // Batch D — Linux cron / init persistence
     LINUX_CRONTAB_SYSTEM,
     LINUX_CRON_D,
@@ -5671,6 +7144,7 @@ pub static CATALOG: ForensicCatalog = ForensicCatalog::new(&[
     JUMP_LIST_AUTO,
     JUMP_LIST_CUSTOM,
     EVTX_DIR,
+    MFT_FILE,
     USN_JOURNAL,
     // Batch E — Windows persistence
     WMI_MOF_DIR,
@@ -5790,7 +7264,7 @@ mod tests {
     #[test]
     fn catalog_has_entries() {
         assert!(!CATALOG.list().is_empty());
-        assert_eq!(CATALOG.list().len(), 151);
+        assert_eq!(CATALOG.list().len(), 167);
     }
 
     #[test]
@@ -7620,6 +9094,7 @@ mod tests_batch_d {
             "jump_list_auto",
             "jump_list_custom",
             "evtx_dir",
+            "mft_file",
             "usn_journal",
             "wmi_mof_dir",
             "bits_db",
@@ -8130,6 +9605,97 @@ mod tests_batch_d {
         assert_eq!(lower.len(), upper.len());
     }
 
+    #[test]
+    fn parsing_profile_lookup_is_case_insensitive() {
+        let lower = parsing_profile("hiberfil_sys").unwrap();
+        let upper = parsing_profile("HIBERFIL_SYS").unwrap();
+        assert_eq!(lower.artifact_id, upper.artifact_id);
+    }
+
+    #[test]
+    fn container_profile_lookup_is_case_insensitive() {
+        let lower = container_profile("windows_registry_hive").unwrap();
+        let upper = container_profile("WINDOWS_REGISTRY_HIVE").unwrap();
+        assert_eq!(lower.id, upper.id);
+    }
+
+    #[test]
+    fn userassist_resolves_to_registry_container_profile() {
+        let profile = CATALOG.container_profile("userassist_exe").unwrap();
+        assert_eq!(profile.id, "windows_registry_hive");
+        assert!(profile
+            .parser_hints
+            .iter()
+            .any(|hint| hint.contains("value name")));
+    }
+
+    #[test]
+    fn windows_timeline_resolves_to_sqlite_container_profile() {
+        let profile = CATALOG.container_profile("windows_timeline").unwrap();
+        assert_eq!(profile.id, "sqlite_database");
+    }
+
+    #[test]
+    fn registry_container_signature_has_regf_magic() {
+        let sig = CATALOG.container_signature("userassist_exe").unwrap();
+        assert_eq!(sig.container_id, "windows_registry_hive");
+        assert_eq!(sig.header_magic, b"regf");
+    }
+
+    #[test]
+    fn userassist_record_signature_prefers_payload_specific_signature() {
+        let sigs = CATALOG.record_signatures("userassist_exe");
+        assert!(sigs.iter().any(|sig| sig.id == "userassist_count_payload"));
+        assert!(sigs
+            .iter()
+            .all(|sig| sig.artifact_id == Some("userassist_exe")));
+    }
+
+    #[test]
+    fn registry_artifact_without_direct_record_signature_falls_back_to_container_records() {
+        let sigs = CATALOG.record_signatures("run_key_hkcu");
+        assert!(sigs.iter().any(|sig| sig.id == "registry_nk_cell"));
+        assert!(sigs.iter().any(|sig| sig.id == "registry_vk_cell"));
+    }
+
+    #[test]
+    fn userassist_parsing_profile_captures_rot13_knowledge() {
+        let profile = CATALOG.parsing_profile("userassist_exe").unwrap();
+        assert!(profile
+            .parser_hints
+            .iter()
+            .any(|hint| hint.contains("ROT13")));
+        assert!(profile.extracted_fields.contains(&"last_run"));
+    }
+
+    #[test]
+    fn hiberfil_parsing_profile_describes_memory_reconstruction() {
+        let profile = CATALOG.parsing_profile("hiberfil_sys").unwrap();
+        assert!(profile.summary.contains("memory"));
+        assert!(profile
+            .parser_hints
+            .iter()
+            .any(|hint| hint.contains("reconstruct")));
+    }
+
+    #[test]
+    fn bits_parsing_profile_mentions_notify_command() {
+        let profile = CATALOG.parsing_profile("bits_db").unwrap();
+        assert!(profile.extracted_fields.contains(&"notify_command"));
+        assert!(profile
+            .parser_hints
+            .iter()
+            .any(|hint| hint.contains("notify")));
+    }
+
+    #[test]
+    fn wmi_parsing_profiles_cover_repository_and_registry_views() {
+        let repo = CATALOG.parsing_profile("wmi_mof_dir").unwrap();
+        let reg = CATALOG.parsing_profile("wmi_subscriptions").unwrap();
+        assert!(repo.extracted_fields.contains(&"binding_filter"));
+        assert!(reg.summary.contains("pivot"));
+    }
+
     // ── CATALOG completeness (batch H) ────────────────────────────────────
 
     // ── sources field — every high-value descriptor must cite at least one
@@ -8237,6 +9803,60 @@ mod tests_batch_d {
             "evtx_system",
             "evtx_powershell",
             "evtx_sysmon",
+        ] {
+            assert!(ids.contains(expected), "CATALOG missing: {expected}");
+        }
+    }
+
+    #[test]
+    fn regipy_batch_has_authoritative_sources() {
+        for desc in [
+            &TYPED_PATHS,
+            &RUN_MRU,
+            &NETWORK_DRIVES,
+            &APP_PATHS,
+            &MOUNTED_DEVICES,
+            &NETWORKLIST_PROFILES,
+            &PUTTY_SESSIONS,
+            &WINSCP_SAVED_SESSIONS,
+            &WINRAR_HISTORY,
+        ] {
+            assert!(
+                !desc.sources.is_empty(),
+                "{} must cite at least one authoritative source",
+                desc.id
+            );
+        }
+    }
+
+    #[test]
+    fn catalog_contains_regipy_batch() {
+        let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
+        for expected in &[
+            "typed_paths",
+            "run_mru",
+            "network_drives",
+            "app_paths",
+            "mounted_devices",
+            "networklist_profiles",
+            "putty_sessions",
+            "winscp_saved_sessions",
+            "winrar_history",
+        ] {
+            assert!(ids.contains(expected), "CATALOG missing: {expected}");
+        }
+    }
+
+    #[test]
+    fn catalog_contains_blue_team_batch() {
+        let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
+        for expected in &[
+            "network_interfaces",
+            "pagefile_sys",
+            "hiberfil_sys",
+            "mountpoints2",
+            "portable_devices",
+            "rdp_bitmap_cache",
         ] {
             assert!(ids.contains(expected), "CATALOG missing: {expected}");
         }

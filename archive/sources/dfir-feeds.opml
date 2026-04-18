@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="1.0">
+  <head>
+    <title>forensic-catalog DFIR source feeds</title>
+  </head>
+  <body>
+    <outline text="DFIR Blogs" title="DFIR Blogs">
+      <outline type="rss" text="Windows Incident Response" title="Windows Incident Response" xmlUrl="https://windowsir.blogspot.com/feeds/posts/default" htmlUrl="https://windowsir.blogspot.com/"/>
+      <outline type="rss" text="dfir.blog" title="dfir.blog" xmlUrl="https://dfir.blog/rss/" htmlUrl="https://dfir.blog/"/>
+      <outline type="rss" text="Another Forensics Blog" title="Another Forensics Blog" xmlUrl="https://az4n6.blogspot.com/feeds/posts/default" htmlUrl="https://az4n6.blogspot.com/"/>
+      <outline type="rss" text="DFIR Diva" title="DFIR Diva" xmlUrl="https://dfirdiva.com/feed" htmlUrl="https://dfirdiva.com/"/>
+      <outline type="rss" text="Digital Forensics Stream" title="Digital Forensics Stream" xmlUrl="https://df-stream.com/feed/" htmlUrl="https://df-stream.com/"/>
+      <outline type="rss" text="mac4n6" title="mac4n6" xmlUrl="https://www.mac4n6.com/blog?format=rss" htmlUrl="https://www.mac4n6.com/"/>
+      <outline type="rss" text="binary foray" title="binary foray" xmlUrl="https://binaryforay.blogspot.com/feeds/posts/default" htmlUrl="https://binaryforay.blogspot.com/"/>
+      <outline type="rss" text="Salt Forensics" title="Salt Forensics" xmlUrl="https://salt4n6.com/feed/" htmlUrl="https://salt4n6.com/"/>
+      <outline type="rss" text="Cheeky4n6Monkey" title="Cheeky4n6Monkey" xmlUrl="https://cheeky4n6monkey.blogspot.com/feeds/posts/default" htmlUrl="https://cheeky4n6monkey.blogspot.com/"/>
+      <outline type="rss" text="ThinkDFIR" title="ThinkDFIR" xmlUrl="https://thinkdfir.com/feed/" htmlUrl="https://thinkdfir.com/"/>
+      <outline type="rss" text="DoubleBlak" title="DoubleBlak" xmlUrl="https://www.doubleblak.com/blogRSS.xml" htmlUrl="https://www.doubleblak.com/"/>
+      <outline type="rss" text="The Binary Hick" title="The Binary Hick" xmlUrl="https://thebinaryhick.blog/feed/" htmlUrl="https://thebinaryhick.blog/"/>
+      <outline type="rss" text="forensicmike1" title="forensicmike1" xmlUrl="https://forensicmike1.com/feed/" htmlUrl="https://forensicmike1.com/"/>
+      <outline type="rss" text="HECF / Hacking Exposed Computer Forensics Blog" title="HECF / Hacking Exposed Computer Forensics Blog" xmlUrl="https://www.hecfblog.com/feeds/posts/default" htmlUrl="https://www.hecfblog.com/"/>
+      <outline type="rss" text="tisiphone.net" title="tisiphone.net" xmlUrl="https://tisiphone.net/feed/" htmlUrl="https://tisiphone.net/"/>
+      <outline type="rss" text="Smarter Forensics" title="Smarter Forensics" xmlUrl="https://smarterforensics.com/feed/" htmlUrl="https://smarterforensics.com/"/>
+      <outline type="rss" text="Initialization Vectors" title="Initialization Vectors" xmlUrl="https://abrignoni.blogspot.com/feeds/posts/default" htmlUrl="https://abrignoni.blogspot.com/"/>
+      <outline type="rss" text="Brett Shavers" title="Brett Shavers" xmlUrl="https://feeds.feedburner.com/brettshavers/oSyq" htmlUrl="https://brettshavers.com/brett-s-blog"/>
+      <outline type="rss" text="Yogesh Khatri's forensic blog" title="Yogesh Khatri's forensic blog" xmlUrl="https://www.swiftforensics.com/feeds/posts/default" htmlUrl="https://www.swiftforensics.com/"/>
+      <outline type="rss" text="Forensic Focus" title="Forensic Focus" xmlUrl="https://www.forensicfocus.com/rss/news2.php" htmlUrl="https://www.forensicfocus.com/"/>
+      <outline type="rss" text="Forensic Multimedia Analysis Blog" title="Forensic Multimedia Analysis Blog" xmlUrl="https://forensicphotoshop.blogspot.com/feeds/posts/default" htmlUrl="https://forensicphotoshop.blogspot.com/"/>
+      <outline type="rss" text="Magnet Forensics" title="Magnet Forensics" xmlUrl="https://www.magnetforensics.com/feed/" htmlUrl="https://www.magnetforensics.com/"/>
+      <outline type="rss" text="DFIR Training" title="DFIR Training" xmlUrl="https://www.dfir.training/dfir-training-categories-k2/itemlist?format=feed" htmlUrl="https://www.dfir.training/"/>
+      <outline type="rss" text="MSAB" title="MSAB" xmlUrl="https://www.msab.com/feed/" htmlUrl="https://www.msab.com/"/>
+      <outline type="rss" text="AboutDFIR" title="AboutDFIR" xmlUrl="https://aboutdfir.com/feed/" htmlUrl="https://aboutdfir.com/"/>
+      <outline type="rss" text="Forensic 4cast" title="Forensic 4cast" xmlUrl="https://4cast.whitfields.org/?feed=rss2" htmlUrl="https://forensic4cast.com/"/>
+      <outline type="rss" text="This Week In 4n6" title="This Week In 4n6" xmlUrl="https://thisweekin4n6.wordpress.com/feed/" htmlUrl="https://thisweekin4n6.com/"/>
+      <outline type="rss" text="The Sleuth Kit updates" title="The Sleuth Kit updates" xmlUrl="https://www.sleuthkit.org/rss.xml" htmlUrl="https://www.sleuthkit.org/"/>
+      <outline type="rss" text="Amped Software blog" title="Amped Software blog" xmlUrl="https://blog.ampedsoftware.com/feed/" htmlUrl="https://blog.ampedsoftware.com/"/>
+    </outline>
+    <outline text="Vendor and Intel Blogs" title="Vendor and Intel Blogs">
+      <outline type="rss" text="CrowdStrike blog" title="CrowdStrike blog" xmlUrl="https://www.crowdstrike.com/blog/feed/" htmlUrl="https://www.crowdstrike.com/blog/"/>
+      <outline type="rss" text="VMware Carbon Black" title="VMware Carbon Black" xmlUrl="https://www.carbonblack.com/feed/" htmlUrl="https://www.carbonblack.com/"/>
+      <outline type="rss" text="Malwarebytes Labs" title="Malwarebytes Labs" xmlUrl="https://blog.malwarebytes.com/feed/" htmlUrl="https://blog.malwarebytes.com/"/>
+      <outline type="rss" text="Krebs on Security" title="Krebs on Security" xmlUrl="https://krebsonsecurity.com/feed/" htmlUrl="https://krebsonsecurity.com/"/>
+      <outline type="rss" text="BleepingComputer" title="BleepingComputer" xmlUrl="https://www.bleepingcomputer.com/feed/" htmlUrl="https://www.bleepingcomputer.com/"/>
+      <outline type="rss" text="Dark Reading" title="Dark Reading" xmlUrl="https://www.darkreading.com/rss/all.xml" htmlUrl="https://www.darkreading.com/"/>
+    </outline>
+  </body>
+</opml>

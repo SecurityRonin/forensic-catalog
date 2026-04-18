@@ -1,0 +1,15 @@
+# Rundown
+
+- URL: https://windowsir.blogspot.com/2024/10/rundown.html
+- Published: 2024-10-15T07:41:00.002-05:00
+- Updated: 2024-10-15T07:41:34.180-05:00
+- Labels: none
+
+It should surprise no one that this is an artifact found on Windows 11; after all, there've been more than a few changes to Windows 10, even just between various individual builds. As such, depending upon the nature of your case, and your investigative goals, this may be a value resource to explore.
+ As a reminder, RegRipper has two plugins that query various values beneath the CapabilityAccessManager\ContentStore subkey, contentstore.pl and location.pl . The contentstore.pl plugin also comes in a TLN variant, as well, so that the information can be included in an investigative timeline.
+ I also ran across an interesting article regarding artifacts of data exfiltration on various platforms, including Windows. While the list of these artifacts, the one specific to Windows, is a good one, IMHO, it misses some very useful artifacts. Some of the artifacts listed in the article, such as Prefetch files, are not definitive, and need to be used in conjunction with other artifacts to even provide a hint of data exfiltration. After all, you can call something whatever you want on Windows systems and not impact the functionality; you can rename net.exe to winrar.exe , and the Prefetch file will be for winrar.exe , and unfortunately, command line arguments are not stored in the Prefecth files.
+
+ Also, the article states that the Shimcache, "...stores information about executables that have been run on the system, even if the file has been deleted. Investigators can use this to trace the usage of data exfiltration tools." The Shimcache does not only/solely store information about executables that have been run on the system, something that has been documented again and again. Executables can be included in the ShimCache if the user has browsed to the folder where the EXE resides. So, yes, the ShimCache does include executables that have been run on the system, but those with little experience often interpret this statement to mean that this is all that the ShimCache includes, and is therefore "evidence of execution".
+ There are other, perhaps more definitive data sources that point to data exfiltration. For example, querying the BITS Client Event Log for upload jobs would reveal a good deal of information regarding data exfiltration. One data source I've used in the past is the IIS web server logs; a threat actor moved archive files to the web server, and then issued GET requests for the files. Looking back through the logs we had available, there had been no prior instances of .zip files being requested.
+ Yes, the SRUM db is a great place to look for evidence of data exfiltration, very much so. However, as with other data sources, we have to keep the context of the data source in mind when conducting an investigation.
+ Even with this list, there are number of ways to exfil data off of a Windows system, including the use of finger.exe (one of my favorites!).

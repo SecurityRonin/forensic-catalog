@@ -14,6 +14,10 @@
 ///   <https://attack.mitre.org/techniques/T1547/001/>
 /// - Sysinternals Autoruns — canonical Windows autostart location reference:
 ///   <https://learn.microsoft.com/en-us/sysinternals/downloads/autoruns>
+/// - Eric Zimmerman RECmd / RegistryPlugins — parser coverage for common
+///   persistence-related Registry locations:
+///   <https://github.com/EricZimmerman/RECmd>
+///   <https://github.com/EricZimmerman/RegistryPlugins>
 pub const WINDOWS_RUN_KEYS: &[&str] = &[
     r"Software\Microsoft\Windows\CurrentVersion\Run",
     r"Software\Microsoft\Windows\CurrentVersion\RunOnce",

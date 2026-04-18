@@ -1,0 +1,12 @@
+# Events Ripper Update
+
+- URL: https://windowsir.blogspot.com/2023/07/events-ripper-update.html
+- Published: 2023-07-14T15:38:00.000-05:00
+- Updated: 2023-07-14T15:38:42.103-05:00
+- Labels: none
+
+Something I really, really like about tools like RegRipper and Events Ripper is that when I see something in the data during an investigation, I can explore whether it makes sense to pull that out and make it visible to the investigator, and if so, figure out how it makes sense to do so. Because of how these tools are set up, the turn around for something new is pretty quick, and the retention (and sharing) of corporate knowledge is pretty freakin' cool!
+ This time, I updated the logins.pl plugin, so that it collects and displays some additional data points beyond the 'current' version; specifically, usernames and SIDs for type 3 and type 10 logins, as well as source system names (if not "-" in the event record), correlated to source IP address, for type 3 and type 10 logins.
+ During a recent incident we were digging into a bit further, we were seeing some odd source system names, ones we'd seen previously, on other incidents for other customers. Now, this isn't stating definitively that it's the same source system, of course, but it is an interesting data point worth tracking...so why not extract that information and make it easy for an analyst to see. We were also seeing repeated type 3 logins for a source system named "nmap", and I wanted to see the logins and source IP addresses that may have had the same source system name. Interestingly, we also saw some additional anomalies, but the point is that this information is easy to see now.
+ With the usernames, in one instance, we were seeing repeated type 3 logins for the "Guest" account; including the SID alongside the username for the type 3 (and type 10) logins provides insight into possibly compromised credentials. In the case we were looking at, the RID for the account was 501, which tells us that someone had enabled the Guest account, something that serves as an interesting data point for the incident.
+ I'd love to provide some sample output but most of the CTF data I have access to doesn't include a great deal of terribly interesting data points.

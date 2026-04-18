@@ -1,0 +1,19 @@
+# FTSCon
+
+- URL: https://windowsir.blogspot.com/2024/10/ftscon.html
+- Published: 2024-10-31T10:41:00.004-05:00
+- Updated: 2024-11-22T12:38:10.829-05:00
+- Labels: none
+
+Keynote
+ Sean Koessel and Steven Adair provided the keynote, which was a look into a fascinating case they worked. In this case, the threat actor gained access to their customer by compromising near-by infrastructures and traversing/moving laterally via the wireless networks; hence the title, "The Nearest Neighbor Attack". Sean and Steven put a lot of effort into crafting and delivering their fascinating story, all about how they worked through this incident, with all of the bumps, detours, and delays along the way. They also promised that they'd be putting together a more comprehensive review of the overall incident on the Volexity blog , so keep an eye out.
+ Something Sean said at the very beginning of the presentation caught my attention, and got me thinking. He referred to the incident as something, "...no one's ever seen before." As Sean and Steven described this particular incident, it was more than just a bit of a complicated. As such, the question becomes, were they able to get as far as they did due to the knowledge, experience, and teamwork they brought to bear? Would someone else, say a single individual with different or lesser experience, have been able to do the same, or would this incident have been more akin the blind men trying to describe an elephant ?
+ Or, had someone seen this before, and just not thought to share it? Not long ago in my career, I worked with different teams of DFIR consultants, and time after time, I spoke to analysts who insisted that they didn't share what they were seeing, because they assumed, often incorrectly, that "...everyone's already seen this...".
+ Yarden Sharif gave a really interesting presentation on enclaves , something I hadn't heard of prior to the event ( Matthew Geiger graciously explained what they were for me).
+ At one point during her presentation, Yarden mentioned that enclaves can be enumerated, and I'm sure I'm not the only one who thought, "whoa, wait...what happens if the bad guy creates an enclave???"
+ Lex Crumpton 's presentation was titled, "ATT&CKing the MITRE NERVE Incident: Operationalizing Threat Intelligence for a Safer Tomorrow." What got my attention most was that Lex said she's interested in "behavior analysis", which, when considered from a DFIR perspective, is something that's fascinated me for quite some time.
+ John Hammond is always an entertaining and educational (as well as knowledgeable) presenter, and his malware presentation was pretty fascinating to watch. John does a great job of illustrating his walk-through and sharing his thought processes when finding and unraveling new challenges.
+ Andrew Case shared some insight into how Volatility could be used to detect EDR-evading malware, which I thought was pretty interesting. I've used Volatility before, and Andrew shared that there are some plugins that already detected the techniques used by some malware, and that other plugins were created to address gaps.
+ Something to keep in mind is that all of the techniques Andrew talked about are used by malware to directly address/attack EDR. There are other techniques at play, such as EDR Silencer , which creates WFP filter rules to prevent the EDR from talking to it's cloud infrastructure. This way, it doesn't directly interact with the EDR agent. As pointed out in the WindowsIR blog post , another technique that would work, would leave fewer artifacts, and would likely be missed by younger, less experienced analysts is to modify the hosts file (shoutz to Dray for that one!)
+ Andrew's presentation of the same title, from DefCon, is available here .
+ Addendum, 22 Nov : Steve and Sean's blog post was published today, find it here . As one would expect, it was picked up by folks like Brian Krebs .

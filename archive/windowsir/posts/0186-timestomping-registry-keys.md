@@ -1,0 +1,33 @@
+# Timestomping Registry Keys
+
+- URL: https://windowsir.blogspot.com/2022/04/timestomping-registry-keys.html
+- Published: 2022-04-08T09:20:00.001-05:00
+- Updated: 2022-04-09T06:12:48.874-05:00
+- Labels: none
+
+If you're worked in DFIR or threat intel for any amount of time, you've likely either seen or heard how threat actors modify systems to meet their own needs, configuring systems to provide data or hide their activities, as they make their way through an infrastructure. From disabling services, to modifying the system to maintain credentials in memory in plain text, to clearing Windows Event Logs, sometimes it seems that the threat actor knows more about the platform than the administrators. These system modifications are used to either provide easier access to the threat actor, or hide the impacts of their activities by "blinding" the administrators, or simply be removing clear evidence of the activity. Sometimes these system modifications go beyond the administrators, and meant to instead hamper/impede the efforts of forensic analysts investigating an incident. Today, thanks to the efforts of a bright, shining star in DFIR, we'll take a look at one such possible technique, one that hasn't been addressed in some time .
+ Continuing with her excellent content creation and sharing, Lina recently illustrated another means threat actors can use to disguise their activity on systems and hide their presence from DFIR analysts and threat hunters; in this case, Lina shared awareness of a technique to modify the LastWrite times on Registry keys . As we've seen in the past , Lina's blog posts are comprehensive, well-thought-out, and extremely cogent.
+ In her blog post, Lina used Joakim Schicht's SetRegTime ( wiki ) to modify Registry key LastWrite times, providing several attack demonstrations. She then followed it up with detection methodology insights, providing additional thoughts as to how threat hunters and DFIR analysts might go about determining if this technique was used. I was particularly interested in her "part 2", relying on key LastWrite time discrepancies in hopes of spotting the use of such a technique.
+ In addition to her blog post, Lina also tweets out her content, and in this case, Maxim stepped up to provide some additional color to Lina's content, providing more detection techniques. Maxim specifically mentioned the use of Registry transaction logs, something he's addressed in detail before in his own blog .
+ Other resources regarding Registry transaction logs and tools can be found:
+ - Andrea Fortuna (uses regipy )
+ - WindowsIR (refs Maxim's yarp + registryFlush.py )
+ - Mandiant
+ More Detection Possibilities
+ Adding to both Lina and Maxim's incredible contributions regarding detections, other possible detection methodologies might include:
+ ** The use of the RegIdleBackup Scheduled Task ; you might remember that this task used to backup the system Registry hive files into the C:\Windows\system32\config\RegBack folder. I say "used to" because a bit ago, we stopped seeing those Registry hive backups in the RegBack folder. Per Microsoft, this change is by design, but there is a way to get those hive backups back, by setting the EnablePeriodicBackup value to "1" and rebooting the system.
+ ** Or, you can create your own Scheduled Task that uses reg.exe to create periodic hive backups, with names appended with time stamps in order to differentiate individual backups.
+
+ Both of these methodologies would serve purposes beyond simply detecting or verifying the use of Registry key time stomping techniques. However, both of these methodologies require that system owners modify systems ahead of an incident, and I'll admit that the reality is that this simply doesn't happen nearly enough. So, what can we do with what we have?
+
+ Lina had a great detection methodology in "part 2", in that looking at an arbitrary key with subkeys, the line of reasoning is that the key LastWrite time should be equal to or more recent than the subkeys; remember that adding, deleting or modifying a value beneath the key via the usual API will cause the key LastWrite time to be updated, as well. This is an interesting approach, and would apply only under specific circumstances, but it is definitely worth testing.
+ Some additional thoughts...
+
+ If an adversary copies the SetRegTime executable over to a system and uses it in a similar manner to the way Lina described, there may be indications of the use available via EDR telemetry, as well as the ShimCache and AmCache.hve files. If there's an entry in the AmCache.hve file, then the entry may also include a hash (even given the limitations of that process). This approach (by the adversary) isn't entirely underheard of, either copying the executable file over to the system, downloading once they're on the system, or including the executable in the resource section of another executable. Of course, if the adversary includes the code from the SetRegTime executable into their own, then that's a whole other ball of wax, but the key thing to remember is that nothing bad happens on a system without something happening, and that something will leave traces or an indicator.
+ There are a number of examples of the use of SetRegTime on the wiki ; if some of the example time stamps are used, there's potential for a possible detection mechanism (yes, the wording there was intentional). Registry key LastWrite times are 64-bit FILETIME objects, or "QWORDs", which are comprised of two "DWORDs". Examples used in the wiki, such as "1743:04:01:00:00:00:000:0000" will result in one of the DWORDs consisting of all zeros. As it is unlikely the case that such a loss of granularity would be unintentional, so reading the two DWORDs and checking to see if one is all zeros might be a good automated DFIR analysis technique, either across the entire hive or by focusing on a subset of keys.
+ Conclusion
+ So, again...fantastic content by both Lina and Maxim! Be sure to visit both of their blogs, as well as give them a follow on Twitter for more amazing content!
+
+ Lina - blog - Twitter
+ Maxim - blog - Twitter
+ Addendum: After publishing this post, I wrote a RegRipper plugin (based on the sizes.pl plugin) to run through a hive file and find all the keys that had LastWrite times that were smaller/older than their most recently-updated subkey...and it turns out, there are a LOT! It seems that doing something...anything...that updates a subkey and causes the LastWrite time to be updated does not then roll that change up to the subkey's parent. This would be necessary for this detection methodology to work.

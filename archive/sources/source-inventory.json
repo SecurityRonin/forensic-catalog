@@ -1,0 +1,1102 @@
+{
+  "generated_from": {
+    "feeds": "archive/sources/dfir-feeds.opml",
+    "directories": "archive/sources/catalog-directories.json",
+    "manual": "archive/sources/manual-sources.json"
+  },
+  "total_sources": 84,
+  "sources": [
+    {
+      "id": "aboutdfir-blogs",
+      "title": "aboutDFIR blogs index",
+      "category": "directory",
+      "kind": "blog-directory",
+      "html_url": "https://aboutdfir.com/reading/blogs/",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Blog index used to discover additional DFIR feeds and long-form practitioner sources.",
+      "sources": [
+        "catalog-directory"
+      ]
+    },
+    {
+      "id": "aboutdfir-forensicators",
+      "title": "aboutDFIR Forensicators of DFIR",
+      "category": "directory",
+      "kind": "community-directory",
+      "html_url": "https://aboutdfir.com/the-community/forensicators-of-dfir/",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Community roster and researcher directory used to discover practitioners and downstream blogs.",
+      "sources": [
+        "catalog-directory"
+      ]
+    },
+    {
+      "id": "crowdstrike-front-lines",
+      "title": "CrowdStrike From the Front Lines",
+      "category": "directory",
+      "kind": "category-page",
+      "html_url": "https://www.crowdstrike.com/en-us/blog/category.from-the-front-lines/",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Threat research category page used to track incident-response and intrusion-analysis posts.",
+      "sources": [
+        "catalog-directory"
+      ]
+    },
+    {
+      "id": "aboutdfir",
+      "title": "AboutDFIR",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://aboutdfir.com/",
+      "feed_url": "https://aboutdfir.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "amped-software-blog",
+      "title": "Amped Software blog",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://blog.ampedsoftware.com/",
+      "feed_url": "https://blog.ampedsoftware.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "another-forensics-blog",
+      "title": "Another Forensics Blog",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://az4n6.blogspot.com/",
+      "feed_url": "https://az4n6.blogspot.com/feeds/posts/default",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "binary-foray",
+      "title": "binary foray",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://binaryforay.blogspot.com/",
+      "feed_url": "https://binaryforay.blogspot.com/feeds/posts/default",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "bleepingcomputer",
+      "title": "BleepingComputer",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.bleepingcomputer.com/",
+      "feed_url": "https://www.bleepingcomputer.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "brett-shavers",
+      "title": "Brett Shavers",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://brettshavers.com/brett-s-blog",
+      "feed_url": "https://feeds.feedburner.com/brettshavers/oSyq",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "cheeky4n6monkey",
+      "title": "Cheeky4n6Monkey",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://cheeky4n6monkey.blogspot.com/",
+      "feed_url": "https://cheeky4n6monkey.blogspot.com/feeds/posts/default",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "crowdstrike-blog",
+      "title": "CrowdStrike blog",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.crowdstrike.com/blog/",
+      "feed_url": "https://www.crowdstrike.com/blog/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "dark-reading",
+      "title": "Dark Reading",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.darkreading.com/",
+      "feed_url": "https://www.darkreading.com/rss/all.xml",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "dfir-diva",
+      "title": "DFIR Diva",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://dfirdiva.com/",
+      "feed_url": "https://dfirdiva.com/feed",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "dfir-training",
+      "title": "DFIR Training",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.dfir.training/",
+      "feed_url": "https://www.dfir.training/dfir-training-categories-k2/itemlist?format=feed",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "dfir-blog",
+      "title": "dfir.blog",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://dfir.blog/",
+      "feed_url": "https://dfir.blog/rss/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "digital-forensics-stream",
+      "title": "Digital Forensics Stream",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://df-stream.com/",
+      "feed_url": "https://df-stream.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "doubleblak",
+      "title": "DoubleBlak",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.doubleblak.com/",
+      "feed_url": "https://www.doubleblak.com/blogRSS.xml",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "forensic-4cast",
+      "title": "Forensic 4cast",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://forensic4cast.com/",
+      "feed_url": "https://4cast.whitfields.org/?feed=rss2",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "forensic-focus",
+      "title": "Forensic Focus",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.forensicfocus.com/",
+      "feed_url": "https://www.forensicfocus.com/rss/news2.php",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "forensic-multimedia-analysis-blog",
+      "title": "Forensic Multimedia Analysis Blog",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://forensicphotoshop.blogspot.com/",
+      "feed_url": "https://forensicphotoshop.blogspot.com/feeds/posts/default",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "forensicmike1",
+      "title": "forensicmike1",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://forensicmike1.com/",
+      "feed_url": "https://forensicmike1.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "hecf-hacking-exposed-computer-forensics-blog",
+      "title": "HECF / Hacking Exposed Computer Forensics Blog",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.hecfblog.com/",
+      "feed_url": "https://www.hecfblog.com/feeds/posts/default",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "initialization-vectors",
+      "title": "Initialization Vectors",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://abrignoni.blogspot.com/",
+      "feed_url": "https://abrignoni.blogspot.com/feeds/posts/default",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "krebs-on-security",
+      "title": "Krebs on Security",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://krebsonsecurity.com/",
+      "feed_url": "https://krebsonsecurity.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "mac4n6",
+      "title": "mac4n6",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.mac4n6.com/",
+      "feed_url": "https://www.mac4n6.com/blog?format=rss",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "magnet-forensics",
+      "title": "Magnet Forensics",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.magnetforensics.com/",
+      "feed_url": "https://www.magnetforensics.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "malwarebytes-labs",
+      "title": "Malwarebytes Labs",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://blog.malwarebytes.com/",
+      "feed_url": "https://blog.malwarebytes.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "msab",
+      "title": "MSAB",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.msab.com/",
+      "feed_url": "https://www.msab.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "salt-forensics",
+      "title": "Salt Forensics",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://salt4n6.com/",
+      "feed_url": "https://salt4n6.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "smarter-forensics",
+      "title": "Smarter Forensics",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://smarterforensics.com/",
+      "feed_url": "https://smarterforensics.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "the-binary-hick",
+      "title": "The Binary Hick",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://thebinaryhick.blog/",
+      "feed_url": "https://thebinaryhick.blog/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "the-sleuth-kit-updates",
+      "title": "The Sleuth Kit updates",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.sleuthkit.org/",
+      "feed_url": "https://www.sleuthkit.org/rss.xml",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "thinkdfir",
+      "title": "ThinkDFIR",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://thinkdfir.com/",
+      "feed_url": "https://thinkdfir.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "this-week-in-4n6",
+      "title": "This Week In 4n6",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://thisweekin4n6.com/",
+      "feed_url": "https://thisweekin4n6.wordpress.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "tisiphone-net",
+      "title": "tisiphone.net",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://tisiphone.net/",
+      "feed_url": "https://tisiphone.net/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "vmware-carbon-black",
+      "title": "VMware Carbon Black",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.carbonblack.com/",
+      "feed_url": "https://www.carbonblack.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "windows-incident-response",
+      "title": "Windows Incident Response",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://windowsir.blogspot.com/",
+      "feed_url": "https://windowsir.blogspot.com/feeds/posts/default",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "yogesh-khatri-s-forensic-blog",
+      "title": "Yogesh Khatri's forensic blog",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.swiftforensics.com/",
+      "feed_url": "https://www.swiftforensics.com/feeds/posts/default",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "blue-team-hunting-field-notes",
+      "title": "Blue Team Hunting Field Notes",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Windows event references, artifact maps, detection rules, and DFIR field notes.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "chainsaw-rules",
+      "title": "Chainsaw detections",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/WithSecureLabs/chainsaw",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Detection rules and event triage references.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-amcacheparser",
+      "title": "Eric Zimmerman AmcacheParser",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/AmcacheParser",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Amcache parser for application inventory artifacts.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-appcompatcacheparser",
+      "title": "Eric Zimmerman AppCompatCacheParser",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/AppCompatCacheParser",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "ShimCache parser across multiple Windows versions.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-dfir-sql-query-repo",
+      "title": "Eric Zimmerman DFIR-SQL-Query-Repo",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/DFIR-SQL-Query-Repo",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "SQL query templates for digital forensics use across SQLite and related databases.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-documentation",
+      "title": "Eric Zimmerman documentation",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/documentation",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Zimmerman documentation repository covering tool usage and workflow guidance.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-evtx",
+      "title": "Eric Zimmerman evtx",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/evtx",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "EVTX parser and supporting event-log processing logic.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-extensionblocks",
+      "title": "Eric Zimmerman ExtensionBlocks",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/ExtensionBlocks",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Extension block parsing used in ShellBags and related registry artifacts.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-get-zimmermantools",
+      "title": "Eric Zimmerman Get-ZimmermanTools",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/Get-ZimmermanTools",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Tool-distribution and acquisition helper for the Zimmerman suite.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-guidmapping",
+      "title": "Eric Zimmerman GuidMapping",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/GuidMapping",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "GUID resolution data useful for UserAssist, ShellBags, and other shell artifacts.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-jlecmd",
+      "title": "Eric Zimmerman JLECmd",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/JLECmd",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Automatic and custom destinations Jump List parser.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-jumplist",
+      "title": "Eric Zimmerman JumpList",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/JumpList",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Jump List parsing library and supporting structures.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-kapedocs",
+      "title": "Eric Zimmerman KapeDocs",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/KapeDocs",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "KAPE documentation and collection guidance.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-kapefiles",
+      "title": "Eric Zimmerman KapeFiles",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/KapeFiles",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Community KAPE targets and modules for DFIR collection and processing.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-lecmd",
+      "title": "Eric Zimmerman LECmd",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/LECmd",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Shell link parser for recent files and LNK artifacts.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-lnk",
+      "title": "Eric Zimmerman Lnk",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/Lnk",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Shell link parsing library.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-mft",
+      "title": "Eric Zimmerman MFT",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/MFT",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "NTFS MFT parsing library underlying Zimmerman MFT-focused tooling.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-mftecmd",
+      "title": "Eric Zimmerman MFTECmd",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/MFTECmd",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "NTFS $MFT and related metadata parsing.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-olecf",
+      "title": "Eric Zimmerman OleCf",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/OleCf",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "OLE compound file parsing library used for compound container artifacts such as Jump Lists.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-pecmd",
+      "title": "Eric Zimmerman PECmd",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/PECmd",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Prefetch parser and command-line analysis tool.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-prefetch",
+      "title": "Eric Zimmerman Prefetch",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/Prefetch",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Windows Prefetch parsing library.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-rbcmd",
+      "title": "Eric Zimmerman RBCmd",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/RBCmd",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Recycle Bin artifact parser.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-recentfilecacheparser",
+      "title": "Eric Zimmerman RecentFileCacheParser",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/RecentFileCacheParser",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Parser for RecentFileCache.bcf execution evidence on legacy Windows systems.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-recmd",
+      "title": "Eric Zimmerman RECmd",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/RECmd",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Registry command-line access and batch artifact extraction.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-registry",
+      "title": "Eric Zimmerman Registry",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/Registry",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Offline Windows Registry parsing library.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-registryexplorerbookmarks",
+      "title": "Eric Zimmerman RegistryExplorerBookmarks",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/RegistryExplorerBookmarks",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Registry Explorer bookmark definitions covering DFIR-relevant artifact locations.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-registryplugins",
+      "title": "Eric Zimmerman RegistryPlugins",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/RegistryPlugins",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Registry artifact plugin definitions used by Zimmerman tooling.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-sqlecmd",
+      "title": "Eric Zimmerman SQLECmd",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/SQLECmd",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "SQLite parsing and triage support for DFIR-oriented databases.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-srum",
+      "title": "Eric Zimmerman Srum",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/Srum",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "SRUM parsing logic for application and network usage artifacts.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-tlefileplugins",
+      "title": "Eric Zimmerman TLEFilePlugins",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/TLEFilePlugins",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Timeline Explorer file plugins for CSV-oriented DFIR parser outputs.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-usbdevices",
+      "title": "Eric Zimmerman USBDevices",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/USBDevices",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Registry-backed USB device extraction and reporting.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-winsearchdbanalyzer",
+      "title": "Eric Zimmerman WinSearchDBAnalyzer",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/WinSearchDBAnalyzer",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Windows Search ESE database analysis utility.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "ericzimmerman-wxtcmd",
+      "title": "Eric Zimmerman WxTCmd",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/EricZimmerman/WxTCmd",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Windows Timeline and activity-cache parsing support.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "hayabusa-rules",
+      "title": "Hayabusa rules",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/Yamato-Security/hayabusa-rules",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Windows event detection rule corpus.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "regipy",
+      "title": "regipy",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/mkorman90/regipy",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Offline Windows registry parsing library and plugin corpus covering many DFIR-relevant registry artifacts.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "sigmahq",
+      "title": "SigmaHQ",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/SigmaHQ/sigma",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Detection rule corpus used for event and artifact cross-checking.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "dfir-report",
+      "title": "The DFIR Report",
+      "category": "practitioner-blog",
+      "kind": "blog",
+      "html_url": "https://thedfirreport.com/",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Incident case studies and intrusion-analysis writeups.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "apple-platform-security",
+      "title": "Apple Platform Security",
+      "category": "primary-reference",
+      "kind": "documentation",
+      "html_url": "https://support.apple.com/guide/security/welcome/web",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Primary Apple platform security documentation.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "eric-zimmerman",
+      "title": "Eric Zimmerman documentation",
+      "category": "primary-reference",
+      "kind": "documentation",
+      "html_url": "https://ericzimmerman.github.io/#!index.md",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Parser and forensic tool documentation.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "gtfobins",
+      "title": "GTFOBins",
+      "category": "primary-reference",
+      "kind": "knowledge-base",
+      "html_url": "https://gtfobins.github.io/",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Unix GTFOBins reference.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "lolbas",
+      "title": "LOLBAS Project",
+      "category": "primary-reference",
+      "kind": "knowledge-base",
+      "html_url": "https://lolbas-project.github.io/",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Windows LOLBAS reference.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "microsoft-learn",
+      "title": "Microsoft Learn",
+      "category": "primary-reference",
+      "kind": "documentation",
+      "html_url": "https://learn.microsoft.com/",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Primary Windows platform and API documentation.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "mitre-attack",
+      "title": "MITRE ATT&CK",
+      "category": "primary-reference",
+      "kind": "knowledge-base",
+      "html_url": "https://attack.mitre.org/",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "ATT&CK technique and software reference.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "sysinternals",
+      "title": "Sysinternals documentation",
+      "category": "primary-reference",
+      "kind": "documentation",
+      "html_url": "https://learn.microsoft.com/en-us/sysinternals/",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Primary Sysinternals documentation and tool references.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "tor-docs",
+      "title": "Tor Project documentation",
+      "category": "primary-reference",
+      "kind": "documentation",
+      "html_url": "https://support.torproject.org/",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Tor deployment and network usage documentation.",
+      "sources": [
+        "manual"
+      ]
+    },
+    {
+      "id": "velociraptor-docs",
+      "title": "Velociraptor documentation",
+      "category": "primary-reference",
+      "kind": "documentation",
+      "html_url": "https://docs.velociraptor.app/",
+      "feed_url": "",
+      "update_strategy": "manual-review",
+      "notes": "Velociraptor artifact and VQL documentation.",
+      "sources": [
+        "manual"
+      ]
+    }
+  ]
+}

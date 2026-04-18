@@ -1,0 +1,48 @@
+name: Feed Watch
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  poll:
+    name: Poll subscribed feeds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Normalize source inventory
+        run: python3 scripts/normalize_sources.py
+
+      - name: Refresh feed snapshot
+        run: python3 scripts/check_feed_updates.py
+
+      - name: Create update PR
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore: refresh source inventory"
+          title: "chore: refresh source inventory"
+          body: |
+            Automated refresh of the DFIR source inventory and subscribed feed state.
+
+            Updated files:
+            - `archive/sources/source-inventory.json`
+            - `archive/sources/source-inventory.md`
+            - `archive/sources/feed-state.json`
+            - `archive/sources/feed-report.md`
+          branch: automation/feed-watch
+          delete-branch: true
+          add-paths: |
+            archive/sources/source-inventory.json
+            archive/sources/source-inventory.md
+            archive/sources/feed-state.json
+            archive/sources/feed-report.md

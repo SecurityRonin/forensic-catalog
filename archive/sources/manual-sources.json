@@ -1,0 +1,416 @@
+[
+  {
+    "id": "microsoft-learn",
+    "title": "Microsoft Learn",
+    "category": "primary-reference",
+    "kind": "documentation",
+    "html_url": "https://learn.microsoft.com/",
+    "update_strategy": "manual-review",
+    "notes": "Primary Windows platform and API documentation."
+  },
+  {
+    "id": "apple-platform-security",
+    "title": "Apple Platform Security",
+    "category": "primary-reference",
+    "kind": "documentation",
+    "html_url": "https://support.apple.com/guide/security/welcome/web",
+    "update_strategy": "manual-review",
+    "notes": "Primary Apple platform security documentation."
+  },
+  {
+    "id": "mitre-attack",
+    "title": "MITRE ATT&CK",
+    "category": "primary-reference",
+    "kind": "knowledge-base",
+    "html_url": "https://attack.mitre.org/",
+    "update_strategy": "manual-review",
+    "notes": "ATT&CK technique and software reference."
+  },
+  {
+    "id": "lolbas",
+    "title": "LOLBAS Project",
+    "category": "primary-reference",
+    "kind": "knowledge-base",
+    "html_url": "https://lolbas-project.github.io/",
+    "update_strategy": "manual-review",
+    "notes": "Windows LOLBAS reference."
+  },
+  {
+    "id": "gtfobins",
+    "title": "GTFOBins",
+    "category": "primary-reference",
+    "kind": "knowledge-base",
+    "html_url": "https://gtfobins.github.io/",
+    "update_strategy": "manual-review",
+    "notes": "Unix GTFOBins reference."
+  },
+  {
+    "id": "sysinternals",
+    "title": "Sysinternals documentation",
+    "category": "primary-reference",
+    "kind": "documentation",
+    "html_url": "https://learn.microsoft.com/en-us/sysinternals/",
+    "update_strategy": "manual-review",
+    "notes": "Primary Sysinternals documentation and tool references."
+  },
+  {
+    "id": "eric-zimmerman",
+    "title": "Eric Zimmerman documentation",
+    "category": "primary-reference",
+    "kind": "documentation",
+    "html_url": "https://ericzimmerman.github.io/#!index.md",
+    "update_strategy": "manual-review",
+    "notes": "Parser and forensic tool documentation."
+  },
+  {
+    "id": "velociraptor-docs",
+    "title": "Velociraptor documentation",
+    "category": "primary-reference",
+    "kind": "documentation",
+    "html_url": "https://docs.velociraptor.app/",
+    "update_strategy": "manual-review",
+    "notes": "Velociraptor artifact and VQL documentation."
+  },
+  {
+    "id": "tor-docs",
+    "title": "Tor Project documentation",
+    "category": "primary-reference",
+    "kind": "documentation",
+    "html_url": "https://support.torproject.org/",
+    "update_strategy": "manual-review",
+    "notes": "Tor deployment and network usage documentation."
+  },
+  {
+    "id": "dfir-report",
+    "title": "The DFIR Report",
+    "category": "practitioner-blog",
+    "kind": "blog",
+    "html_url": "https://thedfirreport.com/",
+    "update_strategy": "manual-review",
+    "notes": "Incident case studies and intrusion-analysis writeups."
+  },
+  {
+    "id": "blue-team-hunting-field-notes",
+    "title": "Blue Team Hunting Field Notes",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes",
+    "update_strategy": "manual-review",
+    "notes": "Windows event references, artifact maps, detection rules, and DFIR field notes."
+  },
+  {
+    "id": "regipy",
+    "title": "regipy",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/mkorman90/regipy",
+    "update_strategy": "manual-review",
+    "notes": "Offline Windows registry parsing library and plugin corpus covering many DFIR-relevant registry artifacts."
+  },
+  {
+    "id": "ericzimmerman-evtx",
+    "title": "Eric Zimmerman evtx",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/evtx",
+    "update_strategy": "manual-review",
+    "notes": "EVTX parser and supporting event-log processing logic."
+  },
+  {
+    "id": "ericzimmerman-recmd",
+    "title": "Eric Zimmerman RECmd",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/RECmd",
+    "update_strategy": "manual-review",
+    "notes": "Registry command-line access and batch artifact extraction."
+  },
+  {
+    "id": "ericzimmerman-registryplugins",
+    "title": "Eric Zimmerman RegistryPlugins",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/RegistryPlugins",
+    "update_strategy": "manual-review",
+    "notes": "Registry artifact plugin definitions used by Zimmerman tooling."
+  },
+  {
+    "id": "ericzimmerman-registry",
+    "title": "Eric Zimmerman Registry",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/Registry",
+    "update_strategy": "manual-review",
+    "notes": "Offline Windows Registry parsing library."
+  },
+  {
+    "id": "ericzimmerman-mftecmd",
+    "title": "Eric Zimmerman MFTECmd",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/MFTECmd",
+    "update_strategy": "manual-review",
+    "notes": "NTFS $MFT and related metadata parsing."
+  },
+  {
+    "id": "ericzimmerman-jumplist",
+    "title": "Eric Zimmerman JumpList",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/JumpList",
+    "update_strategy": "manual-review",
+    "notes": "Jump List parsing library and supporting structures."
+  },
+  {
+    "id": "ericzimmerman-jlecmd",
+    "title": "Eric Zimmerman JLECmd",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/JLECmd",
+    "update_strategy": "manual-review",
+    "notes": "Automatic and custom destinations Jump List parser."
+  },
+  {
+    "id": "ericzimmerman-lecmd",
+    "title": "Eric Zimmerman LECmd",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/LECmd",
+    "update_strategy": "manual-review",
+    "notes": "Shell link parser for recent files and LNK artifacts."
+  },
+  {
+    "id": "ericzimmerman-lnk",
+    "title": "Eric Zimmerman Lnk",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/Lnk",
+    "update_strategy": "manual-review",
+    "notes": "Shell link parsing library."
+  },
+  {
+    "id": "ericzimmerman-pecmd",
+    "title": "Eric Zimmerman PECmd",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/PECmd",
+    "update_strategy": "manual-review",
+    "notes": "Prefetch parser and command-line analysis tool."
+  },
+  {
+    "id": "ericzimmerman-prefetch",
+    "title": "Eric Zimmerman Prefetch",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/Prefetch",
+    "update_strategy": "manual-review",
+    "notes": "Windows Prefetch parsing library."
+  },
+  {
+    "id": "ericzimmerman-appcompatcacheparser",
+    "title": "Eric Zimmerman AppCompatCacheParser",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/AppCompatCacheParser",
+    "update_strategy": "manual-review",
+    "notes": "ShimCache parser across multiple Windows versions."
+  },
+  {
+    "id": "ericzimmerman-amcacheparser",
+    "title": "Eric Zimmerman AmcacheParser",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/AmcacheParser",
+    "update_strategy": "manual-review",
+    "notes": "Amcache parser for application inventory artifacts."
+  },
+  {
+    "id": "ericzimmerman-srum",
+    "title": "Eric Zimmerman Srum",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/Srum",
+    "update_strategy": "manual-review",
+    "notes": "SRUM parsing logic for application and network usage artifacts."
+  },
+  {
+    "id": "ericzimmerman-rbcmd",
+    "title": "Eric Zimmerman RBCmd",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/RBCmd",
+    "update_strategy": "manual-review",
+    "notes": "Recycle Bin artifact parser."
+  },
+  {
+    "id": "ericzimmerman-kapefiles",
+    "title": "Eric Zimmerman KapeFiles",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/KapeFiles",
+    "update_strategy": "manual-review",
+    "notes": "Community KAPE targets and modules for DFIR collection and processing."
+  },
+  {
+    "id": "ericzimmerman-kapedocs",
+    "title": "Eric Zimmerman KapeDocs",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/KapeDocs",
+    "update_strategy": "manual-review",
+    "notes": "KAPE documentation and collection guidance."
+  },
+  {
+    "id": "ericzimmerman-sqlecmd",
+    "title": "Eric Zimmerman SQLECmd",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/SQLECmd",
+    "update_strategy": "manual-review",
+    "notes": "SQLite parsing and triage support for DFIR-oriented databases."
+  },
+  {
+    "id": "ericzimmerman-wxtcmd",
+    "title": "Eric Zimmerman WxTCmd",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/WxTCmd",
+    "update_strategy": "manual-review",
+    "notes": "Windows Timeline and activity-cache parsing support."
+  },
+  {
+    "id": "ericzimmerman-olecf",
+    "title": "Eric Zimmerman OleCf",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/OleCf",
+    "update_strategy": "manual-review",
+    "notes": "OLE compound file parsing library used for compound container artifacts such as Jump Lists."
+  },
+  {
+    "id": "ericzimmerman-mft",
+    "title": "Eric Zimmerman MFT",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/MFT",
+    "update_strategy": "manual-review",
+    "notes": "NTFS MFT parsing library underlying Zimmerman MFT-focused tooling."
+  },
+  {
+    "id": "ericzimmerman-recentfilecacheparser",
+    "title": "Eric Zimmerman RecentFileCacheParser",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/RecentFileCacheParser",
+    "update_strategy": "manual-review",
+    "notes": "Parser for RecentFileCache.bcf execution evidence on legacy Windows systems."
+  },
+  {
+    "id": "ericzimmerman-winsearchdbanalyzer",
+    "title": "Eric Zimmerman WinSearchDBAnalyzer",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/WinSearchDBAnalyzer",
+    "update_strategy": "manual-review",
+    "notes": "Windows Search ESE database analysis utility."
+  },
+  {
+    "id": "ericzimmerman-usbdevices",
+    "title": "Eric Zimmerman USBDevices",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/USBDevices",
+    "update_strategy": "manual-review",
+    "notes": "Registry-backed USB device extraction and reporting."
+  },
+  {
+    "id": "ericzimmerman-extensionblocks",
+    "title": "Eric Zimmerman ExtensionBlocks",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/ExtensionBlocks",
+    "update_strategy": "manual-review",
+    "notes": "Extension block parsing used in ShellBags and related registry artifacts."
+  },
+  {
+    "id": "ericzimmerman-guidmapping",
+    "title": "Eric Zimmerman GuidMapping",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/GuidMapping",
+    "update_strategy": "manual-review",
+    "notes": "GUID resolution data useful for UserAssist, ShellBags, and other shell artifacts."
+  },
+  {
+    "id": "ericzimmerman-dfir-sql-query-repo",
+    "title": "Eric Zimmerman DFIR-SQL-Query-Repo",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/DFIR-SQL-Query-Repo",
+    "update_strategy": "manual-review",
+    "notes": "SQL query templates for digital forensics use across SQLite and related databases."
+  },
+  {
+    "id": "ericzimmerman-registryexplorerbookmarks",
+    "title": "Eric Zimmerman RegistryExplorerBookmarks",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/RegistryExplorerBookmarks",
+    "update_strategy": "manual-review",
+    "notes": "Registry Explorer bookmark definitions covering DFIR-relevant artifact locations."
+  },
+  {
+    "id": "ericzimmerman-tlefileplugins",
+    "title": "Eric Zimmerman TLEFilePlugins",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/TLEFilePlugins",
+    "update_strategy": "manual-review",
+    "notes": "Timeline Explorer file plugins for CSV-oriented DFIR parser outputs."
+  },
+  {
+    "id": "ericzimmerman-documentation",
+    "title": "Eric Zimmerman documentation",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/documentation",
+    "update_strategy": "manual-review",
+    "notes": "Zimmerman documentation repository covering tool usage and workflow guidance."
+  },
+  {
+    "id": "ericzimmerman-get-zimmermantools",
+    "title": "Eric Zimmerman Get-ZimmermanTools",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/EricZimmerman/Get-ZimmermanTools",
+    "update_strategy": "manual-review",
+    "notes": "Tool-distribution and acquisition helper for the Zimmerman suite."
+  },
+  {
+    "id": "sigmahq",
+    "title": "SigmaHQ",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/SigmaHQ/sigma",
+    "update_strategy": "manual-review",
+    "notes": "Detection rule corpus used for event and artifact cross-checking."
+  },
+  {
+    "id": "hayabusa-rules",
+    "title": "Hayabusa rules",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/Yamato-Security/hayabusa-rules",
+    "update_strategy": "manual-review",
+    "notes": "Windows event detection rule corpus."
+  },
+  {
+    "id": "chainsaw-rules",
+    "title": "Chainsaw detections",
+    "category": "knowledge-base",
+    "kind": "github-repository",
+    "html_url": "https://github.com/WithSecureLabs/chainsaw",
+    "update_strategy": "manual-review",
+    "notes": "Detection rules and event triage references."
+  }
+]

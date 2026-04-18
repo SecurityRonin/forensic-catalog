@@ -56,6 +56,9 @@ pub const PERSISTENCE_REFERENCES: &[&str] = &[
     "https://attack.mitre.org/techniques/T1053/003/",
     "https://learn.microsoft.com/en-us/sysinternals/downloads/autoruns",
     "http://windowsir.blogspot.com/2013/07/howto-detecting-persistence-mechanisms.html",
+    "https://github.com/mkorman90/regipy",
+    "https://github.com/EricZimmerman/RECmd",
+    "https://github.com/EricZimmerman/RegistryPlugins",
 ];
 
 pub const ANTIFORENSICS_REFERENCES: &[&str] = &[
@@ -84,6 +87,9 @@ pub const THIRD_PARTY_REFERENCES: &[&str] = &[
     "https://winscp.net/eng/docs/ui_pref_storage",
     "https://learn.microsoft.com/en-us/sharepoint/sync-client-administration-settings",
     "https://chromeenterprise.google/policies/",
+    "https://github.com/mkorman90/regipy",
+    "https://github.com/EricZimmerman/LECmd",
+    "https://github.com/EricZimmerman/Lnk",
 ];
 
 pub const PCA_REFERENCES: &[&str] = &[
@@ -97,6 +103,35 @@ pub const ARTIFACT_REFERENCES: &[&str] = &[
     "https://attack.mitre.org/",
     "http://windowsir.blogspot.com/",
     "https://ericzimmerman.github.io/#!index.md",
+    "https://github.com/mkorman90/regipy",
+    "https://github.com/EricZimmerman/evtx",
+    "https://github.com/EricZimmerman/MFTECmd",
+    "https://github.com/EricZimmerman/JLECmd",
+    "https://github.com/EricZimmerman/LECmd",
+    "https://github.com/EricZimmerman/PECmd",
+    "https://github.com/EricZimmerman/AppCompatCacheParser",
+    "https://github.com/EricZimmerman/AmcacheParser",
+    "https://github.com/EricZimmerman/Srum",
+    "https://github.com/EricZimmerman/RBCmd",
+    "https://github.com/EricZimmerman/RECmd",
+    "https://github.com/EricZimmerman/RegistryPlugins",
+    "https://github.com/EricZimmerman/Registry",
+    "https://github.com/EricZimmerman/SQLECmd",
+    "https://github.com/EricZimmerman/WxTCmd",
+    "https://github.com/EricZimmerman/OleCf",
+    "https://github.com/EricZimmerman/MFT",
+    "https://github.com/EricZimmerman/RecentFileCacheParser",
+    "https://github.com/EricZimmerman/WinSearchDBAnalyzer",
+    "https://github.com/EricZimmerman/USBDevices",
+    "https://github.com/EricZimmerman/ExtensionBlocks",
+    "https://github.com/EricZimmerman/GuidMapping",
+    "https://github.com/EricZimmerman/DFIR-SQL-Query-Repo",
+    "https://github.com/EricZimmerman/RegistryExplorerBookmarks",
+    "https://github.com/EricZimmerman/TLEFilePlugins",
+    "https://github.com/EricZimmerman/KapeFiles",
+    "https://github.com/EricZimmerman/KapeDocs",
+    "https://github.com/EricZimmerman/documentation",
+    "https://github.com/EricZimmerman/Get-ZimmermanTools",
 ];
 
 pub const MODULE_REFERENCES: &[ModuleReference] = &[

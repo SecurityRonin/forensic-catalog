@@ -1,0 +1,2964 @@
+[
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2004/12/first-test-post.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0001-windows-incident-response.md",
+    "json_path": "posts/0001-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2004/12/xp-sp2-and-making-usb-storage-read.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0002-windows-incident-response.md",
+    "json_path": "posts/0002-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2005/12/mystery-of-muicachesolved.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0003-windows-incident-response.md",
+    "json_path": "posts/0003-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2006/04/reassembling-image-file-from-memory.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0004-windows-incident-response.md",
+    "json_path": "posts/0004-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2006/04/updated-lsproc.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0005-windows-incident-response.md",
+    "json_path": "posts/0005-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2006/05/sourceforge-updates.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0006-windows-incident-response.md",
+    "json_path": "posts/0006-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2006/06/fspc-and-fruc-posted.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0007-windows-incident-response.md",
+    "json_path": "posts/0007-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2006/07/list-process-image-upload.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0008-windows-incident-response.md",
+    "json_path": "posts/0008-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2006/09/gromozon-rootkit.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0009-windows-incident-response.md",
+    "json_path": "posts/0009-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2006/09/metadata-and-ediscovery.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0010-windows-incident-response.md",
+    "json_path": "posts/0010-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2006/09/os-detection-explained.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0011-windows-incident-response.md",
+    "json_path": "posts/0011-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2006/09/something-old-something-newwith-usb.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0012-windows-incident-response.md",
+    "json_path": "posts/0012-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2006/10/new-today.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0013-windows-incident-response.md",
+    "json_path": "posts/0013-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2006/10/restore-point-forensics.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0014-windows-incident-response.md",
+    "json_path": "posts/0014-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2006/10/when-did-users-access-change.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0015-windows-incident-response.md",
+    "json_path": "posts/0015-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2006/11/case-study-from-securiteam.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0016-windows-incident-response.md",
+    "json_path": "posts/0016-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2006/11/documenting-disk-information.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0017-windows-incident-response.md",
+    "json_path": "posts/0017-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2006/11/van-hensing-ridesuh-blogs-again.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0018-windows-incident-response.md",
+    "json_path": "posts/0018-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2007/01/intentional-erasure.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0019-windows-incident-response.md",
+    "json_path": "posts/0019-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2007/03/mounting-dd-image.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0020-windows-incident-response.md",
+    "json_path": "posts/0020-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2007/04/from-lab-mapping-usb-devices-via-lnk.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0021-windows-incident-response.md",
+    "json_path": "posts/0021-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2007/05/forensic-laws.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0022-windows-incident-response.md",
+    "json_path": "posts/0022-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2007/05/prefetch-analysis.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0023-windows-incident-response.md",
+    "json_path": "posts/0023-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2007/06/eventlog-analysis.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0024-windows-incident-response.md",
+    "json_path": "posts/0024-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2007/07/acpo-guidelines.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0025-windows-incident-response.md",
+    "json_path": "posts/0025-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2007/07/tool-testing-methodology.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0026-windows-incident-response.md",
+    "json_path": "posts/0026-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2007/09/more-on-userassist-keys.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0027-windows-incident-response.md",
+    "json_path": "posts/0027-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2007/11/alternative-methods-of-analysis.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0028-windows-incident-response.md",
+    "json_path": "posts/0028-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2007/11/upcoming-speaking-engagement.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0029-windows-incident-response.md",
+    "json_path": "posts/0029-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2007/12/mac-daddy.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0030-windows-incident-response.md",
+    "json_path": "posts/0030-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2008/02/getting-started-or-forensic-analysis-on.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0031-windows-incident-response.md",
+    "json_path": "posts/0031-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2008/03/event-log-analysis.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0032-windows-incident-response.md",
+    "json_path": "posts/0032-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2008/04/ripping-registry-w-ripexe.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0033-windows-incident-response.md",
+    "json_path": "posts/0033-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2008/05/more-free-tools.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0034-windows-incident-response.md",
+    "json_path": "posts/0034-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2008/06/memory-collection-and-analysis.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0035-windows-incident-response.md",
+    "json_path": "posts/0035-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2008/06/ntfs-alternate-data-streams.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0036-windows-incident-response.md",
+    "json_path": "posts/0036-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2008/08/data-exfiltration.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0037-windows-incident-response.md",
+    "json_path": "posts/0037-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2008/08/file-associations.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0038-windows-incident-response.md",
+    "json_path": "posts/0038-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2008/08/regripper-news-and-mentions.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0039-windows-incident-response.md",
+    "json_path": "posts/0039-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2008/08/whats-in-your-clipboard.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0040-windows-incident-response.md",
+    "json_path": "posts/0040-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2008/09/updates-29-sept.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0041-windows-incident-response.md",
+    "json_path": "posts/0041-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2008/10/new-registry-analysis-tools.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0042-windows-incident-response.md",
+    "json_path": "posts/0042-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2008/10/sans-forensic-summit.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0043-windows-incident-response.md",
+    "json_path": "posts/0043-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2008/11/more-deleted-keys-goodness.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0044-windows-incident-response.md",
+    "json_path": "posts/0044-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2008/12/honor-thy-settings.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0045-windows-incident-response.md",
+    "json_path": "posts/0045-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2009/03/looking-for-bad-stuff-pt-iii-malware.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0046-windows-incident-response.md",
+    "json_path": "posts/0046-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2009/03/malware-for-incident-responders.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0047-windows-incident-response.md",
+    "json_path": "posts/0047-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2009/04/event-log-analysis.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0048-windows-incident-response.md",
+    "json_path": "posts/0048-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2009/04/timeline-analysis-pt-vi-taking-another.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0049-windows-incident-response.md",
+    "json_path": "posts/0049-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2009/05/e-evidence-updates.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0050-windows-incident-response.md",
+    "json_path": "posts/0050-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2009/10/free-tools.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0051-windows-incident-response.md",
+    "json_path": "posts/0051-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2009/10/timeline-creation-tools.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0052-windows-incident-response.md",
+    "json_path": "posts/0052-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2009/11/best-practices-what-is-best.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0053-windows-incident-response.md",
+    "json_path": "posts/0053-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2009/11/in-news.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0054-windows-incident-response.md",
+    "json_path": "posts/0054-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2009/11/incident-preparation.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0055-windows-incident-response.md",
+    "json_path": "posts/0055-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2009/11/its-about-time.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0056-windows-incident-response.md",
+    "json_path": "posts/0056-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2009/11/p0wnage.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0057-windows-incident-response.md",
+    "json_path": "posts/0057-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2009/11/working-with-volume-shadow-copies.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0058-windows-incident-response.md",
+    "json_path": "posts/0058-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2009/12/df-and-disclosure.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0059-windows-incident-response.md",
+    "json_path": "posts/0059-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2009/12/incident-prep-part-deux.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0060-windows-incident-response.md",
+    "json_path": "posts/0060-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2009/12/investigating-breaches.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0061-windows-incident-response.md",
+    "json_path": "posts/0061-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2009/12/linkaliciousness.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0062-windows-incident-response.md",
+    "json_path": "posts/0062-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2009/12/when-tool-is-just-tool-pt-i.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0063-windows-incident-response.md",
+    "json_path": "posts/0063-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2010/12/book-review-malware-analysts-cookbook.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0064-windows-incident-response.md",
+    "json_path": "posts/0064-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2010/12/writing-books-pt-i.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0065-windows-incident-response.md",
+    "json_path": "posts/0065-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2010/12/writing-books-pt-iv.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0066-windows-incident-response.md",
+    "json_path": "posts/0066-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2011/03/mbr-infector-detector.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0067-windows-incident-response.md",
+    "json_path": "posts/0067-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2011/06/defining-forensic-value.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0068-windows-incident-response.md",
+    "json_path": "posts/0068-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2011/06/meetup-tools-and-other-stuff.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0069-windows-incident-response.md",
+    "json_path": "posts/0069-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2011/06/osdfc-follow-up.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0070-windows-incident-response.md",
+    "json_path": "posts/0070-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2011/08/jump-list-analysis-pt-ii.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0071-windows-incident-response.md",
+    "json_path": "posts/0071-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2011/08/jump-list-analysis.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0072-windows-incident-response.md",
+    "json_path": "posts/0072-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2011/09/getting-started.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0073-windows-incident-response.md",
+    "json_path": "posts/0073-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2011/09/howto-file-extension-analysis.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0074-windows-incident-response.md",
+    "json_path": "posts/0074-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2011/09/howto-mount-and-access-vscs.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0075-windows-incident-response.md",
+    "json_path": "posts/0075-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2011/09/jump-list-analysis-pt-iii.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0076-windows-incident-response.md",
+    "json_path": "posts/0076-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2011/09/stuffand-whatnot.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0077-windows-incident-response.md",
+    "json_path": "posts/0077-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2011/10/forensic-scanner.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0078-windows-incident-response.md",
+    "json_path": "posts/0078-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2011/10/wfa-3e-update.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0079-windows-incident-response.md",
+    "json_path": "posts/0079-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2011/11/stuff-reloaded.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0080-windows-incident-response.md",
+    "json_path": "posts/0080-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2011/11/stuff.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0081-windows-incident-response.md",
+    "json_path": "posts/0081-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2011/11/stuff_15.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0082-windows-incident-response.md",
+    "json_path": "posts/0082-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2011/11/tool-update-wifi-geolocation.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0083-windows-incident-response.md",
+    "json_path": "posts/0083-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2011/12/jump-list-analysis.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0084-windows-incident-response.md",
+    "json_path": "posts/0084-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2011/12/stuff_13.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0085-windows-incident-response.md",
+    "json_path": "posts/0085-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2012/03/links-thoughts-and-updates.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0086-windows-incident-response.md",
+    "json_path": "posts/0086-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2012/03/need-for-analysis-in-intelligence.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0087-windows-incident-response.md",
+    "json_path": "posts/0087-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2012/03/prefetch-analysis-revisited.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0088-windows-incident-response.md",
+    "json_path": "posts/0088-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2012/04/new-tools-registry-findings.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0089-windows-incident-response.md",
+    "json_path": "posts/0089-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2012/06/timeline-analysis-and-program-execution.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0090-windows-incident-response.md",
+    "json_path": "posts/0090-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2012/06/timeline-analysis.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0091-windows-incident-response.md",
+    "json_path": "posts/0091-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2012/08/shellbag-analysis.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0092-windows-incident-response.md",
+    "json_path": "posts/0092-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2012/09/32-bit-exes-on-64-bit-system.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0093-windows-incident-response.md",
+    "json_path": "posts/0093-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2012/10/dosdate-time-stamps-in-shell-items.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0094-windows-incident-response.md",
+    "json_path": "posts/0094-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2012/10/forensic-scanner.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0095-windows-incident-response.md",
+    "json_path": "posts/0095-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2012/10/motivations-behind-forensic-scanner.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0096-windows-incident-response.md",
+    "json_path": "posts/0096-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2012/10/shellbag-analysis-revisitedsome-testing.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0097-windows-incident-response.md",
+    "json_path": "posts/0097-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2012/12/are-you-being-served.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0098-windows-incident-response.md",
+    "json_path": "posts/0098-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/01/binmode-parsing-java-idx-files-pt-deux.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0099-windows-incident-response.md",
+    "json_path": "posts/0099-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/01/there-are-four-lights-analysis-matrix.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0100-windows-incident-response.md",
+    "json_path": "posts/0100-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/03/there-are-four-lights-program-execution.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0101-windows-incident-response.md",
+    "json_path": "posts/0101-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/03/wow6432node-registry-redirection.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0102-windows-incident-response.md",
+    "json_path": "posts/0102-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/05/understanding-data-structures.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0103-windows-incident-response.md",
+    "json_path": "posts/0103-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/06/there-are-four-lights-lnk-parsing-tools.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0104-windows-incident-response.md",
+    "json_path": "posts/0104-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/06/there-are-four-lights-shell-items.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0105-windows-incident-response.md",
+    "json_path": "posts/0105-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/07/howto-correlate-attached-device-to-user.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0106-windows-incident-response.md",
+    "json_path": "posts/0106-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/07/howto-data-exfiltration.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0107-windows-incident-response.md",
+    "json_path": "posts/0107-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/07/howto-determine-program-execution.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0108-windows-incident-response.md",
+    "json_path": "posts/0108-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/07/howto-determine-user-access-to-files.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0109-windows-incident-response.md",
+    "json_path": "posts/0109-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/07/howto-determinedetect-use-of-anti.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0110-windows-incident-response.md",
+    "json_path": "posts/0110-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/07/howto-malware-detection-pt-i.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0111-windows-incident-response.md",
+    "json_path": "posts/0111-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/07/howto-track-lateral-movement.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0112-windows-incident-response.md",
+    "json_path": "posts/0112-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/09/artifacts.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0113-windows-incident-response.md",
+    "json_path": "posts/0113-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/09/data-structures-revisited.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0114-windows-incident-response.md",
+    "json_path": "posts/0114-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/10/shell-item-artifacts-reloaded.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0115-windows-incident-response.md",
+    "json_path": "posts/0115-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/11/conferences.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0116-windows-incident-response.md",
+    "json_path": "posts/0116-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/11/sniper-forensics-memory-analysis-and.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0117-windows-incident-response.md",
+    "json_path": "posts/0117-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/12/links-and-news.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0118-windows-incident-response.md",
+    "json_path": "posts/0118-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2013/12/updates.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0119-windows-incident-response.md",
+    "json_path": "posts/0119-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2014/03/writing-dfir-books-questions.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0120-windows-incident-response.md",
+    "json_path": "posts/0120-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2014/03/writing-dfir-books_28.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0121-windows-incident-response.md",
+    "json_path": "posts/0121-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2014/05/artifacts.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0122-windows-incident-response.md",
+    "json_path": "posts/0122-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2014/07/book-review-art-of-memory-forensics.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0123-windows-incident-response.md",
+    "json_path": "posts/0123-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2014/07/file-system-ops-effects-on-mft-records.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0124-windows-incident-response.md",
+    "json_path": "posts/0124-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2014/08/what-does-that-look-like.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0125-windows-incident-response.md",
+    "json_path": "posts/0125-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2014/09/windows-phone-8-and-regripper.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0126-windows-incident-response.md",
+    "json_path": "posts/0126-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2014/10/publishing-dfir-books.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0127-windows-incident-response.md",
+    "json_path": "posts/0127-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2014/10/windows-event-logs.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0128-windows-incident-response.md",
+    "json_path": "posts/0128-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2014/10/wrf-2e-contest.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0129-windows-incident-response.md",
+    "json_path": "posts/0129-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2015/09/htcia2015-conference-follow-up.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0130-windows-incident-response.md",
+    "json_path": "posts/0130-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2015/09/registry-analysis.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0131-windows-incident-response.md",
+    "json_path": "posts/0131-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2015/09/updates-links-etc.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0132-windows-incident-response.md",
+    "json_path": "posts/0132-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2015/12/doing-analysis.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0133-windows-incident-response.md",
+    "json_path": "posts/0133-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2016/05/accessing-historical-information-during.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0134-windows-incident-response.md",
+    "json_path": "posts/0134-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2016/06/new-book.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0135-windows-incident-response.md",
+    "json_path": "posts/0135-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2016/06/updates.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0136-windows-incident-response.md",
+    "json_path": "posts/0136-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2016/08/landesk-in-registry.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0137-windows-incident-response.md",
+    "json_path": "posts/0137-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2016/08/links-and-updates.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0138-windows-incident-response.md",
+    "json_path": "posts/0138-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2016/09/more-updates.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0139-windows-incident-response.md",
+    "json_path": "posts/0139-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2016/09/oleole-ole-ole.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0140-windows-incident-response.md",
+    "json_path": "posts/0140-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2017/04/getting-started.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0141-windows-incident-response.md",
+    "json_path": "posts/0141-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2017/05/use-of-lnk-filesagain.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0142-windows-incident-response.md",
+    "json_path": "posts/0142-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2017/08/beyond-getting-started.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0143-windows-incident-response.md",
+    "json_path": "posts/0143-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2018/02/on-writing-dfir-books.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0144-windows-incident-response.md",
+    "json_path": "posts/0144-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2018/02/stuffy-stuff.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0145-windows-incident-response.md",
+    "json_path": "posts/0145-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2018/07/lnk-toolmarks.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0146-windows-incident-response.md",
+    "json_path": "posts/0146-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2018/09/a-lil-saturday-morning-computer.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0147-windows-incident-response.md",
+    "json_path": "posts/0147-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2018/09/accessing-volume-shadows-re-revisited.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0148-windows-incident-response.md",
+    "json_path": "posts/0148-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2018/09/first-review-of-iws.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0149-windows-incident-response.md",
+    "json_path": "posts/0149-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2018/09/iws-is-out.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0150-windows-incident-response.md",
+    "json_path": "posts/0150-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2018/11/basic-skillz.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0151-windows-incident-response.md",
+    "json_path": "posts/0151-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2018/11/tool-testing.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0152-windows-incident-response.md",
+    "json_path": "posts/0152-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2018/12/parsing-cozy-bear-lnk-file.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0153-windows-incident-response.md",
+    "json_path": "posts/0153-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2019/01/lnk-toolmarks-revisted.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0154-windows-incident-response.md",
+    "json_path": "posts/0154-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2019/02/lnk-files.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0155-windows-incident-response.md",
+    "json_path": "posts/0155-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2019/05/defcon-2018-ctf-file-server-take-aways_21.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0156-windows-incident-response.md",
+    "json_path": "posts/0156-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2019/05/defcon-2018-ctf-plus.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0157-windows-incident-response.md",
+    "json_path": "posts/0157-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2019/05/defcon-2018-file-server.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0158-windows-incident-response.md",
+    "json_path": "posts/0158-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2019/08/program-executionor-not.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0159-windows-incident-response.md",
+    "json_path": "posts/0159-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2019/09/a-brief-history-of-dfir-time-pt-i.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0160-windows-incident-response.md",
+    "json_path": "posts/0160-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2019/10/return-of-lnk-files.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0161-windows-incident-response.md",
+    "json_path": "posts/0161-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2019/11/activitescachedb-vs-ntuserdat.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0162-windows-incident-response.md",
+    "json_path": "posts/0162-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2019/12/improving-dfir-skills.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0163-windows-incident-response.md",
+    "json_path": "posts/0163-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2020/01/developing-and-using-lessons-learned.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0164-windows-incident-response.md",
+    "json_path": "posts/0164-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2020/04/registry-analysis.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0165-windows-incident-response.md",
+    "json_path": "posts/0165-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2020/05/regripper-v30.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0166-windows-incident-response.md",
+    "json_path": "posts/0166-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2020/05/tips-on-using-regripper-v30.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0167-windows-incident-response.md",
+    "json_path": "posts/0167-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2020/06/plugin-spotlight-printersettings.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0168-windows-incident-response.md",
+    "json_path": "posts/0168-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2020/07/on-artifact-constellations-and-toolmarks.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0169-windows-incident-response.md",
+    "json_path": "posts/0169-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2020/08/toolmarks-and-intrusion-intelligence.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0170-windows-incident-response.md",
+    "json_path": "posts/0170-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2020/10/settings-that-impact-windows-os.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0171-windows-incident-response.md",
+    "json_path": "posts/0171-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2021/01/extracting-toolmarks-from-open-source.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0172-windows-incident-response.md",
+    "json_path": "posts/0172-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2021/08/tips-for-dfir-analysts.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0173-windows-incident-response.md",
+    "json_path": "posts/0173-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2021/09/distros-and-regripper.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0174-windows-incident-response.md",
+    "json_path": "posts/0174-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2021/09/on-writing-dfir-books-pt-i.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0175-windows-incident-response.md",
+    "json_path": "posts/0175-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2022/02/the-misuse-of-artifact-categories.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0176-windows-incident-response.md",
+    "json_path": "posts/0176-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2022/03/the-misuse-of-artifact-categories-pt-ii.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0177-windows-incident-response.md",
+    "json_path": "posts/0177-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2022/10/post-compilation.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0178-windows-incident-response.md",
+    "json_path": "posts/0178-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2022/10/testing-registry-modification-scenarios.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0179-windows-incident-response.md",
+    "json_path": "posts/0179-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2022/11/challenge-7-write-up.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0180-windows-incident-response.md",
+    "json_path": "posts/0180-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2023/07/the-next-step-vhd-files-and-metadata.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0181-windows-incident-response.md",
+    "json_path": "posts/0181-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2023/08/integrating-yara-with-regripper.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0182-windows-incident-response.md",
+    "json_path": "posts/0182-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2023/08/the-next-step-expanding-regripper.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0183-windows-incident-response.md",
+    "json_path": "posts/0183-windows-incident-response.json"
+  },
+  {
+    "title": "Windows Incident Response",
+    "url": "https://windowsir.blogspot.com/2023/09/the-state-of-windows-digital-analysis.html",
+    "published": "",
+    "updated": "",
+    "labels": [],
+    "markdown_path": "posts/0184-windows-incident-response.md",
+    "json_path": "posts/0184-windows-incident-response.json"
+  },
+  {
+    "title": "Scheduled Tasks and Batteries",
+    "url": "https://windowsir.blogspot.com/2022/03/scheduled-tasks-and-batteries.html",
+    "published": "2022-03-27T10:07:00.001-05:00",
+    "updated": "2022-03-27T10:07:47.446-05:00",
+    "labels": [],
+    "markdown_path": "posts/0185-scheduled-tasks-and-batteries.md",
+    "json_path": "posts/0185-scheduled-tasks-and-batteries.json"
+  },
+  {
+    "title": "Timestomping Registry Keys",
+    "url": "https://windowsir.blogspot.com/2022/04/timestomping-registry-keys.html",
+    "published": "2022-04-08T09:20:00.001-05:00",
+    "updated": "2022-04-09T06:12:48.874-05:00",
+    "labels": [],
+    "markdown_path": "posts/0186-timestomping-registry-keys.md",
+    "json_path": "posts/0186-timestomping-registry-keys.json"
+  },
+  {
+    "title": "Digging Into Open Reporting",
+    "url": "https://windowsir.blogspot.com/2022/04/digging-into-open-reporting.html",
+    "published": "2022-04-13T20:14:00.002-05:00",
+    "updated": "2022-04-14T07:09:58.797-05:00",
+    "labels": [],
+    "markdown_path": "posts/0187-digging-into-open-reporting.md",
+    "json_path": "posts/0187-digging-into-open-reporting.json"
+  },
+  {
+    "title": "LNK (Ab)use",
+    "url": "https://windowsir.blogspot.com/2022/04/lnk-abuse.html",
+    "published": "2022-04-19T12:03:00.002-05:00",
+    "updated": "2022-04-19T12:07:35.633-05:00",
+    "labels": [],
+    "markdown_path": "posts/0188-lnk-ab-use.md",
+    "json_path": "posts/0188-lnk-ab-use.json"
+  },
+  {
+    "title": "File Formats",
+    "url": "https://windowsir.blogspot.com/2022/04/file-formats.html",
+    "published": "2022-04-25T19:54:00.000-05:00",
+    "updated": "2022-04-25T19:54:05.375-05:00",
+    "labels": [],
+    "markdown_path": "posts/0189-file-formats.md",
+    "json_path": "posts/0189-file-formats.json"
+  },
+  {
+    "title": "Root Cause Analysis",
+    "url": "https://windowsir.blogspot.com/2022/04/root-cause-analysis.html",
+    "published": "2022-04-29T16:54:00.002-05:00",
+    "updated": "2022-04-29T16:54:54.490-05:00",
+    "labels": [],
+    "markdown_path": "posts/0190-root-cause-analysis.md",
+    "json_path": "posts/0190-root-cause-analysis.json"
+  },
+  {
+    "title": "Changes In The Use Of LNK Files",
+    "url": "https://windowsir.blogspot.com/2022/05/changes-in-use-of-lnk-files.html",
+    "published": "2022-05-01T06:39:00.002-05:00",
+    "updated": "2022-05-01T06:46:02.068-05:00",
+    "labels": [],
+    "markdown_path": "posts/0191-changes-in-the-use-of-lnk-files.md",
+    "json_path": "posts/0191-changes-in-the-use-of-lnk-files.json"
+  },
+  {
+    "title": "Putting It All Together",
+    "url": "https://windowsir.blogspot.com/2022/05/putting-it-all-together.html",
+    "published": "2022-05-03T19:35:00.000-05:00",
+    "updated": "2022-05-03T19:35:02.541-05:00",
+    "labels": [],
+    "markdown_path": "posts/0192-putting-it-all-together.md",
+    "json_path": "posts/0192-putting-it-all-together.json"
+  },
+  {
+    "title": "Understanding Data Sources and File Formats",
+    "url": "https://windowsir.blogspot.com/2022/05/understanding-data-sources-and-file.html",
+    "published": "2022-05-13T16:18:00.000-05:00",
+    "updated": "2022-05-13T16:18:01.595-05:00",
+    "labels": [],
+    "markdown_path": "posts/0193-understanding-data-sources-and-file-formats.md",
+    "json_path": "posts/0193-understanding-data-sources-and-file-formats.json"
+  },
+  {
+    "title": "USB Devices Redux",
+    "url": "https://windowsir.blogspot.com/2022/05/usb-devices-redux.html",
+    "published": "2022-05-17T18:11:00.002-05:00",
+    "updated": "2022-05-23T20:13:47.850-05:00",
+    "labels": [],
+    "markdown_path": "posts/0194-usb-devices-redux.md",
+    "json_path": "posts/0194-usb-devices-redux.json"
+  },
+  {
+    "title": "USB Device Redux, with Timelines",
+    "url": "https://windowsir.blogspot.com/2022/05/usb-device-redux-with-timelines.html",
+    "published": "2022-05-26T20:08:00.000-05:00",
+    "updated": "2022-05-26T20:08:24.356-05:00",
+    "labels": [],
+    "markdown_path": "posts/0195-usb-device-redux-with-timelines.md",
+    "json_path": "posts/0195-usb-device-redux-with-timelines.json"
+  },
+  {
+    "title": "Distros and RegRipper, pt deux",
+    "url": "https://windowsir.blogspot.com/2022/07/distros-and-regripper-pt-deux.html",
+    "published": "2022-07-01T17:01:00.001-05:00",
+    "updated": "2022-07-01T17:01:48.051-05:00",
+    "labels": [
+      "RegRipper"
+    ],
+    "markdown_path": "posts/0196-distros-and-regripper-pt-deux.md",
+    "json_path": "posts/0196-distros-and-regripper-pt-deux.json"
+  },
+  {
+    "title": "Does \"Autostart\" Really Mean \"Autostart\"?",
+    "url": "https://windowsir.blogspot.com/2022/07/does-autostart-really-mean-autostart.html",
+    "published": "2022-07-09T14:05:00.001-05:00",
+    "updated": "2022-07-09T14:05:44.436-05:00",
+    "labels": [],
+    "markdown_path": "posts/0197-does-autostart-really-mean-autostart.md",
+    "json_path": "posts/0197-does-autostart-really-mean-autostart.json"
+  },
+  {
+    "title": "StartupApproved\\Run, pt II",
+    "url": "https://windowsir.blogspot.com/2022/07/startupapprovedrun-pt-ii.html",
+    "published": "2022-07-17T08:26:00.001-05:00",
+    "updated": "2022-07-17T08:26:41.449-05:00",
+    "labels": [],
+    "markdown_path": "posts/0198-startupapproved-run-pt-ii.md",
+    "json_path": "posts/0198-startupapproved-run-pt-ii.json"
+  },
+  {
+    "title": "Fully Exploiting Data Sources",
+    "url": "https://windowsir.blogspot.com/2022/07/fully-exploiting-data-sources.html",
+    "published": "2022-07-19T07:16:00.001-05:00",
+    "updated": "2022-07-19T07:16:56.997-05:00",
+    "labels": [],
+    "markdown_path": "posts/0199-fully-exploiting-data-sources.md",
+    "json_path": "posts/0199-fully-exploiting-data-sources.json"
+  },
+  {
+    "title": "Turning Open Reporting Into Detections",
+    "url": "https://windowsir.blogspot.com/2022/07/turning-open-reporting-into-detections.html",
+    "published": "2022-07-23T07:09:00.002-05:00",
+    "updated": "2022-07-23T07:09:55.675-05:00",
+    "labels": [],
+    "markdown_path": "posts/0200-turning-open-reporting-into-detections.md",
+    "json_path": "posts/0200-turning-open-reporting-into-detections.json"
+  },
+  {
+    "title": "History Repeats Itself",
+    "url": "https://windowsir.blogspot.com/2022/07/history-repeats-itself.html",
+    "published": "2022-07-24T10:38:00.001-05:00",
+    "updated": "2022-07-24T10:38:09.951-05:00",
+    "labels": [],
+    "markdown_path": "posts/0201-history-repeats-itself.md",
+    "json_path": "posts/0201-history-repeats-itself.json"
+  },
+  {
+    "title": "Rods and Cones, and EDR \"blindness\"",
+    "url": "https://windowsir.blogspot.com/2022/07/rods-and-cones-and-edr-blindness.html",
+    "published": "2022-07-26T19:09:00.000-05:00",
+    "updated": "2022-07-26T19:09:31.846-05:00",
+    "labels": [],
+    "markdown_path": "posts/0202-rods-and-cones-and-edr-blindness.md",
+    "json_path": "posts/0202-rods-and-cones-and-edr-blindness.json"
+  },
+  {
+    "title": "EDR Blindness, pt II",
+    "url": "https://windowsir.blogspot.com/2022/07/edr-blindness-pt-ii.html",
+    "published": "2022-07-31T07:29:00.001-05:00",
+    "updated": "2022-07-31T07:29:41.330-05:00",
+    "labels": [],
+    "markdown_path": "posts/0203-edr-blindness-pt-ii.md",
+    "json_path": "posts/0203-edr-blindness-pt-ii.json"
+  },
+  {
+    "title": "Virtual Images for Testing",
+    "url": "https://windowsir.blogspot.com/2022/07/virtual-images-for-testing.html",
+    "published": "2022-07-31T20:20:00.003-05:00",
+    "updated": "2022-08-27T17:24:43.005-05:00",
+    "labels": [],
+    "markdown_path": "posts/0204-virtual-images-for-testing.md",
+    "json_path": "posts/0204-virtual-images-for-testing.json"
+  },
+  {
+    "title": "An Attacker's Perspective",
+    "url": "https://windowsir.blogspot.com/2022/08/an-attackers-perspective.html",
+    "published": "2022-08-08T18:17:00.000-05:00",
+    "updated": "2022-08-08T18:17:03.613-05:00",
+    "labels": [],
+    "markdown_path": "posts/0205-an-attacker-s-perspective.md",
+    "json_path": "posts/0205-an-attacker-s-perspective.json"
+  },
+  {
+    "title": "Researching the Windows Registry",
+    "url": "https://windowsir.blogspot.com/2022/08/researching-windows-registry.html",
+    "published": "2022-08-10T19:37:00.000-05:00",
+    "updated": "2022-08-10T19:37:35.402-05:00",
+    "labels": [],
+    "markdown_path": "posts/0206-researching-the-windows-registry.md",
+    "json_path": "posts/0206-researching-the-windows-registry.json"
+  },
+  {
+    "title": "Who \"Owns\" Your Infrastructure?",
+    "url": "https://windowsir.blogspot.com/2022/08/who-owns-your-infrastructure.html",
+    "published": "2022-08-13T07:10:00.000-05:00",
+    "updated": "2022-08-13T07:10:03.060-05:00",
+    "labels": [],
+    "markdown_path": "posts/0207-who-owns-your-infrastructure.md",
+    "json_path": "posts/0207-who-owns-your-infrastructure.json"
+  },
+  {
+    "title": "Kudos and Recognition",
+    "url": "https://windowsir.blogspot.com/2022/08/kudos-and-recognition.html",
+    "published": "2022-08-24T19:15:00.001-05:00",
+    "updated": "2022-08-24T19:15:25.103-05:00",
+    "labels": [],
+    "markdown_path": "posts/0208-kudos-and-recognition.md",
+    "json_path": "posts/0208-kudos-and-recognition.json"
+  },
+  {
+    "title": "When Windows Lies",
+    "url": "https://windowsir.blogspot.com/2022/08/when-windows-lies.html",
+    "published": "2022-08-27T07:28:00.001-05:00",
+    "updated": "2022-08-27T07:28:19.120-05:00",
+    "labels": [],
+    "markdown_path": "posts/0209-when-windows-lies.md",
+    "json_path": "posts/0209-when-windows-lies.json"
+  },
+  {
+    "title": "Analysis: Situational Awareness + Timelines",
+    "url": "https://windowsir.blogspot.com/2022/09/analysis-situational-awareness-timelines.html",
+    "published": "2022-09-03T06:37:00.001-05:00",
+    "updated": "2022-09-03T06:37:52.168-05:00",
+    "labels": [],
+    "markdown_path": "posts/0210-analysis-situational-awareness-timelines.md",
+    "json_path": "posts/0210-analysis-situational-awareness-timelines.json"
+  },
+  {
+    "title": "LNK Builders",
+    "url": "https://windowsir.blogspot.com/2022/09/lnk-builders.html",
+    "published": "2022-09-03T06:37:00.002-05:00",
+    "updated": "2022-09-19T09:50:32.221-05:00",
+    "labels": [
+      "builder",
+      "generator",
+      "LNK",
+      "toolmarks"
+    ],
+    "markdown_path": "posts/0211-lnk-builders.md",
+    "json_path": "posts/0211-lnk-builders.json"
+  },
+  {
+    "title": "AmCache Revisited",
+    "url": "https://windowsir.blogspot.com/2022/09/amcache-revisited.html",
+    "published": "2022-09-10T08:14:00.001-05:00",
+    "updated": "2022-09-10T08:14:10.320-05:00",
+    "labels": [],
+    "markdown_path": "posts/0212-amcache-revisited.md",
+    "json_path": "posts/0212-amcache-revisited.json"
+  },
+  {
+    "title": "Deconstructing Florian's Bicycle",
+    "url": "https://windowsir.blogspot.com/2022/09/deconstructing-florians-bicycle.html",
+    "published": "2022-09-19T20:39:00.000-05:00",
+    "updated": "2022-09-19T20:39:00.327-05:00",
+    "labels": [],
+    "markdown_path": "posts/0213-deconstructing-florian-s-bicycle.md",
+    "json_path": "posts/0213-deconstructing-florian-s-bicycle.json"
+  },
+  {
+    "title": "ResponderCon Followup",
+    "url": "https://windowsir.blogspot.com/2022/09/respondercon-followup.html",
+    "published": "2022-09-20T18:06:00.000-05:00",
+    "updated": "2022-09-20T18:06:51.781-05:00",
+    "labels": [],
+    "markdown_path": "posts/0214-respondercon-followup.md",
+    "json_path": "posts/0214-respondercon-followup.json"
+  },
+  {
+    "title": "Speaking Engagements",
+    "url": "https://windowsir.blogspot.com/2022/10/speaking-engagements.html",
+    "published": "2022-10-06T19:25:00.003-05:00",
+    "updated": "2023-02-02T10:43:02.493-05:00",
+    "labels": [],
+    "markdown_path": "posts/0215-speaking-engagements.md",
+    "json_path": "posts/0215-speaking-engagements.json"
+  },
+  {
+    "title": "We Need Cybersecurity Mentors",
+    "url": "https://windowsir.blogspot.com/2022/10/we-need-cybersecurity-mentors.html",
+    "published": "2022-10-12T07:11:00.000-05:00",
+    "updated": "2022-10-12T07:11:36.929-05:00",
+    "labels": [],
+    "markdown_path": "posts/0216-we-need-cybersecurity-mentors.md",
+    "json_path": "posts/0216-we-need-cybersecurity-mentors.json"
+  },
+  {
+    "title": "Events Ripper",
+    "url": "https://windowsir.blogspot.com/2022/10/events-ripper.html",
+    "published": "2022-10-15T06:59:00.000-05:00",
+    "updated": "2022-10-15T06:59:22.631-05:00",
+    "labels": [
+      "auditpol",
+      "Events Ripper",
+      "ISO"
+    ],
+    "markdown_path": "posts/0217-events-ripper.md",
+    "json_path": "posts/0217-events-ripper.json"
+  },
+  {
+    "title": "Data Collection",
+    "url": "https://windowsir.blogspot.com/2022/10/data-collection.html",
+    "published": "2022-10-18T19:25:00.000-05:00",
+    "updated": "2022-10-18T19:25:16.244-05:00",
+    "labels": [],
+    "markdown_path": "posts/0218-data-collection.md",
+    "json_path": "posts/0218-data-collection.json"
+  },
+  {
+    "title": "RegRipper Value Proposition",
+    "url": "https://windowsir.blogspot.com/2022/11/regripper-value-proposition.html",
+    "published": "2022-11-14T20:37:00.003-05:00",
+    "updated": "2022-11-14T20:37:23.886-05:00",
+    "labels": [
+      "RegRipper"
+    ],
+    "markdown_path": "posts/0219-regripper-value-proposition.md",
+    "json_path": "posts/0219-regripper-value-proposition.json"
+  },
+  {
+    "title": "Thoughts on Teaching Digital Forensics",
+    "url": "https://windowsir.blogspot.com/2022/11/thoughts-on-teaching-digital-forensics.html",
+    "published": "2022-11-20T09:00:00.000-05:00",
+    "updated": "2022-11-20T09:00:02.525-05:00",
+    "labels": [],
+    "markdown_path": "posts/0220-thoughts-on-teaching-digital-forensics.md",
+    "json_path": "posts/0220-thoughts-on-teaching-digital-forensics.json"
+  },
+  {
+    "title": "Post Compilation",
+    "url": "https://windowsir.blogspot.com/2022/11/post-compilation.html",
+    "published": "2022-11-28T20:47:00.004-05:00",
+    "updated": "2022-11-28T20:49:17.104-05:00",
+    "labels": [],
+    "markdown_path": "posts/0221-post-compilation.md",
+    "json_path": "posts/0221-post-compilation.json"
+  },
+  {
+    "title": "Why I love RegRipper",
+    "url": "https://windowsir.blogspot.com/2022/12/why-i-love-regripper.html",
+    "published": "2022-12-25T06:57:00.000-05:00",
+    "updated": "2022-12-25T06:57:46.132-05:00",
+    "labels": [],
+    "markdown_path": "posts/0222-why-i-love-regripper.md",
+    "json_path": "posts/0222-why-i-love-regripper.json"
+  },
+  {
+    "title": "Keeping Grounded",
+    "url": "https://windowsir.blogspot.com/2022/12/keeping-grounded.html",
+    "published": "2022-12-31T18:39:00.002-05:00",
+    "updated": "2022-12-31T18:39:29.852-05:00",
+    "labels": [],
+    "markdown_path": "posts/0223-keeping-grounded.md",
+    "json_path": "posts/0223-keeping-grounded.json"
+  },
+  {
+    "title": "Persistence and LOLBins",
+    "url": "https://windowsir.blogspot.com/2022/12/persistence-and-lolbins.html",
+    "published": "2022-12-31T18:43:00.001-05:00",
+    "updated": "2022-12-31T18:43:59.955-05:00",
+    "labels": [
+      "persistence",
+      "RegRipper"
+    ],
+    "markdown_path": "posts/0224-persistence-and-lolbins.md",
+    "json_path": "posts/0224-persistence-and-lolbins.json"
+  },
+  {
+    "title": "Wi-Fi Geolocation, Then and Now",
+    "url": "https://windowsir.blogspot.com/2023/01/wi-fi-geolocation-then-and-now.html",
+    "published": "2023-01-15T21:28:00.003-05:00",
+    "updated": "2023-01-15T21:28:53.448-05:00",
+    "labels": [],
+    "markdown_path": "posts/0225-wi-fi-geolocation-then-and-now.md",
+    "json_path": "posts/0225-wi-fi-geolocation-then-and-now.json"
+  },
+  {
+    "title": "Soft Skills: Writing",
+    "url": "https://windowsir.blogspot.com/2023/01/soft-skills-writing.html",
+    "published": "2023-01-30T21:05:00.000-05:00",
+    "updated": "2023-01-30T21:05:05.895-05:00",
+    "labels": [],
+    "markdown_path": "posts/0226-soft-skills-writing.md",
+    "json_path": "posts/0226-soft-skills-writing.json"
+  },
+  {
+    "title": "Validating Tools",
+    "url": "https://windowsir.blogspot.com/2023/02/validating-tools.html",
+    "published": "2023-02-05T09:29:00.003-05:00",
+    "updated": "2023-02-05T09:29:48.727-05:00",
+    "labels": [],
+    "markdown_path": "posts/0227-validating-tools.md",
+    "json_path": "posts/0227-validating-tools.json"
+  },
+  {
+    "title": "Why Lists?",
+    "url": "https://windowsir.blogspot.com/2023/02/why-lists.html",
+    "published": "2023-02-06T20:42:00.000-05:00",
+    "updated": "2023-02-06T20:42:28.262-05:00",
+    "labels": [],
+    "markdown_path": "posts/0228-why-lists.md",
+    "json_path": "posts/0228-why-lists.json"
+  },
+  {
+    "title": "Training and CTFs",
+    "url": "https://windowsir.blogspot.com/2023/02/training-and-ctfs.html",
+    "published": "2023-02-13T19:08:00.000-05:00",
+    "updated": "2023-02-13T19:08:34.474-05:00",
+    "labels": [],
+    "markdown_path": "posts/0229-training-and-ctfs.md",
+    "json_path": "posts/0229-training-and-ctfs.json"
+  },
+  {
+    "title": "WEVTX Event IDs",
+    "url": "https://windowsir.blogspot.com/2023/02/wevtx-event-ids.html",
+    "published": "2023-02-20T21:03:00.002-05:00",
+    "updated": "2023-02-20T21:03:46.231-05:00",
+    "labels": [],
+    "markdown_path": "posts/0230-wevtx-event-ids.md",
+    "json_path": "posts/0230-wevtx-event-ids.json"
+  },
+  {
+    "title": "Why Write?",
+    "url": "https://windowsir.blogspot.com/2023/02/why-write.html",
+    "published": "2023-02-25T07:52:00.000-05:00",
+    "updated": "2023-02-25T07:52:02.502-05:00",
+    "labels": [],
+    "markdown_path": "posts/0231-why-write.md",
+    "json_path": "posts/0231-why-write.json"
+  },
+  {
+    "title": "Devices",
+    "url": "https://windowsir.blogspot.com/2023/02/devices.html",
+    "published": "2023-02-26T08:31:00.005-05:00",
+    "updated": "2023-02-26T08:31:48.954-05:00",
+    "labels": [],
+    "markdown_path": "posts/0232-devices.md",
+    "json_path": "posts/0232-devices.json"
+  },
+  {
+    "title": "On Using Tools",
+    "url": "https://windowsir.blogspot.com/2023/03/on-using-tools.html",
+    "published": "2023-03-12T13:36:00.005-05:00",
+    "updated": "2023-03-12T13:36:38.144-05:00",
+    "labels": [
+      "RegRipper",
+      "Tools"
+    ],
+    "markdown_path": "posts/0233-on-using-tools.md",
+    "json_path": "posts/0233-on-using-tools.json"
+  },
+  {
+    "title": "Threat Actors Changing Tactics",
+    "url": "https://windowsir.blogspot.com/2023/03/threat-actors-changing-tactics.html",
+    "published": "2023-03-16T13:31:00.000-05:00",
+    "updated": "2023-03-16T13:31:54.554-05:00",
+    "labels": [],
+    "markdown_path": "posts/0234-threat-actors-changing-tactics.md",
+    "json_path": "posts/0234-threat-actors-changing-tactics.json"
+  },
+  {
+    "title": "The \"Why\" Behind Tactics",
+    "url": "https://windowsir.blogspot.com/2023/03/the-why-behind-tactics.html",
+    "published": "2023-03-25T06:39:00.000-05:00",
+    "updated": "2023-03-25T06:39:09.300-05:00",
+    "labels": [],
+    "markdown_path": "posts/0235-the-why-behind-tactics.md",
+    "json_path": "posts/0235-the-why-behind-tactics.json"
+  },
+  {
+    "title": "Password Hash Leakage",
+    "url": "https://windowsir.blogspot.com/2023/03/password-hash-leakage.html",
+    "published": "2023-03-25T07:57:00.000-05:00",
+    "updated": "2023-03-25T07:57:19.082-05:00",
+    "labels": [],
+    "markdown_path": "posts/0236-password-hash-leakage.md",
+    "json_path": "posts/0236-password-hash-leakage.json"
+  },
+  {
+    "title": "On Validation",
+    "url": "https://windowsir.blogspot.com/2023/04/on-validation.html",
+    "published": "2023-04-03T19:51:00.003-05:00",
+    "updated": "2023-04-03T19:51:46.158-05:00",
+    "labels": [],
+    "markdown_path": "posts/0237-on-validation.md",
+    "json_path": "posts/0237-on-validation.json"
+  },
+  {
+    "title": "Unraveling Rorschach",
+    "url": "https://windowsir.blogspot.com/2023/04/unraveling-rorschach.html",
+    "published": "2023-04-05T07:55:00.003-05:00",
+    "updated": "2023-04-05T07:55:45.671-05:00",
+    "labels": [],
+    "markdown_path": "posts/0238-unraveling-rorschach.md",
+    "json_path": "posts/0238-unraveling-rorschach.json"
+  },
+  {
+    "title": "Deriving Value From Open Reporting",
+    "url": "https://windowsir.blogspot.com/2023/04/deriving-intel-from-open-reporting.html",
+    "published": "2023-04-07T10:01:00.004-05:00",
+    "updated": "2023-04-08T06:49:44.497-05:00",
+    "labels": [],
+    "markdown_path": "posts/0239-deriving-value-from-open-reporting.md",
+    "json_path": "posts/0239-deriving-value-from-open-reporting.json"
+  },
+  {
+    "title": "On Validation, pt II",
+    "url": "https://windowsir.blogspot.com/2023/04/on-validation-pt-ii.html",
+    "published": "2023-04-16T19:56:00.001-05:00",
+    "updated": "2023-04-16T19:56:14.659-05:00",
+    "labels": [],
+    "markdown_path": "posts/0240-on-validation-pt-ii.md",
+    "json_path": "posts/0240-on-validation-pt-ii.json"
+  },
+  {
+    "title": "On Validation, pt III",
+    "url": "https://windowsir.blogspot.com/2023/04/on-validation-pt-iii.html",
+    "published": "2023-04-24T20:07:00.000-05:00",
+    "updated": "2023-04-24T20:07:22.357-05:00",
+    "labels": [],
+    "markdown_path": "posts/0241-on-validation-pt-iii.md",
+    "json_path": "posts/0241-on-validation-pt-iii.json"
+  },
+  {
+    "title": "New Events Ripper Plugins",
+    "url": "https://windowsir.blogspot.com/2023/04/new-events-ripper-plugins.html",
+    "published": "2023-04-24T20:07:00.001-05:00",
+    "updated": "2023-04-24T20:07:32.091-05:00",
+    "labels": [],
+    "markdown_path": "posts/0242-new-events-ripper-plugins.md",
+    "json_path": "posts/0242-new-events-ripper-plugins.json"
+  },
+  {
+    "title": "Program Execution",
+    "url": "https://windowsir.blogspot.com/2023/04/program-execution.html",
+    "published": "2023-04-27T19:36:00.003-05:00",
+    "updated": "2023-04-27T19:40:22.058-05:00",
+    "labels": [],
+    "markdown_path": "posts/0243-program-execution.md",
+    "json_path": "posts/0243-program-execution.json"
+  },
+  {
+    "title": "Events Ripper Updates",
+    "url": "https://windowsir.blogspot.com/2023/05/events-ripper-updates.html",
+    "published": "2023-05-05T05:59:00.000-05:00",
+    "updated": "2023-05-05T05:59:54.707-05:00",
+    "labels": [],
+    "markdown_path": "posts/0244-events-ripper-updates.md",
+    "json_path": "posts/0244-events-ripper-updates.json"
+  },
+  {
+    "title": "The Windows Registry",
+    "url": "https://windowsir.blogspot.com/2023/05/the-windows-registry.html",
+    "published": "2023-05-16T06:27:00.000-05:00",
+    "updated": "2023-05-16T06:27:14.929-05:00",
+    "labels": [],
+    "markdown_path": "posts/0245-the-windows-registry.md",
+    "json_path": "posts/0245-the-windows-registry.json"
+  },
+  {
+    "title": "Composite Objects and Constellations",
+    "url": "https://windowsir.blogspot.com/2023/05/composite-objects-and-constellations.html",
+    "published": "2023-05-16T19:19:00.000-05:00",
+    "updated": "2023-05-16T19:19:18.369-05:00",
+    "labels": [],
+    "markdown_path": "posts/0246-composite-objects-and-constellations.md",
+    "json_path": "posts/0246-composite-objects-and-constellations.json"
+  },
+  {
+    "title": "Events Ripper Updates",
+    "url": "https://windowsir.blogspot.com/2023/05/events-ripper-updates_26.html",
+    "published": "2023-05-26T11:57:00.000-05:00",
+    "updated": "2023-05-26T11:57:31.813-05:00",
+    "labels": [],
+    "markdown_path": "posts/0247-events-ripper-updates.md",
+    "json_path": "posts/0247-events-ripper-updates.json"
+  },
+  {
+    "title": "Events Ripper Update",
+    "url": "https://windowsir.blogspot.com/2023/06/events-ripper-update.html",
+    "published": "2023-06-01T18:15:00.000-05:00",
+    "updated": "2023-06-01T18:15:06.624-05:00",
+    "labels": [],
+    "markdown_path": "posts/0248-events-ripper-update.md",
+    "json_path": "posts/0248-events-ripper-update.json"
+  },
+  {
+    "title": "Events Ripper Update",
+    "url": "https://windowsir.blogspot.com/2023/06/events-ripper-update_5.html",
+    "published": "2023-06-05T16:37:00.000-05:00",
+    "updated": "2023-06-05T16:37:52.419-05:00",
+    "labels": [],
+    "markdown_path": "posts/0249-events-ripper-update.md",
+    "json_path": "posts/0249-events-ripper-update.json"
+  },
+  {
+    "title": "The Need for Innovation in DFIR",
+    "url": "https://windowsir.blogspot.com/2023/06/the-need-for-innovation-in-dfir.html",
+    "published": "2023-06-19T20:26:00.000-05:00",
+    "updated": "2023-06-19T20:26:41.214-05:00",
+    "labels": [],
+    "markdown_path": "posts/0250-the-need-for-innovation-in-dfir.md",
+    "json_path": "posts/0250-the-need-for-innovation-in-dfir.json"
+  },
+  {
+    "title": "DFIR Core Principles",
+    "url": "https://windowsir.blogspot.com/2023/06/dfir-core-principles.html",
+    "published": "2023-06-24T15:13:00.000-05:00",
+    "updated": "2023-06-24T15:13:01.912-05:00",
+    "labels": [],
+    "markdown_path": "posts/0251-dfir-core-principles.md",
+    "json_path": "posts/0251-dfir-core-principles.json"
+  },
+  {
+    "title": "Validation - This Time, Tool Validation",
+    "url": "https://windowsir.blogspot.com/2023/06/validation-this-time-tool-validation.html",
+    "published": "2023-06-26T19:50:00.000-05:00",
+    "updated": "2023-06-26T19:50:54.806-05:00",
+    "labels": [],
+    "markdown_path": "posts/0252-validation-this-time-tool-validation.md",
+    "json_path": "posts/0252-validation-this-time-tool-validation.json"
+  },
+  {
+    "title": "Interview Questions",
+    "url": "https://windowsir.blogspot.com/2023/06/interview-questions.html",
+    "published": "2023-06-28T18:43:00.000-05:00",
+    "updated": "2023-06-28T18:43:16.482-05:00",
+    "labels": [],
+    "markdown_path": "posts/0253-interview-questions.md",
+    "json_path": "posts/0253-interview-questions.json"
+  },
+  {
+    "title": "Hiding In The Windows Event Log",
+    "url": "https://windowsir.blogspot.com/2023/07/hiding-in-windows-event-log.html",
+    "published": "2023-07-08T16:25:00.001-05:00",
+    "updated": "2023-07-08T16:25:23.850-05:00",
+    "labels": [],
+    "markdown_path": "posts/0254-hiding-in-the-windows-event-log.md",
+    "json_path": "posts/0254-hiding-in-the-windows-event-log.json"
+  },
+  {
+    "title": "Events Ripper Update",
+    "url": "https://windowsir.blogspot.com/2023/07/events-ripper-update.html",
+    "published": "2023-07-14T15:38:00.000-05:00",
+    "updated": "2023-07-14T15:38:42.103-05:00",
+    "labels": [],
+    "markdown_path": "posts/0255-events-ripper-update.md",
+    "json_path": "posts/0255-events-ripper-update.json"
+  },
+  {
+    "title": "The Next Step",
+    "url": "https://windowsir.blogspot.com/2023/07/the-next-step.html",
+    "published": "2023-07-23T14:56:00.003-05:00",
+    "updated": "2023-07-23T14:56:21.643-05:00",
+    "labels": [],
+    "markdown_path": "posts/0256-the-next-step.md",
+    "json_path": "posts/0256-the-next-step.json"
+  },
+  {
+    "title": "Thoughts on Tool Features",
+    "url": "https://windowsir.blogspot.com/2023/07/thoughts-on-tool-features.html",
+    "published": "2023-07-26T20:08:00.003-05:00",
+    "updated": "2023-07-26T20:08:29.643-05:00",
+    "labels": [],
+    "markdown_path": "posts/0257-thoughts-on-tool-features.md",
+    "json_path": "posts/0257-thoughts-on-tool-features.json"
+  },
+  {
+    "title": "Thoughts on Tool Features, pt II",
+    "url": "https://windowsir.blogspot.com/2023/07/thoughts-on-tool-features-pt-ii.html",
+    "published": "2023-07-28T18:10:00.000-05:00",
+    "updated": "2023-07-28T18:10:07.109-05:00",
+    "labels": [],
+    "markdown_path": "posts/0258-thoughts-on-tool-features-pt-ii.md",
+    "json_path": "posts/0258-thoughts-on-tool-features-pt-ii.json"
+  },
+  {
+    "title": "Events Ripper Updates",
+    "url": "https://windowsir.blogspot.com/2023/08/events-ripper-updates.html",
+    "published": "2023-08-02T17:03:00.001-05:00",
+    "updated": "2023-08-03T06:44:33.192-05:00",
+    "labels": [],
+    "markdown_path": "posts/0259-events-ripper-updates.md",
+    "json_path": "posts/0259-events-ripper-updates.json"
+  },
+  {
+    "title": "Ransomware Attack Timeline",
+    "url": "https://windowsir.blogspot.com/2023/08/ransomware-attack-timeline.html",
+    "published": "2023-08-07T19:10:00.001-05:00",
+    "updated": "2023-08-07T19:10:45.153-05:00",
+    "labels": [],
+    "markdown_path": "posts/0260-ransomware-attack-timeline.md",
+    "json_path": "posts/0260-ransomware-attack-timeline.json"
+  },
+  {
+    "title": "Yet Another Glitch In The Matrix",
+    "url": "https://windowsir.blogspot.com/2023/08/yet-another-glitch-in-matrix.html",
+    "published": "2023-08-22T19:42:00.001-05:00",
+    "updated": "2023-08-22T19:42:19.336-05:00",
+    "labels": [],
+    "markdown_path": "posts/0261-yet-another-glitch-in-the-matrix.md",
+    "json_path": "posts/0261-yet-another-glitch-in-the-matrix.json"
+  },
+  {
+    "title": "The Next Step: Integrating Yara with RegRipper, pt II",
+    "url": "https://windowsir.blogspot.com/2023/08/the-next-step-integrating-yara-with.html",
+    "published": "2023-08-27T06:44:00.001-05:00",
+    "updated": "2023-08-27T06:44:28.620-05:00",
+    "labels": [],
+    "markdown_path": "posts/0262-the-next-step-integrating-yara-with-regripper-pt-ii.md",
+    "json_path": "posts/0262-the-next-step-integrating-yara-with-regripper-pt-ii.json"
+  },
+  {
+    "title": "Book Review: Effective Threat Investigation for SOC Analysts",
+    "url": "https://windowsir.blogspot.com/2023/08/book-review-effective-threat.html",
+    "published": "2023-08-28T20:08:00.001-05:00",
+    "updated": "2023-08-28T20:08:07.479-05:00",
+    "labels": [],
+    "markdown_path": "posts/0263-book-review-effective-threat-investigation-for-soc-analysts.md",
+    "json_path": "posts/0263-book-review-effective-threat-investigation-for-soc-analysts.json"
+  },
+  {
+    "title": "The State of Windows Digital Analysis, pt II",
+    "url": "https://windowsir.blogspot.com/2023/09/the-state-of-windows-digital-analysis_19.html",
+    "published": "2023-09-19T19:57:00.000-05:00",
+    "updated": "2023-09-19T19:57:58.595-05:00",
+    "labels": [],
+    "markdown_path": "posts/0264-the-state-of-windows-digital-analysis-pt-ii.md",
+    "json_path": "posts/0264-the-state-of-windows-digital-analysis-pt-ii.json"
+  },
+  {
+    "title": "Investigating Time Stomping",
+    "url": "https://windowsir.blogspot.com/2023/10/investigating-time-stomping.html",
+    "published": "2023-10-09T07:38:00.003-05:00",
+    "updated": "2023-10-09T07:38:25.054-05:00",
+    "labels": [],
+    "markdown_path": "posts/0265-investigating-time-stomping.md",
+    "json_path": "posts/0265-investigating-time-stomping.json"
+  },
+  {
+    "title": "Roll-up",
+    "url": "https://windowsir.blogspot.com/2023/11/roll-up.html",
+    "published": "2023-11-10T12:47:00.000-05:00",
+    "updated": "2023-11-10T12:47:59.717-05:00",
+    "labels": [],
+    "markdown_path": "posts/0266-roll-up.md",
+    "json_path": "posts/0266-roll-up.json"
+  },
+  {
+    "title": "Roll-up",
+    "url": "https://windowsir.blogspot.com/2023/11/roll-up_28.html",
+    "published": "2023-11-28T18:06:00.000-05:00",
+    "updated": "2023-11-28T18:06:47.803-05:00",
+    "labels": [],
+    "markdown_path": "posts/0267-roll-up.md",
+    "json_path": "posts/0267-roll-up.json"
+  },
+  {
+    "title": "...and the question is...",
+    "url": "https://windowsir.blogspot.com/2023/12/and-question-is.html",
+    "published": "2023-12-11T08:17:00.004-05:00",
+    "updated": "2023-12-11T08:17:52.358-05:00",
+    "labels": [],
+    "markdown_path": "posts/0268-and-the-question-is.md",
+    "json_path": "posts/0268-and-the-question-is.json"
+  },
+  {
+    "title": "Round Up",
+    "url": "https://windowsir.blogspot.com/2023/12/round-up.html",
+    "published": "2023-12-18T08:14:00.001-05:00",
+    "updated": "2023-12-18T08:19:48.700-05:00",
+    "labels": [],
+    "markdown_path": "posts/0269-round-up.md",
+    "json_path": "posts/0269-round-up.json"
+  },
+  {
+    "title": "2023 Wrap-up",
+    "url": "https://windowsir.blogspot.com/2023/12/2023-wrap-up.html",
+    "published": "2023-12-31T08:02:00.001-05:00",
+    "updated": "2023-12-31T08:02:24.427-05:00",
+    "labels": [],
+    "markdown_path": "posts/0270-2023-wrap-up.md",
+    "json_path": "posts/0270-2023-wrap-up.json"
+  },
+  {
+    "title": "Human Behavior In Digital Forensics",
+    "url": "https://windowsir.blogspot.com/2024/01/human-behavior-in-digital-forensics.html",
+    "published": "2024-01-03T14:30:00.000-05:00",
+    "updated": "2024-01-03T14:30:00.171-05:00",
+    "labels": [],
+    "markdown_path": "posts/0271-human-behavior-in-digital-forensics.md",
+    "json_path": "posts/0271-human-behavior-in-digital-forensics.json"
+  },
+  {
+    "title": "Human Behavior In Digital Forensics, pt II",
+    "url": "https://windowsir.blogspot.com/2024/01/human-behavior-in-digital-forensics-pt.html",
+    "published": "2024-01-06T13:34:00.005-05:00",
+    "updated": "2024-01-09T12:31:19.389-05:00",
+    "labels": [],
+    "markdown_path": "posts/0272-human-behavior-in-digital-forensics-pt-ii.md",
+    "json_path": "posts/0272-human-behavior-in-digital-forensics-pt-ii.json"
+  },
+  {
+    "title": "Human Behavior In Digital Forensics, pt III",
+    "url": "https://windowsir.blogspot.com/2024/01/human-behavior-in-digital-forensics-pt_10.html",
+    "published": "2024-01-10T16:34:00.000-05:00",
+    "updated": "2024-01-10T16:34:54.716-05:00",
+    "labels": [],
+    "markdown_path": "posts/0273-human-behavior-in-digital-forensics-pt-iii.md",
+    "json_path": "posts/0273-human-behavior-in-digital-forensics-pt-iii.json"
+  },
+  {
+    "title": "EDRSilencer",
+    "url": "https://windowsir.blogspot.com/2024/01/edrsilencer.html",
+    "published": "2024-01-15T12:47:00.002-05:00",
+    "updated": "2024-12-18T08:22:47.696-05:00",
+    "labels": [],
+    "markdown_path": "posts/0274-edrsilencer.md",
+    "json_path": "posts/0274-edrsilencer.json"
+  },
+  {
+    "title": "Lists of Images",
+    "url": "https://windowsir.blogspot.com/2024/01/lists-of-images.html",
+    "published": "2024-01-22T20:38:00.000-05:00",
+    "updated": "2024-01-22T20:38:09.411-05:00",
+    "labels": [],
+    "markdown_path": "posts/0275-lists-of-images.md",
+    "json_path": "posts/0275-lists-of-images.json"
+  },
+  {
+    "title": "A Look At Threat Intel, Through The Lens Of The r77 Rootkit",
+    "url": "https://windowsir.blogspot.com/2024/02/a-look-at-threat-intel-through-lens-of.html",
+    "published": "2024-02-24T10:02:00.000-05:00",
+    "updated": "2024-02-24T10:02:01.809-05:00",
+    "labels": [],
+    "markdown_path": "posts/0276-a-look-at-threat-intel-through-the-lens-of-the-r77-rootkit.md",
+    "json_path": "posts/0276-a-look-at-threat-intel-through-the-lens-of-the-r77-rootkit.json"
+  },
+  {
+    "title": "PCAParse",
+    "url": "https://windowsir.blogspot.com/2024/02/pcaparse.html",
+    "published": "2024-02-26T20:40:00.001-05:00",
+    "updated": "2024-02-27T09:59:51.191-05:00",
+    "labels": [],
+    "markdown_path": "posts/0277-pcaparse.md",
+    "json_path": "posts/0277-pcaparse.json"
+  },
+  {
+    "title": "Investigative Scenario, 2024-03-12",
+    "url": "https://windowsir.blogspot.com/2024/03/investigative-scenario-2024-03-12.html",
+    "published": "2024-03-14T06:48:00.000-05:00",
+    "updated": "2024-03-14T06:48:33.294-05:00",
+    "labels": [],
+    "markdown_path": "posts/0278-investigative-scenario-2024-03-12.md",
+    "json_path": "posts/0278-investigative-scenario-2024-03-12.json"
+  },
+  {
+    "title": "Uptycs Cybersecurity Standup",
+    "url": "https://windowsir.blogspot.com/2024/03/uptycs-cybersecurity-standup.html",
+    "published": "2024-03-15T08:48:00.003-05:00",
+    "updated": "2024-03-15T08:48:40.156-05:00",
+    "labels": [],
+    "markdown_path": "posts/0279-uptycs-cybersecurity-standup.md",
+    "json_path": "posts/0279-uptycs-cybersecurity-standup.json"
+  },
+  {
+    "title": "Threat Actors Dropping Multiple Ransomware Variants",
+    "url": "https://windowsir.blogspot.com/2024/03/threat-actors-dropping-multiple.html",
+    "published": "2024-03-21T19:26:00.000-05:00",
+    "updated": "2024-03-21T19:26:42.437-05:00",
+    "labels": [],
+    "markdown_path": "posts/0280-threat-actors-dropping-multiple-ransomware-variants.md",
+    "json_path": "posts/0280-threat-actors-dropping-multiple-ransomware-variants.json"
+  },
+  {
+    "title": "A Look At Threat Intel Through The Lens Of Kimsuky",
+    "url": "https://windowsir.blogspot.com/2024/03/a-look-at-threat-intel-through-lens-of.html",
+    "published": "2024-03-21T19:28:00.001-05:00",
+    "updated": "2024-03-21T19:28:33.795-05:00",
+    "labels": [],
+    "markdown_path": "posts/0281-a-look-at-threat-intel-through-the-lens-of-kimsuky.md",
+    "json_path": "posts/0281-a-look-at-threat-intel-through-the-lens-of-kimsuky.json"
+  },
+  {
+    "title": "The Myth of \"Fileless\" Malware",
+    "url": "https://windowsir.blogspot.com/2024/06/the-myth-of-fileless-malware.html",
+    "published": "2024-06-03T12:18:00.003-05:00",
+    "updated": "2024-06-05T10:23:13.784-05:00",
+    "labels": [],
+    "markdown_path": "posts/0282-the-myth-of-fileless-malware.md",
+    "json_path": "posts/0282-the-myth-of-fileless-malware.json"
+  },
+  {
+    "title": "What is \"Events Ripper\"?",
+    "url": "https://windowsir.blogspot.com/2024/07/what-is-events-ripper.html",
+    "published": "2024-07-08T19:24:00.000-05:00",
+    "updated": "2024-07-08T19:24:16.395-05:00",
+    "labels": [],
+    "markdown_path": "posts/0283-what-is-events-ripper.md",
+    "json_path": "posts/0283-what-is-events-ripper.json"
+  },
+  {
+    "title": "RegRipper Educational Materials",
+    "url": "https://windowsir.blogspot.com/2024/10/regripper-educational-materials.html",
+    "published": "2024-10-08T18:54:00.003-05:00",
+    "updated": "2024-10-08T18:54:38.777-05:00",
+    "labels": [],
+    "markdown_path": "posts/0284-regripper-educational-materials.md",
+    "json_path": "posts/0284-regripper-educational-materials.json"
+  },
+  {
+    "title": "Shell Items",
+    "url": "https://windowsir.blogspot.com/2024/10/shell-items.html",
+    "published": "2024-10-08T20:19:00.005-05:00",
+    "updated": "2024-10-08T20:19:48.649-05:00",
+    "labels": [],
+    "markdown_path": "posts/0285-shell-items.md",
+    "json_path": "posts/0285-shell-items.json"
+  },
+  {
+    "title": "Exploiting LNK Metadata",
+    "url": "https://windowsir.blogspot.com/2024/10/exploiting-lnk-metadata.html",
+    "published": "2024-10-09T08:18:00.002-05:00",
+    "updated": "2024-10-09T08:18:41.607-05:00",
+    "labels": [],
+    "markdown_path": "posts/0286-exploiting-lnk-metadata.md",
+    "json_path": "posts/0286-exploiting-lnk-metadata.json"
+  },
+  {
+    "title": "Rundown",
+    "url": "https://windowsir.blogspot.com/2024/10/rundown.html",
+    "published": "2024-10-15T07:41:00.002-05:00",
+    "updated": "2024-10-15T07:41:34.180-05:00",
+    "labels": [],
+    "markdown_path": "posts/0287-rundown.md",
+    "json_path": "posts/0287-rundown.json"
+  },
+  {
+    "title": "Analysis Process",
+    "url": "https://windowsir.blogspot.com/2024/10/analysis-process.html",
+    "published": "2024-10-15T13:08:00.000-05:00",
+    "updated": "2024-10-15T13:08:49.584-05:00",
+    "labels": [],
+    "markdown_path": "posts/0288-analysis-process.md",
+    "json_path": "posts/0288-analysis-process.json"
+  },
+  {
+    "title": "Artifact Tracking: Workstation Names",
+    "url": "https://windowsir.blogspot.com/2024/10/artifact-tracking-workstation-names.html",
+    "published": "2024-10-26T11:05:00.004-05:00",
+    "updated": "2024-11-26T13:46:23.353-05:00",
+    "labels": [],
+    "markdown_path": "posts/0289-artifact-tracking-workstation-names.md",
+    "json_path": "posts/0289-artifact-tracking-workstation-names.json"
+  },
+  {
+    "title": "FTSCon",
+    "url": "https://windowsir.blogspot.com/2024/10/ftscon.html",
+    "published": "2024-10-31T10:41:00.004-05:00",
+    "updated": "2024-11-22T12:38:10.829-05:00",
+    "labels": [],
+    "markdown_path": "posts/0290-ftscon.md",
+    "json_path": "posts/0290-ftscon.json"
+  },
+  {
+    "title": "Program Execution: The ShimCache/AmCache Myth",
+    "url": "https://windowsir.blogspot.com/2024/11/program-execution-shimcacheamcache-myth.html",
+    "published": "2024-11-26T12:53:00.002-05:00",
+    "updated": "2024-11-26T12:53:53.162-05:00",
+    "labels": [],
+    "markdown_path": "posts/0291-program-execution-the-shimcache-amcache-myth.md",
+    "json_path": "posts/0291-program-execution-the-shimcache-amcache-myth.json"
+  },
+  {
+    "title": "UEPOTB, LNK edition",
+    "url": "https://windowsir.blogspot.com/2024/12/uepotb-lnk-edition.html",
+    "published": "2024-12-24T10:47:00.003-05:00",
+    "updated": "2024-12-24T10:47:57.734-05:00",
+    "labels": [],
+    "markdown_path": "posts/0292-uepotb-lnk-edition.md",
+    "json_path": "posts/0292-uepotb-lnk-edition.json"
+  },
+  {
+    "title": "Carving",
+    "url": "https://windowsir.blogspot.com/2025/01/carving.html",
+    "published": "2025-01-06T14:18:00.002-05:00",
+    "updated": "2025-01-13T12:10:05.141-05:00",
+    "labels": [],
+    "markdown_path": "posts/0293-carving.md",
+    "json_path": "posts/0293-carving.json"
+  },
+  {
+    "title": "Artifacts: Jump Lists",
+    "url": "https://windowsir.blogspot.com/2025/01/artifacts-jump-lists.html",
+    "published": "2025-01-20T13:58:00.003-05:00",
+    "updated": "2025-01-20T14:06:43.118-05:00",
+    "labels": [],
+    "markdown_path": "posts/0294-artifacts-jump-lists.md",
+    "json_path": "posts/0294-artifacts-jump-lists.json"
+  },
+  {
+    "title": "The Role of AI in DFIR",
+    "url": "https://windowsir.blogspot.com/2025/02/the-role-of-ai-in-dfir.html",
+    "published": "2025-02-16T08:47:00.003-05:00",
+    "updated": "2025-02-16T08:47:58.481-05:00",
+    "labels": [],
+    "markdown_path": "posts/0295-the-role-of-ai-in-dfir.md",
+    "json_path": "posts/0295-the-role-of-ai-in-dfir.json"
+  },
+  {
+    "title": "Lina's Write-up",
+    "url": "https://windowsir.blogspot.com/2025/02/linas-write-up.html",
+    "published": "2025-02-19T15:57:00.004-05:00",
+    "updated": "2025-02-27T16:25:38.093-05:00",
+    "labels": [],
+    "markdown_path": "posts/0296-lina-s-write-up.md",
+    "json_path": "posts/0296-lina-s-write-up.json"
+  },
+  {
+    "title": "The Problem with the Modern Security Stack",
+    "url": "https://windowsir.blogspot.com/2025/03/the-problem-with-modern-security-stack.html",
+    "published": "2025-03-10T11:36:00.000-05:00",
+    "updated": "2025-03-10T11:36:25.455-05:00",
+    "labels": [],
+    "markdown_path": "posts/0297-the-problem-with-the-modern-security-stack.md",
+    "json_path": "posts/0297-the-problem-with-the-modern-security-stack.json"
+  },
+  {
+    "title": "WMI",
+    "url": "https://windowsir.blogspot.com/2025/03/wmi.html",
+    "published": "2025-03-17T11:07:00.002-05:00",
+    "updated": "2025-03-17T11:07:28.926-05:00",
+    "labels": [],
+    "markdown_path": "posts/0298-wmi.md",
+    "json_path": "posts/0298-wmi.json"
+  },
+  {
+    "title": "Know Your Tools",
+    "url": "https://windowsir.blogspot.com/2025/03/know-your-tools.html",
+    "published": "2025-03-20T11:40:00.000-05:00",
+    "updated": "2025-03-20T11:40:29.628-05:00",
+    "labels": [],
+    "markdown_path": "posts/0299-know-your-tools.md",
+    "json_path": "posts/0299-know-your-tools.json"
+  },
+  {
+    "title": "I've Seen Things",
+    "url": "https://windowsir.blogspot.com/2025/05/ive-seen-things.html",
+    "published": "2025-05-26T12:37:00.002-05:00",
+    "updated": "2025-05-26T12:37:29.081-05:00",
+    "labels": [],
+    "markdown_path": "posts/0300-i-ve-seen-things.md",
+    "json_path": "posts/0300-i-ve-seen-things.json"
+  },
+  {
+    "title": "I've Seen Things, pt II",
+    "url": "https://windowsir.blogspot.com/2025/06/ive-seen-things-pt-ii.html",
+    "published": "2025-06-25T07:16:00.001-05:00",
+    "updated": "2025-06-25T07:16:18.896-05:00",
+    "labels": [],
+    "markdown_path": "posts/0301-i-ve-seen-things-pt-ii.md",
+    "json_path": "posts/0301-i-ve-seen-things-pt-ii.json"
+  },
+  {
+    "title": "Program Execution, follow-up",
+    "url": "https://windowsir.blogspot.com/2025/06/program-execution-follow-up.html",
+    "published": "2025-06-25T07:16:00.002-05:00",
+    "updated": "2025-06-25T07:16:31.856-05:00",
+    "labels": [],
+    "markdown_path": "posts/0302-program-execution-follow-up.md",
+    "json_path": "posts/0302-program-execution-follow-up.json"
+  },
+  {
+    "title": "Program Execution, follow-up pt II",
+    "url": "https://windowsir.blogspot.com/2025/06/program-execution-follow-up-pt-ii.html",
+    "published": "2025-06-26T16:59:00.000-05:00",
+    "updated": "2025-06-26T16:59:02.948-05:00",
+    "labels": [],
+    "markdown_path": "posts/0303-program-execution-follow-up-pt-ii.md",
+    "json_path": "posts/0303-program-execution-follow-up-pt-ii.json"
+  },
+  {
+    "title": "Hunting Fileless Malware",
+    "url": "https://windowsir.blogspot.com/2025/06/hunting-fileless-malware.html",
+    "published": "2025-06-30T15:15:00.000-05:00",
+    "updated": "2025-06-30T15:15:16.262-05:00",
+    "labels": [],
+    "markdown_path": "posts/0304-hunting-fileless-malware.md",
+    "json_path": "posts/0304-hunting-fileless-malware.json"
+  },
+  {
+    "title": "RegRipper",
+    "url": "https://windowsir.blogspot.com/2025/07/regripper.html",
+    "published": "2025-07-03T14:05:00.000-05:00",
+    "updated": "2025-07-03T14:05:25.952-05:00",
+    "labels": [],
+    "markdown_path": "posts/0305-regripper.md",
+    "json_path": "posts/0305-regripper.json"
+  },
+  {
+    "title": "Ransomware artifacts",
+    "url": "https://windowsir.blogspot.com/2025/09/ransomware-artifacts.html",
+    "published": "2025-09-01T09:02:00.000-05:00",
+    "updated": "2025-09-01T09:02:10.561-05:00",
+    "labels": [],
+    "markdown_path": "posts/0306-ransomware-artifacts.md",
+    "json_path": "posts/0306-ransomware-artifacts.json"
+  },
+  {
+    "title": "Analyzing Ransomware",
+    "url": "https://windowsir.blogspot.com/2025/10/analyzing-ransomware.html",
+    "published": "2025-10-27T13:02:00.001-05:00",
+    "updated": "2025-10-27T13:02:51.283-05:00",
+    "labels": [],
+    "markdown_path": "posts/0307-analyzing-ransomware.md",
+    "json_path": "posts/0307-analyzing-ransomware.json"
+  },
+  {
+    "title": "Registry Analysis",
+    "url": "https://windowsir.blogspot.com/2025/10/registry-analysis.html",
+    "published": "2025-10-31T08:41:00.000-05:00",
+    "updated": "2025-10-31T08:41:03.676-05:00",
+    "labels": [],
+    "markdown_path": "posts/0308-registry-analysis.md",
+    "json_path": "posts/0308-registry-analysis.json"
+  },
+  {
+    "title": "Analysis Playbooks: USB",
+    "url": "https://windowsir.blogspot.com/2025/11/analysis-playbooks-usb.html",
+    "published": "2025-11-03T13:28:00.001-05:00",
+    "updated": "2025-11-03T13:28:17.503-05:00",
+    "labels": [],
+    "markdown_path": "posts/0309-analysis-playbooks-usb.md",
+    "json_path": "posts/0309-analysis-playbooks-usb.json"
+  },
+  {
+    "title": "What We Value",
+    "url": "https://windowsir.blogspot.com/2025/11/what-we-value.html",
+    "published": "2025-11-10T13:01:00.002-05:00",
+    "updated": "2025-11-10T13:01:19.648-05:00",
+    "labels": [],
+    "markdown_path": "posts/0310-what-we-value.md",
+    "json_path": "posts/0310-what-we-value.json"
+  },
+  {
+    "title": "File Formats",
+    "url": "https://windowsir.blogspot.com/2025/11/file-formats.html",
+    "published": "2025-11-12T09:46:00.006-05:00",
+    "updated": "2025-11-12T09:46:59.871-05:00",
+    "labels": [],
+    "markdown_path": "posts/0311-file-formats.md",
+    "json_path": "posts/0311-file-formats.json"
+  },
+  {
+    "title": "Images",
+    "url": "https://windowsir.blogspot.com/2025/11/images.html",
+    "published": "2025-11-13T08:23:00.000-05:00",
+    "updated": "2025-11-13T08:23:44.659-05:00",
+    "labels": [],
+    "markdown_path": "posts/0312-images.md",
+    "json_path": "posts/0312-images.json"
+  },
+  {
+    "title": "Thoughts on Analysis",
+    "url": "https://windowsir.blogspot.com/2025/11/thoughts-on-analysis.html",
+    "published": "2025-11-26T09:25:00.000-05:00",
+    "updated": "2025-11-26T09:25:08.508-05:00",
+    "labels": [],
+    "markdown_path": "posts/0313-thoughts-on-analysis.md",
+    "json_path": "posts/0313-thoughts-on-analysis.json"
+  },
+  {
+    "title": "Unprecedented Complexity",
+    "url": "https://windowsir.blogspot.com/2025/11/unprecedented-complexity.html",
+    "published": "2025-11-26T09:30:00.002-05:00",
+    "updated": "2025-11-26T09:30:11.167-05:00",
+    "labels": [],
+    "markdown_path": "posts/0314-unprecedented-complexity.md",
+    "json_path": "posts/0314-unprecedented-complexity.json"
+  },
+  {
+    "title": "Registry: FeatureUsage",
+    "url": "https://windowsir.blogspot.com/2025/11/registry-featureusage.html",
+    "published": "2025-11-26T09:40:00.001-05:00",
+    "updated": "2025-11-26T09:40:08.112-05:00",
+    "labels": [],
+    "markdown_path": "posts/0315-registry-featureusage.md",
+    "json_path": "posts/0315-registry-featureusage.json"
+  },
+  {
+    "title": "Intel in LNK Files",
+    "url": "https://windowsir.blogspot.com/2025/11/intel-in-lnk-files.html",
+    "published": "2025-11-29T15:48:00.000-05:00",
+    "updated": "2025-11-29T15:48:53.056-05:00",
+    "labels": [],
+    "markdown_path": "posts/0316-intel-in-lnk-files.md",
+    "json_path": "posts/0316-intel-in-lnk-files.json"
+  },
+  {
+    "title": "Releasing Open Source Tools to the Community",
+    "url": "https://windowsir.blogspot.com/2025/12/releasing-open-source-tools-to-community.html",
+    "published": "2025-12-10T16:16:00.000-05:00",
+    "updated": "2025-12-10T16:16:21.712-05:00",
+    "labels": [],
+    "markdown_path": "posts/0317-releasing-open-source-tools-to-the-community.md",
+    "json_path": "posts/0317-releasing-open-source-tools-to-the-community.json"
+  },
+  {
+    "title": "Perspectives on Cybersecurity",
+    "url": "https://windowsir.blogspot.com/2025/12/perspectives-on-cybersecurity.html",
+    "published": "2025-12-11T17:10:00.002-05:00",
+    "updated": "2025-12-11T17:10:19.729-05:00",
+    "labels": [],
+    "markdown_path": "posts/0318-perspectives-on-cybersecurity.md",
+    "json_path": "posts/0318-perspectives-on-cybersecurity.json"
+  },
+  {
+    "title": "Question on Open Source Tools",
+    "url": "https://windowsir.blogspot.com/2025/12/question-on-open-source-tools.html",
+    "published": "2025-12-29T13:16:00.002-05:00",
+    "updated": "2025-12-29T13:16:17.477-05:00",
+    "labels": [],
+    "markdown_path": "posts/0319-question-on-open-source-tools.md",
+    "json_path": "posts/0319-question-on-open-source-tools.json"
+  },
+  {
+    "title": "Grab Bag",
+    "url": "https://windowsir.blogspot.com/2026/01/grab-bag.html",
+    "published": "2026-01-01T19:20:00.000-05:00",
+    "updated": "2026-01-01T19:20:38.349-05:00",
+    "labels": [],
+    "markdown_path": "posts/0320-grab-bag.md",
+    "json_path": "posts/0320-grab-bag.json"
+  },
+  {
+    "title": "Windows Defender Support Logs",
+    "url": "https://windowsir.blogspot.com/2026/01/windows-defender-support-logs.html",
+    "published": "2026-01-01T19:20:00.001-05:00",
+    "updated": "2026-01-01T19:20:47.306-05:00",
+    "labels": [],
+    "markdown_path": "posts/0321-windows-defender-support-logs.md",
+    "json_path": "posts/0321-windows-defender-support-logs.json"
+  },
+  {
+    "title": "Questions I've Been Asked",
+    "url": "https://windowsir.blogspot.com/2026/01/questions-ive-been-asked.html",
+    "published": "2026-01-05T12:21:00.001-05:00",
+    "updated": "2026-01-05T12:21:06.774-05:00",
+    "labels": [],
+    "markdown_path": "posts/0322-questions-i-ve-been-asked.md",
+    "json_path": "posts/0322-questions-i-ve-been-asked.json"
+  },
+  {
+    "title": "What's on your clipboard?",
+    "url": "https://windowsir.blogspot.com/2026/01/whats-on-your-clipboard.html",
+    "published": "2026-01-10T16:13:00.004-05:00",
+    "updated": "2026-01-10T16:13:59.072-05:00",
+    "labels": [],
+    "markdown_path": "posts/0323-what-s-on-your-clipboard.md",
+    "json_path": "posts/0323-what-s-on-your-clipboard.json"
+  },
+  {
+    "title": "Views on AI & the Anthropic Report",
+    "url": "https://windowsir.blogspot.com/2026/01/views-on-ai-anthropic-report.html",
+    "published": "2026-01-19T13:28:00.001-05:00",
+    "updated": "2026-01-20T08:26:21.227-05:00",
+    "labels": [],
+    "markdown_path": "posts/0324-views-on-ai-the-anthropic-report.md",
+    "json_path": "posts/0324-views-on-ai-the-anthropic-report.json"
+  },
+  {
+    "title": "Devices",
+    "url": "https://windowsir.blogspot.com/2026/02/devices.html",
+    "published": "2026-02-02T14:07:00.002-05:00",
+    "updated": "2026-03-02T13:42:34.049-05:00",
+    "labels": [],
+    "markdown_path": "posts/0325-devices.md",
+    "json_path": "posts/0325-devices.json"
+  },
+  {
+    "title": "Links",
+    "url": "https://windowsir.blogspot.com/2026/03/links.html",
+    "published": "2026-03-10T06:23:00.000-05:00",
+    "updated": "2026-03-10T06:23:21.772-05:00",
+    "labels": [],
+    "markdown_path": "posts/0326-links.md",
+    "json_path": "posts/0326-links.json"
+  },
+  {
+    "title": "LNK Files",
+    "url": "https://windowsir.blogspot.com/2026/03/lnk-files.html",
+    "published": "2026-03-10T06:23:00.001-05:00",
+    "updated": "2026-03-10T06:23:32.332-05:00",
+    "labels": [],
+    "markdown_path": "posts/0327-lnk-files.md",
+    "json_path": "posts/0327-lnk-files.json"
+  }
+]

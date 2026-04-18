@@ -10,6 +10,10 @@
 ///   <https://isc.sans.edu/diary/27376>
 /// - PuTTY documentation — Appendix C: registry storage layout:
 ///   <https://the.earth.li/~sgtatham/putty/0.78/htmldoc/AppendixC.html>
+/// - Eric Zimmerman RECmd / RegistryPlugins — practical parser coverage for
+///   PuTTY-family registry artifacts:
+///   <https://github.com/EricZimmerman/RECmd>
+///   <https://github.com/EricZimmerman/RegistryPlugins>
 pub const PUTTY_PATHS: &[&str] = &[
     r"Software\SimonTatham\PuTTY\Sessions",
     r"Software\SimonTatham\PuTTY\SshHostKeys",
@@ -27,6 +31,10 @@ pub const PUTTY_PATHS: &[&str] = &[
 /// - Synacktiv — "WinSCP Passwords — How They Are Stored" (2022),
 ///   reverse-engineers the XOR-based obfuscation used to encode saved passwords:
 ///   <https://www.synacktiv.com/en/publications/winscp-passwords-how-they-are-stored>
+/// - Eric Zimmerman RECmd / RegistryPlugins — registry parser coverage for
+///   WinSCP session artifacts:
+///   <https://github.com/EricZimmerman/RECmd>
+///   <https://github.com/EricZimmerman/RegistryPlugins>
 pub const WINSCP_PATHS: &[&str] = &[
     r"Software\Martin Prikryl\WinSCP 2\Sessions",
     r"Software\Martin Prikryl\WinSCP 2\Configuration",
@@ -105,6 +113,25 @@ pub const KITTY_PATHS: &[&str] = &[
     r"Software\9bis.com\KiTTY\SshHostKeys",
 ];
 
+/// WinRAR registry paths — archive open/create/extract history.
+///
+/// Sources:
+/// - win.rar GmbH - official registry-backed history behavior documented via
+///   WinRAR help and configuration references:
+///   <https://www.win-rar.com/switches/settings.htm>
+/// - regipy WinRAR plugin - explicit NTUSER registry paths used for DFIR
+///   extraction:
+///   <https://github.com/mkorman90/regipy/blob/master/regipy/plugins/ntuser/winrar.py>
+/// - Eric Zimmerman RECmd / RegistryPlugins — registry parser coverage for
+///   WinRAR history keys:
+///   <https://github.com/EricZimmerman/RECmd>
+///   <https://github.com/EricZimmerman/RegistryPlugins>
+pub const WINRAR_PATHS: &[&str] = &[
+    r"SOFTWARE\WinRAR\ArcHistory",
+    r"SOFTWARE\WinRAR\DialogEditHistory\ArcName",
+    r"SOFTWARE\WinRAR\DialogEditHistory\ExtrPath",
+];
+
 /// Returns an iterator over all third-party application forensic artifact paths.
 ///
 /// Prefer this over the legacy `ALL_THIRD_PARTY_PATHS` slice for bulk scanning —
@@ -117,6 +144,7 @@ pub fn all_third_party_paths() -> impl Iterator<Item = &'static str> {
         .chain(DROPBOX_PATHS.iter())
         .chain(CHROME_PATHS.iter())
         .chain(KITTY_PATHS.iter())
+        .chain(WINRAR_PATHS.iter())
         .copied()
 }
 
@@ -148,6 +176,8 @@ pub fn identify_application(path: &str) -> Option<&'static str> {
         Some("Dropbox")
     } else if matches(CHROME_PATHS) {
         Some("Chrome")
+    } else if matches(WINRAR_PATHS) {
+        Some("WinRAR")
     } else {
         None
     }
@@ -185,6 +215,7 @@ mod tests {
             DROPBOX_PATHS[0],
             CHROME_PATHS[0],
             KITTY_PATHS[0],
+            WINRAR_PATHS[0],
         ] {
             assert!(
                 all.contains(&path),
@@ -232,6 +263,15 @@ mod tests {
             identify_application(r"SOFTWARE\SomethingElse\Unknown"),
             None,
             "Unknown path should return None"
+        );
+    }
+
+    #[test]
+    fn identify_application_winrar() {
+        assert_eq!(
+            identify_application(r"SOFTWARE\WinRAR\ArcHistory"),
+            Some("WinRAR"),
+            "Should identify WinRAR"
         );
     }
 }

@@ -1,0 +1,25 @@
+# Roll-up
+
+- URL: https://windowsir.blogspot.com/2023/11/roll-up.html
+- Published: 2023-11-10T12:47:00.000-05:00
+- Updated: 2023-11-10T12:47:59.717-05:00
+- Labels: none
+
+I don't like checklists in #DFIR.
+ Rather, I don't like how checklists are used in #DFIR. Too often, they're used as a replacement for learning and knowledge, and looked at as, "...if I do just this, I'm good...". Nothing could be further from the truth, which is why even in November 2023, we still see analysts retrieving just the Security, Application, and System Event Logs from Windows 10 & 11 endpoints.
+ I'm also not a fan of lists in #DFIR. Rather than a long list of links with no context or insight, I'd much rather see just a few links with descriptions of how useful they are (or, they aren't , as the case may be...), and how they were incorporated into an analysis workflow.
+ SRUM DB
+ Shanna Daly recently shared some excellent content regarding SRUMDB , excellent in the sense that it was not only enjoyable to read, but it was thorough in its content, particularly regarding the fact that the database contents are written on an hourly basis. As such, this data source is not a good candidate for being included in a timeline, but it is an excellent pivot point.
+ This is where timelines and artifact constellations cross paths, and lay a foundation for validation of findings. Most analysts are familiar with ShimCache and AmCache artifacts, but many still mistakenly believe that these are "evidence of execution"; in fact, the recently published Windows Forensics Analysts Field Guide states this, as well. So, what happens is that analysts will see an entry in either artifact for apparent malware and declare victory, basing their finding on that one artifact, in isolation. All either of these artifacts tells us definitively is that file existed on the endpoint; we need additional information, other elements of the constellation, to confirm execution. So, there's Prefetch files...unless you're examining a server. One place to pivot to for validation is the SRUM DB, which Shanna does a thorough job of addressing and describing.
+ Dev Drive
+ Grzegorz recently tweeted regarding Windows "dev drive" ( LinkedIn post here ), a capability that allows a developer to optimize an area of their hard drive for storage operations. Apparently, part of this allows the developer to "disallow" AV, which sounds similar to designating exclusions in Windows Defender. However, in this case, it sounds as if it's for all AV, not just Defender.
+ MS provides information on "dev drive", including describing how to enable it via GPO .
+ Finger
+ I was doing some research recently for a blog post on the use of finger.exe for both file download, as well as exfil, and ran across a couple of very similar articles and posts, all of which seemed to be derived from a single resource (from hyp3rlinx) .
+ And yes, you read that right...the LOLBin/ LOLBAS finger.exe used for data exfil. When I was in graduate school and working on my master's thesis (late '95 through '96), I was teaching myself Java programming in order to facilitate data collection for my thesis. As part of my self-study, I wrote networking code to implement SMTP, finger, etc., clients on Windows (at the time, Windows 3.11 for Workgroups and Windows 95). However, at the time, I wasn't as focused on things like data exfil and digital forensics...rather, I was focused on implementing networking sockets and protocols to replicate various client applications. What's wild about this one is that I don't think I ever expected to see it "in the wild", but in October 2023, I did.
+ Actively used, "in the wild".
+ And to be quite honest, it's pretty freaking cool!
+
+ Another example is NTFS alternate data streams (ADSs). This NTFS file system artifact has been around since...well...NTFS, but there are more than a few analysts who haven't experienced them and aren't familiar with them.
+ The point of this isn't to point out shortcomings in training, education, experience, or knowledge; rather, that threat actors can use (and have used) something "old" with great success, because it's not recognized by current analysts. Think about it for a second...think DOS batch files are "lame" when compared to PowerShell or some more "modern" scripting languages? They may be but they work, really well, in fact. There's two Windows Event Logs that PowerShell code can end up in, but batch files don't get "recorded" anywhere. Further, there are some pretty straightforward things you can do with DOS batch files that will not only work, but have the added benefit of confusing the crap out of "modern" analysts.
+ So, here's something to think about...there's a lot of different ways to data exfiltration as part of recon activities, but one that folks may not be expecting is to do so via finger.exe . Do you employ EDR technology, or have an MDR? If so, how often is finger.exe launched in your infrastructure? Would it be a good idea to have a rule that simply monitors for the execution of that LOLBAS?

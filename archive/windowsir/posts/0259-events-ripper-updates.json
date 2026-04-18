@@ -1,0 +1,9 @@
+{
+  "url": "https://windowsir.blogspot.com/2023/08/events-ripper-updates.html",
+  "title": "Events Ripper Updates",
+  "published": "2023-08-02T17:03:00.001-05:00",
+  "updated": "2023-08-03T06:44:33.192-05:00",
+  "labels": [],
+  "text": "",
+  "html": "I uploaded several new updates to <a href=\"https://github.com/keydet89/Events-Ripper\">Events Ripper</a> plugins in the repo recently...<div><br /></div><div><i>defender.pl</i> - added a check for <a href=\"https://kirannr.com/2020/07/02/__trashed/#:~:text=Every%20time%20Windows%20Defender%20AV,the%20file%20name%20and%20hash.\">event ID 2050 records</a>, indicating that Defender uploaded a sample (as opposed to <a href=\"https://windowsir.blogspot.com/2022/10/events-ripper.html\">event ID 2051 records</a>, indicating that a file could<i> not</i> be sent). The plugin now displays the file path and name, as well as the hash.</div><div><br /></div><div><i>filter.pl</i> - added a check for <a href=\"https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-5152\">event ID 5152 records</a>, indicating that WFP blocked a packet. The plugin displays the source IP address of the packet, but not the direction (usually inbound), ports, or destination IP address (will likely be the endpoint itself, or broadcast). When looking at this output, keep the endpoint IP address in mind...you may see connection attempts from other subnets, or from public IP addresses.</div><div><br /></div><div><i>scm.pl</i> - added a check for <i><a href=\"https://www.manageengine.com/products/eventlog/kb/event-7031-service-crash-help.html\">Service Control Manager/7031</a></i>&nbsp;service crash events. I did not add event ID 7039 events; well, actually, I did, but found that there was a lot of noise, and if you're creating a timeline and using Events Ripper as it was intended, you'll get a pivot point from the new capability.</div>"
+}

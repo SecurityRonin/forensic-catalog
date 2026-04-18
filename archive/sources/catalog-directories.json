@@ -1,0 +1,29 @@
+[
+  {
+    "id": "aboutdfir-forensicators",
+    "title": "aboutDFIR Forensicators of DFIR",
+    "category": "directory",
+    "html_url": "https://aboutdfir.com/the-community/forensicators-of-dfir/",
+    "kind": "community-directory",
+    "update_strategy": "manual-review",
+    "notes": "Community roster and researcher directory used to discover practitioners and downstream blogs."
+  },
+  {
+    "id": "aboutdfir-blogs",
+    "title": "aboutDFIR blogs index",
+    "category": "directory",
+    "html_url": "https://aboutdfir.com/reading/blogs/",
+    "kind": "blog-directory",
+    "update_strategy": "manual-review",
+    "notes": "Blog index used to discover additional DFIR feeds and long-form practitioner sources."
+  },
+  {
+    "id": "crowdstrike-front-lines",
+    "title": "CrowdStrike From the Front Lines",
+    "category": "directory",
+    "html_url": "https://www.crowdstrike.com/en-us/blog/category.from-the-front-lines/",
+    "kind": "category-page",
+    "update_strategy": "manual-review",
+    "notes": "Threat research category page used to track incident-response and intrusion-analysis posts."
+  }
+]

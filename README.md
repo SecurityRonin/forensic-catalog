@@ -8,6 +8,13 @@
 
 Forensic knowledge as code — zero-dependency, `std`-only, embeds in any Rust binary.
 
+## Docs
+
+- [Module Source Map](docs/module-sources.md)
+- [Canonical Source Inventory](archive/sources/source-inventory.md)
+- [Windows IR Archive Index](archive/windowsir/index.json)
+- GitHub Pages / API docs: `https://securityronin.github.io/forensic-catalog/`
+
 ## Quick start
 
 ```toml
@@ -134,6 +141,75 @@ let record = CATALOG.decode(descriptor, value_name, raw_bytes)?;
 - **Test-driven** — every indicator table has positive and negative test cases. Run `cargo test` to verify coverage.
 - **Additive** — each module is independent. Pull in only what you need.
 
+## Scope Boundary
+
+This project is a forensic catalog first, not a full DFIR parsing engine.
+
+- Parsing knowledge is layered:
+- `ContainerProfile` models how to open and enumerate the outer container such as an offline Registry hive, SQLite database, EVTX log, OLE compound file, or memory image.
+- `ContainerSignature` models how to recognize or carve that container from raw bytes in unallocated space or memory.
+- `ArtifactDescriptor` identifies where the artifact lives inside that container or on disk.
+- `ArtifactParsingProfile` captures artifact-specific semantics such as `UserAssist` ROT13 or BITS job reconstruction.
+- `RecordSignature` models how to recognize or validate individual records or payloads inside a container, including carved fragments.
+- `Decoder` is reserved for compact, stable transforms we can safely implement in-core.
+- Keep `ArtifactDescriptor` for artifact location, significance, field schema, ATT&CK mapping, triage value, and authoritative citations.
+- Keep `ArtifactParsingProfile` for format knowledge and analyst guidance that does not fit a small stable decoder.
+- Implement in-core decoders only for compact, stable encodings where the logic is intrinsic to the artifact model, such as `UserAssist`, `MRUListEx`, `FILETIME`, `REG_MULTI_SZ`, or PCA record layouts.
+- Do not keep pushing large or evolving formats such as `hiberfil.sys`, BITS job stores, or full WMI repository parsing into this crate's core decode engine.
+- If execution-grade parsers are needed later, put them in a separate parsing module or companion crate rather than turning the catalog itself into a full parser framework.
+
+## Knowledge Base Architecture
+
+The repository keeps DFIR knowledge in multiple linked layers: source corpus inventory, module-level references, artifact descriptors, parsing guidance, and carving/signature guidance.
+
+```mermaid
+flowchart TD
+    A[Curated DFIR Source Corpus] --> A1[archive/sources/manual-sources.json]
+    A --> A2[archive/sources/catalog-directories.json]
+    A --> A3[archive/sources/dfir-feeds.opml]
+    A1 --> B[scripts/normalize_sources.py]
+    A2 --> B
+    A3 --> B
+    B --> C[archive/sources/source-inventory.json]
+    C --> D[src/references.rs]
+    C --> E[docs/module-sources.md]
+    D --> F[ModuleReference]
+    E --> G[Maintainer Docs]
+    C --> H[src/artifact.rs]
+    H --> I[ArtifactDescriptor]
+    H --> J[ContainerProfile]
+    H --> K[ContainerSignature]
+    H --> L[ArtifactParsingProfile]
+    H --> M[RecordSignature]
+    I --> N[CATALOG API]
+    J --> N
+    K --> N
+    L --> N
+    M --> N
+```
+
+### Parsing Stack
+
+```mermaid
+flowchart TD
+    A[Raw Bytes or Acquired Files] --> B[ContainerSignature]
+    B --> C[ContainerProfile]
+    C --> D[ArtifactDescriptor]
+    D --> E[ArtifactParsingProfile]
+    E --> F[Decoder]
+    D --> G[RecordSignature]
+    G --> E
+    F --> H[ArtifactRecord]
+```
+
+`UserAssist` is the canonical example:
+- `ContainerSignature`: Registry hive carving guidance like `regf`, `hbin`, `nk`, and `vk`
+- `ContainerProfile`: open `NTUSER.DAT` as an offline Registry hive
+- `ArtifactDescriptor`: locate `UserAssist\\{GUID}\\Count`
+- `ArtifactParsingProfile`: ROT13 the value name and interpret the Count payload
+- `RecordSignature`: validate the 72-byte `UserAssist` Count payload when carving fragments
+- `Decoder`: perform the actual ROT13 and binary field extraction
+
 ## Source provenance
 
 Module-level research provenance is available through `forensic_catalog::references`.
@@ -157,4 +233,3 @@ assert!(!desc.sources.is_empty());
 ## Used by
 
 - [`RapidTriage`](https://github.com/SecurityRonin/RapidTriage) — live incident response triage tool
-

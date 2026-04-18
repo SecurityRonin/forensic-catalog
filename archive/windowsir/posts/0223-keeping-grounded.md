@@ -1,0 +1,14 @@
+# Keeping Grounded
+
+- URL: https://windowsir.blogspot.com/2022/12/keeping-grounded.html
+- Published: 2022-12-31T18:39:00.002-05:00
+- Updated: 2022-12-31T18:39:29.852-05:00
+- Labels: none
+
+As 2022 comes to a close, I reflect back over the past year, and the previous years that have gone before. I know we find it fascinating to hear "experts" make predictions for the future, but I tend to believe that there's more value in reflecting on and learning from the past.
+ Years ago, I remember hearing about something in legal circles referred to as " the CSI effect ". In short, the unrealistic portrayal of "forensics" on TV shows had influenced public opinion. People would watch an hour-long crime drama TV show and what they saw set the expectation in their minds of "forensics" should be, and this unrealistic expectation made it difficult for prosecutors to convince some juries of their evidence.
+ Over the holiday season, a "bomb cyclone" across the US combined with the numbers of folks wanting to travel to cause travel delays with the airlines, as one might expect. Planes needed to be deiced, but at some locations, travel was simply impossible. However, one airline in particular experienced heavier than usual delays and cancellations, to the point where the Transportation Secretary took notice. For several days, the evening national news covered this story, focusing in on the failures of the airline, and how stranded passengers were standing in long lines just to seek assistance from the airline's customer service. As each day went by and media reports highlighted how the cascading failures were snowballing and impacting travelers, all of this served to create an sense of negativity toward the airline management. Everyone I spoke with over the holidays had the same negative perspective of the airline's management.
+ On the morning of 28 Dec 2022, I saw the following post on LinkedIn :
+
+ Erin's message served as a stark reminder that there's often more to the story, that regardless of what we see being reported in the media, there are often stories that are not covered and reported, and that do not make it into the public eye. News outlets have a limited amount of time to cover a hand-picked menu of events of the day, so we have to be conscious of "collection bias", and if what we're seeing and hearing is playing into a narrative that we assume is correct.
+ The point here is to remain grounded, and as we roll over into the New Year, this is a good opportunity to make a resolution to remain grounded, and to seek out accountability partners and mentors to help us remain grounded. Don't be so focused on the negative aspects of an event that we loose sight of the positive things that happen, and that the folks who make those positive things happen need our support more than someone we believe is to blame needs our anger.

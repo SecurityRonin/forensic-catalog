@@ -3,98 +3,88 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/SecurityRonin/forensic-catalog/ci.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/SecurityRonin/forensic-catalog/actions/workflows/ci.yml)
 [![license](https://img.shields.io/crates/l/forensic-catalog?style=for-the-badge)](LICENSE)
 [![rust](https://img.shields.io/badge/rust-1.75+-orange?style=for-the-badge&logo=rust)](https://www.rust-lang.org)
+[![Sponsor](https://img.shields.io/github/sponsors/h4x0r?style=for-the-badge&logo=github&label=Sponsor&color=ea4aaa)](https://github.com/sponsors/h4x0r)
 
 # forensic-catalog
 
-Forensic knowledge as code — zero-dependency, `std`-only, embeds in any Rust binary.
+**Stop hardcoding artifact paths and MITRE tags into your DFIR tool.**
 
-## Docs
-
-| | |
-|---|---|
-| [DFIR Handbook](https://securityronin.github.io/forensic-catalog/forensic_catalog/handbook/) | Analyst-facing artifact guide, investigation paths, carving guidance |
-| [API Reference](https://docs.rs/forensic-catalog) | Full rustdoc — all structs, enums, and functions |
-| [Architecture Diagram](https://securityronin.github.io/forensic-catalog/architecture.html) | Data-flow diagram: raw bytes → ArtifactRecord |
-| [Module Source Map](docs/module-sources.md) | Per-module authoritative reference list |
-| [Source Inventory](archive/sources/source-inventory.md) | Normalized DFIR source corpus |
-
-## Quick start
+150+ forensic artifacts — registry keys, files, event logs — each with a decoder, MITRE ATT&CK mapping, triage priority, and source citations. Embed it all in one line.
 
 ```toml
 [dependencies]
 forensic-catalog = "0.1"
 ```
 
+Zero dependencies. No I/O. Everything lives in `const` memory.
+
+---
+
+## See it in 30 seconds
+
 ```rust
 use forensic_catalog::ports::is_suspicious_port;
 use forensic_catalog::catalog::{CATALOG, TriagePriority};
 
-// Instant port check — no allocations
+// Boolean port check — no allocations
 assert!(is_suspicious_port(4444)); // Metasploit default
 
-// Pull every Critical-priority artifact, sorted for triage
-let critical: Vec<_> = CATALOG
+// What to look at first — sorted Critical → High → Medium → Low
+let top = CATALOG
     .for_triage()
     .into_iter()
     .filter(|d| d.triage_priority == TriagePriority::Critical)
-    .collect();
+    .collect::<Vec<_>>();
 ```
 
-## What's inside
+If that looks useful, keep reading.
 
-| Module | Covers | Key function / constant |
-|---|---|---|
-| `ports` | C2 ports, Cobalt Strike, Tor, WinRM, RAT defaults | `is_suspicious_port(port)` |
-| `lolbins` | Windows + Linux LOLBins | `WINDOWS_LOLBINS`, `LINUX_LOLBINS` |
-| `processes` | Known malware process names | `MALWARE_PROCESS_NAMES` |
-| `commands` | Reverse shells, PowerShell abuse, download cradles | pattern slices |
-| `paths` | Suspicious filesystem paths | path slices |
-| `persistence` | Windows Run keys, Linux cron/init, macOS LaunchAgents | `WINDOWS_RUN_KEYS`, `LINUX_PERSISTENCE_PATHS`, `MACOS_PERSISTENCE_PATHS` |
-| `catalog` | 150+ `ArtifactDescriptor`s with MITRE ATT&CK, triage priority, decode logic | `CATALOG` |
-| `antiforensics` | Anti-forensics indicator paths and patterns | indicator slices |
-| `encryption` | FDE artifact paths, credential store locations | path slices |
-| `remote_access` | Remote access tool indicators (RMM, RAT, VPN) | indicator slices |
-| `third_party` | OneDrive, PuTTY, and other third-party app artifact paths | path slices |
-| `pca` | Windows Program Compatibility Assistant artifacts | path / key constants |
-| `references` | Queryable authoritative source map for each public module | `module_references(name)` |
+---
 
-## The `ForensicCatalog` API
+## Why use this instead of rolling your own?
 
-The `catalog` module is the power feature. Every artifact descriptor is a `const`-constructible `ArtifactDescriptor` — MITRE ATT&CK tags, triage priority, retention period, cross-correlation links, and embedded decode logic all in one static struct. No I/O, no allocation until you query.
+Every DFIR tool eventually accumulates a hand-rolled list of artifact paths, MITRE tags, and triage rules scattered across constants, comments, and config files. That list drifts, goes uncited, and becomes a maintenance burden.
 
-### Query by MITRE technique
+`forensic-catalog` is that list, structured:
+
+- Each artifact has a **known location** (hive, key path, file path), a **decoder**, a **triage priority**, and **authoritative source URLs** — all in one `const`-constructible struct
+- The catalog is **queryable** — by MITRE technique, triage priority, keyword, or structured filter
+- **Zero deps** — no supply-chain risk, embeds in any binary including `#![no_std]`-adjacent tooling
+
+---
+
+## Decode a raw artifact
 
 ```rust
 use forensic_catalog::catalog::CATALOG;
 
-// All artifacts relevant to process injection
-let artifacts = CATALOG.by_mitre("T1055");
-for d in &artifacts {
-    println!("{} — {}", d.id, d.meaning);
-}
+let d = CATALOG.by_id("userassist_exe").unwrap();
+let record = CATALOG.decode(d, value_name, raw_bytes)?;
+
+// record.fields      — Vec<(&str, ArtifactValue)>: typed field pairs
+// record.timestamp   — Option<String>: ISO 8601 UTC when present
+// record.mitre_techniques — carried from the descriptor
+// record.uid         — stable unique ID built from key fields
 ```
 
-### Triage-ordered collection list
+Built-in decoders: `Rot13Name` (UserAssist), `FiletimeAt` (FILETIME → ISO 8601), `BinaryRecord` (fixed struct layout), `MruListEx`, `MultiSz`, `Utf16Le`.
+
+---
+
+## Query the catalog
 
 ```rust
-let ordered = CATALOG.for_triage(); // Critical → High → Medium → Low
-for d in ordered.iter().take(10) {
-    println!("[{:?}] {} — {}", d.triage_priority, d.id, d.name);
-}
-```
+// All artifacts relevant to a MITRE technique
+let hits = CATALOG.by_mitre("T1547.001");
 
-### Keyword search
+// Triage-ordered list — Critical first
+let ordered = CATALOG.for_triage();
 
-```rust
+// Keyword search across name and meaning
 let hits = CATALOG.filter_by_keyword("prefetch");
-// matches on name or meaning, case-insensitive
-```
 
-### Structured filter
-
-```rust
+// Structured filter
 use forensic_catalog::catalog::{ArtifactQuery, DataScope, HiveTarget};
-
 let hits = CATALOG.filter(&ArtifactQuery {
     scope: Some(DataScope::User),
     hive: Some(HiveTarget::NtUser),
@@ -102,24 +92,53 @@ let hits = CATALOG.filter(&ArtifactQuery {
 });
 ```
 
-### Decode raw artifact data
+---
+
+## Indicator tables
+
+Ten flat lookup modules — no schema, no decoder, just fast boolean checks:
 
 ```rust
-use forensic_catalog::catalog::CATALOG;
-
-let descriptor = CATALOG.by_id("userassist_exe").unwrap();
-let record = CATALOG.decode(descriptor, value_name, raw_bytes)?;
-// record.fields — decoded field name/value pairs
-// record.timestamp — ISO 8601 UTC string, if present
-// record.mitre_techniques — inherited from the descriptor
+use forensic_catalog::{
+    ports::is_suspicious_port,
+    lolbins::is_windows_lolbin,
+    processes::MALWARE_PROCESS_NAMES,
+    persistence::WINDOWS_RUN_KEYS,
+    remote_access::is_lolrmm_path,
+    third_party::identify_application,
+};
 ```
 
 <details>
-<summary>ArtifactDescriptor fields</summary>
+<summary>Full module list</summary>
+
+| Module | Covers | Key API |
+|---|---|---|
+| `ports` | C2, Cobalt Strike, Tor, WinRM, RAT defaults | `is_suspicious_port(u16)` |
+| `lolbins` | Windows LOLBAS + Linux GTFOBins | `is_windows_lolbin(&str)`, `is_linux_lolbin(&str)` |
+| `processes` | Known malware / masquerade process names | `MALWARE_PROCESS_NAMES` |
+| `commands` | Reverse shells, PowerShell abuse, download cradles | pattern slices |
+| `paths` | Suspicious staging and hijack paths | path slices |
+| `persistence` | Run keys, cron/init, LaunchAgents, IFEO, AppInit | `WINDOWS_RUN_KEYS`, `LINUX_PERSISTENCE_PATHS`, `MACOS_PERSISTENCE_PATHS` |
+| `antiforensics` | Log-wipe, timestomping, rootkit indicators | indicator slices |
+| `encryption` | BitLocker, EFS, VeraCrypt, Tor, archive tools | path slices |
+| `remote_access` | LOLRMM / RMM tool indicators | `all_lolrmm_paths()`, `is_lolrmm_path(&str)` |
+| `third_party` | PuTTY, WinSCP, OneDrive, Chrome, Dropbox | `identify_application(&str)` |
+| `pca` | Windows 11 Program Compatibility Assistant | path / key constants |
+| `references` | Queryable source map per module | `module_references(name)` |
+
+</details>
+
+---
+
+<details>
+<summary>ArtifactDescriptor — full field reference</summary>
+
+Every entry in `CATALOG` is a `const`-constructible `ArtifactDescriptor`:
 
 | Field | Type | Description |
 |---|---|---|
-| `id` | `&'static str` | Machine-readable identifier (e.g. `"userassist"`) |
+| `id` | `&'static str` | Machine-readable identifier, e.g. `"userassist_exe"` |
 | `name` | `&'static str` | Human-readable display name |
 | `artifact_type` | `ArtifactType` | `RegistryKey`, `RegistryValue`, `File`, `Directory`, `EventLog`, `MemoryRegion` |
 | `hive` | `Option<HiveTarget>` | Registry hive, or `None` for file/memory artifacts |
@@ -130,69 +149,21 @@ let record = CATALOG.decode(descriptor, value_name, raw_bytes)?;
 | `meaning` | `&'static str` | Forensic significance |
 | `mitre_techniques` | `&'static [&'static str]` | ATT&CK technique IDs |
 | `fields` | `&'static [FieldSchema]` | Decoded output field schema |
-| `retention` | `Option<&'static str>` | How long artifact typically persists |
+| `retention` | `Option<&'static str>` | How long the artifact typically persists |
 | `triage_priority` | `TriagePriority` | `Critical` / `High` / `Medium` / `Low` |
 | `related_artifacts` | `&'static [&'static str]` | Cross-correlation artifact IDs |
 | `sources` | `&'static [&'static str]` | Authoritative source URLs (MITRE, SANS, vendor docs) |
 
 </details>
 
-## Design philosophy
+---
 
-- **Zero dependencies** — `Cargo.toml` has no `[dependencies]`. No transitive supply-chain risk.
-- **No I/O** — every function operates on values passed in. Reading files, registry, or memory is the caller's job.
-- **`const`/`static`-friendly** — `ArtifactDescriptor` and all its enums are constructible in `const` context. Extend the catalog at compile time.
-- **Test-driven** — every indicator table has positive and negative test cases. Run `cargo test` to verify coverage.
-- **Additive** — each module is independent. Pull in only what you need.
+<details>
+<summary>Parsing stack and scope boundary</summary>
 
-## Scope Boundary
+This crate is a **forensic catalog**, not a full parsing engine. Compact stable transforms (UserAssist ROT13, FILETIME, MRU ordering) live in-core. Large evolving parsers (hiberfil.sys, full WMI repository, BITS job store) belong in separate companion crates.
 
-This project is a forensic catalog first, not a full DFIR parsing engine.
-
-- Parsing knowledge is layered:
-- `ContainerProfile` models how to open and enumerate the outer container such as an offline Registry hive, SQLite database, EVTX log, OLE compound file, or memory image.
-- `ContainerSignature` models how to recognize or carve that container from raw bytes in unallocated space or memory.
-- `ArtifactDescriptor` identifies where the artifact lives inside that container or on disk.
-- `ArtifactParsingProfile` captures artifact-specific semantics such as `UserAssist` ROT13 or BITS job reconstruction.
-- `RecordSignature` models how to recognize or validate individual records or payloads inside a container, including carved fragments.
-- `Decoder` is reserved for compact, stable transforms we can safely implement in-core.
-- Keep `ArtifactDescriptor` for artifact location, significance, field schema, ATT&CK mapping, triage value, and authoritative citations.
-- Keep `ArtifactParsingProfile` for format knowledge and analyst guidance that does not fit a small stable decoder.
-- Implement in-core decoders only for compact, stable encodings where the logic is intrinsic to the artifact model, such as `UserAssist`, `MRUListEx`, `FILETIME`, `REG_MULTI_SZ`, or PCA record layouts.
-- Do not keep pushing large or evolving formats such as `hiberfil.sys`, BITS job stores, or full WMI repository parsing into this crate's core decode engine.
-- If execution-grade parsers are needed later, put them in a separate parsing module or companion crate rather than turning the catalog itself into a full parser framework.
-
-## Knowledge Base Architecture
-
-The repository keeps DFIR knowledge in multiple linked layers: source corpus inventory, module-level references, artifact descriptors, parsing guidance, and carving/signature guidance.
-
-```mermaid
-flowchart TD
-    A[Curated DFIR Source Corpus] --> A1[archive/sources/manual-sources.json]
-    A --> A2[archive/sources/catalog-directories.json]
-    A --> A3[archive/sources/dfir-feeds.opml]
-    A1 --> B[scripts/normalize_sources.py]
-    A2 --> B
-    A3 --> B
-    B --> C[archive/sources/source-inventory.json]
-    C --> D[src/references.rs]
-    C --> E[docs/module-sources.md]
-    D --> F[ModuleReference]
-    E --> G[Maintainer Docs]
-    C --> H[src/artifact.rs]
-    H --> I[ArtifactDescriptor]
-    H --> J[ContainerProfile]
-    H --> K[ContainerSignature]
-    H --> L[ArtifactParsingProfile]
-    H --> M[RecordSignature]
-    I --> N[CATALOG API]
-    J --> N
-    K --> N
-    L --> N
-    M --> N
-```
-
-### Parsing Stack
+Parsing knowledge is layered:
 
 ```mermaid
 flowchart TD
@@ -200,39 +171,42 @@ flowchart TD
     B --> C[ContainerProfile]
     C --> D[ArtifactDescriptor]
     D --> E[ArtifactParsingProfile]
-    E --> F[Decoder]
     D --> G[RecordSignature]
     G --> E
+    E --> F[Decoder]
     F --> H[ArtifactRecord]
 ```
 
-`UserAssist` is the canonical example:
-- `ContainerSignature`: Registry hive carving guidance like `regf`, `hbin`, `nk`, and `vk`
-- `ContainerProfile`: open `NTUSER.DAT` as an offline Registry hive
-- `ArtifactDescriptor`: locate `UserAssist\\{GUID}\\Count`
-- `ArtifactParsingProfile`: ROT13 the value name and interpret the Count payload
-- `RecordSignature`: validate the 72-byte `UserAssist` Count payload when carving fragments
-- `Decoder`: perform the actual ROT13 and binary field extraction
+- **`ContainerSignature`** — magic bytes, offsets, and structural invariants for recognizing or carving outer containers
+- **`ContainerProfile`** — how to open and enumerate a container (Registry hive, SQLite, EVTX, OLE CFB, memory image)
+- **`ArtifactDescriptor`** — where the artifact lives inside that container and why it matters
+- **`ArtifactParsingProfile`** — artifact-specific semantics (UserAssist ROT13, WMI subscription triads)
+- **`RecordSignature`** — carving and validation of individual records or payload fragments
+- **`Decoder`** — compact in-core transforms
 
-## Source provenance
-
-Module-level research provenance is available through `forensic_catalog::references`.
+All layers are queryable via `CATALOG`:
 
 ```rust
-use forensic_catalog::references::module_references;
-
-let refs = module_references("persistence").unwrap();
-assert!(refs.urls.iter().any(|url| url.contains("attack.mitre.org")));
+let cp  = CATALOG.container_profile("windows_registry_hive");
+let cs  = CATALOG.container_signature("windows_registry_hive");
+let pp  = CATALOG.parsing_profile("userassist_exe");
+let rs  = CATALOG.record_signatures("userassist_exe");
 ```
 
-Artifact-level provenance remains embedded directly in the catalog:
+</details>
 
-```rust
-use forensic_catalog::catalog::CATALOG;
+---
 
-let desc = CATALOG.by_id("userassist_exe").unwrap();
-assert!(!desc.sources.is_empty());
-```
+## Docs
+
+| | |
+|---|---|
+| [DFIR Handbook](https://securityronin.github.io/forensic-catalog/forensic_catalog/handbook/) | Artifact families, investigation paths, carving guidance |
+| [API Reference](https://docs.rs/forensic-catalog) | Full rustdoc |
+| [Architecture Diagram](https://securityronin.github.io/forensic-catalog/architecture.html) | Data-flow: raw bytes → ArtifactRecord |
+| [Module Source Map](docs/module-sources.md) | Per-module authoritative references |
+
+---
 
 ## Used by
 

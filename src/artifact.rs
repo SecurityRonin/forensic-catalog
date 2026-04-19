@@ -1799,7 +1799,7 @@ pub static RUN_KEY_HKLM_RUN: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[
-        "run_key_hklm_run",
+        "run_key_hklm_once",
         "services_imagepath",
         "scheduled_tasks_dir",
     ],
@@ -1916,7 +1916,7 @@ pub static RUN_KEY_HKCU_RUN: ArtifactDescriptor = ArtifactDescriptor {
     fields: RUN_KEY_FIELDS,
     retention: None,
     triage_priority: TriagePriority::High,
-    related_artifacts: &["run_key_hklm_run", "startup_folder_user"],
+    related_artifacts: &["run_key_hklm", "startup_folder_user"],
     sources: &[
         "https://attack.mitre.org/techniques/T1547/001/",
         "https://learn.microsoft.com/en-us/windows/win32/setupapi/run-and-runonce-registry-keys",
@@ -7247,23 +7247,20 @@ mod catalog_integrity {
     fn no_duplicate_ids() {
         let mut seen = std::collections::HashSet::new();
         for d in CATALOG.list() {
-            assert!(
-                seen.insert(d.id),
-                "duplicate artifact id: {}", d.id
-            );
+            assert!(seen.insert(d.id), "duplicate artifact id: {}", d.id);
         }
     }
 
     #[test]
     fn all_related_artifacts_exist() {
-        let ids: std::collections::HashSet<&str> =
-            CATALOG.list().iter().map(|d| d.id).collect();
+        let ids: std::collections::HashSet<&str> = CATALOG.list().iter().map(|d| d.id).collect();
         for d in CATALOG.list() {
             for related in d.related_artifacts {
                 assert!(
                     ids.contains(related),
                     "artifact '{}' references unknown related artifact '{}'",
-                    d.id, related
+                    d.id,
+                    related
                 );
             }
         }
@@ -7274,14 +7271,20 @@ mod catalog_integrity {
         // Valid: T1234 or T1234.001
         let valid = |s: &str| -> bool {
             let bytes = s.as_bytes();
-            if bytes.len() < 5 { return false; }
-            if bytes[0] != b'T' { return false; }
+            if bytes.len() < 5 {
+                return false;
+            }
+            if bytes[0] != b'T' {
+                return false;
+            }
             let digits: &[u8] = if bytes.len() == 5 {
                 &bytes[1..5]
             } else if bytes.len() == 9 && bytes[5] == b'.' {
                 // check sub-technique: T1234.001
                 let sub = &bytes[6..9];
-                if !sub.iter().all(|b| b.is_ascii_digit()) { return false; }
+                if !sub.iter().all(|b| b.is_ascii_digit()) {
+                    return false;
+                }
                 &bytes[1..5]
             } else {
                 return false;
@@ -7293,7 +7296,8 @@ mod catalog_integrity {
                 assert!(
                     valid(technique),
                     "artifact '{}' has invalid MITRE technique id '{}'",
-                    d.id, technique
+                    d.id,
+                    technique
                 );
             }
         }
@@ -7302,10 +7306,7 @@ mod catalog_integrity {
     #[test]
     fn all_entries_have_sources() {
         for d in CATALOG.list() {
-            assert!(
-                !d.sources.is_empty(),
-                "artifact '{}' has no sources", d.id
-            );
+            assert!(!d.sources.is_empty(), "artifact '{}' has no sources", d.id);
         }
     }
 
@@ -7314,7 +7315,8 @@ mod catalog_integrity {
         for d in CATALOG.list() {
             assert!(
                 !d.meaning.is_empty(),
-                "artifact '{}' has empty meaning", d.id
+                "artifact '{}' has empty meaning",
+                d.id
             );
         }
     }
@@ -7325,7 +7327,9 @@ mod catalog_integrity {
             for src in d.sources {
                 assert!(
                     src.starts_with("https://") || src.starts_with("http://"),
-                    "artifact '{}' has non-URL source: {}", d.id, src
+                    "artifact '{}' has non-URL source: {}",
+                    d.id,
+                    src
                 );
             }
         }

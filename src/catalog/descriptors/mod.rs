@@ -1,1685 +1,18 @@
-//! Universal forensic artifact catalog.
+//! Static [`ArtifactDescriptor`] instances and the [`CATALOG_ENTRIES`] slice.
 //!
-//! Provides a self-describing, queryable registry of forensic artifact locations
-//! (registry keys, files, event logs) with embedded decode logic. Consumers
-//! query the catalog by id, hive, scope, or MITRE technique and receive fully
-//! decoded [`ArtifactRecord`] values -- never raw bytes.
-//!
-//! # Design principles
-//!
-//! - **Zero mandatory external deps** -- FILETIME conversion and ROT13 are pure
-//!   math/ASCII. Timestamps are ISO 8601 `String`s.
-//! - **`const`/`static`-friendly** -- [`ArtifactDescriptor`] and its constituent
-//!   enums are all constructible in `const` context. [`Decoder`] is flat (no
-//!   recursive `&'static Decoder`).
-//! - **Additive** -- existing modules (`ports`, `persistence`, ...) are untouched.
-//!   This module is purely additive.
-//! - **Single source of truth** -- artifact paths, decode logic, field schemas,
-//!   and MITRE mappings live here. Consumers never hardcode them.
-//!
-//! # Curated source corpus
-//!
-//! Artifact additions in this module are researched from a maintained DFIR source
-//! corpus. The authoritative inventory now lives in machine-readable form under
-//! `archive/sources/`:
-//!
-//! - `catalog-directories.json` for directory-style discovery pages
-//! - `manual-sources.json` for curated manual additions and knowledge bases
-//! - `dfir-feeds.opml` for subscribed RSS/Atom feeds
-//! - `source-inventory.json` for the normalized canonical inventory
-//!
-//! The catalog should prefer primary/vendor documentation and well-cited
-//! practitioner research over generic security blogging. Individual
-//! [`ArtifactDescriptor::sources`] entries should still point to the specific
-//! authoritative references that justify each artifact; the maintained source
-//! corpus is discovery input, not a blanket citation.
-//!
-//! Parser knowledge is layered:
-//!
-//! - [`ContainerProfile`] models how to open and enumerate the outer container
-//!   such as an offline Registry hive, SQLite database, EVTX log, or memory image.
-//! - [`ContainerSignature`] models how to recognize or carve that container
-//!   from raw bytes in unallocated space or memory.
-//! - [`ArtifactDescriptor`] identifies where the artifact lives inside that
-//!   container or on disk.
-//! - [`ArtifactParsingProfile`] captures artifact-specific interpretation rules
-//!   such as "UserAssist names are ROT13" or "BITS jobs must be reconstructed
-//!   from qmgr*.dat records".
-//! - [`RecordSignature`] models how to recognize or validate individual records
-//!   or payloads inside a container when carving or validating fragments.
-//! - [`Decoder`] is reserved for compact, stable transforms we can implement
-//!   safely in-core.
-
-// ── Core enums ───────────────────────────────────────────────────────────────
-
-/// The kind of forensic artifact location.
-#[non_exhaustive]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum ArtifactType {
-    /// A registry key (container of values).
-    RegistryKey,
-    /// A specific registry value.
-    RegistryValue,
-    /// A file on disk.
-    File,
-    /// A directory on disk.
-    Directory,
-    /// A Windows Event Log channel.
-    EventLog,
-    /// A region of process/physical memory.
-    MemoryRegion,
-}
-
-/// Which Windows registry hive an artifact lives in.
-#[non_exhaustive]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum HiveTarget {
-    HklmSystem,
-    HklmSoftware,
-    HklmSam,
-    HklmSecurity,
-    NtUser,
-    UsrClass,
-    Amcache,
-    Bcd,
-    /// Non-registry artifacts (files, event logs, memory).
-    None,
-}
-
-/// Whether the artifact is per-user, system-wide, or mixed.
-#[non_exhaustive]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum DataScope {
-    User,
-    System,
-    Network,
-    Mixed,
-}
-
-/// Minimum OS version / platform required for the artifact to exist.
-#[non_exhaustive]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum OsScope {
-    // ── Windows ──────────────────────────────────────────────────────────
-    All,
-    Win7Plus,
-    Win8Plus,
-    Win10Plus,
-    Win11Plus,
-    Win11_22H2,
-    // ── Linux ────────────────────────────────────────────────────────────
-    /// All Linux distributions (kernel + standard POSIX userland).
-    Linux,
-    /// systemd-based distros (Ubuntu 16.04+, Fedora 15+, Debian 8+, Arch).
-    LinuxSystemd,
-    /// Debian / Ubuntu specific paths or tools.
-    LinuxDebian,
-    /// Red Hat / CentOS / Fedora specific paths.
-    LinuxRhel,
-}
-
-// ── Binary field layout ──────────────────────────────────────────────────────
-
-/// Primitive type of a field inside a fixed-layout binary record.
-#[non_exhaustive]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BinaryFieldType {
-    U16Le,
-    U32Le,
-    U64Le,
-    I32Le,
-    I64Le,
-    FiletimeLe,
-    Bytes { len: usize },
-}
-
-/// One field inside a fixed-layout binary record (e.g. the 72-byte UserAssist
-/// value). Fully `const`-constructible.
-#[non_exhaustive]
-#[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct BinaryField {
-    pub name: &'static str,
-    pub offset: usize,
-    pub field_type: BinaryFieldType,
-    pub description: &'static str,
-}
-
-// ── Decoder ──────────────────────────────────────────────────────────────────
-
-/// Describes how to decode raw bytes (and/or a registry value name) into
-/// structured fields.
-///
-/// This enum is intentionally **flat** -- no recursive `&'static Decoder` --
-/// so every variant is usable in `const`/`static` context.
-#[non_exhaustive]
-#[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Decoder {
-    /// Pass-through: interpret raw bytes as UTF-8 text. Single field "value".
-    Identity,
-    /// ROT13-decode the *name* parameter. Single field "program".
-    Rot13Name,
-    /// Read an 8-byte little-endian FILETIME at the given byte offset.
-    FiletimeAt { offset: usize },
-    /// Interpret raw bytes as UTF-16LE text.
-    Utf16Le,
-    /// Split the *name* (or raw as UTF-8) on `|` and zip with field names.
-    PipeDelimited { fields: &'static [&'static str] },
-    /// Read a little-endian u32 from raw bytes.
-    DwordLe,
-    /// REG_MULTI_SZ: NUL-separated UTF-16LE strings terminated by double NUL.
-    MultiSz,
-    /// MRUListEx: u32-LE index list terminated by 0xFFFFFFFF.
-    MruListEx,
-    /// Parse a fixed-layout binary record using the given field descriptors.
-    BinaryRecord(&'static [BinaryField]),
-    /// ROT13-decode the *name*, then parse the binary *value* using field
-    /// descriptors. Combined output has "program" plus all binary fields.
-    Rot13NameWithBinaryValue(&'static [BinaryField]),
-}
-
-// ── Field schema (describes output fields) ───────────────────────────────────
-
-/// The semantic type of a decoded output field value.
-#[non_exhaustive]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum ValueType {
-    Text,
-    Integer,
-    UnsignedInt,
-    Timestamp,
-    Bytes,
-    Bool,
-    List,
-}
-
-/// Describes one field in a decoded artifact record -- purely metadata, no data.
-#[non_exhaustive]
-#[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct FieldSchema {
-    pub name: &'static str,
-    pub value_type: ValueType,
-    pub description: &'static str,
-    /// If `true`, this field participates in the record's unique identifier.
-    pub is_uid_component: bool,
-}
-
-/// Triage collection priority for this artifact during live incident response.
-#[non_exhaustive]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum TriagePriority {
-    /// Must collect immediately — volatile, high forensic value, or credential exposure.
-    Critical = 3,
-    /// Collect in first pass — strong execution/persistence evidence.
-    High = 2,
-    /// Collect when time permits — useful but less time-sensitive.
-    Medium = 1,
-    /// Collect last — low volatility, supporting evidence only.
-    Low = 0,
-}
-
-// ── ArtifactDescriptor (the catalog entry) ───────────────────────────────────
-
-/// A single entry in the forensic artifact catalog. Fully `const`-constructible
-/// so it can live in a `static`.
-#[non_exhaustive]
-#[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ArtifactDescriptor {
-    /// Short machine-readable identifier, e.g. `"userassist"`.
-    pub id: &'static str,
-    /// Human-readable display name.
-    pub name: &'static str,
-    /// What kind of artifact location this is.
-    pub artifact_type: ArtifactType,
-    /// Which registry hive, or `None` for non-registry artifacts.
-    pub hive: Option<HiveTarget>,
-    /// Registry key path relative to the hive root (empty for non-registry).
-    pub key_path: &'static str,
-    /// Specific registry value name, if targeting a single value.
-    pub value_name: Option<&'static str>,
-    /// Filesystem path, for file/directory artifacts.
-    pub file_path: Option<&'static str>,
-    /// User vs System vs Mixed scope.
-    pub scope: DataScope,
-    /// Minimum OS version required.
-    pub os_scope: OsScope,
-    /// How to decode the raw data.
-    pub decoder: Decoder,
-    /// Forensic meaning / significance of this artifact.
-    pub meaning: &'static str,
-    /// MITRE ATT&CK technique IDs.
-    pub mitre_techniques: &'static [&'static str],
-    /// Schema of the decoded output fields.
-    pub fields: &'static [FieldSchema],
-    /// How long this artifact typically persists before being overwritten or rotated.
-    /// `None` means indefinite (registry keys, most files until explicitly deleted).
-    pub retention: Option<&'static str>,
-    /// Live triage collection priority.
-    pub triage_priority: TriagePriority,
-    /// IDs of related catalog descriptors useful for cross-correlation.
-    pub related_artifacts: &'static [&'static str],
-    /// Authoritative external references for this artifact (SANS, Harlan Carvey,
-    /// Brian Carrier, Red Canary, Microsoft docs, MITRE ATT&CK, etc.).
-    /// Every production entry should have at least one URL.
-    pub sources: &'static [&'static str],
-}
-
-/// How to acquire and enumerate the outer container that holds one or more
-/// forensic artifacts.
-#[non_exhaustive]
-#[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerProfile {
-    /// Machine-readable identifier, e.g. `windows_registry_hive`.
-    pub id: &'static str,
-    /// Human-readable display name.
-    pub name: &'static str,
-    /// Summary of what the container represents.
-    pub summary: &'static str,
-    /// High-signal acquisition and enumeration guidance.
-    pub parser_hints: &'static [&'static str],
-    /// Authoritative references that justify the container guidance.
-    pub sources: &'static [&'static str],
-}
-
-/// How to recognize or carve a container format from raw bytes.
-#[non_exhaustive]
-#[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerSignature {
-    /// Container id this signature belongs to.
-    pub container_id: &'static str,
-    /// Human-readable name for the signature.
-    pub name: &'static str,
-    /// Expected magic or marker bytes near the start of the structure.
-    pub header_magic: &'static [u8],
-    /// Optional footer or trailer bytes when the format has a stable trailer.
-    pub footer_magic: &'static [u8],
-    /// Byte offset where `header_magic` is expected.
-    pub header_offset: usize,
-    /// Minimum plausible container size.
-    pub min_size: Option<usize>,
-    /// Expected alignment or page/chunk size when applicable.
-    pub alignment: Option<usize>,
-    /// Structural validation rules beyond simple magic bytes.
-    pub invariants: &'static [&'static str],
-    /// Authoritative references for the signature or structure rules.
-    pub sources: &'static [&'static str],
-}
-
-/// Parsing guidance for artifacts whose interpretation requires more than a
-/// flat decoder or field schema.
-#[non_exhaustive]
-#[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ArtifactParsingProfile {
-    /// Catalog artifact id this guidance applies to.
-    pub artifact_id: &'static str,
-    /// Storage or serialization format analysts should expect.
-    pub format: &'static str,
-    /// Short summary of the parsing model.
-    pub summary: &'static str,
-    /// High-signal parser notes and workflow guidance.
-    pub parser_hints: &'static [&'static str],
-    /// Semantically important fields or entities to extract.
-    pub extracted_fields: &'static [&'static str],
-    /// Authoritative references that justify the parsing guidance.
-    pub sources: &'static [&'static str],
-}
-
-/// How to recognize or validate individual records or payloads inside a
-/// container, including carved fragments.
-#[non_exhaustive]
-#[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct RecordSignature {
-    /// Machine-readable record identifier.
-    pub id: &'static str,
-    /// Parent container id.
-    pub container_id: &'static str,
-    /// Optional artifact id this signature is directly associated with.
-    pub artifact_id: Option<&'static str>,
-    /// Human-readable display name.
-    pub name: &'static str,
-    /// Expected magic or marker bytes near the start of the record.
-    pub header_magic: &'static [u8],
-    /// Optional footer or trailer bytes when present and stable.
-    pub footer_magic: &'static [u8],
-    /// Byte offset where `header_magic` is expected.
-    pub header_offset: usize,
-    /// Minimum plausible record size.
-    pub min_size: Option<usize>,
-    /// Expected alignment or chunking rule.
-    pub alignment: Option<usize>,
-    /// Structural validation rules beyond simple magic bytes.
-    pub invariants: &'static [&'static str],
-    /// Authoritative references for the record structure.
-    pub sources: &'static [&'static str],
-}
-
-// ── ArtifactValue (universal decoded value) ──────────────────────────────────
-
-/// A decoded value produced by the catalog's decode logic. Uses only `std` types.
-#[non_exhaustive]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Debug, Clone, PartialEq)]
-pub enum ArtifactValue {
-    Text(String),
-    Integer(i64),
-    UnsignedInt(u64),
-    Timestamp(String),
-    Bytes(Vec<u8>),
-    Bool(bool),
-    List(Vec<ArtifactValue>),
-    Map(Vec<(String, ArtifactValue)>),
-    Null,
-}
-
-// ── ArtifactRecord (universal decoded output) ────────────────────────────────
-
-/// A fully decoded forensic artifact record. This is the universal output type
-/// that all consumers receive -- no raw bytes, no hardcoded field names.
-#[non_exhaustive]
-#[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[derive(Debug, Clone, PartialEq)]
-pub struct ArtifactRecord {
-    /// Globally unique URI, e.g. `winreg://HKCU/Software/.../value_name` or
-    /// `file:///path/to/file#line`.
-    pub uid: String,
-    /// The catalog entry id that produced this record.
-    pub artifact_id: &'static str,
-    /// Human-readable artifact name.
-    pub artifact_name: &'static str,
-    /// Data scope (User/System/...).
-    pub scope: DataScope,
-    /// OS scope.
-    pub os_scope: OsScope,
-    /// Primary timestamp in ISO 8601 UTC, if the artifact has one.
-    pub timestamp: Option<String>,
-    /// Ordered decoded field name-value pairs.
-    pub fields: Vec<(&'static str, ArtifactValue)>,
-    /// Human-readable meaning, possibly with interpolated field values.
-    pub meaning: String,
-    /// MITRE ATT&CK technique IDs applicable to this record.
-    pub mitre_techniques: Vec<&'static str>,
-    /// Confidence score 0.0-1.0, set by the decoder or classifier.
-    pub confidence: f32,
-}
-
-// ── ArtifactQuery (filter parameters) ────────────────────────────────────────
-
-/// Filter parameters for querying the catalog. All fields are optional --
-/// `None` means "match any".
-#[non_exhaustive]
-#[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[derive(Debug, Clone, Default)]
-pub struct ArtifactQuery {
-    pub scope: Option<DataScope>,
-    pub os_scope: Option<OsScope>,
-    pub artifact_type: Option<ArtifactType>,
-    pub hive: Option<HiveTarget>,
-    pub mitre_technique: Option<&'static str>,
-    pub id: Option<&'static str>,
-}
-
-// ── DecodeError ──────────────────────────────────────────────────────────────
-
-/// Errors that can occur during artifact decoding.
-#[non_exhaustive]
-#[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum DecodeError {
-    /// The raw data buffer is too short for the decoder to operate.
-    BufferTooShort { expected: usize, actual: usize },
-    /// The raw data is not valid UTF-8 where UTF-8 was expected.
-    InvalidUtf8,
-    /// The raw data is not valid UTF-16LE.
-    InvalidUtf16,
-    /// A binary field offset+size exceeds the buffer length.
-    FieldOutOfBounds {
-        field: &'static str,
-        offset: usize,
-        size: usize,
-        buf_len: usize,
-    },
-    /// The decoder variant does not apply to this data shape.
-    UnsupportedDecoder(&'static str),
-}
-
-impl core::fmt::Display for DecodeError {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::BufferTooShort { expected, actual } => {
-                write!(f, "buffer too short: need {expected} bytes, got {actual}")
-            }
-            Self::InvalidUtf8 => write!(f, "invalid UTF-8 in raw data"),
-            Self::InvalidUtf16 => write!(f, "invalid UTF-16LE in raw data"),
-            Self::FieldOutOfBounds {
-                field,
-                offset,
-                size,
-                buf_len,
-            } => write!(
-                f,
-                "field '{field}' at offset {offset} size {size} exceeds buffer length {buf_len}"
-            ),
-            Self::UnsupportedDecoder(msg) => write!(f, "unsupported decoder: {msg}"),
-        }
-    }
-}
-
-impl std::error::Error for DecodeError {}
-
-// ── ForensicCatalog ──────────────────────────────────────────────────────────
-
-/// A queryable collection of [`ArtifactDescriptor`]s with built-in decode logic.
-pub struct ForensicCatalog {
-    entries: &'static [ArtifactDescriptor],
-}
-
-impl ForensicCatalog {
-    /// Create a new catalog from a static slice of descriptors.
-    pub const fn new(entries: &'static [ArtifactDescriptor]) -> Self {
-        Self { entries }
-    }
-
-    /// Return all descriptors in the catalog.
-    pub fn list(&self) -> &[ArtifactDescriptor] {
-        self.entries
-    }
-
-    /// Look up a descriptor by its `id` field.
-    pub fn by_id(&self, id: &str) -> Option<&ArtifactDescriptor> {
-        self.entries.iter().find(|d| d.id == id)
-    }
-
-    /// Look up parsing guidance for an artifact id.
-    pub fn parsing_profile(&self, id: &str) -> Option<&'static ArtifactParsingProfile> {
-        parsing_profile(id)
-    }
-
-    /// Look up the container parsing layer for an artifact id.
-    pub fn container_profile(&self, id: &str) -> Option<&'static ContainerProfile> {
-        container_profile_for_artifact(id)
-    }
-
-    /// Look up carving/recognition guidance for an artifact's outer container.
-    pub fn container_signature(&self, id: &str) -> Option<&'static ContainerSignature> {
-        container_signature_for_artifact(id)
-    }
-
-    /// Look up carving/recognition guidance for records associated with an artifact.
-    pub fn record_signatures(&self, id: &str) -> Vec<&'static RecordSignature> {
-        record_signatures_for_artifact(id)
-    }
-
-    /// Return all descriptors matching the given query. Every `Some` field in
-    /// the query must match; `None` fields are wildcards.
-    pub fn filter(&self, query: &ArtifactQuery) -> Vec<&ArtifactDescriptor> {
-        self.entries
-            .iter()
-            .filter(|d| {
-                if let Some(scope) = query.scope {
-                    if d.scope != scope {
-                        return false;
-                    }
-                }
-                if let Some(os) = query.os_scope {
-                    if d.os_scope != os {
-                        return false;
-                    }
-                }
-                if let Some(at) = query.artifact_type {
-                    if d.artifact_type != at {
-                        return false;
-                    }
-                }
-                if let Some(hive) = query.hive {
-                    if d.hive != Some(hive) {
-                        return false;
-                    }
-                }
-                if let Some(tech) = query.mitre_technique {
-                    if !d.mitre_techniques.contains(&tech) {
-                        return false;
-                    }
-                }
-                if let Some(id) = query.id {
-                    if d.id != id {
-                        return false;
-                    }
-                }
-                true
-            })
-            .collect()
-    }
-
-    /// Return all descriptors associated with the given MITRE ATT&CK technique ID.
-    pub fn by_mitre(&self, technique: &str) -> Vec<&ArtifactDescriptor> {
-        self.entries
-            .iter()
-            .filter(|d| d.mitre_techniques.contains(&technique))
-            .collect()
-    }
-
-    /// Return all descriptors sorted by triage priority descending (Critical first).
-    /// Within the same priority, original catalog order is preserved.
-    pub fn for_triage(&self) -> Vec<&ArtifactDescriptor> {
-        let mut v: Vec<&ArtifactDescriptor> = self.entries.iter().collect();
-        v.sort_by_key(|d| std::cmp::Reverse(d.triage_priority));
-        v
-    }
-
-    /// Return all descriptors whose `meaning` or `name` contains `keyword`
-    /// (case-insensitive).
-    pub fn filter_by_keyword(&self, keyword: &str) -> Vec<&ArtifactDescriptor> {
-        let kw = keyword.to_ascii_lowercase();
-        self.entries
-            .iter()
-            .filter(|d| {
-                d.meaning.to_ascii_lowercase().contains(&kw)
-                    || d.name.to_ascii_lowercase().contains(&kw)
-            })
-            .collect()
-    }
-
-    /// Decode raw data using the descriptor's embedded decoder.
-    ///
-    /// # Parameters
-    /// - `descriptor` -- the catalog entry describing the artifact
-    /// - `name` -- the registry value name (or filename), used by ROT13 and
-    ///   PipeDelimited decoders
-    /// - `raw` -- the raw byte payload of the registry value or file content
-    pub fn decode(
-        &self,
-        descriptor: &ArtifactDescriptor,
-        name: &str,
-        raw: &[u8],
-    ) -> Result<ArtifactRecord, DecodeError> {
-        decode_artifact(descriptor, name, raw)
-    }
-}
-
-/// Returns all container-layer parsing profiles maintained by the catalog.
-pub fn all_container_profiles() -> &'static [ContainerProfile] {
-    CONTAINER_PROFILES
-}
-
-/// Returns the container profile by id.
-pub fn container_profile(id: &str) -> Option<&'static ContainerProfile> {
-    CONTAINER_PROFILES
-        .iter()
-        .find(|profile| profile.id.eq_ignore_ascii_case(id))
-}
-
-/// Returns all container carving/signature profiles maintained by the catalog.
-pub fn all_container_signatures() -> &'static [ContainerSignature] {
-    CONTAINER_SIGNATURES
-}
-
-/// Returns the container signature by container id.
-pub fn container_signature(id: &str) -> Option<&'static ContainerSignature> {
-    CONTAINER_SIGNATURES
-        .iter()
-        .find(|sig| sig.container_id.eq_ignore_ascii_case(id))
-}
-
-/// Returns the outer-container parsing profile for a catalog artifact id.
-pub fn container_profile_for_artifact(id: &str) -> Option<&'static ContainerProfile> {
-    if let Some(binding) = ARTIFACT_CONTAINER_BINDINGS
-        .iter()
-        .find(|binding| binding.artifact_id.eq_ignore_ascii_case(id))
-    {
-        return container_profile(binding.container_id);
-    }
-
-    let desc = CATALOG.by_id(id)?;
-    infer_container_profile(desc)
-}
-
-/// Returns the outer-container carving/signature guidance for a catalog artifact id.
-pub fn container_signature_for_artifact(id: &str) -> Option<&'static ContainerSignature> {
-    let profile = container_profile_for_artifact(id)?;
-    container_signature(profile.id)
-}
-
-/// Returns all parser knowledge profiles maintained by the catalog.
-pub fn all_parsing_profiles() -> &'static [ArtifactParsingProfile] {
-    PARSING_PROFILES
-}
-
-/// Returns parsing guidance for a catalog artifact id.
-pub fn parsing_profile(id: &str) -> Option<&'static ArtifactParsingProfile> {
-    PARSING_PROFILES
-        .iter()
-        .find(|profile| profile.artifact_id.eq_ignore_ascii_case(id))
-}
-
-/// Returns all record signatures maintained by the catalog.
-pub fn all_record_signatures() -> &'static [RecordSignature] {
-    RECORD_SIGNATURES
-}
-
-/// Returns record signatures associated with a container id.
-pub fn record_signatures_for_container(id: &str) -> Vec<&'static RecordSignature> {
-    RECORD_SIGNATURES
-        .iter()
-        .filter(|sig| sig.container_id.eq_ignore_ascii_case(id))
-        .collect()
-}
-
-/// Returns record signatures associated with a catalog artifact id.
-pub fn record_signatures_for_artifact(id: &str) -> Vec<&'static RecordSignature> {
-    let direct: Vec<&'static RecordSignature> = RECORD_SIGNATURES
-        .iter()
-        .filter(|sig| {
-            sig.artifact_id
-                .is_some_and(|artifact_id| artifact_id.eq_ignore_ascii_case(id))
-        })
-        .collect();
-    if !direct.is_empty() {
-        return direct;
-    }
-
-    if let Some(container_sig) = container_profile_for_artifact(id) {
-        return record_signatures_for_container(container_sig.id);
-    }
-    Vec::new()
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-struct ArtifactContainerBinding {
-    artifact_id: &'static str,
-    container_id: &'static str,
-}
-
-const WINDOWS_REGISTRY_HIVE_HINTS: &[&str] = &[
-    "Open the hive as an offline Registry container and enumerate keys, values, and raw value bytes.",
-    "Replay transaction logs when available before trusting key/value state from a copied hive.",
-    "Preserve the original value name and raw bytes so artifact-specific decoders can interpret them correctly.",
-];
-
-const REGISTRY_HIVE_INVARIANTS: &[&str] = &[
-    "Header begins with the ASCII signature 'regf' at offset 0.",
-    "Primary hive bins normally begin with 'hbin' on 0x1000 boundaries after the 4 KB hive header.",
-    "Cell records use signed size fields; negative values indicate allocated cells.",
-];
-
-const SQLITE_DATABASE_INVARIANTS: &[&str] = &[
-    "Header begins with 'SQLite format 3\\0' at offset 0.",
-    "Database page size is stored in the header and should be a power of two between 512 and 65536.",
-];
-
-const ESE_DATABASE_INVARIANTS: &[&str] = &[
-    "Header begins with the ESE/Jet signature at offset 4.",
-    "Page-based structure should remain consistent with the recorded page size and checksum rules.",
-];
-
-const OLE_COMPOUND_FILE_INVARIANTS: &[&str] = &[
-    "Header begins with the OLE compound file signature at offset 0.",
-    "Sector size and FAT/DIFAT fields must be internally consistent before trusting carved data.",
-];
-
-const EVTX_INVARIANTS: &[&str] = &[
-    "File header begins with 'ElfFile\\0' and chunks begin with 'ElfChnk\\0'.",
-    "Chunk headers and record offsets must be internally consistent before trusting carved events.",
-];
-
-const USERASSIST_RECORD_INVARIANTS: &[&str] = &[
-    "Value name is ROT13-encoded and must be decoded before path interpretation.",
-    "Win7+ Count payload is 72 bytes with last_run FILETIME at offset 60.",
-];
-
-const REGISTRY_NK_INVARIANTS: &[&str] = &[
-    "Record begins with the 'nk' key-cell signature.",
-    "Cell size and subkey/value offsets must remain within the parent hive bin.",
-];
-
-const REGISTRY_VK_INVARIANTS: &[&str] = &[
-    "Record begins with the 'vk' value-cell signature.",
-    "Name length, data length, and data offset must remain within the parent hive bin or data cell.",
-];
-
-const SQLITE_PAGE_INVARIANTS: &[&str] =
-    &["B-tree page header and cell pointers must remain within the declared page size."];
-
-const OLE_DIR_STREAM_INVARIANTS: &[&str] = &[
-    "Directory entries are 128-byte records whose sibling/child references must remain internally consistent.",
-];
-
-const EVTX_CHUNK_INVARIANTS: &[&str] =
-    &["Chunk begins with 'ElfChnk\\0' and normally spans 64 KB."];
-
-const EVTX_RECORD_INVARIANTS: &[&str] = &[
-    "EVTX records begin with the 0x2a 0x2a 0x00 0x00 signature and end with their declared size.",
-];
-
-const MEMORY_FRAGMENT_INVARIANTS: &[&str] = &[
-    "Memory-bearing sources rarely have a stable footer; validate carved fragments by internal structure and cross-artifact corroboration.",
-];
-
-const SQLITE_DATABASE_HINTS: &[&str] = &[
-    "Open the file as a SQLite database and enumerate schema, tables, and rows before applying artifact-specific queries.",
-    "Preserve raw cell values and timestamps so higher-level artifact logic can normalize them safely.",
-];
-
-const ESE_DATABASE_HINTS: &[&str] = &[
-    "Treat the file as an Extensible Storage Engine database and enumerate tables, columns, and records.",
-    "Be prepared for dirty-state handling and page-level recovery when working from copied live systems.",
-];
-
-const OLE_COMPOUND_FILE_HINTS: &[&str] = &[
-    "Open the file as an OLE compound file and enumerate storages and streams before interpreting embedded records.",
-    "Preserve stream names and raw stream bytes so artifact-specific parsers can resolve AppIDs, LNK blocks, or other structured payloads.",
-];
-
-const EVTX_HINTS: &[&str] = &[
-    "Open the file or channel as an EVTX container and enumerate records with their event IDs, providers, timestamps, and XML payloads.",
-    "Keep both rendered and raw event data available so artifact-specific logic can cross-check field extraction.",
-];
-
-const MEMORY_IMAGE_HINTS: &[&str] = &[
-    "Treat the source as a memory-bearing container whose pages must be reconstructed before higher-level artifact interpretation.",
-    "Preserve page-level provenance so extracted processes, sockets, strings, and handles can be tied back to the source image.",
-];
-
-const FLAT_FILE_HINTS: &[&str] = &[
-    "Treat the source as a flat file or directory artifact and preserve raw bytes, filenames, and timestamps before any higher-level interpretation.",
-];
-
-static CONTAINER_PROFILES: &[ContainerProfile] = &[
-    ContainerProfile {
-        id: "windows_registry_hive",
-        name: "Windows Registry Hive",
-        summary: "Offline Windows Registry hive containing keys, values, value names, and raw value bytes.",
-        parser_hints: WINDOWS_REGISTRY_HIVE_HINTS,
-        sources: &[
-            "https://github.com/mkorman90/regipy",
-            "https://github.com/EricZimmerman/Registry",
-            "https://github.com/EricZimmerman/RECmd",
-        ],
-    },
-    ContainerProfile {
-        id: "sqlite_database",
-        name: "SQLite Database",
-        summary: "SQLite database used by browser, timeline, and other application artifacts.",
-        parser_hints: SQLITE_DATABASE_HINTS,
-        sources: &[
-            "https://github.com/EricZimmerman/SQLECmd",
-            "https://github.com/EricZimmerman/WxTCmd",
-            "https://github.com/EricZimmerman/DFIR-SQL-Query-Repo",
-        ],
-    },
-    ContainerProfile {
-        id: "ese_database",
-        name: "ESE Database",
-        summary: "Extensible Storage Engine database used by Windows Search and related Windows subsystems.",
-        parser_hints: ESE_DATABASE_HINTS,
-        sources: &[
-            "https://github.com/EricZimmerman/WinSearchDBAnalyzer",
-            "https://www.sans.org/blog/windows-search-index-forensics/",
-        ],
-    },
-    ContainerProfile {
-        id: "ole_compound_file",
-        name: "OLE Compound File",
-        summary: "Compound file binary format used by Jump Lists and other multi-stream Windows artifacts.",
-        parser_hints: OLE_COMPOUND_FILE_HINTS,
-        sources: &[
-            "https://github.com/EricZimmerman/OleCf",
-            "https://github.com/EricZimmerman/JLECmd",
-            "https://github.com/EricZimmerman/LECmd",
-        ],
-    },
-    ContainerProfile {
-        id: "windows_evtx",
-        name: "Windows EVTX",
-        summary: "Windows Event Log file or channel containing structured event records.",
-        parser_hints: EVTX_HINTS,
-        sources: &[
-            "https://github.com/EricZimmerman/evtx",
-            "https://attack.mitre.org/techniques/T1070/001/",
-        ],
-    },
-    ContainerProfile {
-        id: "memory_image",
-        name: "Memory Image",
-        summary: "Memory-bearing container such as hiberfil.sys or a paging artifact.",
-        parser_hints: MEMORY_IMAGE_HINTS,
-        sources: &[
-            "https://forensics.wiki/hiberfil.sys/",
-            "https://learn.microsoft.com/en-us/troubleshoot/windows-server/performance/memory-dump-file-options",
-        ],
-    },
-    ContainerProfile {
-        id: "flat_file",
-        name: "Flat File",
-        summary: "Standalone file or directory artifact without a richer outer container model.",
-        parser_hints: FLAT_FILE_HINTS,
-        sources: &[
-            "https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file",
-        ],
-    },
-];
-
-static REGF_MAGIC: &[u8] = b"regf";
-static SQLITE_MAGIC: &[u8] = b"SQLite format 3\0";
-static ESE_MAGIC: &[u8] = &[0xef, 0xcd, 0xab, 0x89];
-static OLE_MAGIC: &[u8] = &[0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1];
-static EVTX_FILE_MAGIC: &[u8] = b"ElfFile\0";
-static MEMORY_MAGIC: &[u8] = &[];
-static NK_MAGIC: &[u8] = b"nk";
-static VK_MAGIC: &[u8] = b"vk";
-static EVTX_CHUNK_MAGIC: &[u8] = b"ElfChnk\0";
-static EVTX_RECORD_MAGIC: &[u8] = &[0x2a, 0x2a, 0x00, 0x00];
-
-static CONTAINER_SIGNATURES: &[ContainerSignature] = &[
-    ContainerSignature {
-        container_id: "windows_registry_hive",
-        name: "Windows Registry Hive Signature",
-        header_magic: REGF_MAGIC,
-        footer_magic: &[],
-        header_offset: 0,
-        min_size: Some(4096),
-        alignment: Some(4096),
-        invariants: REGISTRY_HIVE_INVARIANTS,
-        sources: &[
-            "https://github.com/mkorman90/regipy",
-            "https://github.com/EricZimmerman/Registry",
-        ],
-    },
-    ContainerSignature {
-        container_id: "sqlite_database",
-        name: "SQLite Database Header",
-        header_magic: SQLITE_MAGIC,
-        footer_magic: &[],
-        header_offset: 0,
-        min_size: Some(100),
-        alignment: None,
-        invariants: SQLITE_DATABASE_INVARIANTS,
-        sources: &[
-            "https://github.com/EricZimmerman/SQLECmd",
-            "https://github.com/EricZimmerman/DFIR-SQL-Query-Repo",
-        ],
-    },
-    ContainerSignature {
-        container_id: "ese_database",
-        name: "ESE Database Header",
-        header_magic: ESE_MAGIC,
-        footer_magic: &[],
-        header_offset: 4,
-        min_size: Some(4096),
-        alignment: Some(4096),
-        invariants: ESE_DATABASE_INVARIANTS,
-        sources: &[
-            "https://github.com/EricZimmerman/WinSearchDBAnalyzer",
-        ],
-    },
-    ContainerSignature {
-        container_id: "ole_compound_file",
-        name: "OLE Compound File Header",
-        header_magic: OLE_MAGIC,
-        footer_magic: &[],
-        header_offset: 0,
-        min_size: Some(512),
-        alignment: Some(512),
-        invariants: OLE_COMPOUND_FILE_INVARIANTS,
-        sources: &[
-            "https://github.com/EricZimmerman/OleCf",
-        ],
-    },
-    ContainerSignature {
-        container_id: "windows_evtx",
-        name: "Windows EVTX File Header",
-        header_magic: EVTX_FILE_MAGIC,
-        footer_magic: &[],
-        header_offset: 0,
-        min_size: Some(4096),
-        alignment: Some(4096),
-        invariants: EVTX_INVARIANTS,
-        sources: &[
-            "https://github.com/EricZimmerman/evtx",
-        ],
-    },
-    ContainerSignature {
-        container_id: "memory_image",
-        name: "Memory-Bearing Container Signature",
-        header_magic: MEMORY_MAGIC,
-        footer_magic: &[],
-        header_offset: 0,
-        min_size: None,
-        alignment: Some(4096),
-        invariants: MEMORY_FRAGMENT_INVARIANTS,
-        sources: &[
-            "https://forensics.wiki/hiberfil.sys/",
-            "https://learn.microsoft.com/en-us/troubleshoot/windows-server/performance/memory-dump-file-options",
-        ],
-    },
-];
-
-static ARTIFACT_CONTAINER_BINDINGS: &[ArtifactContainerBinding] = &[
-    ArtifactContainerBinding {
-        artifact_id: "windows_timeline",
-        container_id: "sqlite_database",
-    },
-    ArtifactContainerBinding {
-        artifact_id: "chrome_login_data",
-        container_id: "sqlite_database",
-    },
-    ArtifactContainerBinding {
-        artifact_id: "chrome_cookies",
-        container_id: "sqlite_database",
-    },
-    ArtifactContainerBinding {
-        artifact_id: "search_db_user",
-        container_id: "ese_database",
-    },
-    ArtifactContainerBinding {
-        artifact_id: "jump_list_auto",
-        container_id: "ole_compound_file",
-    },
-    ArtifactContainerBinding {
-        artifact_id: "jump_list_custom",
-        container_id: "ole_compound_file",
-    },
-    ArtifactContainerBinding {
-        artifact_id: "jump_list_system",
-        container_id: "ole_compound_file",
-    },
-    ArtifactContainerBinding {
-        artifact_id: "hiberfil_sys",
-        container_id: "memory_image",
-    },
-    ArtifactContainerBinding {
-        artifact_id: "pagefile_sys",
-        container_id: "memory_image",
-    },
-];
-
-static RECORD_SIGNATURES: &[RecordSignature] = &[
-    RecordSignature {
-        id: "registry_nk_cell",
-        container_id: "windows_registry_hive",
-        artifact_id: None,
-        name: "Registry Key Cell (nk)",
-        header_magic: NK_MAGIC,
-        footer_magic: &[],
-        header_offset: 0,
-        min_size: Some(0x4c),
-        alignment: None,
-        invariants: REGISTRY_NK_INVARIANTS,
-        sources: &[
-            "https://github.com/mkorman90/regipy",
-            "https://github.com/EricZimmerman/Registry",
-        ],
-    },
-    RecordSignature {
-        id: "registry_vk_cell",
-        container_id: "windows_registry_hive",
-        artifact_id: None,
-        name: "Registry Value Cell (vk)",
-        header_magic: VK_MAGIC,
-        footer_magic: &[],
-        header_offset: 0,
-        min_size: Some(0x18),
-        alignment: None,
-        invariants: REGISTRY_VK_INVARIANTS,
-        sources: &[
-            "https://github.com/mkorman90/regipy",
-            "https://github.com/EricZimmerman/Registry",
-        ],
-    },
-    RecordSignature {
-        id: "userassist_count_payload",
-        container_id: "windows_registry_hive",
-        artifact_id: Some("userassist_exe"),
-        name: "UserAssist Count Payload",
-        header_magic: &[],
-        footer_magic: &[],
-        header_offset: 0,
-        min_size: Some(72),
-        alignment: None,
-        invariants: USERASSIST_RECORD_INVARIANTS,
-        sources: &[
-            "http://windowsir.blogspot.com/2013/05/userassist-redux.html",
-            "https://github.com/EricZimmerman/RegistryPlugins",
-        ],
-    },
-    RecordSignature {
-        id: "sqlite_btree_page",
-        container_id: "sqlite_database",
-        artifact_id: None,
-        name: "SQLite B-tree Page",
-        header_magic: &[],
-        footer_magic: &[],
-        header_offset: 0,
-        min_size: Some(512),
-        alignment: Some(512),
-        invariants: SQLITE_PAGE_INVARIANTS,
-        sources: &["https://github.com/EricZimmerman/SQLECmd"],
-    },
-    RecordSignature {
-        id: "ole_directory_entry",
-        container_id: "ole_compound_file",
-        artifact_id: None,
-        name: "OLE Directory Entry",
-        header_magic: &[],
-        footer_magic: &[],
-        header_offset: 0,
-        min_size: Some(128),
-        alignment: Some(128),
-        invariants: OLE_DIR_STREAM_INVARIANTS,
-        sources: &["https://github.com/EricZimmerman/OleCf"],
-    },
-    RecordSignature {
-        id: "evtx_chunk",
-        container_id: "windows_evtx",
-        artifact_id: None,
-        name: "EVTX Chunk",
-        header_magic: EVTX_CHUNK_MAGIC,
-        footer_magic: &[],
-        header_offset: 0,
-        min_size: Some(65536),
-        alignment: Some(65536),
-        invariants: EVTX_CHUNK_INVARIANTS,
-        sources: &["https://github.com/EricZimmerman/evtx"],
-    },
-    RecordSignature {
-        id: "evtx_record",
-        container_id: "windows_evtx",
-        artifact_id: None,
-        name: "EVTX Record",
-        header_magic: EVTX_RECORD_MAGIC,
-        footer_magic: &[],
-        header_offset: 0,
-        min_size: Some(24),
-        alignment: None,
-        invariants: EVTX_RECORD_INVARIANTS,
-        sources: &["https://github.com/EricZimmerman/evtx"],
-    },
-];
-
-fn infer_container_profile(descriptor: &ArtifactDescriptor) -> Option<&'static ContainerProfile> {
-    if descriptor.hive.is_some() {
-        return container_profile("windows_registry_hive");
-    }
-
-    match descriptor.artifact_type {
-        ArtifactType::EventLog => container_profile("windows_evtx"),
-        ArtifactType::File | ArtifactType::Directory => container_profile("flat_file"),
-        _ => None,
-    }
-}
-
-const USERASSIST_PARSER_HINTS: &[&str] = &[
-    "Decode the registry value name with ROT13 before treating it as a program or folder path.",
-    "For Win7+ Count values, parse the binary payload as a fixed 72-byte structure rather than plain text.",
-    "Use offset 4 for run_count, 8 for focus_count, 12 for focus_duration_ms, and 60 for the last_run FILETIME.",
-    "Promote the decoded last_run FILETIME to the record timestamp and keep a null when the FILETIME is zeroed.",
-];
-
-const USERASSIST_EXTRACTED_FIELDS: &[&str] = &[
-    "program",
-    "run_count",
-    "focus_count",
-    "focus_duration_ms",
-    "last_run",
-];
-
-const HIBERFIL_PARSER_HINTS: &[&str] = &[
-    "Treat hiberfil.sys as a compressed hibernation snapshot, not as a generic flat file.",
-    "Use a hibernation-aware parser to reconstruct memory pages before extracting processes, sockets, handles, or strings.",
-    "Prioritize command lines, network connections, loaded modules, clipboard fragments, and credential-bearing memory regions.",
-    "Correlate recovered memory state with pagefile.sys and nearby event-log activity to bound execution time.",
-];
-
-const MEMORY_IMAGE_FIELDS: &[&str] = &[
-    "processes",
-    "command_lines",
-    "sockets",
-    "loaded_modules",
-    "clipboard_data",
-    "interesting_strings",
-];
-
-const PAGEFILE_PARSER_HINTS: &[&str] = &[
-    "Treat pagefile.sys as paged-out memory fragments rather than a structured file format with stable records.",
-    "Search for strings, command fragments, URLs, registry paths, and credential residue, then re-anchor those hits to other artifacts.",
-    "Use pagefile hits as corroborating evidence unless you can tie them back to a process, socket, or on-disk artifact.",
-];
-
-const BITS_PARSER_HINTS: &[&str] = &[
-    "Enumerate qmgr*.dat job-store files under the Downloader directory and preserve originals before parsing.",
-    "Parse each job as a durable transfer record with job GUID, owner SID/account, source URL, destination path, and state.",
-    "Extract notify command or callback metadata when present; command-to-notify is the highest-signal execution pivot.",
-    "Correlate parsed jobs with downloaded files, Prefetch, PowerShell, and BITS-related event logs or cmdlet usage.",
-];
-
-const BITS_EXTRACTED_FIELDS: &[&str] = &[
-    "job_id",
-    "owner_sid",
-    "display_name",
-    "source_url",
-    "destination_path",
-    "job_state",
-    "created_time",
-    "modified_time",
-    "notify_command",
-];
-
-const WMI_REPOSITORY_PARSER_HINTS: &[&str] = &[
-    "Treat the repository as a graph of permanent-consumer objects, not a simple directory listing.",
-    "Reconstruct triads of __EventFilter, consumer instance, and __FilterToConsumerBinding for each subscription.",
-    "Normalize standard consumer classes such as CommandLineEventConsumer, ActiveScriptEventConsumer, and NTEventLogEventConsumer.",
-    "Extract WQL query text, consumer payload, referenced namespace, and creator SID to distinguish benign admin automation from persistence.",
-];
-
-const WMI_REPOSITORY_FIELDS: &[&str] = &[
-    "filter_name",
-    "filter_query",
-    "consumer_class",
-    "consumer_payload",
-    "binding_consumer",
-    "binding_filter",
-    "creator_sid",
-    "namespace",
-];
-
-const WMI_REGISTRY_PARSER_HINTS: &[&str] = &[
-    "Treat the registry-side subscription view as a pivot artifact, not the authoritative source of full WMI subscription semantics.",
-    "Use names and paths recovered here to resolve the underlying repository objects in root\\subscription.",
-    "Validate the complete chain by linking EventFilter, consumer object, and FilterToConsumerBinding rather than alerting on a single fragment.",
-];
-
-const WMI_REGISTRY_FIELDS: &[&str] = &["filter_name", "consumer_type", "consumer_value", "query"];
-
-static PARSING_PROFILES: &[ArtifactParsingProfile] = &[
-    ArtifactParsingProfile {
-        artifact_id: "userassist_exe",
-        format: "NTUSER.DAT UserAssist Count binary value",
-        summary: "ROT13-decode the value name, then parse the fixed-layout Count payload.",
-        parser_hints: USERASSIST_PARSER_HINTS,
-        extracted_fields: USERASSIST_EXTRACTED_FIELDS,
-        sources: &[
-            "http://windowsir.blogspot.com/2013/05/userassist-redux.html",
-            "https://github.com/EricZimmerman/RegistryPlugins",
-        ],
-    },
-    ArtifactParsingProfile {
-        artifact_id: "userassist_folder",
-        format: "NTUSER.DAT UserAssist Count binary value",
-        summary: "Folder GUID entries use the same ROT13 name decoding and 72-byte Count layout as EXE entries.",
-        parser_hints: USERASSIST_PARSER_HINTS,
-        extracted_fields: USERASSIST_EXTRACTED_FIELDS,
-        sources: &[
-            "http://windowsir.blogspot.com/2013/05/userassist-redux.html",
-            "https://github.com/EricZimmerman/RegistryPlugins",
-        ],
-    },
-    ArtifactParsingProfile {
-        artifact_id: "pagefile_sys",
-        format: "Windows paging file containing paged-out virtual memory",
-        summary: "Pagefile evidence is memory residue that should be searched and correlated, not row-oriented parsed.",
-        parser_hints: PAGEFILE_PARSER_HINTS,
-        extracted_fields: MEMORY_IMAGE_FIELDS,
-        sources: &[
-            "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/06_Tool_Command_Vault/6.02_Windows_DFIR_Master_Notes.md",
-            "https://learn.microsoft.com/en-us/troubleshoot/windows-server/performance/memory-dump-file-options",
-        ],
-    },
-    ArtifactParsingProfile {
-        artifact_id: "hiberfil_sys",
-        format: "Compressed Windows hibernation memory image",
-        summary: "Reconstruct the memory image before extracting forensic entities from the snapshot.",
-        parser_hints: HIBERFIL_PARSER_HINTS,
-        extracted_fields: MEMORY_IMAGE_FIELDS,
-        sources: &[
-            "https://forensics.wiki/hiberfil.sys/",
-            "https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/storport/nf-storport-storportmarkdumpmemory",
-        ],
-    },
-    ArtifactParsingProfile {
-        artifact_id: "bits_db",
-        format: "BITS qmgr job database",
-        summary: "Parse qmgr*.dat as persisted transfer jobs and pull out transfer metadata plus notify-execution pivots.",
-        parser_hints: BITS_PARSER_HINTS,
-        extracted_fields: BITS_EXTRACTED_FIELDS,
-        sources: &[
-            "https://learn.microsoft.com/en-us/windows/win32/bits/background-intelligent-transfer-service-portal",
-            "https://www.sans.org/white-papers/39195",
-        ],
-    },
-    ArtifactParsingProfile {
-        artifact_id: "wmi_mof_dir",
-        format: "WMI repository containing permanent consumer objects",
-        summary: "Rebuild permanent-event-consumer relationships from repository objects, not just filenames.",
-        parser_hints: WMI_REPOSITORY_PARSER_HINTS,
-        extracted_fields: WMI_REPOSITORY_FIELDS,
-        sources: &[
-            "https://learn.microsoft.com/en-us/windows/win32/wmisdk/receiving-a-wmi-event",
-            "https://learn.microsoft.com/en-us/windows/win32/wmisdk/monitoring-and-responding-to-events-with-standard-consumers",
-            "https://learn.microsoft.com/en-us/windows/win32/wmisdk/commandlineeventconsumer",
-            "https://learn.microsoft.com/en-us/windows/win32/wmisdk/--filtertoconsumerbinding",
-        ],
-    },
-    ArtifactParsingProfile {
-        artifact_id: "wmi_subscriptions",
-        format: "Registry-side WMI subscription index",
-        summary: "Use registry-side subscription data as a pivot into the authoritative WMI repository objects.",
-        parser_hints: WMI_REGISTRY_PARSER_HINTS,
-        extracted_fields: WMI_REGISTRY_FIELDS,
-        sources: &[
-            "https://learn.microsoft.com/en-us/windows/win32/wmisdk/receiving-a-wmi-event",
-            "https://learn.microsoft.com/en-us/windows/win32/wmisdk/monitoring-and-responding-to-events-with-standard-consumers",
-            "https://learn.microsoft.com/en-us/windows/win32/wmisdk/--filtertoconsumerbinding",
-        ],
-    },
-];
-
-// ── Decode implementation ────────────────────────────────────────────────────
-
-/// ROT13-decode an ASCII string: rotate A-Z and a-z by 13, leave other chars.
-fn rot13(s: &str) -> String {
-    s.chars()
-        .map(|c| match c {
-            'A'..='Z' => (b'A' + (c as u8 - b'A' + 13) % 26) as char,
-            'a'..='z' => (b'a' + (c as u8 - b'a' + 13) % 26) as char,
-            other => other,
-        })
-        .collect()
-}
-
-/// Convert a Windows FILETIME (100ns ticks since 1601-01-01) to ISO 8601 UTC.
-///
-/// Returns `None` for zero or negative Unix epoch values.
-fn filetime_to_iso8601(ft: u64) -> Option<String> {
-    // FILETIME epoch is 1601-01-01. Unix epoch offset in 100ns ticks:
-    const EPOCH_DIFF: u64 = 116_444_736_000_000_000;
-    if ft == 0 {
-        return None;
-    }
-    if ft < EPOCH_DIFF {
-        return None;
-    }
-    let unix_secs = (ft - EPOCH_DIFF) / 10_000_000;
-
-    // Convert unix_secs to calendar date/time via pure arithmetic.
-    // Algorithm: days since epoch -> year/month/day; remainder -> H:M:S.
-    let secs_per_day: u64 = 86400;
-    let mut days = unix_secs / secs_per_day;
-    let day_secs = unix_secs % secs_per_day;
-    let hours = day_secs / 3600;
-    let minutes = (day_secs % 3600) / 60;
-    let seconds = day_secs % 60;
-
-    // Civil date from days since 1970-01-01 (Euclidean affine algorithm).
-    // Shift epoch to 0000-03-01 to make leap-year logic simpler.
-    days += 719_468; // days from 0000-03-01 to 1970-01-01
-    let era = days / 146_097;
-    let doe = days - era * 146_097; // day of era [0, 146096]
-    let yoe = (doe - doe / 1460 + doe / 36524 - doe / 146_096) / 365;
-    let y = yoe + era * 400;
-    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
-    let mp = (5 * doy + 2) / 153;
-    let d = doy - (153 * mp + 2) / 5 + 1;
-    let m = if mp < 10 { mp + 3 } else { mp - 9 };
-    let y = if m <= 2 { y + 1 } else { y };
-
-    Some(format!(
-        "{y:04}-{m:02}-{d:02}T{hours:02}:{minutes:02}:{seconds:02}Z"
-    ))
-}
-
-/// Read a u16 LE at `offset`, returning 0 if out of bounds.
-fn read_u16_le(data: &[u8], offset: usize) -> u16 {
-    if offset + 2 > data.len() {
-        return 0;
-    }
-    u16::from_le_bytes([data[offset], data[offset + 1]])
-}
-
-/// Read a u32 LE at `offset`, returning 0 if out of bounds.
-fn read_u32_le(data: &[u8], offset: usize) -> u32 {
-    if offset + 4 > data.len() {
-        return 0;
-    }
-    u32::from_le_bytes([
-        data[offset],
-        data[offset + 1],
-        data[offset + 2],
-        data[offset + 3],
-    ])
-}
-
-/// Read a u64 LE at `offset`, returning 0 if out of bounds.
-fn read_u64_le(data: &[u8], offset: usize) -> u64 {
-    if offset + 8 > data.len() {
-        return 0;
-    }
-    u64::from_le_bytes([
-        data[offset],
-        data[offset + 1],
-        data[offset + 2],
-        data[offset + 3],
-        data[offset + 4],
-        data[offset + 5],
-        data[offset + 6],
-        data[offset + 7],
-    ])
-}
-
-/// Read an i32 LE at `offset`, returning 0 if out of bounds.
-fn read_i32_le(data: &[u8], offset: usize) -> i32 {
-    if offset + 4 > data.len() {
-        return 0;
-    }
-    i32::from_le_bytes([
-        data[offset],
-        data[offset + 1],
-        data[offset + 2],
-        data[offset + 3],
-    ])
-}
-
-/// Read an i64 LE at `offset`, returning 0 if out of bounds.
-fn read_i64_le(data: &[u8], offset: usize) -> i64 {
-    if offset + 8 > data.len() {
-        return 0;
-    }
-    i64::from_le_bytes([
-        data[offset],
-        data[offset + 1],
-        data[offset + 2],
-        data[offset + 3],
-        data[offset + 4],
-        data[offset + 5],
-        data[offset + 6],
-        data[offset + 7],
-    ])
-}
-
-/// Decode a single [`BinaryField`] from a raw buffer into an [`ArtifactValue`].
-fn decode_binary_field(field: &BinaryField, raw: &[u8]) -> Result<ArtifactValue, DecodeError> {
-    let size = match field.field_type {
-        BinaryFieldType::U16Le => 2,
-        BinaryFieldType::U32Le | BinaryFieldType::I32Le => 4,
-        BinaryFieldType::U64Le | BinaryFieldType::I64Le | BinaryFieldType::FiletimeLe => 8,
-        BinaryFieldType::Bytes { len } => len,
-    };
-    if field.offset + size > raw.len() {
-        return Err(DecodeError::FieldOutOfBounds {
-            field: field.name,
-            offset: field.offset,
-            size,
-            buf_len: raw.len(),
-        });
-    }
-    Ok(match field.field_type {
-        BinaryFieldType::U16Le => {
-            ArtifactValue::UnsignedInt(u64::from(read_u16_le(raw, field.offset)))
-        }
-        BinaryFieldType::U32Le => {
-            ArtifactValue::UnsignedInt(u64::from(read_u32_le(raw, field.offset)))
-        }
-        BinaryFieldType::U64Le => ArtifactValue::UnsignedInt(read_u64_le(raw, field.offset)),
-        BinaryFieldType::I32Le => ArtifactValue::Integer(i64::from(read_i32_le(raw, field.offset))),
-        BinaryFieldType::I64Le => ArtifactValue::Integer(read_i64_le(raw, field.offset)),
-        BinaryFieldType::FiletimeLe => {
-            let ft = read_u64_le(raw, field.offset);
-            match filetime_to_iso8601(ft) {
-                Some(ts) => ArtifactValue::Timestamp(ts),
-                None => ArtifactValue::Null,
-            }
-        }
-        BinaryFieldType::Bytes { len } => {
-            ArtifactValue::Bytes(raw[field.offset..field.offset + len].to_vec())
-        }
-    })
-}
-
-/// Build the default UID for a registry artifact.
-fn build_registry_uid(descriptor: &ArtifactDescriptor, name: &str) -> String {
-    let hive_prefix = match descriptor.hive {
-        Some(HiveTarget::NtUser) => "HKCU",
-        Some(HiveTarget::UsrClass) => "HKCU_Classes",
-        Some(HiveTarget::HklmSoftware) => "HKLM\\SOFTWARE",
-        Some(HiveTarget::HklmSystem) => "HKLM\\SYSTEM",
-        Some(HiveTarget::HklmSam) => "HKLM\\SAM",
-        Some(HiveTarget::HklmSecurity) => "HKLM\\SECURITY",
-        Some(HiveTarget::Amcache) => "Amcache",
-        Some(HiveTarget::Bcd) => "BCD",
-        Some(HiveTarget::None) | None => "unknown",
-    };
-    if name.is_empty() {
-        format!("winreg://{}/{}", hive_prefix, descriptor.key_path)
-    } else {
-        format!("winreg://{}/{}/{}", hive_prefix, descriptor.key_path, name)
-    }
-}
-
-/// Build the default UID for a file artifact.
-fn build_file_uid(descriptor: &ArtifactDescriptor, name: &str) -> String {
-    let path = descriptor.file_path.unwrap_or("");
-    if name.is_empty() {
-        format!("file://{path}")
-    } else {
-        format!("file://{path}#{name}")
-    }
-}
-
-/// Decode a slice of [`BinaryField`]s from raw bytes, returning field values
-/// and the first FILETIME timestamp encountered (if any).
-#[allow(clippy::type_complexity)]
-fn decode_binary_fields(
-    binary_fields: &[BinaryField],
-    raw: &[u8],
-) -> Result<(Vec<(&'static str, ArtifactValue)>, Option<String>), DecodeError> {
-    let mut decoded = Vec::new();
-    let mut ts = None;
-    for bf in binary_fields {
-        let val = decode_binary_field(bf, raw)?;
-        if bf.field_type == BinaryFieldType::FiletimeLe {
-            if let ArtifactValue::Timestamp(ref s) = val {
-                if ts.is_none() {
-                    ts = Some(s.clone());
-                }
-            }
-        }
-        decoded.push((bf.name, val));
-    }
-    Ok((decoded, ts))
-}
-
-/// Core decode function: routes to the appropriate decoder variant.
-#[allow(clippy::too_many_lines)]
-fn decode_artifact(
-    descriptor: &ArtifactDescriptor,
-    name: &str,
-    raw: &[u8],
-) -> Result<ArtifactRecord, DecodeError> {
-    let (fields, timestamp) = match descriptor.decoder {
-        Decoder::Identity => {
-            let text = std::str::from_utf8(raw)
-                .map_err(|_| DecodeError::InvalidUtf8)?
-                .to_string();
-            (vec![("value", ArtifactValue::Text(text))], None)
-        }
-
-        Decoder::Rot13Name => {
-            let decoded = rot13(name);
-            (vec![("program", ArtifactValue::Text(decoded))], None)
-        }
-
-        Decoder::FiletimeAt { offset } => {
-            if offset + 8 > raw.len() {
-                return Err(DecodeError::BufferTooShort {
-                    expected: offset + 8,
-                    actual: raw.len(),
-                });
-            }
-            let ft = read_u64_le(raw, offset);
-            let ts = filetime_to_iso8601(ft);
-            (
-                vec![(
-                    "timestamp",
-                    match ts {
-                        Some(ref s) => ArtifactValue::Timestamp(s.clone()),
-                        None => ArtifactValue::Null,
-                    },
-                )],
-                ts,
-            )
-        }
-
-        Decoder::Utf16Le => {
-            if raw.len() % 2 != 0 {
-                return Err(DecodeError::InvalidUtf16);
-            }
-            let u16s: Vec<u16> = raw
-                .chunks_exact(2)
-                .map(|c| u16::from_le_bytes([c[0], c[1]]))
-                .collect();
-            // Trim trailing NUL(s).
-            let trimmed: &[u16] = match u16s.iter().position(|&c| c == 0) {
-                Some(pos) => &u16s[..pos],
-                None => &u16s,
-            };
-            let text = String::from_utf16(trimmed).map_err(|_| DecodeError::InvalidUtf16)?;
-            (vec![("value", ArtifactValue::Text(text))], None)
-        }
-
-        Decoder::PipeDelimited {
-            fields: field_names,
-        } => {
-            // Try name first; fall back to raw as UTF-8.
-            let source = if name.is_empty() {
-                std::str::from_utf8(raw)
-                    .map_err(|_| DecodeError::InvalidUtf8)?
-                    .to_string()
-            } else {
-                name.to_string()
-            };
-            let parts: Vec<&str> = source.split('|').collect();
-            let decoded_fields: Vec<(&'static str, ArtifactValue)> = field_names
-                .iter()
-                .enumerate()
-                .map(|(i, &fname)| {
-                    let val = match parts.get(i) {
-                        Some(s) => ArtifactValue::Text((*s).to_string()),
-                        None => ArtifactValue::Null,
-                    };
-                    (fname, val)
-                })
-                .collect();
-            (decoded_fields, None)
-        }
-
-        Decoder::DwordLe => {
-            if raw.len() < 4 {
-                return Err(DecodeError::BufferTooShort {
-                    expected: 4,
-                    actual: raw.len(),
-                });
-            }
-            let val = read_u32_le(raw, 0);
-            (
-                vec![("value", ArtifactValue::UnsignedInt(u64::from(val)))],
-                None,
-            )
-        }
-
-        Decoder::MultiSz => {
-            // REG_MULTI_SZ: UTF-16LE, NUL-separated, double NUL terminated.
-            if raw.len() < 2 {
-                return Ok(make_record(
-                    descriptor,
-                    name,
-                    vec![("values", ArtifactValue::List(vec![]))],
-                    None,
-                ));
-            }
-            if raw.len() % 2 != 0 {
-                return Err(DecodeError::InvalidUtf16);
-            }
-            let u16s: Vec<u16> = raw
-                .chunks_exact(2)
-                .map(|c| u16::from_le_bytes([c[0], c[1]]))
-                .collect();
-            // Split on NUL, dropping the final empty string(s) from the double NUL.
-            let strings: Vec<ArtifactValue> = u16s
-                .split(|&c| c == 0)
-                .filter(|s| !s.is_empty())
-                .map(|s| ArtifactValue::Text(String::from_utf16_lossy(s)))
-                .collect();
-            (vec![("values", ArtifactValue::List(strings))], None)
-        }
-
-        Decoder::MruListEx => {
-            // u32 LE index list terminated by 0xFFFFFFFF.
-            let mut indices = Vec::new();
-            let mut offset = 0;
-            while offset + 4 <= raw.len() {
-                let idx = read_u32_le(raw, offset);
-                if idx == 0xFFFF_FFFF {
-                    break;
-                }
-                indices.push(ArtifactValue::UnsignedInt(u64::from(idx)));
-                offset += 4;
-            }
-            (vec![("indices", ArtifactValue::List(indices))], None)
-        }
-
-        Decoder::BinaryRecord(binary_fields) => decode_binary_fields(binary_fields, raw)?,
-
-        Decoder::Rot13NameWithBinaryValue(binary_fields) => {
-            let (mut fields, ts) = decode_binary_fields(binary_fields, raw)?;
-            fields.insert(0, ("program", ArtifactValue::Text(rot13(name))));
-            (fields, ts)
-        }
-    };
-
-    Ok(make_record(descriptor, name, fields, timestamp))
-}
-
-/// Construct an [`ArtifactRecord`] from decoded fields.
-fn make_record(
-    descriptor: &ArtifactDescriptor,
-    name: &str,
-    fields: Vec<(&'static str, ArtifactValue)>,
-    timestamp: Option<String>,
-) -> ArtifactRecord {
-    let uid = match descriptor.artifact_type {
-        ArtifactType::File | ArtifactType::Directory => build_file_uid(descriptor, name),
-        _ => build_registry_uid(descriptor, name),
-    };
-    ArtifactRecord {
-        uid,
-        artifact_id: descriptor.id,
-        artifact_name: descriptor.name,
-        scope: descriptor.scope,
-        os_scope: descriptor.os_scope,
-        timestamp,
-        fields,
-        meaning: descriptor.meaning.to_string(),
-        mitre_techniques: descriptor.mitre_techniques.to_vec(),
-        confidence: 1.0,
-    }
-}
-
-// ── Static descriptor instances ──────────────────────────────────────────────
+//! All descriptor statics live here to avoid const-concatenation limitations.
+//! The content is organised with section comments matching the original
+//! `artifact.rs` structure so `grep -n "^// ──"` still navigates cleanly.
+
+#![allow(clippy::too_many_lines)]
+
+use super::types::{
+    ArtifactDescriptor, ArtifactType, BinaryField, BinaryFieldType, DataScope, Decoder,
+    FieldSchema, HiveTarget, OsScope, TriagePriority, ValueType,
+};
 
 /// UserAssist 72-byte binary value fields (Win7+ EXE GUID).
-static USERASSIST_BINARY_FIELDS: &[BinaryField] = &[
+pub(crate) static USERASSIST_BINARY_FIELDS: &[BinaryField] = &[
     BinaryField {
         name: "run_count",
         offset: 4,
@@ -1707,7 +40,7 @@ static USERASSIST_BINARY_FIELDS: &[BinaryField] = &[
 ];
 
 /// UserAssist field schema (decoded output description).
-static USERASSIST_FIELDS: &[FieldSchema] = &[
+pub(crate) static USERASSIST_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "program",
         value_type: ValueType::Text,
@@ -1774,7 +107,7 @@ pub static USERASSIST_EXE: ArtifactDescriptor = ArtifactDescriptor {
 };
 
 /// Run key field schema.
-static RUN_KEY_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static RUN_KEY_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "value",
     value_type: ValueType::Text,
     description: "Autostart command or path",
@@ -1813,7 +146,7 @@ pub static RUN_KEY_HKLM_RUN: ArtifactDescriptor = ArtifactDescriptor {
 };
 
 /// TypedURLs field schema.
-static TYPED_URLS_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static TYPED_URLS_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "value",
     value_type: ValueType::Text,
     description: "URL typed into the IE/Edge address bar",
@@ -1847,7 +180,7 @@ pub static TYPED_URLS: ArtifactDescriptor = ArtifactDescriptor {
 };
 
 /// PCA AppLaunch.dic pipe-delimited fields.
-static PCA_FIELDS_SCHEMA: &[FieldSchema] = &[
+pub(crate) static PCA_FIELDS_SCHEMA: &[FieldSchema] = &[
     FieldSchema {
         name: "exe_path",
         value_type: ValueType::Text,
@@ -1862,7 +195,7 @@ static PCA_FIELDS_SCHEMA: &[FieldSchema] = &[
     },
 ];
 
-static PCA_PIPE_FIELDS: &[&str] = &["exe_path", "timestamp"];
+pub(crate) static PCA_PIPE_FIELDS: &[&str] = &["exe_path", "timestamp"];
 
 /// Program Compatibility Assistant AppLaunch.dic (Win11 22H2+).
 ///
@@ -1977,7 +310,7 @@ pub static RUN_KEY_HKLM_RUNONCE: ArtifactDescriptor = ArtifactDescriptor {
 
 // ── IFEO ──────────────────────────────────────────────────────────────────────
 
-static IFEO_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static IFEO_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "debugger",
     value_type: ValueType::Text,
     description: "Debugger path that hijacks the target process launch",
@@ -2045,7 +378,7 @@ pub static USERASSIST_FOLDER: ArtifactDescriptor = ArtifactDescriptor {
 
 // ── ShellBags ─────────────────────────────────────────────────────────────────
 
-static SHELLBAGS_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static SHELLBAGS_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "indices",
     value_type: ValueType::List,
     description: "MRU order of accessed shell folder slots",
@@ -2089,7 +422,7 @@ pub static SHELLBAGS_USER: ArtifactDescriptor = ArtifactDescriptor {
 
 // ── Amcache ───────────────────────────────────────────────────────────────────
 
-static AMCACHE_FIELDS: &[FieldSchema] = &[
+pub(crate) static AMCACHE_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "file_id",
         value_type: ValueType::Text,
@@ -2136,7 +469,7 @@ pub static AMCACHE_APP_FILE: ArtifactDescriptor = ArtifactDescriptor {
 
 // ── ShimCache (AppCompatCache) ────────────────────────────────────────────────
 
-static SHIMCACHE_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static SHIMCACHE_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "raw",
     value_type: ValueType::Bytes,
     description: "Raw AppCompatCache binary blob (parsed by shimcache module)",
@@ -2180,7 +513,7 @@ pub static SHIMCACHE: ArtifactDescriptor = ArtifactDescriptor {
 
 // ── BAM / DAM ─────────────────────────────────────────────────────────────────
 
-static BAM_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static BAM_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "last_exec",
     value_type: ValueType::Timestamp,
     description: "FILETIME of last background execution",
@@ -2219,7 +552,7 @@ pub static BAM_USER: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static DAM_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static DAM_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "last_exec",
     value_type: ValueType::Timestamp,
     description: "FILETIME of last desktop application execution",
@@ -2255,7 +588,7 @@ pub static DAM_USER: ArtifactDescriptor = ArtifactDescriptor {
 
 // ── SAM ───────────────────────────────────────────────────────────────────────
 
-static SAM_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static SAM_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "username",
     value_type: ValueType::Text,
     description: "Local account username (sub-key name)",
@@ -2294,7 +627,7 @@ pub static SAM_USERS: ArtifactDescriptor = ArtifactDescriptor {
 
 // ── LSA Secrets / DCC2 ───────────────────────────────────────────────────────
 
-static LSA_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static LSA_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "secret_name",
     value_type: ValueType::Text,
     description: "LSA secret key name (e.g. _SC_*, DPAPI_SYSTEM, DefaultPassword)",
@@ -2326,7 +659,7 @@ pub static LSA_SECRETS: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static DCC2_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static DCC2_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "slot_name",
     value_type: ValueType::Text,
     description: "Cache slot name (NL$1 through NL$25)",
@@ -2362,7 +695,7 @@ pub static DCC2_CACHE: ArtifactDescriptor = ArtifactDescriptor {
 
 // ── TypedURLsTime ─────────────────────────────────────────────────────────────
 
-static TYPED_URLS_TIME_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static TYPED_URLS_TIME_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "timestamp",
     value_type: ValueType::Timestamp,
     description: "FILETIME when the URL slot was typed",
@@ -2395,7 +728,7 @@ pub static TYPED_URLS_TIME: ArtifactDescriptor = ArtifactDescriptor {
 
 // ── MRU RecentDocs ────────────────────────────────────────────────────────────
 
-static MRU_RECENT_DOCS_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static MRU_RECENT_DOCS_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "indices",
     value_type: ValueType::List,
     description: "MRUListEx order indices of recently accessed documents",
@@ -2432,7 +765,7 @@ pub static MRU_RECENT_DOCS: ArtifactDescriptor = ArtifactDescriptor {
 
 // ── USB device enumeration ────────────────────────────────────────────────────
 
-static USB_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static USB_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "device_id",
     value_type: ValueType::Text,
     description: "USB device instance ID (VID&PID sub-key name)",
@@ -2470,7 +803,7 @@ pub static USB_ENUM: ArtifactDescriptor = ArtifactDescriptor {
 
 // ── MUICache ──────────────────────────────────────────────────────────────────
 
-static MUICACHE_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static MUICACHE_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "display_name",
     value_type: ValueType::Text,
     description: "Localized display name of the executed application",
@@ -2511,7 +844,7 @@ pub static MUICACHE: ArtifactDescriptor = ArtifactDescriptor {
 
 // ── AppInit_DLLs ──────────────────────────────────────────────────────────────
 
-static APPINIT_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static APPINIT_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "dll_list",
     value_type: ValueType::Text,
     description: "Comma/space-separated DLL paths injected into user32.dll consumers",
@@ -2546,7 +879,7 @@ pub static APPINIT_DLLS: ArtifactDescriptor = ArtifactDescriptor {
 
 // ── Winlogon Userinit ─────────────────────────────────────────────────────────
 
-static WINLOGON_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static WINLOGON_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "userinit",
     value_type: ValueType::Text,
     description: "Comma-separated executables launched by Winlogon at logon",
@@ -2582,7 +915,7 @@ pub static WINLOGON_USERINIT: ArtifactDescriptor = ArtifactDescriptor {
 
 // ── Screensaver persistence ───────────────────────────────────────────────────
 
-static SCREENSAVER_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static SCREENSAVER_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "path",
     value_type: ValueType::Text,
     description: "Path to the screensaver executable (.scr)",
@@ -2623,7 +956,7 @@ pub static SCREENSAVER_EXE: ArtifactDescriptor = ArtifactDescriptor {
 // ── Shared field schemas (reused across multiple descriptors) ─────────────
 
 /// Generic "command or path" field — suitable for persistence value descriptors.
-static PERSIST_CMD_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static PERSIST_CMD_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "command",
     value_type: ValueType::Text,
     description: "Command, DLL path, or executable registered for execution",
@@ -2631,7 +964,7 @@ static PERSIST_CMD_FIELDS: &[FieldSchema] = &[FieldSchema {
 }];
 
 /// Generic "DLL path" field.
-static DLL_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static DLL_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "dll_path",
     value_type: ValueType::Text,
     description: "Path to the DLL registered for injection or loading",
@@ -2639,7 +972,7 @@ static DLL_FIELDS: &[FieldSchema] = &[FieldSchema {
 }];
 
 /// Generic "directory listing" field for filesystem directory artifacts.
-static DIR_ENTRY_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static DIR_ENTRY_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "entry_name",
     value_type: ValueType::Text,
     description: "Name of the file or shortcut present in this directory",
@@ -2647,7 +980,7 @@ static DIR_ENTRY_FIELDS: &[FieldSchema] = &[FieldSchema {
 }];
 
 /// Generic "file path" for single-file artifacts.
-static FILE_PATH_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static FILE_PATH_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "path",
     value_type: ValueType::Text,
     description: "Full path to the artifact file",
@@ -2713,7 +1046,7 @@ pub static SERVICES_IMAGEPATH: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static ACTIVE_SETUP_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static ACTIVE_SETUP_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "stub_path",
     value_type: ValueType::Text,
     description: "StubPath command executed once per user at logon for new installs",
@@ -2825,7 +1158,7 @@ pub static APPCERT_DLLS: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static BOOT_EXECUTE_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static BOOT_EXECUTE_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "commands",
     value_type: ValueType::List,
     description: "Commands executed by Session Manager before Win32 subsystem starts",
@@ -2985,7 +1318,7 @@ pub static NETSH_HELPER_DLLS: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static BHO_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static BHO_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "clsid",
     value_type: ValueType::Text,
     description: "CLSID of the Browser Helper Object (sub-key name)",
@@ -3248,7 +1581,7 @@ pub static PREFETCH_DIR: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static SRUM_FIELDS: &[FieldSchema] = &[
+pub(crate) static SRUM_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "app_name",
         value_type: ValueType::Text,
@@ -3458,7 +1791,7 @@ pub static SEARCH_DB_USER: ArtifactDescriptor = ArtifactDescriptor {
 
 // ── Windows credential artifacts ──────────────────────────────────────────
 
-static DPAPI_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static DPAPI_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "guid",
     value_type: ValueType::Text,
     description: "GUID filename of the DPAPI master key or credential blob",
@@ -3550,7 +1883,7 @@ pub static DPAPI_CRED_ROAMING: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static VAULT_FIELDS: &[FieldSchema] = &[
+pub(crate) static VAULT_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "policy_file",
         value_type: ValueType::Text,
@@ -3618,7 +1951,7 @@ pub static WINDOWS_VAULT_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static RDP_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static RDP_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "username_hint",
     value_type: ValueType::Text,
     description: "Last username used to connect to this RDP server",
@@ -3655,7 +1988,7 @@ pub static RDP_CLIENT_SERVERS: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static RDP_MRU_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static RDP_MRU_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "server",
     value_type: ValueType::Text,
     description: "RDP server address from the most-recently-used list",
@@ -3689,7 +2022,7 @@ pub static RDP_CLIENT_DEFAULT: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static NTDS_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static NTDS_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "path",
     value_type: ValueType::Text,
     description: "Full path to the NTDS.dit file",
@@ -3723,7 +2056,7 @@ pub static NTDS_DIT: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static BROWSER_CRED_FIELDS: &[FieldSchema] = &[
+pub(crate) static BROWSER_CRED_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "origin_url",
         value_type: ValueType::Text,
@@ -3765,7 +2098,7 @@ pub static CHROME_LOGIN_DATA: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static FIREFOX_CRED_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static FIREFOX_CRED_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "hostname",
     value_type: ValueType::Text,
     description: "Hostname the Firefox credential is associated with",
@@ -3800,7 +2133,7 @@ pub static FIREFOX_LOGINS: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static WIFI_FIELDS: &[FieldSchema] = &[
+pub(crate) static WIFI_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "ssid",
         value_type: ValueType::Text,
@@ -3850,7 +2183,7 @@ pub static WIFI_PROFILES: ArtifactDescriptor = ArtifactDescriptor {
 // ── Shared Linux field schemas ────────────────────────────────────────────
 
 /// Cron / script line — single scheduled command or shell line.
-static CRON_LINE_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static CRON_LINE_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "schedule_line",
     value_type: ValueType::Text,
     description: "Cron schedule expression and command, or shell script line",
@@ -3858,7 +2191,7 @@ static CRON_LINE_FIELDS: &[FieldSchema] = &[FieldSchema {
 }];
 
 /// SSH public key entry.
-static SSH_KEY_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static SSH_KEY_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "public_key",
     value_type: ValueType::Text,
     description: "SSH public key entry (key-type base64 comment)",
@@ -3866,7 +2199,7 @@ static SSH_KEY_FIELDS: &[FieldSchema] = &[FieldSchema {
 }];
 
 /// Linux account entry (colon-delimited fields).
-static ACCOUNT_FIELDS: &[FieldSchema] = &[
+pub(crate) static ACCOUNT_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "username",
         value_type: ValueType::Text,
@@ -3882,7 +2215,7 @@ static ACCOUNT_FIELDS: &[FieldSchema] = &[
 ];
 
 /// Log line / journal entry.
-static LOG_LINE_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static LOG_LINE_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "log_line",
     value_type: ValueType::Text,
     description: "Log line or structured journal entry",
@@ -5131,7 +3464,7 @@ pub static BITS_DB: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static WMI_SUB_FIELDS: &[FieldSchema] = &[
+pub(crate) static WMI_SUB_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "filter_name",
         description: "WMI EventFilter name",
@@ -5973,7 +4306,7 @@ pub static LNK_FILES_OFFICE: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static PREFETCH_FIELDS: &[FieldSchema] = &[
+pub(crate) static PREFETCH_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "executable_name",
         description: "Name of the prefetched executable (up to 29 chars)",
@@ -6057,7 +4390,7 @@ pub static PREFETCH_FILE: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static SRUM_NET_FIELDS: &[FieldSchema] = &[
+pub(crate) static SRUM_NET_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "app_id",
         description: "Application identifier (path or service name)",
@@ -6127,7 +4460,7 @@ pub static SRUM_NETWORK_USAGE: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static SRUM_APP_FIELDS: &[FieldSchema] = &[
+pub(crate) static SRUM_APP_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "app_id",
         description: "Application path or service name",
@@ -6201,7 +4534,7 @@ pub static SRUM_APP_RESOURCE: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static SRUM_ENERGY_FIELDS: &[FieldSchema] = &[
+pub(crate) static SRUM_ENERGY_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "app_id",
         description: "Application path",
@@ -6266,7 +4599,7 @@ pub static SRUM_ENERGY_USAGE: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static SRUM_PUSH_FIELDS: &[FieldSchema] = &[
+pub(crate) static SRUM_PUSH_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "app_id",
         description: "Application that received notification",
@@ -6325,7 +4658,7 @@ pub static SRUM_PUSH_NOTIFICATION: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static EVTX_FIELDS: &[FieldSchema] = &[
+pub(crate) static EVTX_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "event_id",
         description: "Windows Event ID",
@@ -6501,7 +4834,7 @@ pub static EVTX_SYSMON: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static TYPED_PATHS_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static TYPED_PATHS_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "typed_path",
     description: "Path manually entered into Explorer address bar history",
     value_type: ValueType::Text,
@@ -6533,7 +4866,7 @@ pub static TYPED_PATHS: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static RUN_MRU_FIELDS: &[FieldSchema] = &[
+pub(crate) static RUN_MRU_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "mru_order",
         description: "Run dialog MRU letter ordering string",
@@ -6573,7 +4906,7 @@ pub static RUN_MRU: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static NETWORK_DRIVES_FIELDS: &[FieldSchema] = &[
+pub(crate) static NETWORK_DRIVES_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "drive_letter",
         description: "Mapped drive letter under HKCU\\Network",
@@ -6611,7 +4944,7 @@ pub static NETWORK_DRIVES: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static APP_PATHS_FIELDS: &[FieldSchema] = &[
+pub(crate) static APP_PATHS_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "application",
         description: "Executable name registered under App Paths",
@@ -6657,7 +4990,7 @@ pub static APP_PATHS: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static MOUNTED_DEVICES_FIELDS: &[FieldSchema] = &[
+pub(crate) static MOUNTED_DEVICES_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "value_name",
         description: "MountedDevices value name such as a drive letter or volume GUID",
@@ -6703,7 +5036,7 @@ pub static MOUNTED_DEVICES: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static NETWORKLIST_FIELDS: &[FieldSchema] = &[
+pub(crate) static NETWORKLIST_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "profile_guid",
         description: "GUID of a network profile under NetworkList",
@@ -6749,7 +5082,7 @@ pub static NETWORKLIST_PROFILES: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static PUTTY_SESSION_FIELDS: &[FieldSchema] = &[
+pub(crate) static PUTTY_SESSION_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "session_name",
         description: "Saved PuTTY session name",
@@ -6795,7 +5128,7 @@ pub static PUTTY_SESSIONS: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static WINSCP_SESSION_FIELDS: &[FieldSchema] = &[
+pub(crate) static WINSCP_SESSION_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "session_name",
         description: "Saved WinSCP session name",
@@ -6842,7 +5175,7 @@ pub static WINSCP_SAVED_SESSIONS: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static WINRAR_HISTORY_FIELDS: &[FieldSchema] = &[
+pub(crate) static WINRAR_HISTORY_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "operation",
         description: "Archive opened, created, or extracted",
@@ -6882,7 +5215,7 @@ pub static WINRAR_HISTORY: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static NETWORK_INTERFACE_FIELDS: &[FieldSchema] = &[
+pub(crate) static NETWORK_INTERFACE_FIELDS: &[FieldSchema] = &[
     FieldSchema {
         name: "interface_guid",
         description: "TCP/IP interface GUID under the Interfaces key",
@@ -6967,7 +5300,7 @@ pub static HIBERFIL_SYS: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-static MOUNTPOINTS2_FIELDS: &[FieldSchema] = &[FieldSchema {
+pub(crate) static MOUNTPOINTS2_FIELDS: &[FieldSchema] = &[FieldSchema {
     name: "mount_point",
     description: "Per-user mount point or device reference cached by Explorer",
     value_type: ValueType::Text,
@@ -7038,16 +5371,16 @@ pub static RDP_BITMAP_CACHE: ArtifactDescriptor = ArtifactDescriptor {
     sources: &["https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv"],
 };
 
-// ── Global catalog ───────────────────────────────────────────────────────────
+// ── Global catalog entries ────────────────────────────────────────────────────
 
-/// The global forensic artifact catalog containing all known artifact descriptors.
+/// All descriptor instances that make up the global catalog.
 ///
 /// Maintainer note:
 /// New descriptors should be researched against the curated DFIR source corpus
 /// documented in this module header, then anchored with artifact-specific URLs in
 /// the descriptor's `sources` field. Archived source corpora are discovery input;
 /// they do not replace per-artifact attribution.
-pub static CATALOG: ForensicCatalog = ForensicCatalog::new(&[
+pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     USERASSIST_EXE,
     USERASSIST_FOLDER,
     RUN_KEY_HKLM_RUN,
@@ -7235,2879 +5568,4 @@ pub static CATALOG: ForensicCatalog = ForensicCatalog::new(&[
     EVTX_SYSTEM,
     EVTX_POWERSHELL,
     EVTX_SYSMON,
-]);
-
-// ── Tests ────────────────────────────────────────────────────────────────────
-
-#[cfg(test)]
-mod catalog_integrity {
-    use super::*;
-
-    #[test]
-    fn no_duplicate_ids() {
-        let mut seen = std::collections::HashSet::new();
-        for d in CATALOG.list() {
-            assert!(seen.insert(d.id), "duplicate artifact id: {}", d.id);
-        }
-    }
-
-    #[test]
-    fn all_related_artifacts_exist() {
-        let ids: std::collections::HashSet<&str> = CATALOG.list().iter().map(|d| d.id).collect();
-        for d in CATALOG.list() {
-            for related in d.related_artifacts {
-                assert!(
-                    ids.contains(related),
-                    "artifact '{}' references unknown related artifact '{}'",
-                    d.id,
-                    related
-                );
-            }
-        }
-    }
-
-    #[test]
-    fn all_mitre_ids_match_pattern() {
-        // Valid: T1234 or T1234.001
-        let valid = |s: &str| -> bool {
-            let bytes = s.as_bytes();
-            if bytes.len() < 5 {
-                return false;
-            }
-            if bytes[0] != b'T' {
-                return false;
-            }
-            let digits: &[u8] = if bytes.len() == 5 {
-                &bytes[1..5]
-            } else if bytes.len() == 9 && bytes[5] == b'.' {
-                // check sub-technique: T1234.001
-                let sub = &bytes[6..9];
-                if !sub.iter().all(|b| b.is_ascii_digit()) {
-                    return false;
-                }
-                &bytes[1..5]
-            } else {
-                return false;
-            };
-            digits.iter().all(|b| b.is_ascii_digit())
-        };
-        for d in CATALOG.list() {
-            for technique in d.mitre_techniques {
-                assert!(
-                    valid(technique),
-                    "artifact '{}' has invalid MITRE technique id '{}'",
-                    d.id,
-                    technique
-                );
-            }
-        }
-    }
-
-    #[test]
-    fn all_entries_have_sources() {
-        for d in CATALOG.list() {
-            assert!(!d.sources.is_empty(), "artifact '{}' has no sources", d.id);
-        }
-    }
-
-    #[test]
-    fn no_empty_meanings() {
-        for d in CATALOG.list() {
-            assert!(
-                !d.meaning.is_empty(),
-                "artifact '{}' has empty meaning",
-                d.id
-            );
-        }
-    }
-
-    #[test]
-    fn all_sources_are_https_urls() {
-        for d in CATALOG.list() {
-            for src in d.sources {
-                assert!(
-                    src.starts_with("https://") || src.starts_with("http://"),
-                    "artifact '{}' has non-URL source: {}",
-                    d.id,
-                    src
-                );
-            }
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    // ── FILETIME conversion ──────────────────────────────────────────────
-
-    #[test]
-    fn filetime_zero_returns_none() {
-        assert_eq!(filetime_to_iso8601(0), None);
-    }
-
-    #[test]
-    fn filetime_before_unix_epoch_returns_none() {
-        // 1600-01-01 is before the Unix epoch offset.
-        assert_eq!(filetime_to_iso8601(1), None);
-    }
-
-    #[test]
-    fn filetime_unix_epoch_is_1970() {
-        // Exactly the Unix epoch: 1970-01-01T00:00:00Z
-        let ft: u64 = 116_444_736_000_000_000;
-        assert_eq!(
-            filetime_to_iso8601(ft),
-            Some("1970-01-01T00:00:00Z".to_string())
-        );
-    }
-
-    #[test]
-    fn filetime_known_date_2023() {
-        // 2023-01-15T10:30:00Z
-        // Unix timestamp: 1673778600
-        // FILETIME = 1673778600 * 10_000_000 + 116_444_736_000_000_000
-        let unix_ts: u64 = 1_673_778_600;
-        let ft = unix_ts * 10_000_000 + 116_444_736_000_000_000;
-        assert_eq!(
-            filetime_to_iso8601(ft),
-            Some("2023-01-15T10:30:00Z".to_string())
-        );
-    }
-
-    // ── ROT13 ────────────────────────────────────────────────────────────
-
-    #[test]
-    fn rot13_roundtrip() {
-        let s = "Hello, World!";
-        assert_eq!(rot13(&rot13(s)), s);
-    }
-
-    #[test]
-    fn rot13_known_value() {
-        assert_eq!(rot13("URYYB"), "HELLO");
-    }
-
-    #[test]
-    fn rot13_numbers_unchanged() {
-        assert_eq!(rot13("12345"), "12345");
-    }
-
-    // ── Catalog queries ──────────────────────────────────────────────────
-
-    #[test]
-    fn catalog_has_entries() {
-        assert!(!CATALOG.list().is_empty());
-        assert_eq!(CATALOG.list().len(), 167);
-    }
-
-    #[test]
-    fn catalog_by_id_userassist() {
-        let desc = CATALOG.by_id("userassist_exe").unwrap();
-        assert_eq!(desc.name, "UserAssist (EXE)");
-        assert_eq!(desc.hive, Some(HiveTarget::NtUser));
-        assert_eq!(desc.scope, DataScope::User);
-    }
-
-    #[test]
-    fn catalog_by_id_missing_returns_none() {
-        assert!(CATALOG.by_id("nonexistent").is_none());
-    }
-
-    #[test]
-    fn catalog_filter_by_hive_ntuser() {
-        let q = ArtifactQuery {
-            hive: Some(HiveTarget::NtUser),
-            ..Default::default()
-        };
-        let results = CATALOG.filter(&q);
-        assert!(results.len() >= 2); // userassist + typed_urls
-        assert!(results.iter().all(|d| d.hive == Some(HiveTarget::NtUser)));
-    }
-
-    #[test]
-    fn catalog_filter_by_scope_system() {
-        let q = ArtifactQuery {
-            scope: Some(DataScope::System),
-            ..Default::default()
-        };
-        let results = CATALOG.filter(&q);
-        assert!(results.iter().all(|d| d.scope == DataScope::System));
-    }
-
-    #[test]
-    fn catalog_filter_by_mitre_technique() {
-        let q = ArtifactQuery {
-            mitre_technique: Some("T1547.001"),
-            ..Default::default()
-        };
-        let results = CATALOG.filter(&q);
-        assert!(!results.is_empty());
-        assert!(results
-            .iter()
-            .all(|d| d.mitre_techniques.contains(&"T1547.001")));
-    }
-
-    #[test]
-    fn catalog_filter_by_artifact_type_file() {
-        let q = ArtifactQuery {
-            artifact_type: Some(ArtifactType::File),
-            ..Default::default()
-        };
-        let results = CATALOG.filter(&q);
-        // Multiple File artifacts now exist (PCA, SRUM, Timeline, PowerShell history,
-        // NTDS.dit, Chrome Login Data, Firefox logins, Windows Search DB).
-        assert!(!results.is_empty());
-        // PCA must still be present.
-        assert!(results.iter().any(|d| d.id == "pca_applaunch_dic"));
-    }
-
-    #[test]
-    fn catalog_filter_empty_query_returns_all() {
-        let q = ArtifactQuery::default();
-        assert_eq!(CATALOG.filter(&q).len(), CATALOG.list().len());
-    }
-
-    #[test]
-    fn catalog_filter_by_id() {
-        let q = ArtifactQuery {
-            id: Some("typed_urls"),
-            ..Default::default()
-        };
-        let results = CATALOG.filter(&q);
-        assert_eq!(results.len(), 1);
-        assert_eq!(results[0].id, "typed_urls");
-    }
-
-    #[test]
-    fn catalog_filter_combined_scope_and_hive() {
-        let q = ArtifactQuery {
-            scope: Some(DataScope::User),
-            hive: Some(HiveTarget::NtUser),
-            ..Default::default()
-        };
-        let results = CATALOG.filter(&q);
-        assert!(results.len() >= 2);
-    }
-
-    // ── Decoder: Identity ────────────────────────────────────────────────
-
-    #[test]
-    fn decode_identity_utf8() {
-        let rec = CATALOG
-            .decode(&RUN_KEY_HKLM_RUN, "MyApp", b"C:\\Program Files\\app.exe")
-            .unwrap();
-        assert_eq!(rec.artifact_id, "run_key_hklm");
-        assert_eq!(
-            rec.fields,
-            vec![(
-                "value",
-                ArtifactValue::Text("C:\\Program Files\\app.exe".to_string())
-            )]
-        );
-    }
-
-    #[test]
-    fn decode_identity_empty_raw() {
-        let rec = CATALOG.decode(&RUN_KEY_HKLM_RUN, "", b"").unwrap();
-        assert_eq!(
-            rec.fields,
-            vec![("value", ArtifactValue::Text(String::new()))]
-        );
-    }
-
-    #[test]
-    fn decode_identity_invalid_utf8() {
-        let err = CATALOG
-            .decode(&RUN_KEY_HKLM_RUN, "", &[0xFF, 0xFE, 0x80])
-            .unwrap_err();
-        assert_eq!(err, DecodeError::InvalidUtf8);
-    }
-
-    // ── Decoder: Rot13NameWithBinaryValue (UserAssist) ───────────────────
-
-    #[test]
-    fn decode_userassist_valid() {
-        // Build a 72-byte UserAssist binary value:
-        // bytes 4-7: run_count = 5
-        // bytes 8-11: focus_count = 3
-        // bytes 12-15: focus_duration_ms = 10000
-        // bytes 60-67: FILETIME for 2023-01-15T10:30:00Z
-        let mut raw = vec![0u8; 72];
-        raw[4..8].copy_from_slice(&5u32.to_le_bytes());
-        raw[8..12].copy_from_slice(&3u32.to_le_bytes());
-        raw[12..16].copy_from_slice(&10000u32.to_le_bytes());
-        let ft: u64 = 1_673_778_600 * 10_000_000 + 116_444_736_000_000_000;
-        raw[60..68].copy_from_slice(&ft.to_le_bytes());
-
-        let rot13_name = rot13("C:\\Program Files\\notepad.exe");
-        let rec = CATALOG.decode(&USERASSIST_EXE, &rot13_name, &raw).unwrap();
-
-        assert_eq!(rec.artifact_id, "userassist_exe");
-        assert_eq!(rec.scope, DataScope::User);
-        assert_eq!(
-            rec.fields[0],
-            (
-                "program",
-                ArtifactValue::Text("C:\\Program Files\\notepad.exe".to_string())
-            )
-        );
-        assert_eq!(rec.fields[1], ("run_count", ArtifactValue::UnsignedInt(5)));
-        assert_eq!(
-            rec.fields[2],
-            ("focus_count", ArtifactValue::UnsignedInt(3))
-        );
-        assert_eq!(
-            rec.fields[3],
-            ("focus_duration_ms", ArtifactValue::UnsignedInt(10000))
-        );
-        assert_eq!(
-            rec.fields[4],
-            (
-                "last_run",
-                ArtifactValue::Timestamp("2023-01-15T10:30:00Z".to_string())
-            )
-        );
-        assert_eq!(rec.timestamp, Some("2023-01-15T10:30:00Z".to_string()));
-    }
-
-    #[test]
-    fn decode_userassist_buffer_too_short() {
-        let raw = vec![0u8; 16]; // need at least 68 for last_run field
-        let err = CATALOG.decode(&USERASSIST_EXE, "test", &raw).unwrap_err();
-        match err {
-            DecodeError::FieldOutOfBounds { field, .. } => {
-                assert_eq!(field, "last_run");
-            }
-            other => panic!("expected FieldOutOfBounds, got: {other:?}"),
-        }
-    }
-
-    #[test]
-    fn decode_userassist_zero_filetime() {
-        // All zeros: FILETIME at offset 60 is zero -> Null
-        let raw = vec![0u8; 72];
-        let rec = CATALOG.decode(&USERASSIST_EXE, "grfg", &raw).unwrap();
-        assert_eq!(rec.fields[4], ("last_run", ArtifactValue::Null));
-        assert_eq!(rec.timestamp, None);
-    }
-
-    // ── Decoder: PipeDelimited ───────────────────────────────────────────
-
-    #[test]
-    fn decode_pipe_delimited_from_name() {
-        let rec = CATALOG
-            .decode(
-                &PCA_APPLAUNCH_DIC,
-                r"C:\Windows\notepad.exe|2023-01-15 10:30:00",
-                b"",
-            )
-            .unwrap();
-        assert_eq!(rec.artifact_id, "pca_applaunch_dic");
-        assert_eq!(
-            rec.fields[0],
-            (
-                "exe_path",
-                ArtifactValue::Text(r"C:\Windows\notepad.exe".to_string())
-            )
-        );
-        assert_eq!(
-            rec.fields[1],
-            (
-                "timestamp",
-                ArtifactValue::Text("2023-01-15 10:30:00".to_string())
-            )
-        );
-    }
-
-    #[test]
-    fn decode_pipe_delimited_fewer_fields_than_schema() {
-        // Only one field in the pipe string, but schema expects two.
-        let rec = CATALOG
-            .decode(&PCA_APPLAUNCH_DIC, r"C:\app.exe", b"")
-            .unwrap();
-        assert_eq!(
-            rec.fields[0],
-            ("exe_path", ArtifactValue::Text(r"C:\app.exe".to_string()))
-        );
-        // Second field should be Null (missing).
-        assert_eq!(rec.fields[1], ("timestamp", ArtifactValue::Null));
-    }
-
-    #[test]
-    fn decode_pipe_delimited_from_raw_when_name_empty() {
-        let raw = b"C:\\tool.exe|2024-06-01";
-        let rec = CATALOG.decode(&PCA_APPLAUNCH_DIC, "", raw).unwrap();
-        assert_eq!(
-            rec.fields[0],
-            ("exe_path", ArtifactValue::Text("C:\\tool.exe".to_string()))
-        );
-    }
-
-    // ── Decoder: DwordLe ─────────────────────────────────────────────────
-
-    #[test]
-    fn decode_dword_le() {
-        // Build a minimal descriptor with DwordLe decoder.
-        static DWORD_DESC: ArtifactDescriptor = ArtifactDescriptor {
-            id: "test_dword",
-            name: "Test DWORD",
-            artifact_type: ArtifactType::RegistryValue,
-            hive: Some(HiveTarget::HklmSoftware),
-            key_path: "Test",
-            value_name: None,
-            file_path: None,
-            scope: DataScope::System,
-            os_scope: OsScope::All,
-            decoder: Decoder::DwordLe,
-            meaning: "test",
-            mitre_techniques: &[],
-            fields: &[],
-            retention: None,
-            triage_priority: TriagePriority::Low,
-            related_artifacts: &[],
-            sources: &[],
-        };
-        let raw = 42u32.to_le_bytes();
-        let rec = CATALOG.decode(&DWORD_DESC, "val", &raw).unwrap();
-        assert_eq!(rec.fields, vec![("value", ArtifactValue::UnsignedInt(42))]);
-    }
-
-    #[test]
-    fn decode_dword_le_too_short() {
-        static DWORD_DESC: ArtifactDescriptor = ArtifactDescriptor {
-            id: "test_dword2",
-            name: "Test DWORD 2",
-            artifact_type: ArtifactType::RegistryValue,
-            hive: Some(HiveTarget::HklmSoftware),
-            key_path: "Test",
-            value_name: None,
-            file_path: None,
-            scope: DataScope::System,
-            os_scope: OsScope::All,
-            decoder: Decoder::DwordLe,
-            meaning: "test",
-            mitre_techniques: &[],
-            fields: &[],
-            retention: None,
-            triage_priority: TriagePriority::Low,
-            related_artifacts: &[],
-            sources: &[],
-        };
-        let err = CATALOG.decode(&DWORD_DESC, "v", &[1, 2]).unwrap_err();
-        assert_eq!(
-            err,
-            DecodeError::BufferTooShort {
-                expected: 4,
-                actual: 2
-            }
-        );
-    }
-
-    // ── Decoder: Utf16Le ─────────────────────────────────────────────────
-
-    #[test]
-    fn decode_utf16le() {
-        static UTF16_DESC: ArtifactDescriptor = ArtifactDescriptor {
-            id: "test_utf16",
-            name: "Test UTF-16",
-            artifact_type: ArtifactType::RegistryValue,
-            hive: Some(HiveTarget::NtUser),
-            key_path: "Test",
-            value_name: None,
-            file_path: None,
-            scope: DataScope::User,
-            os_scope: OsScope::All,
-            decoder: Decoder::Utf16Le,
-            meaning: "test",
-            mitre_techniques: &[],
-            fields: &[],
-            retention: None,
-            triage_priority: TriagePriority::Low,
-            related_artifacts: &[],
-            sources: &[],
-        };
-        // "Hi" in UTF-16LE + NUL terminator
-        let raw: &[u8] = &[0x48, 0x00, 0x69, 0x00, 0x00, 0x00];
-        let rec = CATALOG.decode(&UTF16_DESC, "", raw).unwrap();
-        assert_eq!(
-            rec.fields,
-            vec![("value", ArtifactValue::Text("Hi".to_string()))]
-        );
-    }
-
-    #[test]
-    fn decode_utf16le_odd_length() {
-        static UTF16_DESC: ArtifactDescriptor = ArtifactDescriptor {
-            id: "test_utf16_odd",
-            name: "Test UTF-16 odd",
-            artifact_type: ArtifactType::RegistryValue,
-            hive: Some(HiveTarget::NtUser),
-            key_path: "Test",
-            value_name: None,
-            file_path: None,
-            scope: DataScope::User,
-            os_scope: OsScope::All,
-            decoder: Decoder::Utf16Le,
-            meaning: "test",
-            mitre_techniques: &[],
-            fields: &[],
-            retention: None,
-            triage_priority: TriagePriority::Low,
-            related_artifacts: &[],
-            sources: &[],
-        };
-        let err = CATALOG
-            .decode(&UTF16_DESC, "", &[0x48, 0x00, 0x69])
-            .unwrap_err();
-        assert_eq!(err, DecodeError::InvalidUtf16);
-    }
-
-    // ── Decoder: MultiSz ─────────────────────────────────────────────────
-
-    #[test]
-    fn decode_multi_sz() {
-        static MSZ_DESC: ArtifactDescriptor = ArtifactDescriptor {
-            id: "test_msz",
-            name: "Test MultiSz",
-            artifact_type: ArtifactType::RegistryValue,
-            hive: Some(HiveTarget::HklmSoftware),
-            key_path: "Test",
-            value_name: None,
-            file_path: None,
-            scope: DataScope::System,
-            os_scope: OsScope::All,
-            decoder: Decoder::MultiSz,
-            meaning: "test",
-            mitre_techniques: &[],
-            fields: &[],
-            retention: None,
-            triage_priority: TriagePriority::Low,
-            related_artifacts: &[],
-            sources: &[],
-        };
-        // "AB\0CD\0\0" in UTF-16LE
-        let raw: &[u8] = &[
-            0x41, 0x00, 0x42, 0x00, // "AB"
-            0x00, 0x00, // NUL separator
-            0x43, 0x00, 0x44, 0x00, // "CD"
-            0x00, 0x00, // NUL terminator
-            0x00, 0x00, // double NUL
-        ];
-        let rec = CATALOG.decode(&MSZ_DESC, "", raw).unwrap();
-        assert_eq!(
-            rec.fields,
-            vec![(
-                "values",
-                ArtifactValue::List(vec![
-                    ArtifactValue::Text("AB".to_string()),
-                    ArtifactValue::Text("CD".to_string()),
-                ])
-            )]
-        );
-    }
-
-    #[test]
-    fn decode_multi_sz_empty() {
-        static MSZ_DESC: ArtifactDescriptor = ArtifactDescriptor {
-            id: "test_msz_empty",
-            name: "Test MultiSz empty",
-            artifact_type: ArtifactType::RegistryValue,
-            hive: Some(HiveTarget::HklmSoftware),
-            key_path: "Test",
-            value_name: None,
-            file_path: None,
-            scope: DataScope::System,
-            os_scope: OsScope::All,
-            decoder: Decoder::MultiSz,
-            meaning: "test",
-            mitre_techniques: &[],
-            fields: &[],
-            retention: None,
-            triage_priority: TriagePriority::Low,
-            related_artifacts: &[],
-            sources: &[],
-        };
-        let rec = CATALOG.decode(&MSZ_DESC, "", &[]).unwrap();
-        assert_eq!(rec.fields, vec![("values", ArtifactValue::List(vec![]))]);
-    }
-
-    // ── Decoder: MruListEx ───────────────────────────────────────────────
-
-    #[test]
-    fn decode_mrulistex() {
-        static MRU_DESC: ArtifactDescriptor = ArtifactDescriptor {
-            id: "test_mru",
-            name: "Test MRUListEx",
-            artifact_type: ArtifactType::RegistryValue,
-            hive: Some(HiveTarget::NtUser),
-            key_path: "Test",
-            value_name: None,
-            file_path: None,
-            scope: DataScope::User,
-            os_scope: OsScope::All,
-            decoder: Decoder::MruListEx,
-            meaning: "test",
-            mitre_techniques: &[],
-            fields: &[],
-            retention: None,
-            triage_priority: TriagePriority::Low,
-            related_artifacts: &[],
-            sources: &[],
-        };
-        // [2, 0, 1, 0xFFFFFFFF]
-        let mut raw = Vec::new();
-        raw.extend_from_slice(&2u32.to_le_bytes());
-        raw.extend_from_slice(&0u32.to_le_bytes());
-        raw.extend_from_slice(&1u32.to_le_bytes());
-        raw.extend_from_slice(&0xFFFF_FFFFu32.to_le_bytes());
-        let rec = CATALOG.decode(&MRU_DESC, "", &raw).unwrap();
-        assert_eq!(
-            rec.fields,
-            vec![(
-                "indices",
-                ArtifactValue::List(vec![
-                    ArtifactValue::UnsignedInt(2),
-                    ArtifactValue::UnsignedInt(0),
-                    ArtifactValue::UnsignedInt(1),
-                ])
-            )]
-        );
-    }
-
-    #[test]
-    fn decode_mrulistex_empty() {
-        static MRU_DESC: ArtifactDescriptor = ArtifactDescriptor {
-            id: "test_mru_empty",
-            name: "Test MRUListEx empty",
-            artifact_type: ArtifactType::RegistryValue,
-            hive: Some(HiveTarget::NtUser),
-            key_path: "Test",
-            value_name: None,
-            file_path: None,
-            scope: DataScope::User,
-            os_scope: OsScope::All,
-            decoder: Decoder::MruListEx,
-            meaning: "test",
-            mitre_techniques: &[],
-            fields: &[],
-            retention: None,
-            triage_priority: TriagePriority::Low,
-            related_artifacts: &[],
-            sources: &[],
-        };
-        let rec = CATALOG.decode(&MRU_DESC, "", &[]).unwrap();
-        assert_eq!(rec.fields, vec![("indices", ArtifactValue::List(vec![]))]);
-    }
-
-    // ── Decoder: FiletimeAt ──────────────────────────────────────────────
-
-    #[test]
-    fn decode_filetime_at() {
-        static FT_DESC: ArtifactDescriptor = ArtifactDescriptor {
-            id: "test_ft",
-            name: "Test FiletimeAt",
-            artifact_type: ArtifactType::RegistryValue,
-            hive: Some(HiveTarget::NtUser),
-            key_path: "Test",
-            value_name: None,
-            file_path: None,
-            scope: DataScope::User,
-            os_scope: OsScope::All,
-            decoder: Decoder::FiletimeAt { offset: 0 },
-            meaning: "test",
-            mitre_techniques: &[],
-            fields: &[],
-            retention: None,
-            triage_priority: TriagePriority::Low,
-            related_artifacts: &[],
-            sources: &[],
-        };
-        let ft: u64 = 116_444_736_000_000_000; // Unix epoch
-        let raw = ft.to_le_bytes();
-        let rec = CATALOG.decode(&FT_DESC, "", &raw).unwrap();
-        assert_eq!(
-            rec.fields,
-            vec![(
-                "timestamp",
-                ArtifactValue::Timestamp("1970-01-01T00:00:00Z".to_string())
-            )]
-        );
-        assert_eq!(rec.timestamp, Some("1970-01-01T00:00:00Z".to_string()));
-    }
-
-    #[test]
-    fn decode_filetime_at_buffer_too_short() {
-        static FT_DESC: ArtifactDescriptor = ArtifactDescriptor {
-            id: "test_ft_short",
-            name: "Test FiletimeAt short",
-            artifact_type: ArtifactType::RegistryValue,
-            hive: Some(HiveTarget::NtUser),
-            key_path: "Test",
-            value_name: None,
-            file_path: None,
-            scope: DataScope::User,
-            os_scope: OsScope::All,
-            decoder: Decoder::FiletimeAt { offset: 4 },
-            meaning: "test",
-            mitre_techniques: &[],
-            fields: &[],
-            retention: None,
-            triage_priority: TriagePriority::Low,
-            related_artifacts: &[],
-            sources: &[],
-        };
-        let err = CATALOG.decode(&FT_DESC, "", &[0; 8]).unwrap_err();
-        assert_eq!(
-            err,
-            DecodeError::BufferTooShort {
-                expected: 12,
-                actual: 8
-            }
-        );
-    }
-
-    // ── UID generation ───────────────────────────────────────────────────
-
-    #[test]
-    fn uid_registry_with_name() {
-        let rec = CATALOG
-            .decode(&RUN_KEY_HKLM_RUN, "MyApp", b"cmd.exe")
-            .unwrap();
-        assert!(rec.uid.starts_with("winreg://HKLM\\SOFTWARE/"));
-        assert!(rec.uid.contains("MyApp"));
-    }
-
-    #[test]
-    fn uid_file_artifact() {
-        let rec = CATALOG.decode(&PCA_APPLAUNCH_DIC, "line1", b"").unwrap();
-        assert!(rec.uid.starts_with("file://"));
-        assert!(rec.uid.contains("AppLaunch.dic"));
-    }
-
-    // ── DecodeError Display ──────────────────────────────────────────────
-
-    #[test]
-    fn decode_error_display_buffer_too_short() {
-        let e = DecodeError::BufferTooShort {
-            expected: 8,
-            actual: 4,
-        };
-        assert_eq!(e.to_string(), "buffer too short: need 8 bytes, got 4");
-    }
-
-    #[test]
-    fn decode_error_display_field_out_of_bounds() {
-        let e = DecodeError::FieldOutOfBounds {
-            field: "last_run",
-            offset: 60,
-            size: 8,
-            buf_len: 16,
-        };
-        assert!(e.to_string().contains("last_run"));
-    }
-
-    // ── ArtifactDescriptor field coverage ────────────────────────────────
-
-    #[test]
-    fn userassist_descriptor_has_correct_metadata() {
-        assert_eq!(USERASSIST_EXE.id, "userassist_exe");
-        assert_eq!(USERASSIST_EXE.hive, Some(HiveTarget::NtUser));
-        assert_eq!(USERASSIST_EXE.scope, DataScope::User);
-        assert_eq!(USERASSIST_EXE.os_scope, OsScope::Win7Plus);
-        assert!(!USERASSIST_EXE.mitre_techniques.is_empty());
-        assert!(!USERASSIST_EXE.fields.is_empty());
-        assert!(USERASSIST_EXE.key_path.contains("UserAssist"));
-    }
-
-    #[test]
-    fn pca_descriptor_has_correct_metadata() {
-        assert_eq!(PCA_APPLAUNCH_DIC.id, "pca_applaunch_dic");
-        assert_eq!(PCA_APPLAUNCH_DIC.artifact_type, ArtifactType::File);
-        assert_eq!(PCA_APPLAUNCH_DIC.hive, None);
-        assert_eq!(PCA_APPLAUNCH_DIC.os_scope, OsScope::Win11_22H2);
-        assert!(PCA_APPLAUNCH_DIC.file_path.is_some());
-    }
-
-    #[test]
-    fn run_key_descriptor_has_correct_metadata() {
-        assert_eq!(RUN_KEY_HKLM_RUN.scope, DataScope::System);
-        assert!(RUN_KEY_HKLM_RUN.mitre_techniques.contains(&"T1547.001"));
-    }
-
-    // ── ArtifactRecord confidence default ────────────────────────────────
-
-    #[test]
-    fn decoded_record_has_default_confidence() {
-        let rec = CATALOG.decode(&RUN_KEY_HKLM_RUN, "x", b"y").unwrap();
-        assert!((rec.confidence - 1.0).abs() < f32::EPSILON);
-    }
-
-    // ── BinaryField edge cases ───────────────────────────────────────────
-
-    #[test]
-    fn binary_record_exact_size_boundary() {
-        // A record with a single U32Le at offset 0 -- exactly 4 bytes.
-        static FIELDS: &[BinaryField] = &[BinaryField {
-            name: "val",
-            offset: 0,
-            field_type: BinaryFieldType::U32Le,
-            description: "test",
-        }];
-        static DESC: ArtifactDescriptor = ArtifactDescriptor {
-            id: "test_exact",
-            name: "Test exact",
-            artifact_type: ArtifactType::RegistryValue,
-            hive: Some(HiveTarget::HklmSoftware),
-            key_path: "Test",
-            value_name: None,
-            file_path: None,
-            scope: DataScope::System,
-            os_scope: OsScope::All,
-            decoder: Decoder::BinaryRecord(FIELDS),
-            meaning: "test",
-            mitre_techniques: &[],
-            fields: &[],
-            retention: None,
-            triage_priority: TriagePriority::Low,
-            related_artifacts: &[],
-            sources: &[],
-        };
-        let raw = 99u32.to_le_bytes();
-        let rec = CATALOG.decode(&DESC, "", &raw).unwrap();
-        assert_eq!(rec.fields, vec![("val", ArtifactValue::UnsignedInt(99))]);
-    }
-
-    #[test]
-    fn binary_record_bytes_field() {
-        static FIELDS: &[BinaryField] = &[BinaryField {
-            name: "header",
-            offset: 0,
-            field_type: BinaryFieldType::Bytes { len: 4 },
-            description: "test header",
-        }];
-        static DESC: ArtifactDescriptor = ArtifactDescriptor {
-            id: "test_bytes",
-            name: "Test bytes",
-            artifact_type: ArtifactType::RegistryValue,
-            hive: Some(HiveTarget::HklmSoftware),
-            key_path: "Test",
-            value_name: None,
-            file_path: None,
-            scope: DataScope::System,
-            os_scope: OsScope::All,
-            decoder: Decoder::BinaryRecord(FIELDS),
-            meaning: "test",
-            mitre_techniques: &[],
-            fields: &[],
-            retention: None,
-            triage_priority: TriagePriority::Low,
-            related_artifacts: &[],
-            sources: &[],
-        };
-        let raw = [0xDE, 0xAD, 0xBE, 0xEF];
-        let rec = CATALOG.decode(&DESC, "", &raw).unwrap();
-        assert_eq!(
-            rec.fields,
-            vec![("header", ArtifactValue::Bytes(vec![0xDE, 0xAD, 0xBE, 0xEF]))]
-        );
-    }
-}
-
-// ── Tests for new batch-A/B descriptors ──────────────────────────────────────
-
-#[cfg(test)]
-mod tests_new_descriptors {
-    use super::*;
-
-    // ── Run key variants ─────────────────────────────────────────────────
-
-    #[test]
-    fn run_key_hkcu_run_metadata() {
-        assert_eq!(RUN_KEY_HKCU_RUN.id, "run_key_hkcu");
-        assert_eq!(RUN_KEY_HKCU_RUN.hive, Some(HiveTarget::NtUser));
-        assert_eq!(RUN_KEY_HKCU_RUN.scope, DataScope::User);
-        assert!(RUN_KEY_HKCU_RUN.mitre_techniques.contains(&"T1547.001"));
-        assert!(RUN_KEY_HKCU_RUN.key_path.contains("Run"));
-    }
-
-    #[test]
-    fn run_key_hkcu_runonce_metadata() {
-        assert_eq!(RUN_KEY_HKCU_RUNONCE.id, "run_key_hkcu_once");
-        assert_eq!(RUN_KEY_HKCU_RUNONCE.hive, Some(HiveTarget::NtUser));
-        assert_eq!(RUN_KEY_HKCU_RUNONCE.scope, DataScope::User);
-        assert!(RUN_KEY_HKCU_RUNONCE.key_path.contains("RunOnce"));
-    }
-
-    #[test]
-    fn run_key_hklm_runonce_metadata() {
-        assert_eq!(RUN_KEY_HKLM_RUNONCE.id, "run_key_hklm_once");
-        assert_eq!(RUN_KEY_HKLM_RUNONCE.hive, Some(HiveTarget::HklmSoftware));
-        assert_eq!(RUN_KEY_HKLM_RUNONCE.scope, DataScope::System);
-        assert!(RUN_KEY_HKLM_RUNONCE.key_path.contains("RunOnce"));
-    }
-
-    // ── IFEO ─────────────────────────────────────────────────────────────
-
-    #[test]
-    fn ifeo_debugger_metadata() {
-        assert_eq!(IFEO_DEBUGGER.id, "ifeo_debugger");
-        assert_eq!(IFEO_DEBUGGER.hive, Some(HiveTarget::HklmSoftware));
-        assert_eq!(IFEO_DEBUGGER.scope, DataScope::System);
-        assert!(IFEO_DEBUGGER.mitre_techniques.contains(&"T1546.012"));
-        assert!(IFEO_DEBUGGER
-            .key_path
-            .contains("Image File Execution Options"));
-    }
-
-    // ── UserAssist folder GUID ────────────────────────────────────────────
-
-    #[test]
-    fn userassist_folder_metadata() {
-        assert_eq!(USERASSIST_FOLDER.id, "userassist_folder");
-        assert_eq!(USERASSIST_FOLDER.hive, Some(HiveTarget::NtUser));
-        assert_eq!(USERASSIST_FOLDER.scope, DataScope::User);
-        assert!(USERASSIST_FOLDER.key_path.contains("UserAssist"));
-    }
-
-    // ── Shellbags ────────────────────────────────────────────────────────
-
-    #[test]
-    fn shellbags_user_metadata() {
-        assert_eq!(SHELLBAGS_USER.id, "shellbags_user");
-        assert_eq!(SHELLBAGS_USER.hive, Some(HiveTarget::UsrClass));
-        assert_eq!(SHELLBAGS_USER.scope, DataScope::User);
-        assert!(SHELLBAGS_USER.mitre_techniques.contains(&"T1083"));
-        assert!(SHELLBAGS_USER.key_path.contains("Shell"));
-    }
-
-    // ── Amcache ──────────────────────────────────────────────────────────
-
-    #[test]
-    fn amcache_app_file_metadata() {
-        assert_eq!(AMCACHE_APP_FILE.id, "amcache_app_file");
-        assert_eq!(AMCACHE_APP_FILE.hive, Some(HiveTarget::Amcache));
-        assert_eq!(AMCACHE_APP_FILE.scope, DataScope::System);
-        assert!(AMCACHE_APP_FILE.mitre_techniques.contains(&"T1218"));
-    }
-
-    // ── ShimCache ────────────────────────────────────────────────────────
-
-    #[test]
-    fn shimcache_metadata() {
-        assert_eq!(SHIMCACHE.id, "shimcache");
-        assert_eq!(SHIMCACHE.hive, Some(HiveTarget::HklmSystem));
-        assert_eq!(SHIMCACHE.scope, DataScope::System);
-        assert!(SHIMCACHE.mitre_techniques.contains(&"T1218"));
-        assert!(SHIMCACHE.key_path.contains("AppCompatCache"));
-    }
-
-    // ── BAM / DAM ────────────────────────────────────────────────────────
-
-    #[test]
-    fn bam_user_metadata() {
-        assert_eq!(BAM_USER.id, "bam_user");
-        assert_eq!(BAM_USER.hive, Some(HiveTarget::HklmSystem));
-        assert_eq!(BAM_USER.scope, DataScope::Mixed);
-        assert_eq!(BAM_USER.os_scope, OsScope::Win10Plus);
-        assert!(BAM_USER.key_path.contains("bam"));
-    }
-
-    #[test]
-    fn dam_user_metadata() {
-        assert_eq!(DAM_USER.id, "dam_user");
-        assert_eq!(DAM_USER.hive, Some(HiveTarget::HklmSystem));
-        assert_eq!(DAM_USER.scope, DataScope::Mixed);
-        assert_eq!(DAM_USER.os_scope, OsScope::Win10Plus);
-        assert!(DAM_USER.key_path.contains("dam"));
-    }
-
-    // ── SAM ──────────────────────────────────────────────────────────────
-
-    #[test]
-    fn sam_users_metadata() {
-        assert_eq!(SAM_USERS.id, "sam_users");
-        assert_eq!(SAM_USERS.hive, Some(HiveTarget::HklmSam));
-        assert_eq!(SAM_USERS.scope, DataScope::System);
-        assert!(SAM_USERS.key_path.contains("Users"));
-        assert!(SAM_USERS.mitre_techniques.contains(&"T1003.002"));
-    }
-
-    // ── LSA ──────────────────────────────────────────────────────────────
-
-    #[test]
-    fn lsa_secrets_metadata() {
-        assert_eq!(LSA_SECRETS.id, "lsa_secrets");
-        assert_eq!(LSA_SECRETS.hive, Some(HiveTarget::HklmSecurity));
-        assert_eq!(LSA_SECRETS.scope, DataScope::System);
-        assert!(LSA_SECRETS.key_path.contains("Secrets"));
-        assert!(LSA_SECRETS.mitre_techniques.contains(&"T1003.004"));
-    }
-
-    #[test]
-    fn dcc2_cache_metadata() {
-        assert_eq!(DCC2_CACHE.id, "dcc2_cache");
-        assert_eq!(DCC2_CACHE.hive, Some(HiveTarget::HklmSecurity));
-        assert_eq!(DCC2_CACHE.scope, DataScope::System);
-        assert!(DCC2_CACHE.mitre_techniques.contains(&"T1003.005"));
-    }
-
-    // ── TypedURLsTime ────────────────────────────────────────────────────
-
-    #[test]
-    fn typed_urls_time_metadata() {
-        assert_eq!(TYPED_URLS_TIME.id, "typed_urls_time");
-        assert_eq!(TYPED_URLS_TIME.hive, Some(HiveTarget::NtUser));
-        assert_eq!(TYPED_URLS_TIME.scope, DataScope::User);
-        assert!(TYPED_URLS_TIME.key_path.contains("TypedURLsTime"));
-    }
-
-    // ── MRU RecentDocs ───────────────────────────────────────────────────
-
-    #[test]
-    fn mru_recent_docs_metadata() {
-        assert_eq!(MRU_RECENT_DOCS.id, "mru_recent_docs");
-        assert_eq!(MRU_RECENT_DOCS.hive, Some(HiveTarget::NtUser));
-        assert_eq!(MRU_RECENT_DOCS.scope, DataScope::User);
-        assert!(MRU_RECENT_DOCS.key_path.contains("RecentDocs"));
-    }
-
-    // ── USB ──────────────────────────────────────────────────────────────
-
-    #[test]
-    fn usb_enum_metadata() {
-        assert_eq!(USB_ENUM.id, "usb_enum");
-        assert_eq!(USB_ENUM.hive, Some(HiveTarget::HklmSystem));
-        assert_eq!(USB_ENUM.scope, DataScope::System);
-        assert!(USB_ENUM.mitre_techniques.contains(&"T1200"));
-        assert!(USB_ENUM.key_path.contains("USBSTOR"));
-    }
-
-    // ── MUICache ─────────────────────────────────────────────────────────
-
-    #[test]
-    fn muicache_metadata() {
-        assert_eq!(MUICACHE.id, "muicache");
-        assert_eq!(MUICACHE.hive, Some(HiveTarget::UsrClass));
-        assert_eq!(MUICACHE.scope, DataScope::User);
-        assert!(MUICACHE.key_path.contains("MuiCache"));
-    }
-
-    // ── AppInit DLLs ─────────────────────────────────────────────────────
-
-    #[test]
-    fn appinit_dlls_metadata() {
-        assert_eq!(APPINIT_DLLS.id, "appinit_dlls");
-        assert_eq!(APPINIT_DLLS.hive, Some(HiveTarget::HklmSoftware));
-        assert_eq!(APPINIT_DLLS.scope, DataScope::System);
-        assert!(APPINIT_DLLS.mitre_techniques.contains(&"T1546.010"));
-        assert!(APPINIT_DLLS.key_path.contains("Windows NT"));
-    }
-
-    // ── Winlogon ─────────────────────────────────────────────────────────
-
-    #[test]
-    fn winlogon_userinit_metadata() {
-        assert_eq!(WINLOGON_USERINIT.id, "winlogon_userinit");
-        assert_eq!(WINLOGON_USERINIT.hive, Some(HiveTarget::HklmSoftware));
-        assert_eq!(WINLOGON_USERINIT.scope, DataScope::System);
-        assert!(WINLOGON_USERINIT.mitre_techniques.contains(&"T1547.004"));
-        assert!(WINLOGON_USERINIT.key_path.contains("Winlogon"));
-    }
-
-    // ── Screensaver ──────────────────────────────────────────────────────
-
-    #[test]
-    fn screensaver_exe_metadata() {
-        assert_eq!(SCREENSAVER_EXE.id, "screensaver_exe");
-        assert_eq!(SCREENSAVER_EXE.hive, Some(HiveTarget::NtUser));
-        assert_eq!(SCREENSAVER_EXE.scope, DataScope::User);
-        assert!(SCREENSAVER_EXE.mitre_techniques.contains(&"T1546.002"));
-        assert!(SCREENSAVER_EXE.key_path.contains("Desktop"));
-    }
-
-    // ── CATALOG completeness ──────────────────────────────────────────────
-
-    #[test]
-    fn catalog_contains_all_new_descriptors() {
-        let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
-        for expected in &[
-            "run_key_hkcu",
-            "run_key_hkcu_once",
-            "run_key_hklm_once",
-            "ifeo_debugger",
-            "userassist_folder",
-            "shellbags_user",
-            "amcache_app_file",
-            "shimcache",
-            "bam_user",
-            "dam_user",
-            "sam_users",
-            "lsa_secrets",
-            "dcc2_cache",
-            "typed_urls_time",
-            "mru_recent_docs",
-            "usb_enum",
-            "muicache",
-            "appinit_dlls",
-            "winlogon_userinit",
-            "screensaver_exe",
-        ] {
-            assert!(ids.contains(expected), "CATALOG missing: {expected}");
-        }
-    }
-}
-
-// ── Tests for Batch C (Windows persistence / execution / credential) ──────────
-
-#[cfg(test)]
-mod tests_batch_c {
-    use super::*;
-
-    // ── Windows persistence ───────────────────────────────────────────────
-
-    #[test]
-    fn winlogon_shell_md() {
-        assert_eq!(WINLOGON_SHELL.id, "winlogon_shell");
-        assert_eq!(WINLOGON_SHELL.hive, Some(HiveTarget::HklmSoftware));
-        assert_eq!(WINLOGON_SHELL.scope, DataScope::System);
-        assert!(WINLOGON_SHELL.mitre_techniques.contains(&"T1547.004"));
-        assert!(WINLOGON_SHELL.key_path.contains("Winlogon"));
-    }
-    #[test]
-    fn services_imagepath_md() {
-        assert_eq!(SERVICES_IMAGEPATH.id, "services_imagepath");
-        assert_eq!(SERVICES_IMAGEPATH.hive, Some(HiveTarget::HklmSystem));
-        assert_eq!(SERVICES_IMAGEPATH.scope, DataScope::System);
-        assert!(SERVICES_IMAGEPATH.mitre_techniques.contains(&"T1543.003"));
-    }
-    #[test]
-    fn active_setup_hklm_md() {
-        assert_eq!(ACTIVE_SETUP_HKLM.id, "active_setup_hklm");
-        assert_eq!(ACTIVE_SETUP_HKLM.hive, Some(HiveTarget::HklmSoftware));
-        assert_eq!(ACTIVE_SETUP_HKLM.scope, DataScope::System);
-        assert!(ACTIVE_SETUP_HKLM.mitre_techniques.contains(&"T1547.014"));
-    }
-    #[test]
-    fn active_setup_hkcu_md() {
-        assert_eq!(ACTIVE_SETUP_HKCU.id, "active_setup_hkcu");
-        assert_eq!(ACTIVE_SETUP_HKCU.hive, Some(HiveTarget::NtUser));
-        assert_eq!(ACTIVE_SETUP_HKCU.scope, DataScope::User);
-    }
-    #[test]
-    fn com_hijack_clsid_hkcu_md() {
-        assert_eq!(COM_HIJACK_CLSID_HKCU.id, "com_hijack_clsid_hkcu");
-        assert_eq!(COM_HIJACK_CLSID_HKCU.hive, Some(HiveTarget::UsrClass));
-        assert_eq!(COM_HIJACK_CLSID_HKCU.scope, DataScope::User);
-        assert!(COM_HIJACK_CLSID_HKCU
-            .mitre_techniques
-            .contains(&"T1546.015"));
-    }
-    #[test]
-    fn appcert_dlls_md() {
-        assert_eq!(APPCERT_DLLS.id, "appcert_dlls");
-        assert_eq!(APPCERT_DLLS.hive, Some(HiveTarget::HklmSystem));
-        assert_eq!(APPCERT_DLLS.scope, DataScope::System);
-        assert!(APPCERT_DLLS.mitre_techniques.contains(&"T1546.009"));
-    }
-    #[test]
-    fn boot_execute_md() {
-        assert_eq!(BOOT_EXECUTE.id, "boot_execute");
-        assert_eq!(BOOT_EXECUTE.hive, Some(HiveTarget::HklmSystem));
-        assert_eq!(BOOT_EXECUTE.scope, DataScope::System);
-        assert!(BOOT_EXECUTE.mitre_techniques.contains(&"T1547.001"));
-        assert!(BOOT_EXECUTE.key_path.contains("Session Manager"));
-    }
-    #[test]
-    fn lsa_security_pkgs_md() {
-        assert_eq!(LSA_SECURITY_PKGS.id, "lsa_security_pkgs");
-        assert_eq!(LSA_SECURITY_PKGS.hive, Some(HiveTarget::HklmSystem));
-        assert_eq!(LSA_SECURITY_PKGS.scope, DataScope::System);
-        assert!(LSA_SECURITY_PKGS.mitre_techniques.contains(&"T1547.005"));
-    }
-    #[test]
-    fn lsa_auth_pkgs_md() {
-        assert_eq!(LSA_AUTH_PKGS.id, "lsa_auth_pkgs");
-        assert_eq!(LSA_AUTH_PKGS.hive, Some(HiveTarget::HklmSystem));
-        assert_eq!(LSA_AUTH_PKGS.scope, DataScope::System);
-        assert!(LSA_AUTH_PKGS.mitre_techniques.contains(&"T1547.002"));
-    }
-    #[test]
-    fn print_monitors_md() {
-        assert_eq!(PRINT_MONITORS.id, "print_monitors");
-        assert_eq!(PRINT_MONITORS.hive, Some(HiveTarget::HklmSystem));
-        assert_eq!(PRINT_MONITORS.scope, DataScope::System);
-        assert!(PRINT_MONITORS.mitre_techniques.contains(&"T1547.010"));
-    }
-    #[test]
-    fn time_providers_md() {
-        assert_eq!(TIME_PROVIDERS.id, "time_providers");
-        assert_eq!(TIME_PROVIDERS.hive, Some(HiveTarget::HklmSystem));
-        assert_eq!(TIME_PROVIDERS.scope, DataScope::System);
-        assert!(TIME_PROVIDERS.mitre_techniques.contains(&"T1547.003"));
-    }
-    #[test]
-    fn netsh_helper_dlls_md() {
-        assert_eq!(NETSH_HELPER_DLLS.id, "netsh_helper_dlls");
-        assert_eq!(NETSH_HELPER_DLLS.hive, Some(HiveTarget::HklmSoftware));
-        assert_eq!(NETSH_HELPER_DLLS.scope, DataScope::System);
-        assert!(NETSH_HELPER_DLLS.mitre_techniques.contains(&"T1546.007"));
-    }
-    #[test]
-    fn browser_helper_objects_md() {
-        assert_eq!(BROWSER_HELPER_OBJECTS.id, "browser_helper_objects");
-        assert_eq!(BROWSER_HELPER_OBJECTS.hive, Some(HiveTarget::HklmSoftware));
-        assert_eq!(BROWSER_HELPER_OBJECTS.scope, DataScope::System);
-        assert!(BROWSER_HELPER_OBJECTS.mitre_techniques.contains(&"T1176"));
-    }
-    #[test]
-    fn startup_folder_user_md() {
-        assert_eq!(STARTUP_FOLDER_USER.id, "startup_folder_user");
-        assert_eq!(STARTUP_FOLDER_USER.artifact_type, ArtifactType::Directory);
-        assert_eq!(STARTUP_FOLDER_USER.scope, DataScope::User);
-        assert!(STARTUP_FOLDER_USER.mitre_techniques.contains(&"T1547.001"));
-    }
-    #[test]
-    fn startup_folder_system_md() {
-        assert_eq!(STARTUP_FOLDER_SYSTEM.id, "startup_folder_system");
-        assert_eq!(STARTUP_FOLDER_SYSTEM.artifact_type, ArtifactType::Directory);
-        assert_eq!(STARTUP_FOLDER_SYSTEM.scope, DataScope::System);
-        assert!(STARTUP_FOLDER_SYSTEM
-            .mitre_techniques
-            .contains(&"T1547.001"));
-    }
-    #[test]
-    fn scheduled_tasks_dir_md() {
-        assert_eq!(SCHEDULED_TASKS_DIR.id, "scheduled_tasks_dir");
-        assert_eq!(SCHEDULED_TASKS_DIR.artifact_type, ArtifactType::Directory);
-        assert_eq!(SCHEDULED_TASKS_DIR.scope, DataScope::System);
-        assert!(SCHEDULED_TASKS_DIR.mitre_techniques.contains(&"T1053.005"));
-    }
-    #[test]
-    fn wdigest_caching_md() {
-        assert_eq!(WDIGEST_CACHING.id, "wdigest_caching");
-        assert_eq!(WDIGEST_CACHING.hive, Some(HiveTarget::HklmSystem));
-        assert_eq!(WDIGEST_CACHING.scope, DataScope::System);
-        assert!(WDIGEST_CACHING.mitre_techniques.contains(&"T1003.001"));
-    }
-
-    // ── Windows execution evidence ────────────────────────────────────────
-
-    #[test]
-    fn wordwheel_query_md() {
-        assert_eq!(WORDWHEEL_QUERY.id, "wordwheel_query");
-        assert_eq!(WORDWHEEL_QUERY.hive, Some(HiveTarget::NtUser));
-        assert_eq!(WORDWHEEL_QUERY.scope, DataScope::User);
-        assert!(WORDWHEEL_QUERY.key_path.contains("WordWheelQuery"));
-    }
-    #[test]
-    fn opensave_mru_md() {
-        assert_eq!(OPENSAVE_MRU.id, "opensave_mru");
-        assert_eq!(OPENSAVE_MRU.hive, Some(HiveTarget::NtUser));
-        assert_eq!(OPENSAVE_MRU.scope, DataScope::User);
-        assert!(OPENSAVE_MRU.key_path.contains("OpenSaveMRU"));
-    }
-    #[test]
-    fn lastvisited_mru_md() {
-        assert_eq!(LASTVISITED_MRU.id, "lastvisited_mru");
-        assert_eq!(LASTVISITED_MRU.hive, Some(HiveTarget::NtUser));
-        assert_eq!(LASTVISITED_MRU.scope, DataScope::User);
-        assert!(LASTVISITED_MRU.key_path.contains("LastVisitedMRU"));
-    }
-    #[test]
-    fn prefetch_dir_md() {
-        assert_eq!(PREFETCH_DIR.id, "prefetch_dir");
-        assert_eq!(PREFETCH_DIR.artifact_type, ArtifactType::Directory);
-        assert_eq!(PREFETCH_DIR.scope, DataScope::System);
-        assert!(PREFETCH_DIR.mitre_techniques.contains(&"T1204.002"));
-    }
-    #[test]
-    fn srum_db_md() {
-        assert_eq!(SRUM_DB.id, "srum_db");
-        assert_eq!(SRUM_DB.artifact_type, ArtifactType::File);
-        assert_eq!(SRUM_DB.scope, DataScope::System);
-        assert!(SRUM_DB.os_scope == OsScope::Win8Plus);
-    }
-    #[test]
-    fn windows_timeline_md() {
-        assert_eq!(WINDOWS_TIMELINE.id, "windows_timeline");
-        assert_eq!(WINDOWS_TIMELINE.artifact_type, ArtifactType::File);
-        assert_eq!(WINDOWS_TIMELINE.scope, DataScope::User);
-        assert_eq!(WINDOWS_TIMELINE.os_scope, OsScope::Win10Plus);
-    }
-    #[test]
-    fn powershell_history_md() {
-        assert_eq!(POWERSHELL_HISTORY.id, "powershell_history");
-        assert_eq!(POWERSHELL_HISTORY.artifact_type, ArtifactType::File);
-        assert_eq!(POWERSHELL_HISTORY.scope, DataScope::User);
-        assert!(POWERSHELL_HISTORY.mitre_techniques.contains(&"T1059.001"));
-    }
-    #[test]
-    fn recycle_bin_md() {
-        assert_eq!(RECYCLE_BIN.id, "recycle_bin");
-        assert_eq!(RECYCLE_BIN.artifact_type, ArtifactType::Directory);
-        assert_eq!(RECYCLE_BIN.scope, DataScope::User);
-        assert!(RECYCLE_BIN.mitre_techniques.contains(&"T1070.004"));
-    }
-    #[test]
-    fn thumbcache_md() {
-        assert_eq!(THUMBCACHE.id, "thumbcache");
-        assert_eq!(THUMBCACHE.artifact_type, ArtifactType::Directory);
-        assert_eq!(THUMBCACHE.scope, DataScope::User);
-    }
-    #[test]
-    fn search_db_user_md() {
-        assert_eq!(SEARCH_DB_USER.id, "search_db_user");
-        assert_eq!(SEARCH_DB_USER.artifact_type, ArtifactType::File);
-        assert_eq!(SEARCH_DB_USER.scope, DataScope::System);
-    }
-
-    // ── Windows credentials ───────────────────────────────────────────────
-
-    #[test]
-    fn dpapi_masterkey_user_md() {
-        assert_eq!(DPAPI_MASTERKEY_USER.id, "dpapi_masterkey_user");
-        assert_eq!(DPAPI_MASTERKEY_USER.artifact_type, ArtifactType::Directory);
-        assert_eq!(DPAPI_MASTERKEY_USER.scope, DataScope::User);
-        assert!(DPAPI_MASTERKEY_USER.mitre_techniques.contains(&"T1555.004"));
-    }
-    #[test]
-    fn dpapi_cred_user_md() {
-        assert_eq!(DPAPI_CRED_USER.id, "dpapi_cred_user");
-        assert_eq!(DPAPI_CRED_USER.artifact_type, ArtifactType::Directory);
-        assert_eq!(DPAPI_CRED_USER.scope, DataScope::User);
-    }
-    #[test]
-    fn dpapi_cred_roaming_md() {
-        assert_eq!(DPAPI_CRED_ROAMING.id, "dpapi_cred_roaming");
-        assert_eq!(DPAPI_CRED_ROAMING.artifact_type, ArtifactType::Directory);
-        assert_eq!(DPAPI_CRED_ROAMING.scope, DataScope::User);
-    }
-    #[test]
-    fn windows_vault_user_md() {
-        assert_eq!(WINDOWS_VAULT_USER.id, "windows_vault_user");
-        assert_eq!(WINDOWS_VAULT_USER.artifact_type, ArtifactType::Directory);
-        assert_eq!(WINDOWS_VAULT_USER.scope, DataScope::User);
-        assert!(WINDOWS_VAULT_USER.mitre_techniques.contains(&"T1555.004"));
-    }
-    #[test]
-    fn windows_vault_system_md() {
-        assert_eq!(WINDOWS_VAULT_SYSTEM.id, "windows_vault_system");
-        assert_eq!(WINDOWS_VAULT_SYSTEM.artifact_type, ArtifactType::Directory);
-        assert_eq!(WINDOWS_VAULT_SYSTEM.scope, DataScope::System);
-    }
-    #[test]
-    fn rdp_client_servers_md() {
-        assert_eq!(RDP_CLIENT_SERVERS.id, "rdp_client_servers");
-        assert_eq!(RDP_CLIENT_SERVERS.hive, Some(HiveTarget::NtUser));
-        assert_eq!(RDP_CLIENT_SERVERS.scope, DataScope::User);
-        assert!(RDP_CLIENT_SERVERS.mitre_techniques.contains(&"T1021.001"));
-    }
-    #[test]
-    fn rdp_client_default_md() {
-        assert_eq!(RDP_CLIENT_DEFAULT.id, "rdp_client_default");
-        assert_eq!(RDP_CLIENT_DEFAULT.hive, Some(HiveTarget::NtUser));
-        assert_eq!(RDP_CLIENT_DEFAULT.scope, DataScope::User);
-        assert!(RDP_CLIENT_DEFAULT.mitre_techniques.contains(&"T1021.001"));
-    }
-    #[test]
-    fn ntds_dit_md() {
-        assert_eq!(NTDS_DIT.id, "ntds_dit");
-        assert_eq!(NTDS_DIT.artifact_type, ArtifactType::File);
-        assert_eq!(NTDS_DIT.scope, DataScope::System);
-        assert!(NTDS_DIT.mitre_techniques.contains(&"T1003.003"));
-    }
-    #[test]
-    fn chrome_login_data_md() {
-        assert_eq!(CHROME_LOGIN_DATA.id, "chrome_login_data");
-        assert_eq!(CHROME_LOGIN_DATA.artifact_type, ArtifactType::File);
-        assert_eq!(CHROME_LOGIN_DATA.scope, DataScope::User);
-        assert!(CHROME_LOGIN_DATA.mitre_techniques.contains(&"T1555.003"));
-    }
-    #[test]
-    fn firefox_logins_md() {
-        assert_eq!(FIREFOX_LOGINS.id, "firefox_logins");
-        assert_eq!(FIREFOX_LOGINS.artifact_type, ArtifactType::File);
-        assert_eq!(FIREFOX_LOGINS.scope, DataScope::User);
-        assert!(FIREFOX_LOGINS.mitre_techniques.contains(&"T1555.003"));
-    }
-    #[test]
-    fn wifi_profiles_md() {
-        assert_eq!(WIFI_PROFILES.id, "wifi_profiles");
-        assert_eq!(WIFI_PROFILES.artifact_type, ArtifactType::Directory);
-        assert_eq!(WIFI_PROFILES.scope, DataScope::System);
-        assert!(WIFI_PROFILES.mitre_techniques.contains(&"T1552.001"));
-    }
-
-    // ── CATALOG completeness (batch C) ────────────────────────────────────
-
-    #[test]
-    fn catalog_contains_batch_c() {
-        let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
-        for expected in &[
-            "winlogon_shell",
-            "services_imagepath",
-            "active_setup_hklm",
-            "active_setup_hkcu",
-            "com_hijack_clsid_hkcu",
-            "appcert_dlls",
-            "boot_execute",
-            "lsa_security_pkgs",
-            "lsa_auth_pkgs",
-            "print_monitors",
-            "time_providers",
-            "netsh_helper_dlls",
-            "browser_helper_objects",
-            "startup_folder_user",
-            "startup_folder_system",
-            "scheduled_tasks_dir",
-            "wdigest_caching",
-            "wordwheel_query",
-            "opensave_mru",
-            "lastvisited_mru",
-            "prefetch_dir",
-            "srum_db",
-            "windows_timeline",
-            "powershell_history",
-            "recycle_bin",
-            "thumbcache",
-            "search_db_user",
-            "dpapi_masterkey_user",
-            "dpapi_cred_user",
-            "dpapi_cred_roaming",
-            "windows_vault_user",
-            "windows_vault_system",
-            "rdp_client_servers",
-            "rdp_client_default",
-            "ntds_dit",
-            "chrome_login_data",
-            "firefox_logins",
-            "wifi_profiles",
-        ] {
-            assert!(ids.contains(expected), "CATALOG missing: {expected}");
-        }
-    }
-}
-
-// ── Tests for Batch D (Linux persistence / execution / credential) ────────────
-
-#[cfg(test)]
-mod tests_batch_d {
-    use super::*;
-
-    // ── Linux persistence: cron ───────────────────────────────────────────
-
-    #[test]
-    fn linux_crontab_system_md() {
-        assert_eq!(LINUX_CRONTAB_SYSTEM.id, "linux_crontab_system");
-        assert_eq!(LINUX_CRONTAB_SYSTEM.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_CRONTAB_SYSTEM.scope, DataScope::System);
-        assert_eq!(LINUX_CRONTAB_SYSTEM.os_scope, OsScope::Linux);
-        assert!(LINUX_CRONTAB_SYSTEM.mitre_techniques.contains(&"T1053.003"));
-    }
-    #[test]
-    fn linux_cron_d_md() {
-        assert_eq!(LINUX_CRON_D.id, "linux_cron_d");
-        assert_eq!(LINUX_CRON_D.artifact_type, ArtifactType::Directory);
-        assert_eq!(LINUX_CRON_D.scope, DataScope::System);
-        assert_eq!(LINUX_CRON_D.os_scope, OsScope::Linux);
-    }
-    #[test]
-    fn linux_cron_periodic_md() {
-        assert_eq!(LINUX_CRON_PERIODIC.id, "linux_cron_periodic");
-        assert_eq!(LINUX_CRON_PERIODIC.artifact_type, ArtifactType::Directory);
-        assert_eq!(LINUX_CRON_PERIODIC.scope, DataScope::System);
-    }
-    #[test]
-    fn linux_user_crontab_md() {
-        assert_eq!(LINUX_USER_CRONTAB.id, "linux_user_crontab");
-        assert_eq!(LINUX_USER_CRONTAB.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_USER_CRONTAB.scope, DataScope::User);
-        assert!(LINUX_USER_CRONTAB.mitre_techniques.contains(&"T1053.003"));
-    }
-    #[test]
-    fn linux_anacrontab_md() {
-        assert_eq!(LINUX_ANACRONTAB.id, "linux_anacrontab");
-        assert_eq!(LINUX_ANACRONTAB.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_ANACRONTAB.scope, DataScope::System);
-    }
-
-    // ── Linux persistence: systemd ────────────────────────────────────────
-
-    #[test]
-    fn linux_systemd_system_unit_md() {
-        assert_eq!(LINUX_SYSTEMD_SYSTEM_UNIT.id, "linux_systemd_system_unit");
-        assert_eq!(
-            LINUX_SYSTEMD_SYSTEM_UNIT.artifact_type,
-            ArtifactType::Directory
-        );
-        assert_eq!(LINUX_SYSTEMD_SYSTEM_UNIT.scope, DataScope::System);
-        assert_eq!(LINUX_SYSTEMD_SYSTEM_UNIT.os_scope, OsScope::LinuxSystemd);
-        assert!(LINUX_SYSTEMD_SYSTEM_UNIT
-            .mitre_techniques
-            .contains(&"T1543.002"));
-    }
-    #[test]
-    fn linux_systemd_user_unit_md() {
-        assert_eq!(LINUX_SYSTEMD_USER_UNIT.id, "linux_systemd_user_unit");
-        assert_eq!(
-            LINUX_SYSTEMD_USER_UNIT.artifact_type,
-            ArtifactType::Directory
-        );
-        assert_eq!(LINUX_SYSTEMD_USER_UNIT.scope, DataScope::User);
-        assert_eq!(LINUX_SYSTEMD_USER_UNIT.os_scope, OsScope::LinuxSystemd);
-    }
-    #[test]
-    fn linux_systemd_timer_md() {
-        assert_eq!(LINUX_SYSTEMD_TIMER.id, "linux_systemd_timer");
-        assert_eq!(LINUX_SYSTEMD_TIMER.artifact_type, ArtifactType::Directory);
-        assert_eq!(LINUX_SYSTEMD_TIMER.os_scope, OsScope::LinuxSystemd);
-        assert!(LINUX_SYSTEMD_TIMER.mitre_techniques.contains(&"T1053.006"));
-    }
-
-    // ── Linux persistence: init / rc.local ───────────────────────────────
-
-    #[test]
-    fn linux_rc_local_md() {
-        assert_eq!(LINUX_RC_LOCAL.id, "linux_rc_local");
-        assert_eq!(LINUX_RC_LOCAL.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_RC_LOCAL.scope, DataScope::System);
-        assert!(LINUX_RC_LOCAL.mitre_techniques.contains(&"T1037.004"));
-    }
-    #[test]
-    fn linux_init_d_md() {
-        assert_eq!(LINUX_INIT_D.id, "linux_init_d");
-        assert_eq!(LINUX_INIT_D.artifact_type, ArtifactType::Directory);
-        assert_eq!(LINUX_INIT_D.scope, DataScope::System);
-    }
-
-    // ── Linux persistence: shell startup ─────────────────────────────────
-
-    #[test]
-    fn linux_bashrc_user_md() {
-        assert_eq!(LINUX_BASHRC_USER.id, "linux_bashrc_user");
-        assert_eq!(LINUX_BASHRC_USER.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_BASHRC_USER.scope, DataScope::User);
-        assert!(LINUX_BASHRC_USER.mitre_techniques.contains(&"T1546.004"));
-    }
-    #[test]
-    fn linux_bash_profile_user_md() {
-        assert_eq!(LINUX_BASH_PROFILE_USER.id, "linux_bash_profile_user");
-        assert_eq!(LINUX_BASH_PROFILE_USER.scope, DataScope::User);
-        assert!(LINUX_BASH_PROFILE_USER
-            .mitre_techniques
-            .contains(&"T1546.004"));
-    }
-    #[test]
-    fn linux_profile_user_md() {
-        assert_eq!(LINUX_PROFILE_USER.id, "linux_profile_user");
-        assert_eq!(LINUX_PROFILE_USER.scope, DataScope::User);
-    }
-    #[test]
-    fn linux_zshrc_user_md() {
-        assert_eq!(LINUX_ZSHRC_USER.id, "linux_zshrc_user");
-        assert_eq!(LINUX_ZSHRC_USER.scope, DataScope::User);
-        assert!(LINUX_ZSHRC_USER.mitre_techniques.contains(&"T1546.004"));
-    }
-    #[test]
-    fn linux_profile_system_md() {
-        assert_eq!(LINUX_PROFILE_SYSTEM.id, "linux_profile_system");
-        assert_eq!(LINUX_PROFILE_SYSTEM.scope, DataScope::System);
-    }
-    #[test]
-    fn linux_profile_d_md() {
-        assert_eq!(LINUX_PROFILE_D.id, "linux_profile_d");
-        assert_eq!(LINUX_PROFILE_D.artifact_type, ArtifactType::Directory);
-        assert_eq!(LINUX_PROFILE_D.scope, DataScope::System);
-    }
-
-    // ── Linux persistence: LD_PRELOAD / linker ────────────────────────────
-
-    #[test]
-    fn linux_ld_so_preload_md() {
-        assert_eq!(LINUX_LD_SO_PRELOAD.id, "linux_ld_so_preload");
-        assert_eq!(LINUX_LD_SO_PRELOAD.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_LD_SO_PRELOAD.scope, DataScope::System);
-        assert!(LINUX_LD_SO_PRELOAD.mitre_techniques.contains(&"T1574.006"));
-    }
-    #[test]
-    fn linux_ld_so_conf_d_md() {
-        assert_eq!(LINUX_LD_SO_CONF_D.id, "linux_ld_so_conf_d");
-        assert_eq!(LINUX_LD_SO_CONF_D.artifact_type, ArtifactType::Directory);
-        assert_eq!(LINUX_LD_SO_CONF_D.scope, DataScope::System);
-    }
-
-    // ── Linux persistence: SSH ────────────────────────────────────────────
-
-    #[test]
-    fn linux_ssh_authorized_keys_md() {
-        assert_eq!(LINUX_SSH_AUTHORIZED_KEYS.id, "linux_ssh_authorized_keys");
-        assert_eq!(LINUX_SSH_AUTHORIZED_KEYS.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_SSH_AUTHORIZED_KEYS.scope, DataScope::User);
-        assert!(LINUX_SSH_AUTHORIZED_KEYS
-            .mitre_techniques
-            .contains(&"T1098.004"));
-    }
-
-    // ── Linux persistence: PAM / sudo / kernel ────────────────────────────
-
-    #[test]
-    fn linux_pam_d_md() {
-        assert_eq!(LINUX_PAM_D.id, "linux_pam_d");
-        assert_eq!(LINUX_PAM_D.artifact_type, ArtifactType::Directory);
-        assert_eq!(LINUX_PAM_D.scope, DataScope::System);
-        assert!(LINUX_PAM_D.mitre_techniques.contains(&"T1556.003"));
-    }
-    #[test]
-    fn linux_sudoers_d_md() {
-        assert_eq!(LINUX_SUDOERS_D.id, "linux_sudoers_d");
-        assert_eq!(LINUX_SUDOERS_D.artifact_type, ArtifactType::Directory);
-        assert_eq!(LINUX_SUDOERS_D.scope, DataScope::System);
-        assert!(LINUX_SUDOERS_D.mitre_techniques.contains(&"T1548.003"));
-    }
-    #[test]
-    fn linux_modules_load_d_md() {
-        assert_eq!(LINUX_MODULES_LOAD_D.id, "linux_modules_load_d");
-        assert_eq!(LINUX_MODULES_LOAD_D.artifact_type, ArtifactType::Directory);
-        assert_eq!(LINUX_MODULES_LOAD_D.scope, DataScope::System);
-        assert!(LINUX_MODULES_LOAD_D.mitre_techniques.contains(&"T1547.006"));
-    }
-    #[test]
-    fn linux_motd_d_md() {
-        assert_eq!(LINUX_MOTD_D.id, "linux_motd_d");
-        assert_eq!(LINUX_MOTD_D.artifact_type, ArtifactType::Directory);
-        assert_eq!(LINUX_MOTD_D.scope, DataScope::System);
-    }
-    #[test]
-    fn linux_udev_rules_d_md() {
-        assert_eq!(LINUX_UDEV_RULES_D.id, "linux_udev_rules_d");
-        assert_eq!(LINUX_UDEV_RULES_D.artifact_type, ArtifactType::Directory);
-        assert_eq!(LINUX_UDEV_RULES_D.scope, DataScope::System);
-        assert!(LINUX_UDEV_RULES_D.mitre_techniques.contains(&"T1546"));
-    }
-
-    // ── Linux execution evidence ──────────────────────────────────────────
-
-    #[test]
-    fn linux_bash_history_md() {
-        assert_eq!(LINUX_BASH_HISTORY.id, "linux_bash_history");
-        assert_eq!(LINUX_BASH_HISTORY.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_BASH_HISTORY.scope, DataScope::User);
-        assert!(LINUX_BASH_HISTORY.mitre_techniques.contains(&"T1059.004"));
-    }
-    #[test]
-    fn linux_zsh_history_md() {
-        assert_eq!(LINUX_ZSH_HISTORY.id, "linux_zsh_history");
-        assert_eq!(LINUX_ZSH_HISTORY.scope, DataScope::User);
-    }
-    #[test]
-    fn linux_wtmp_md() {
-        assert_eq!(LINUX_WTMP.id, "linux_wtmp");
-        assert_eq!(LINUX_WTMP.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_WTMP.scope, DataScope::System);
-        assert!(LINUX_WTMP.mitre_techniques.contains(&"T1078"));
-    }
-    #[test]
-    fn linux_btmp_md() {
-        assert_eq!(LINUX_BTMP.id, "linux_btmp");
-        assert_eq!(LINUX_BTMP.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_BTMP.scope, DataScope::System);
-    }
-    #[test]
-    fn linux_lastlog_md() {
-        assert_eq!(LINUX_LASTLOG.id, "linux_lastlog");
-        assert_eq!(LINUX_LASTLOG.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_LASTLOG.scope, DataScope::System);
-    }
-    #[test]
-    fn linux_auth_log_md() {
-        assert_eq!(LINUX_AUTH_LOG.id, "linux_auth_log");
-        assert_eq!(LINUX_AUTH_LOG.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_AUTH_LOG.scope, DataScope::System);
-        assert!(LINUX_AUTH_LOG.mitre_techniques.contains(&"T1078"));
-    }
-    #[test]
-    fn linux_journal_dir_md() {
-        assert_eq!(LINUX_JOURNAL_DIR.id, "linux_journal_dir");
-        assert_eq!(LINUX_JOURNAL_DIR.artifact_type, ArtifactType::Directory);
-        assert_eq!(LINUX_JOURNAL_DIR.os_scope, OsScope::LinuxSystemd);
-    }
-
-    // ── Linux credentials ─────────────────────────────────────────────────
-
-    #[test]
-    fn linux_passwd_md() {
-        assert_eq!(LINUX_PASSWD.id, "linux_passwd");
-        assert_eq!(LINUX_PASSWD.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_PASSWD.scope, DataScope::System);
-        assert!(LINUX_PASSWD.mitre_techniques.contains(&"T1087.001"));
-    }
-    #[test]
-    fn linux_shadow_md() {
-        assert_eq!(LINUX_SHADOW.id, "linux_shadow");
-        assert_eq!(LINUX_SHADOW.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_SHADOW.scope, DataScope::System);
-        assert!(LINUX_SHADOW.mitre_techniques.contains(&"T1003.008"));
-    }
-    #[test]
-    fn linux_ssh_private_key_md() {
-        assert_eq!(LINUX_SSH_PRIVATE_KEY.id, "linux_ssh_private_key");
-        assert_eq!(LINUX_SSH_PRIVATE_KEY.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_SSH_PRIVATE_KEY.scope, DataScope::User);
-        assert!(LINUX_SSH_PRIVATE_KEY
-            .mitre_techniques
-            .contains(&"T1552.004"));
-    }
-    #[test]
-    fn linux_ssh_known_hosts_md() {
-        assert_eq!(LINUX_SSH_KNOWN_HOSTS.id, "linux_ssh_known_hosts");
-        assert_eq!(LINUX_SSH_KNOWN_HOSTS.scope, DataScope::User);
-        assert!(LINUX_SSH_KNOWN_HOSTS
-            .mitre_techniques
-            .contains(&"T1021.004"));
-    }
-    #[test]
-    fn linux_gnupg_private_md() {
-        assert_eq!(LINUX_GNUPG_PRIVATE.id, "linux_gnupg_private");
-        assert_eq!(LINUX_GNUPG_PRIVATE.artifact_type, ArtifactType::Directory);
-        assert_eq!(LINUX_GNUPG_PRIVATE.scope, DataScope::User);
-        assert!(LINUX_GNUPG_PRIVATE.mitre_techniques.contains(&"T1552.004"));
-    }
-    #[test]
-    fn linux_aws_credentials_md() {
-        assert_eq!(LINUX_AWS_CREDENTIALS.id, "linux_aws_credentials");
-        assert_eq!(LINUX_AWS_CREDENTIALS.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_AWS_CREDENTIALS.scope, DataScope::User);
-        assert!(LINUX_AWS_CREDENTIALS
-            .mitre_techniques
-            .contains(&"T1552.001"));
-    }
-    #[test]
-    fn linux_docker_config_md() {
-        assert_eq!(LINUX_DOCKER_CONFIG.id, "linux_docker_config");
-        assert_eq!(LINUX_DOCKER_CONFIG.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_DOCKER_CONFIG.scope, DataScope::User);
-        assert!(LINUX_DOCKER_CONFIG.mitre_techniques.contains(&"T1552.001"));
-    }
-
-    // ── CATALOG completeness (batch D) ────────────────────────────────────
-
-    #[test]
-    fn catalog_contains_batch_d() {
-        let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
-        for expected in &[
-            "linux_crontab_system",
-            "linux_cron_d",
-            "linux_cron_periodic",
-            "linux_user_crontab",
-            "linux_anacrontab",
-            "linux_systemd_system_unit",
-            "linux_systemd_user_unit",
-            "linux_systemd_timer",
-            "linux_rc_local",
-            "linux_init_d",
-            "linux_bashrc_user",
-            "linux_bash_profile_user",
-            "linux_profile_user",
-            "linux_zshrc_user",
-            "linux_profile_system",
-            "linux_profile_d",
-            "linux_ld_so_preload",
-            "linux_ld_so_conf_d",
-            "linux_ssh_authorized_keys",
-            "linux_pam_d",
-            "linux_sudoers_d",
-            "linux_modules_load_d",
-            "linux_motd_d",
-            "linux_udev_rules_d",
-            "linux_bash_history",
-            "linux_zsh_history",
-            "linux_wtmp",
-            "linux_btmp",
-            "linux_lastlog",
-            "linux_auth_log",
-            "linux_journal_dir",
-            "linux_passwd",
-            "linux_shadow",
-            "linux_ssh_private_key",
-            "linux_ssh_known_hosts",
-            "linux_gnupg_private",
-            "linux_aws_credentials",
-            "linux_docker_config",
-        ] {
-            assert!(ids.contains(expected), "CATALOG missing: {expected}");
-        }
-    }
-
-    // ═══════════════════════════════════════════════════════════════════════
-    // Batch E — Windows execution / persistence / credential (RED)
-    // ═══════════════════════════════════════════════════════════════════════
-
-    // ── Windows execution evidence ────────────────────────────────────────
-
-    #[test]
-    fn lnk_files_md() {
-        assert_eq!(LNK_FILES.id, "lnk_files");
-        assert_eq!(LNK_FILES.artifact_type, ArtifactType::Directory);
-        assert_eq!(LNK_FILES.scope, DataScope::User);
-        assert!(LNK_FILES.mitre_techniques.contains(&"T1547.009"));
-    }
-    #[test]
-    fn jump_list_auto_md() {
-        assert_eq!(JUMP_LIST_AUTO.id, "jump_list_auto");
-        assert_eq!(JUMP_LIST_AUTO.artifact_type, ArtifactType::Directory);
-        assert_eq!(JUMP_LIST_AUTO.scope, DataScope::User);
-        assert!(JUMP_LIST_AUTO.mitre_techniques.contains(&"T1547.009"));
-    }
-    #[test]
-    fn jump_list_custom_md() {
-        assert_eq!(JUMP_LIST_CUSTOM.id, "jump_list_custom");
-        assert_eq!(JUMP_LIST_CUSTOM.artifact_type, ArtifactType::Directory);
-        assert_eq!(JUMP_LIST_CUSTOM.scope, DataScope::User);
-        assert!(JUMP_LIST_CUSTOM.mitre_techniques.contains(&"T1547.009"));
-    }
-    #[test]
-    fn evtx_dir_md() {
-        assert_eq!(EVTX_DIR.id, "evtx_dir");
-        assert_eq!(EVTX_DIR.artifact_type, ArtifactType::Directory);
-        assert_eq!(EVTX_DIR.scope, DataScope::System);
-        assert!(EVTX_DIR.mitre_techniques.contains(&"T1070.001"));
-    }
-    #[test]
-    fn usn_journal_md() {
-        assert_eq!(USN_JOURNAL.id, "usn_journal");
-        assert_eq!(USN_JOURNAL.artifact_type, ArtifactType::File);
-        assert_eq!(USN_JOURNAL.scope, DataScope::System);
-        assert_eq!(USN_JOURNAL.os_scope, OsScope::Win7Plus);
-    }
-
-    // ── Windows persistence ───────────────────────────────────────────────
-
-    #[test]
-    fn wmi_mof_dir_md() {
-        assert_eq!(WMI_MOF_DIR.id, "wmi_mof_dir");
-        assert_eq!(WMI_MOF_DIR.artifact_type, ArtifactType::Directory);
-        assert_eq!(WMI_MOF_DIR.scope, DataScope::System);
-        assert!(WMI_MOF_DIR.mitre_techniques.contains(&"T1546.003"));
-    }
-    #[test]
-    fn bits_db_md() {
-        assert_eq!(BITS_DB.id, "bits_db");
-        assert_eq!(BITS_DB.artifact_type, ArtifactType::Directory);
-        assert_eq!(BITS_DB.scope, DataScope::System);
-        assert!(BITS_DB.mitre_techniques.contains(&"T1197"));
-    }
-    #[test]
-    fn wmi_subscriptions_md() {
-        assert_eq!(WMI_SUBSCRIPTIONS.id, "wmi_subscriptions");
-        assert_eq!(WMI_SUBSCRIPTIONS.artifact_type, ArtifactType::RegistryKey);
-        assert_eq!(WMI_SUBSCRIPTIONS.scope, DataScope::System);
-        assert!(WMI_SUBSCRIPTIONS.mitre_techniques.contains(&"T1546.003"));
-    }
-    #[test]
-    fn logon_scripts_md() {
-        assert_eq!(LOGON_SCRIPTS.id, "logon_scripts");
-        assert_eq!(LOGON_SCRIPTS.artifact_type, ArtifactType::RegistryValue);
-        assert_eq!(LOGON_SCRIPTS.scope, DataScope::User);
-        assert!(LOGON_SCRIPTS.mitre_techniques.contains(&"T1037.001"));
-    }
-    #[test]
-    fn winsock_lsp_md() {
-        assert_eq!(WINSOCK_LSP.id, "winsock_lsp");
-        assert_eq!(WINSOCK_LSP.artifact_type, ArtifactType::RegistryKey);
-        assert_eq!(WINSOCK_LSP.scope, DataScope::System);
-        assert!(WINSOCK_LSP.mitre_techniques.contains(&"T1547.010"));
-    }
-    #[test]
-    fn appshim_db_md() {
-        assert_eq!(APPSHIM_DB.id, "appshim_db");
-        assert_eq!(APPSHIM_DB.artifact_type, ArtifactType::Directory);
-        assert_eq!(APPSHIM_DB.scope, DataScope::System);
-        assert!(APPSHIM_DB.mitre_techniques.contains(&"T1546.011"));
-    }
-    #[test]
-    fn password_filter_dll_md() {
-        assert_eq!(PASSWORD_FILTER_DLL.id, "password_filter_dll");
-        assert_eq!(
-            PASSWORD_FILTER_DLL.artifact_type,
-            ArtifactType::RegistryValue
-        );
-        assert_eq!(PASSWORD_FILTER_DLL.scope, DataScope::System);
-        assert!(PASSWORD_FILTER_DLL.mitre_techniques.contains(&"T1556.002"));
-    }
-    #[test]
-    fn office_normal_dotm_md() {
-        assert_eq!(OFFICE_NORMAL_DOTM.id, "office_normal_dotm");
-        assert_eq!(OFFICE_NORMAL_DOTM.artifact_type, ArtifactType::File);
-        assert_eq!(OFFICE_NORMAL_DOTM.scope, DataScope::User);
-        assert!(OFFICE_NORMAL_DOTM.mitre_techniques.contains(&"T1137.001"));
-    }
-    #[test]
-    fn powershell_profile_all_md() {
-        assert_eq!(POWERSHELL_PROFILE_ALL.id, "powershell_profile_all");
-        assert_eq!(POWERSHELL_PROFILE_ALL.artifact_type, ArtifactType::File);
-        assert_eq!(POWERSHELL_PROFILE_ALL.scope, DataScope::System);
-        assert!(POWERSHELL_PROFILE_ALL
-            .mitre_techniques
-            .contains(&"T1546.013"));
-    }
-
-    // ── Windows credentials ───────────────────────────────────────────────
-
-    #[test]
-    fn dpapi_system_masterkey_md() {
-        assert_eq!(DPAPI_SYSTEM_MASTERKEY.id, "dpapi_system_masterkey");
-        assert_eq!(
-            DPAPI_SYSTEM_MASTERKEY.artifact_type,
-            ArtifactType::Directory
-        );
-        assert_eq!(DPAPI_SYSTEM_MASTERKEY.scope, DataScope::System);
-        assert!(DPAPI_SYSTEM_MASTERKEY
-            .mitre_techniques
-            .contains(&"T1555.004"));
-    }
-    #[test]
-    fn dpapi_credhist_md() {
-        assert_eq!(DPAPI_CREDHIST.id, "dpapi_credhist");
-        assert_eq!(DPAPI_CREDHIST.artifact_type, ArtifactType::File);
-        assert_eq!(DPAPI_CREDHIST.scope, DataScope::User);
-        assert!(DPAPI_CREDHIST.mitre_techniques.contains(&"T1555.004"));
-    }
-    #[test]
-    fn chrome_cookies_md() {
-        assert_eq!(CHROME_COOKIES.id, "chrome_cookies");
-        assert_eq!(CHROME_COOKIES.artifact_type, ArtifactType::File);
-        assert_eq!(CHROME_COOKIES.scope, DataScope::User);
-        assert!(CHROME_COOKIES.mitre_techniques.contains(&"T1539"));
-    }
-    #[test]
-    fn edge_webcache_md() {
-        assert_eq!(EDGE_WEBCACHE.id, "edge_webcache");
-        assert_eq!(EDGE_WEBCACHE.artifact_type, ArtifactType::Directory);
-        assert_eq!(EDGE_WEBCACHE.scope, DataScope::User);
-        assert!(EDGE_WEBCACHE.mitre_techniques.contains(&"T1539"));
-    }
-    #[test]
-    fn vpn_ras_phonebook_md() {
-        assert_eq!(VPN_RAS_PHONEBOOK.id, "vpn_ras_phonebook");
-        assert_eq!(VPN_RAS_PHONEBOOK.artifact_type, ArtifactType::File);
-        assert_eq!(VPN_RAS_PHONEBOOK.scope, DataScope::User);
-        assert!(VPN_RAS_PHONEBOOK.mitre_techniques.contains(&"T1552.001"));
-    }
-    #[test]
-    fn windows_hello_ngc_md() {
-        assert_eq!(WINDOWS_HELLO_NGC.id, "windows_hello_ngc");
-        assert_eq!(WINDOWS_HELLO_NGC.artifact_type, ArtifactType::Directory);
-        assert_eq!(WINDOWS_HELLO_NGC.scope, DataScope::System);
-        assert!(WINDOWS_HELLO_NGC.mitre_techniques.contains(&"T1555"));
-    }
-    #[test]
-    fn user_cert_private_key_md() {
-        assert_eq!(USER_CERT_PRIVATE_KEY.id, "user_cert_private_key");
-        assert_eq!(USER_CERT_PRIVATE_KEY.artifact_type, ArtifactType::Directory);
-        assert_eq!(USER_CERT_PRIVATE_KEY.scope, DataScope::User);
-        assert!(USER_CERT_PRIVATE_KEY
-            .mitre_techniques
-            .contains(&"T1552.004"));
-    }
-    #[test]
-    fn machine_cert_store_md() {
-        assert_eq!(MACHINE_CERT_STORE.id, "machine_cert_store");
-        assert_eq!(MACHINE_CERT_STORE.artifact_type, ArtifactType::Directory);
-        assert_eq!(MACHINE_CERT_STORE.scope, DataScope::System);
-        assert!(MACHINE_CERT_STORE.mitre_techniques.contains(&"T1552.004"));
-    }
-
-    // ── CATALOG completeness (batch E) ────────────────────────────────────
-
-    #[test]
-    fn catalog_contains_batch_e() {
-        let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
-        for expected in &[
-            "lnk_files",
-            "jump_list_auto",
-            "jump_list_custom",
-            "evtx_dir",
-            "mft_file",
-            "usn_journal",
-            "wmi_mof_dir",
-            "bits_db",
-            "wmi_subscriptions",
-            "logon_scripts",
-            "winsock_lsp",
-            "appshim_db",
-            "password_filter_dll",
-            "office_normal_dotm",
-            "powershell_profile_all",
-            "dpapi_system_masterkey",
-            "dpapi_credhist",
-            "chrome_cookies",
-            "edge_webcache",
-            "vpn_ras_phonebook",
-            "windows_hello_ngc",
-            "user_cert_private_key",
-            "machine_cert_store",
-        ] {
-            assert!(ids.contains(expected), "CATALOG missing: {expected}");
-        }
-    }
-
-    // ═══════════════════════════════════════════════════════════════════════
-    // Batch F — Linux extended credential / execution artifacts (RED)
-    // ═══════════════════════════════════════════════════════════════════════
-
-    #[test]
-    fn linux_at_queue_md() {
-        assert_eq!(LINUX_AT_QUEUE.id, "linux_at_queue");
-        assert_eq!(LINUX_AT_QUEUE.artifact_type, ArtifactType::Directory);
-        assert_eq!(LINUX_AT_QUEUE.scope, DataScope::System);
-        assert!(LINUX_AT_QUEUE.mitre_techniques.contains(&"T1053.001"));
-    }
-    #[test]
-    fn linux_sshd_config_md() {
-        assert_eq!(LINUX_SSHD_CONFIG.id, "linux_sshd_config");
-        assert_eq!(LINUX_SSHD_CONFIG.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_SSHD_CONFIG.scope, DataScope::System);
-        assert!(LINUX_SSHD_CONFIG.mitre_techniques.contains(&"T1098.004"));
-    }
-    #[test]
-    fn linux_etc_group_md() {
-        assert_eq!(LINUX_ETC_GROUP.id, "linux_etc_group");
-        assert_eq!(LINUX_ETC_GROUP.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_ETC_GROUP.scope, DataScope::System);
-        assert!(LINUX_ETC_GROUP.mitre_techniques.contains(&"T1087.001"));
-    }
-    #[test]
-    fn linux_gnome_keyring_md() {
-        assert_eq!(LINUX_GNOME_KEYRING.id, "linux_gnome_keyring");
-        assert_eq!(LINUX_GNOME_KEYRING.artifact_type, ArtifactType::Directory);
-        assert_eq!(LINUX_GNOME_KEYRING.scope, DataScope::User);
-        assert!(LINUX_GNOME_KEYRING.mitre_techniques.contains(&"T1555.003"));
-    }
-    #[test]
-    fn linux_kde_kwallet_md() {
-        assert_eq!(LINUX_KDE_KWALLET.id, "linux_kde_kwallet");
-        assert_eq!(LINUX_KDE_KWALLET.artifact_type, ArtifactType::Directory);
-        assert_eq!(LINUX_KDE_KWALLET.scope, DataScope::User);
-        assert!(LINUX_KDE_KWALLET.mitre_techniques.contains(&"T1555.003"));
-    }
-    #[test]
-    fn linux_chrome_login_linux_md() {
-        assert_eq!(LINUX_CHROME_LOGIN_LINUX.id, "linux_chrome_login_linux");
-        assert_eq!(LINUX_CHROME_LOGIN_LINUX.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_CHROME_LOGIN_LINUX.scope, DataScope::User);
-        assert!(LINUX_CHROME_LOGIN_LINUX
-            .mitre_techniques
-            .contains(&"T1555.003"));
-    }
-    #[test]
-    fn linux_firefox_logins_linux_md() {
-        assert_eq!(LINUX_FIREFOX_LOGINS_LINUX.id, "linux_firefox_logins_linux");
-        assert_eq!(LINUX_FIREFOX_LOGINS_LINUX.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_FIREFOX_LOGINS_LINUX.scope, DataScope::User);
-        assert!(LINUX_FIREFOX_LOGINS_LINUX
-            .mitre_techniques
-            .contains(&"T1555.003"));
-    }
-    #[test]
-    fn linux_utmp_md() {
-        assert_eq!(LINUX_UTMP.id, "linux_utmp");
-        assert_eq!(LINUX_UTMP.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_UTMP.scope, DataScope::System);
-        assert!(LINUX_UTMP.mitre_techniques.contains(&"T1078"));
-    }
-    #[test]
-    fn linux_gcp_credentials_md() {
-        assert_eq!(LINUX_GCP_CREDENTIALS.id, "linux_gcp_credentials");
-        assert_eq!(LINUX_GCP_CREDENTIALS.artifact_type, ArtifactType::Directory);
-        assert_eq!(LINUX_GCP_CREDENTIALS.scope, DataScope::User);
-        assert!(LINUX_GCP_CREDENTIALS
-            .mitre_techniques
-            .contains(&"T1552.001"));
-    }
-    #[test]
-    fn linux_azure_credentials_md() {
-        assert_eq!(LINUX_AZURE_CREDENTIALS.id, "linux_azure_credentials");
-        assert_eq!(
-            LINUX_AZURE_CREDENTIALS.artifact_type,
-            ArtifactType::Directory
-        );
-        assert_eq!(LINUX_AZURE_CREDENTIALS.scope, DataScope::User);
-        assert!(LINUX_AZURE_CREDENTIALS
-            .mitre_techniques
-            .contains(&"T1552.001"));
-    }
-    #[test]
-    fn linux_kube_config_md() {
-        assert_eq!(LINUX_KUBE_CONFIG.id, "linux_kube_config");
-        assert_eq!(LINUX_KUBE_CONFIG.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_KUBE_CONFIG.scope, DataScope::User);
-        assert!(LINUX_KUBE_CONFIG.mitre_techniques.contains(&"T1552.001"));
-    }
-    #[test]
-    fn linux_git_credentials_md() {
-        assert_eq!(LINUX_GIT_CREDENTIALS.id, "linux_git_credentials");
-        assert_eq!(LINUX_GIT_CREDENTIALS.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_GIT_CREDENTIALS.scope, DataScope::User);
-        assert!(LINUX_GIT_CREDENTIALS
-            .mitre_techniques
-            .contains(&"T1552.001"));
-    }
-    #[test]
-    fn linux_netrc_md() {
-        assert_eq!(LINUX_NETRC.id, "linux_netrc");
-        assert_eq!(LINUX_NETRC.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_NETRC.scope, DataScope::User);
-        assert!(LINUX_NETRC.mitre_techniques.contains(&"T1552.001"));
-    }
-
-    // ── CATALOG completeness (batch F) ────────────────────────────────────
-
-    #[test]
-    fn catalog_contains_batch_f() {
-        let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
-        for expected in &[
-            "linux_at_queue",
-            "linux_sshd_config",
-            "linux_etc_group",
-            "linux_gnome_keyring",
-            "linux_kde_kwallet",
-            "linux_chrome_login_linux",
-            "linux_firefox_logins_linux",
-            "linux_utmp",
-            "linux_gcp_credentials",
-            "linux_azure_credentials",
-            "linux_kube_config",
-            "linux_git_credentials",
-            "linux_netrc",
-        ] {
-            assert!(ids.contains(expected), "CATALOG missing: {expected}");
-        }
-    }
-
-    // ═══════════════════════════════════════════════════════════════════════
-    // Batch G — LinuxPersist-sourced artifacts (RED)
-    // Source: https://github.com/GuyEldad/LinuxPersist
-    // ═══════════════════════════════════════════════════════════════════════
-
-    #[test]
-    fn linux_etc_environment_md() {
-        assert_eq!(LINUX_ETC_ENVIRONMENT.id, "linux_etc_environment");
-        assert_eq!(LINUX_ETC_ENVIRONMENT.artifact_type, ArtifactType::File);
-        assert_eq!(LINUX_ETC_ENVIRONMENT.scope, DataScope::System);
-        assert!(LINUX_ETC_ENVIRONMENT
-            .mitre_techniques
-            .contains(&"T1546.004"));
-    }
-    #[test]
-    fn linux_xdg_autostart_user_md() {
-        assert_eq!(LINUX_XDG_AUTOSTART_USER.id, "linux_xdg_autostart_user");
-        assert_eq!(
-            LINUX_XDG_AUTOSTART_USER.artifact_type,
-            ArtifactType::Directory
-        );
-        assert_eq!(LINUX_XDG_AUTOSTART_USER.scope, DataScope::User);
-        assert!(LINUX_XDG_AUTOSTART_USER
-            .mitre_techniques
-            .contains(&"T1547.014"));
-    }
-    #[test]
-    fn linux_xdg_autostart_system_md() {
-        assert_eq!(LINUX_XDG_AUTOSTART_SYSTEM.id, "linux_xdg_autostart_system");
-        assert_eq!(
-            LINUX_XDG_AUTOSTART_SYSTEM.artifact_type,
-            ArtifactType::Directory
-        );
-        assert_eq!(LINUX_XDG_AUTOSTART_SYSTEM.scope, DataScope::System);
-        assert!(LINUX_XDG_AUTOSTART_SYSTEM
-            .mitre_techniques
-            .contains(&"T1547.014"));
-    }
-    #[test]
-    fn linux_networkmanager_dispatcher_md() {
-        assert_eq!(
-            LINUX_NETWORKMANAGER_DISPATCHER.id,
-            "linux_networkmanager_dispatcher"
-        );
-        assert_eq!(
-            LINUX_NETWORKMANAGER_DISPATCHER.artifact_type,
-            ArtifactType::Directory
-        );
-        assert_eq!(LINUX_NETWORKMANAGER_DISPATCHER.scope, DataScope::System);
-        assert!(LINUX_NETWORKMANAGER_DISPATCHER
-            .mitre_techniques
-            .contains(&"T1547.013"));
-    }
-    #[test]
-    fn linux_apt_hooks_md() {
-        assert_eq!(LINUX_APT_HOOKS.id, "linux_apt_hooks");
-        assert_eq!(LINUX_APT_HOOKS.artifact_type, ArtifactType::Directory);
-        assert_eq!(LINUX_APT_HOOKS.scope, DataScope::System);
-        assert_eq!(LINUX_APT_HOOKS.os_scope, OsScope::LinuxDebian);
-        assert!(LINUX_APT_HOOKS.mitre_techniques.contains(&"T1546.004"));
-    }
-
-    // ── CATALOG completeness (batch G) ────────────────────────────────────
-
-    #[test]
-    fn catalog_contains_batch_g() {
-        let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
-        for expected in &[
-            "linux_etc_environment",
-            "linux_xdg_autostart_user",
-            "linux_xdg_autostart_system",
-            "linux_networkmanager_dispatcher",
-            "linux_apt_hooks",
-        ] {
-            assert!(ids.contains(expected), "CATALOG missing: {expected}");
-        }
-    }
-
-    // ═══════════════════════════════════════════════════════════════════════
-    // Batch H — Jump List / LNK / Prefetch / SRUM tables / EVTX channels
-    // ═══════════════════════════════════════════════════════════════════════
-
-    // ── Jump Lists ────────────────────────────────────────────────────────
-
-    #[test]
-    fn jump_list_system_md() {
-        assert_eq!(JUMP_LIST_SYSTEM.id, "jump_list_system");
-        assert_eq!(JUMP_LIST_SYSTEM.artifact_type, ArtifactType::Directory);
-        assert_eq!(JUMP_LIST_SYSTEM.scope, DataScope::System);
-        assert!(JUMP_LIST_SYSTEM.mitre_techniques.contains(&"T1547.009"));
-    }
-
-    // ── LNK Files ─────────────────────────────────────────────────────────
-
-    #[test]
-    fn lnk_files_office_md() {
-        assert_eq!(LNK_FILES_OFFICE.id, "lnk_files_office");
-        assert_eq!(LNK_FILES_OFFICE.artifact_type, ArtifactType::Directory);
-        assert_eq!(LNK_FILES_OFFICE.scope, DataScope::User);
-        assert!(LNK_FILES_OFFICE.mitre_techniques.contains(&"T1547.009"));
-    }
-
-    // ── Prefetch ──────────────────────────────────────────────────────────
-
-    #[test]
-    fn prefetch_file_md() {
-        assert_eq!(PREFETCH_FILE.id, "prefetch_file");
-        assert_eq!(PREFETCH_FILE.artifact_type, ArtifactType::File);
-        assert_eq!(PREFETCH_FILE.scope, DataScope::System);
-        assert_eq!(PREFETCH_FILE.os_scope, OsScope::Win7Plus);
-        assert!(PREFETCH_FILE.mitre_techniques.contains(&"T1059"));
-    }
-
-    // ── SRUM tables ───────────────────────────────────────────────────────
-
-    #[test]
-    fn srum_network_usage_md() {
-        assert_eq!(SRUM_NETWORK_USAGE.id, "srum_network_usage");
-        assert_eq!(SRUM_NETWORK_USAGE.artifact_type, ArtifactType::File);
-        assert_eq!(SRUM_NETWORK_USAGE.scope, DataScope::System);
-        assert_eq!(SRUM_NETWORK_USAGE.os_scope, OsScope::Win8Plus);
-        assert!(SRUM_NETWORK_USAGE.mitre_techniques.contains(&"T1049"));
-    }
-    #[test]
-    fn srum_app_resource_md() {
-        assert_eq!(SRUM_APP_RESOURCE.id, "srum_app_resource");
-        assert_eq!(SRUM_APP_RESOURCE.artifact_type, ArtifactType::File);
-        assert_eq!(SRUM_APP_RESOURCE.scope, DataScope::System);
-        assert_eq!(SRUM_APP_RESOURCE.os_scope, OsScope::Win8Plus);
-        assert!(SRUM_APP_RESOURCE.mitre_techniques.contains(&"T1059"));
-    }
-    #[test]
-    fn srum_energy_usage_md() {
-        assert_eq!(SRUM_ENERGY_USAGE.id, "srum_energy_usage");
-        assert_eq!(SRUM_ENERGY_USAGE.artifact_type, ArtifactType::File);
-        assert_eq!(SRUM_ENERGY_USAGE.scope, DataScope::System);
-        assert_eq!(SRUM_ENERGY_USAGE.os_scope, OsScope::Win8Plus);
-        assert!(SRUM_ENERGY_USAGE.mitre_techniques.contains(&"T1059"));
-    }
-    #[test]
-    fn srum_push_notification_md() {
-        assert_eq!(SRUM_PUSH_NOTIFICATION.id, "srum_push_notification");
-        assert_eq!(SRUM_PUSH_NOTIFICATION.artifact_type, ArtifactType::File);
-        assert_eq!(SRUM_PUSH_NOTIFICATION.scope, DataScope::System);
-        assert_eq!(SRUM_PUSH_NOTIFICATION.os_scope, OsScope::Win10Plus);
-        assert!(SRUM_PUSH_NOTIFICATION.mitre_techniques.contains(&"T1059"));
-    }
-
-    // ── EVTX channels ─────────────────────────────────────────────────────
-
-    #[test]
-    fn evtx_security_md() {
-        assert_eq!(EVTX_SECURITY.id, "evtx_security");
-        assert_eq!(EVTX_SECURITY.artifact_type, ArtifactType::File);
-        assert_eq!(EVTX_SECURITY.scope, DataScope::System);
-        assert!(EVTX_SECURITY.mitre_techniques.contains(&"T1070.001"));
-    }
-    #[test]
-    fn evtx_system_md() {
-        assert_eq!(EVTX_SYSTEM.id, "evtx_system");
-        assert_eq!(EVTX_SYSTEM.artifact_type, ArtifactType::File);
-        assert_eq!(EVTX_SYSTEM.scope, DataScope::System);
-        assert!(EVTX_SYSTEM.mitre_techniques.contains(&"T1543.003"));
-    }
-    #[test]
-    fn evtx_powershell_md() {
-        assert_eq!(EVTX_POWERSHELL.id, "evtx_powershell");
-        assert_eq!(EVTX_POWERSHELL.artifact_type, ArtifactType::File);
-        assert_eq!(EVTX_POWERSHELL.scope, DataScope::System);
-        assert!(EVTX_POWERSHELL.mitre_techniques.contains(&"T1059.001"));
-    }
-    #[test]
-    fn evtx_sysmon_md() {
-        assert_eq!(EVTX_SYSMON.id, "evtx_sysmon");
-        assert_eq!(EVTX_SYSMON.artifact_type, ArtifactType::File);
-        assert_eq!(EVTX_SYSMON.scope, DataScope::System);
-        assert!(EVTX_SYSMON.mitre_techniques.contains(&"T1059"));
-    }
-
-    // ═══════════════════════════════════════════════════════════════════════
-    // Enhancement I — retention / triage_priority / related_artifacts (RED)
-    // ═══════════════════════════════════════════════════════════════════════
-
-    // ── TriagePriority enum exists and is ordered ─────────────────────────
-
-    #[test]
-    fn triage_priority_ordering() {
-        assert!(TriagePriority::Critical > TriagePriority::High);
-        assert!(TriagePriority::High > TriagePriority::Medium);
-        assert!(TriagePriority::Medium > TriagePriority::Low);
-    }
-
-    // ── ArtifactDescriptor has new fields ─────────────────────────────────
-
-    #[test]
-    fn descriptor_has_retention_field() {
-        // retention is Option<&str>; registry persistence keys are indefinite
-        assert_eq!(RUN_KEY_HKLM_RUN.retention, None);
-    }
-
-    #[test]
-    fn descriptor_has_triage_priority_field() {
-        assert_eq!(RUN_KEY_HKLM_RUN.triage_priority, TriagePriority::High);
-    }
-
-    #[test]
-    fn descriptor_has_related_artifacts_field() {
-        let _ = RUN_KEY_HKLM_RUN.related_artifacts;
-    }
-
-    // ── Specific retention values ─────────────────────────────────────────
-
-    #[test]
-    fn srum_retention_is_30_days() {
-        assert_eq!(SRUM_DB.retention, Some("~30 days"));
-    }
-
-    #[test]
-    fn shimcache_retention_mentions_shutdown() {
-        assert!(SHIMCACHE.retention.unwrap_or("").contains("shutdown"));
-    }
-
-    #[test]
-    fn powershell_history_retention_mentions_limit() {
-        assert!(POWERSHELL_HISTORY.retention.unwrap_or("").contains("4096"));
-    }
-
-    #[test]
-    fn bam_user_retention_is_7_days() {
-        assert!(BAM_USER.retention.unwrap_or("").contains("7 day"));
-    }
-
-    #[test]
-    fn evtx_security_retention_mentions_rolling() {
-        assert!(EVTX_SECURITY.retention.unwrap_or("").contains("rolling"));
-    }
-
-    // ── Specific triage_priority values ──────────────────────────────────
-
-    #[test]
-    fn evtx_security_triage_is_critical() {
-        assert_eq!(EVTX_SECURITY.triage_priority, TriagePriority::Critical);
-    }
-
-    #[test]
-    fn sam_users_triage_is_critical() {
-        assert_eq!(SAM_USERS.triage_priority, TriagePriority::Critical);
-    }
-
-    #[test]
-    fn lsa_secrets_triage_is_critical() {
-        assert_eq!(LSA_SECRETS.triage_priority, TriagePriority::Critical);
-    }
-
-    #[test]
-    fn linux_shadow_triage_is_critical() {
-        assert_eq!(LINUX_SHADOW.triage_priority, TriagePriority::Critical);
-    }
-
-    #[test]
-    fn shimcache_triage_is_critical() {
-        assert_eq!(SHIMCACHE.triage_priority, TriagePriority::Critical);
-    }
-
-    #[test]
-    fn userassist_exe_triage_is_high() {
-        assert_eq!(USERASSIST_EXE.triage_priority, TriagePriority::High);
-    }
-
-    #[test]
-    fn thumbcache_triage_is_medium() {
-        assert_eq!(THUMBCACHE.triage_priority, TriagePriority::Medium);
-    }
-
-    #[test]
-    fn vpn_ras_phonebook_triage_is_low() {
-        assert_eq!(VPN_RAS_PHONEBOOK.triage_priority, TriagePriority::Low);
-    }
-
-    // ── related_artifacts ────────────────────────────────────────────────
-
-    #[test]
-    fn srum_network_related_includes_evtx_security() {
-        assert!(SRUM_NETWORK_USAGE
-            .related_artifacts
-            .contains(&"evtx_security"));
-    }
-
-    #[test]
-    fn evtx_security_related_includes_srum() {
-        assert!(EVTX_SECURITY
-            .related_artifacts
-            .contains(&"srum_network_usage"));
-    }
-
-    #[test]
-    fn prefetch_file_related_includes_shimcache() {
-        assert!(PREFETCH_FILE.related_artifacts.contains(&"shimcache"));
-    }
-
-    #[test]
-    fn dpapi_masterkey_related_includes_dpapi_cred() {
-        assert!(DPAPI_MASTERKEY_USER
-            .related_artifacts
-            .contains(&"dpapi_cred_user"));
-    }
-
-    // ── New catalog API ──────────────────────────────────────────────────
-
-    #[test]
-    fn catalog_by_mitre_finds_srum_network_usage() {
-        let hits = CATALOG.by_mitre("T1049");
-        assert!(hits.iter().any(|d| d.id == "srum_network_usage"));
-    }
-
-    #[test]
-    fn catalog_by_mitre_finds_no_results_for_unknown() {
-        assert!(CATALOG.by_mitre("T9999.999").is_empty());
-    }
-
-    #[test]
-    fn catalog_for_triage_nonempty_and_critical_first() {
-        let hits = CATALOG.for_triage();
-        assert!(!hits.is_empty());
-        assert_eq!(hits[0].triage_priority, TriagePriority::Critical);
-        // Last entry must not be higher priority than Medium
-        assert!(hits.last().unwrap().triage_priority <= TriagePriority::Medium);
-    }
-
-    #[test]
-    fn catalog_for_triage_stable_within_priority() {
-        // All Criticals before any High; all Highs before any Medium
-        let hits = CATALOG.for_triage();
-        let mut max_seen = TriagePriority::Critical;
-        for d in &hits {
-            assert!(d.triage_priority <= max_seen, "priority not monotone");
-            max_seen = d.triage_priority;
-        }
-    }
-
-    #[test]
-    fn catalog_filter_by_keyword_finds_dpapi() {
-        let hits = CATALOG.filter_by_keyword("DPAPI");
-        assert!(!hits.is_empty());
-        assert!(hits.iter().any(|d| d.id.contains("dpapi")));
-    }
-
-    #[test]
-    fn catalog_filter_by_keyword_case_insensitive() {
-        let lower = CATALOG.filter_by_keyword("dpapi");
-        let upper = CATALOG.filter_by_keyword("DPAPI");
-        assert_eq!(lower.len(), upper.len());
-    }
-
-    #[test]
-    fn parsing_profile_lookup_is_case_insensitive() {
-        let lower = parsing_profile("hiberfil_sys").unwrap();
-        let upper = parsing_profile("HIBERFIL_SYS").unwrap();
-        assert_eq!(lower.artifact_id, upper.artifact_id);
-    }
-
-    #[test]
-    fn container_profile_lookup_is_case_insensitive() {
-        let lower = container_profile("windows_registry_hive").unwrap();
-        let upper = container_profile("WINDOWS_REGISTRY_HIVE").unwrap();
-        assert_eq!(lower.id, upper.id);
-    }
-
-    #[test]
-    fn userassist_resolves_to_registry_container_profile() {
-        let profile = CATALOG.container_profile("userassist_exe").unwrap();
-        assert_eq!(profile.id, "windows_registry_hive");
-        assert!(profile
-            .parser_hints
-            .iter()
-            .any(|hint| hint.contains("value name")));
-    }
-
-    #[test]
-    fn windows_timeline_resolves_to_sqlite_container_profile() {
-        let profile = CATALOG.container_profile("windows_timeline").unwrap();
-        assert_eq!(profile.id, "sqlite_database");
-    }
-
-    #[test]
-    fn registry_container_signature_has_regf_magic() {
-        let sig = CATALOG.container_signature("userassist_exe").unwrap();
-        assert_eq!(sig.container_id, "windows_registry_hive");
-        assert_eq!(sig.header_magic, b"regf");
-    }
-
-    #[test]
-    fn userassist_record_signature_prefers_payload_specific_signature() {
-        let sigs = CATALOG.record_signatures("userassist_exe");
-        assert!(sigs.iter().any(|sig| sig.id == "userassist_count_payload"));
-        assert!(sigs
-            .iter()
-            .all(|sig| sig.artifact_id == Some("userassist_exe")));
-    }
-
-    #[test]
-    fn registry_artifact_without_direct_record_signature_falls_back_to_container_records() {
-        let sigs = CATALOG.record_signatures("run_key_hkcu");
-        assert!(sigs.iter().any(|sig| sig.id == "registry_nk_cell"));
-        assert!(sigs.iter().any(|sig| sig.id == "registry_vk_cell"));
-    }
-
-    #[test]
-    fn userassist_parsing_profile_captures_rot13_knowledge() {
-        let profile = CATALOG.parsing_profile("userassist_exe").unwrap();
-        assert!(profile
-            .parser_hints
-            .iter()
-            .any(|hint| hint.contains("ROT13")));
-        assert!(profile.extracted_fields.contains(&"last_run"));
-    }
-
-    #[test]
-    fn hiberfil_parsing_profile_describes_memory_reconstruction() {
-        let profile = CATALOG.parsing_profile("hiberfil_sys").unwrap();
-        assert!(profile.summary.contains("memory"));
-        assert!(profile
-            .parser_hints
-            .iter()
-            .any(|hint| hint.contains("reconstruct")));
-    }
-
-    #[test]
-    fn bits_parsing_profile_mentions_notify_command() {
-        let profile = CATALOG.parsing_profile("bits_db").unwrap();
-        assert!(profile.extracted_fields.contains(&"notify_command"));
-        assert!(profile
-            .parser_hints
-            .iter()
-            .any(|hint| hint.contains("notify")));
-    }
-
-    #[test]
-    fn wmi_parsing_profiles_cover_repository_and_registry_views() {
-        let repo = CATALOG.parsing_profile("wmi_mof_dir").unwrap();
-        let reg = CATALOG.parsing_profile("wmi_subscriptions").unwrap();
-        assert!(repo.extracted_fields.contains(&"binding_filter"));
-        assert!(reg.summary.contains("pivot"));
-    }
-
-    // ── CATALOG completeness (batch H) ────────────────────────────────────
-
-    // ── sources field — every high-value descriptor must cite at least one
-    //    authoritative external reference (SANS, Harlan Carvey, Brian Carrier,
-    //    Red Canary, Microsoft docs, MITRE ATT&CK, etc.)  ────────────────────
-
-    #[test]
-    fn userassist_has_authoritative_sources() {
-        assert!(
-            !USERASSIST_EXE.sources.is_empty(),
-            "USERASSIST_EXE must cite at least one authoritative source"
-        );
-    }
-
-    #[test]
-    fn run_key_hklm_has_authoritative_sources() {
-        assert!(
-            !RUN_KEY_HKLM_RUN.sources.is_empty(),
-            "RUN_KEY_HKLM_RUN must cite at least one authoritative source"
-        );
-    }
-
-    #[test]
-    fn shimcache_has_authoritative_sources() {
-        assert!(
-            !SHIMCACHE.sources.is_empty(),
-            "SHIMCACHE must cite at least one authoritative source"
-        );
-    }
-
-    #[test]
-    fn prefetch_dir_has_authoritative_sources() {
-        assert!(
-            !PREFETCH_DIR.sources.is_empty(),
-            "PREFETCH_DIR must cite at least one authoritative source"
-        );
-    }
-
-    #[test]
-    fn amcache_has_authoritative_sources() {
-        assert!(
-            !AMCACHE_APP_FILE.sources.is_empty(),
-            "AMCACHE_APP_FILE must cite at least one authoritative source"
-        );
-    }
-
-    #[test]
-    fn evtx_security_has_authoritative_sources() {
-        assert!(
-            !EVTX_SECURITY.sources.is_empty(),
-            "EVTX_SECURITY must cite at least one authoritative source"
-        );
-    }
-
-    #[test]
-    fn srum_app_resource_has_authoritative_sources() {
-        assert!(
-            !SRUM_APP_RESOURCE.sources.is_empty(),
-            "SRUM_APP_RESOURCE must cite at least one authoritative source"
-        );
-    }
-
-    #[test]
-    fn sam_users_has_authoritative_sources() {
-        assert!(
-            !SAM_USERS.sources.is_empty(),
-            "SAM_USERS must cite at least one authoritative source"
-        );
-    }
-
-    #[test]
-    fn shellbags_has_authoritative_sources() {
-        assert!(
-            !SHELLBAGS_USER.sources.is_empty(),
-            "SHELLBAGS_USER must cite at least one authoritative source"
-        );
-    }
-
-    #[test]
-    fn no_descriptor_in_catalog_has_empty_sources() {
-        let empty: Vec<&str> = CATALOG
-            .list()
-            .iter()
-            .filter(|d| d.sources.is_empty())
-            .map(|d| d.id)
-            .collect();
-        assert!(
-            empty.is_empty(),
-            "These catalog entries have no authoritative sources: {empty:?}"
-        );
-    }
-
-    #[test]
-    fn catalog_contains_batch_h() {
-        let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
-        for expected in &[
-            "jump_list_system",
-            "lnk_files_office",
-            "prefetch_file",
-            "srum_network_usage",
-            "srum_app_resource",
-            "srum_energy_usage",
-            "srum_push_notification",
-            "evtx_security",
-            "evtx_system",
-            "evtx_powershell",
-            "evtx_sysmon",
-        ] {
-            assert!(ids.contains(expected), "CATALOG missing: {expected}");
-        }
-    }
-
-    #[test]
-    fn regipy_batch_has_authoritative_sources() {
-        for desc in [
-            &TYPED_PATHS,
-            &RUN_MRU,
-            &NETWORK_DRIVES,
-            &APP_PATHS,
-            &MOUNTED_DEVICES,
-            &NETWORKLIST_PROFILES,
-            &PUTTY_SESSIONS,
-            &WINSCP_SAVED_SESSIONS,
-            &WINRAR_HISTORY,
-        ] {
-            assert!(
-                !desc.sources.is_empty(),
-                "{} must cite at least one authoritative source",
-                desc.id
-            );
-        }
-    }
-
-    #[test]
-    fn catalog_contains_regipy_batch() {
-        let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
-        for expected in &[
-            "typed_paths",
-            "run_mru",
-            "network_drives",
-            "app_paths",
-            "mounted_devices",
-            "networklist_profiles",
-            "putty_sessions",
-            "winscp_saved_sessions",
-            "winrar_history",
-        ] {
-            assert!(ids.contains(expected), "CATALOG missing: {expected}");
-        }
-    }
-
-    #[test]
-    fn catalog_contains_blue_team_batch() {
-        let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
-        for expected in &[
-            "network_interfaces",
-            "pagefile_sys",
-            "hiberfil_sys",
-            "mountpoints2",
-            "portable_devices",
-            "rdp_bitmap_cache",
-        ] {
-            assert!(ids.contains(expected), "CATALOG missing: {expected}");
-        }
-    }
-}
-
-#[cfg(test)]
-#[cfg(feature = "serde")]
-mod serde_tests {
-    use super::*;
-
-    #[test]
-    fn artifact_type_roundtrips_json() {
-        let json = serde_json::to_string(&ArtifactType::File).unwrap();
-        assert_eq!(json, "\"File\"");
-        let decoded: ArtifactType = serde_json::from_str(&json).unwrap();
-        assert_eq!(decoded, ArtifactType::File);
-    }
-
-    #[test]
-    fn triage_priority_roundtrips_json() {
-        let json = serde_json::to_string(&TriagePriority::Critical).unwrap();
-        assert_eq!(json, "\"Critical\"");
-        let decoded: TriagePriority = serde_json::from_str(&json).unwrap();
-        assert_eq!(decoded, TriagePriority::Critical);
-    }
-
-    #[test]
-    fn data_scope_roundtrips_json() {
-        let json = serde_json::to_string(&DataScope::User).unwrap();
-        assert_eq!(json, "\"User\"");
-        let decoded: DataScope = serde_json::from_str(&json).unwrap();
-        assert_eq!(decoded, DataScope::User);
-    }
-
-    #[test]
-    fn artifact_value_text_roundtrips_json() {
-        let val = ArtifactValue::Text("hello".to_string());
-        let json = serde_json::to_string(&val).unwrap();
-        let decoded: ArtifactValue = serde_json::from_str(&json).unwrap();
-        assert_eq!(decoded, val);
-    }
-
-    #[test]
-    fn artifact_value_list_roundtrips_json() {
-        let val = ArtifactValue::List(vec![ArtifactValue::Integer(1), ArtifactValue::Bool(true)]);
-        let json = serde_json::to_string(&val).unwrap();
-        let decoded: ArtifactValue = serde_json::from_str(&json).unwrap();
-        assert_eq!(decoded, val);
-    }
-
-    #[test]
-    fn artifact_descriptor_serializes_to_json() {
-        let d = CATALOG.by_id("userassist_exe").unwrap();
-        let json = serde_json::to_string(d).unwrap();
-        assert!(json.contains("userassist_exe"), "id missing from JSON");
-        assert!(json.contains("UserAssist"), "name missing from JSON");
-        assert!(json.contains("T1059"), "mitre_techniques missing from JSON");
-    }
-
-    #[test]
-    fn decode_error_serializes_to_json() {
-        let err = DecodeError::InvalidUtf8;
-        let json = serde_json::to_string(&err).unwrap();
-        assert_eq!(json, "\"InvalidUtf8\"");
-    }
-
-    #[test]
-    fn decode_error_buffer_too_short_serializes_to_json() {
-        let err = DecodeError::BufferTooShort {
-            expected: 8,
-            actual: 3,
-        };
-        let json = serde_json::to_string(&err).unwrap();
-        assert!(json.contains("BufferTooShort"), "variant name missing");
-        assert!(json.contains("8"), "expected value missing");
-        assert!(json.contains("3"), "actual value missing");
-    }
-
-    #[test]
-    fn os_scope_roundtrips_json() {
-        let json = serde_json::to_string(&OsScope::Win10Plus).unwrap();
-        let decoded: OsScope = serde_json::from_str(&json).unwrap();
-        assert_eq!(decoded, OsScope::Win10Plus);
-    }
-}
-
-// ── Refactor contract ────────────────────────────────────────────────────────
-
-#[cfg(test)]
-mod refactor_contract {
-    use super::*;
-
-    /// Verifies that the public API surface of the catalog module remains
-    /// accessible after any internal reorganisation (e.g. splitting artifact.rs
-    /// into src/catalog/). If this test compiles and passes, the refactor has
-    /// not broken any consumer-facing path.
-    #[test]
-    fn catalog_api_surface_intact() {
-        // CATALOG static and its query methods must be reachable.
-        let _ = CATALOG.by_id("userassist_exe");
-        let _ = CATALOG.for_triage();
-        let _ = CATALOG.by_mitre("T1547.001");
-        let _ = CATALOG.filter_by_keyword("prefetch");
-
-        // Key public types must be nameable without qualification issues.
-        let _: ArtifactType = ArtifactType::File;
-        let _: TriagePriority = TriagePriority::Critical;
-        let _: DataScope = DataScope::User;
-        let _: OsScope = OsScope::Win10Plus;
-        let _: HiveTarget = HiveTarget::NtUser;
-
-        // Free functions must be reachable.
-        let _ = all_container_profiles();
-        let _ = all_container_signatures();
-        let _ = all_parsing_profiles();
-        let _ = all_record_signatures();
-    }
-}
+];

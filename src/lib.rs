@@ -43,8 +43,8 @@
 //! modules or companion crates.
 
 pub mod antiforensics;
-pub mod artifact;
-pub use artifact as catalog;
+pub mod catalog;
+pub use catalog as artifact;
 pub mod commands;
 pub mod encryption;
 pub mod handbook;

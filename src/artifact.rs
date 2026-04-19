@@ -10078,3 +10078,36 @@ mod serde_tests {
         assert_eq!(decoded, OsScope::Win10Plus);
     }
 }
+
+// ── Refactor contract ────────────────────────────────────────────────────────
+
+#[cfg(test)]
+mod refactor_contract {
+    use super::*;
+
+    /// Verifies that the public API surface of the catalog module remains
+    /// accessible after any internal reorganisation (e.g. splitting artifact.rs
+    /// into src/catalog/). If this test compiles and passes, the refactor has
+    /// not broken any consumer-facing path.
+    #[test]
+    fn catalog_api_surface_intact() {
+        // CATALOG static and its query methods must be reachable.
+        let _ = CATALOG.by_id("userassist_exe");
+        let _ = CATALOG.for_triage();
+        let _ = CATALOG.by_mitre("T1547.001");
+        let _ = CATALOG.filter_by_keyword("prefetch");
+
+        // Key public types must be nameable without qualification issues.
+        let _: ArtifactType = ArtifactType::File;
+        let _: TriagePriority = TriagePriority::Critical;
+        let _: DataScope = DataScope::User;
+        let _: OsScope = OsScope::Win10Plus;
+        let _: HiveTarget = HiveTarget::NtUser;
+
+        // Free functions must be reachable.
+        let _ = all_container_profiles();
+        let _ = all_container_signatures();
+        let _ = all_parsing_profiles();
+        let _ = all_record_signatures();
+    }
+}

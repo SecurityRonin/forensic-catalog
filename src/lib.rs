@@ -57,3 +57,4 @@ pub mod processes;
 pub mod references;
 pub mod remote_access;
 pub mod third_party;
+pub mod volatility;

@@ -32,24 +32,347 @@ pub struct EvidenceEntry {
     pub caveats: &'static [&'static str],
 }
 
-pub static EVIDENCE_TABLE: &[EvidenceEntry] = &[];
+pub static EVIDENCE_TABLE: &[EvidenceEntry] = &[
+    // ── Execution ────────────────────────────────────────────────────────────
+    EvidenceEntry {
+        artifact_id: "prefetch_file",
+        strength: EvidenceStrength::Definitive,
+        caveats: &["Prefetch can be disabled via registry; absence does not mean no execution"],
+    },
+    EvidenceEntry {
+        artifact_id: "shimcache",
+        strength: EvidenceStrength::Strong,
+        caveats: &[
+            "Presence proves file existed on disk, not necessarily executed",
+            "Written only on reboot; live system shows stale data",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "amcache_app_file",
+        strength: EvidenceStrength::Strong,
+        caveats: &[
+            "Presence proves file was on disk and touched by Windows; not always execution",
+            "Can be populated by antivirus scans",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "userassist_exe",
+        strength: EvidenceStrength::Definitive,
+        caveats: &[
+            "Counts GUI application launches; CLI-only execution not recorded",
+            "ROT13 name encoding can be misread if decoder is missing",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "bam_user",
+        strength: EvidenceStrength::Strong,
+        caveats: &["Granularity is per-day; precise execution time not available"],
+    },
+    EvidenceEntry {
+        artifact_id: "dam_user",
+        strength: EvidenceStrength::Corroborative,
+        caveats: &["Device Activity Monitor; less studied than BAM"],
+    },
+    // ── Persistence ──────────────────────────────────────────────────────────
+    EvidenceEntry {
+        artifact_id: "run_key_hklm",
+        strength: EvidenceStrength::Strong,
+        caveats: &["Legitimate software also uses Run keys; context required"],
+    },
+    EvidenceEntry {
+        artifact_id: "run_key_hkcu",
+        strength: EvidenceStrength::Strong,
+        caveats: &["Per-user; requires knowing which user profile to examine"],
+    },
+    EvidenceEntry {
+        artifact_id: "scheduled_tasks_dir",
+        strength: EvidenceStrength::Definitive,
+        caveats: &["Task XML may be deleted after execution; check event log 4698/4702"],
+    },
+    EvidenceEntry {
+        artifact_id: "services_imagepath",
+        strength: EvidenceStrength::Definitive,
+        caveats: &["Many legitimate services present; focus on unsigned/unusual paths"],
+    },
+    EvidenceEntry {
+        artifact_id: "winlogon_shell",
+        strength: EvidenceStrength::Definitive,
+        caveats: &["Default value is 'explorer.exe'; any deviation is highly suspicious"],
+    },
+    EvidenceEntry {
+        artifact_id: "ifeo_debugger",
+        strength: EvidenceStrength::Definitive,
+        caveats: &["Legitimate debugger keys exist; focus on non-debugger executables"],
+    },
+    EvidenceEntry {
+        artifact_id: "appinit_dlls",
+        strength: EvidenceStrength::Definitive,
+        caveats: &["Only effective when SecureBoot is disabled"],
+    },
+    EvidenceEntry {
+        artifact_id: "com_hijack_clsid_hkcu",
+        strength: EvidenceStrength::Strong,
+        caveats: &["Some legitimate COM redirection exists; compare with HKLM entries"],
+    },
+    // ── Credential ───────────────────────────────────────────────────────────
+    EvidenceEntry {
+        artifact_id: "lsa_secrets",
+        strength: EvidenceStrength::Definitive,
+        caveats: &["Requires SYSTEM privileges to read; encrypted at rest"],
+    },
+    EvidenceEntry {
+        artifact_id: "dcc2_cache",
+        strength: EvidenceStrength::Strong,
+        caveats: &["Only proves domain user logged in; not current password"],
+    },
+    EvidenceEntry {
+        artifact_id: "dpapi_masterkey_user",
+        strength: EvidenceStrength::Corroborative,
+        caveats: &["Presence expected for every user; useful for decrypting other artifacts"],
+    },
+    EvidenceEntry {
+        artifact_id: "ntds_dit",
+        strength: EvidenceStrength::Definitive,
+        caveats: &["All domain hashes present; requires parsing with secretsdump or ntdsutil"],
+    },
+    EvidenceEntry {
+        artifact_id: "sam_users",
+        strength: EvidenceStrength::Definitive,
+        caveats: &[
+            "Contains local account NTLM hashes; requires SYSTEM privilege to read",
+            "Must be used with SYSTEM hive to decrypt",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "dpapi_system_masterkey",
+        strength: EvidenceStrength::Definitive,
+        caveats: &[
+            "Required to decrypt SYSTEM-scope DPAPI blobs; requires SYSTEM privilege",
+            "Loss of this key means DPAPI-protected data is unrecoverable",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "chrome_login_data",
+        strength: EvidenceStrength::Definitive,
+        caveats: &[
+            "Credentials encrypted with DPAPI; require user masterkey to decrypt",
+            "May contain stale or user-deleted passwords",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "firefox_logins",
+        strength: EvidenceStrength::Definitive,
+        caveats: &[
+            "Encrypted with Firefox key4.db; requires key extraction for plaintext",
+            "Primary password (master password) prevents access if set",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "linux_gnome_keyring",
+        strength: EvidenceStrength::Definitive,
+        caveats: &[
+            "Encrypted with user login password; accessible after user session unlock",
+            "Contains Wi-Fi keys, VPN credentials, and application secrets",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "linux_kde_kwallet",
+        strength: EvidenceStrength::Definitive,
+        caveats: &[
+            "Encrypted; requires wallet password or auto-unlock to access",
+            "Coverage depends on which KDE applications store credentials here",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "linux_chrome_login_linux",
+        strength: EvidenceStrength::Definitive,
+        caveats: &[
+            "On Linux, Chrome uses GNOME Keyring or KWallet for encryption key storage",
+            "Plaintext accessible if keyring is unlocked",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "linux_firefox_logins_linux",
+        strength: EvidenceStrength::Definitive,
+        caveats: &[
+            "Same format as Windows Firefox logins; key4.db required for decryption",
+            "Primary password prevents access if set",
+        ],
+    },
+    // ── Filesystem ───────────────────────────────────────────────────────────
+    EvidenceEntry {
+        artifact_id: "mft_file",
+        strength: EvidenceStrength::Strong,
+        caveats: &[
+            "Timestamps susceptible to timestomping ($STANDARD_INFORMATION vs $FILE_NAME)",
+            "$FILE_NAME timestamps harder to tamper; compare both",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "usn_journal",
+        strength: EvidenceStrength::Strong,
+        caveats: &["Circular; entries overwritten; may not have full history"],
+    },
+    EvidenceEntry {
+        artifact_id: "lnk_files",
+        strength: EvidenceStrength::Strong,
+        caveats: &["Can be spoofed; verify with corroborating artifacts"],
+    },
+    EvidenceEntry {
+        artifact_id: "jump_list_auto",
+        strength: EvidenceStrength::Strong,
+        caveats: &["Application-specific; some apps don't integrate with jump lists"],
+    },
+    EvidenceEntry {
+        artifact_id: "mru_recent_docs",
+        strength: EvidenceStrength::Corroborative,
+        caveats: &["Only tracks files opened via common dialog; programmatic access not recorded"],
+    },
+    EvidenceEntry {
+        artifact_id: "recycle_bin",
+        strength: EvidenceStrength::Strong,
+        caveats: &["File name and deletion time available; original content may be overwritten"],
+    },
+    EvidenceEntry {
+        artifact_id: "shellbags_user",
+        strength: EvidenceStrength::Corroborative,
+        caveats: &["Proves folder was browsed; does not prove file access or execution"],
+    },
+    // ── Network ──────────────────────────────────────────────────────────────
+    EvidenceEntry {
+        artifact_id: "networklist_profiles",
+        strength: EvidenceStrength::Strong,
+        caveats: &["Profile name set by router; can be spoofed by attacker-controlled AP"],
+    },
+    EvidenceEntry {
+        artifact_id: "rdp_client_servers",
+        strength: EvidenceStrength::Strong,
+        caveats: &["Proves RDP was initiated FROM this machine; does not confirm success"],
+    },
+    // ── SRUM ─────────────────────────────────────────────────────────────────
+    EvidenceEntry {
+        artifact_id: "srum_db",
+        strength: EvidenceStrength::Strong,
+        caveats: &[
+            "Requires ESE database parsing; data is aggregated over time windows",
+            "App paths may be partial; correlate with other execution artifacts",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "srum_network_usage",
+        strength: EvidenceStrength::Strong,
+        caveats: &[
+            "Aggregated bytes sent/received per process; not per-connection detail",
+            "Clock skew between SRUM and event logs possible",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "srum_app_resource",
+        strength: EvidenceStrength::Corroborative,
+        caveats: &[
+            "CPU and memory usage metrics; useful for corroborating execution, not proving it",
+        ],
+    },
+    // ── Event Logs ───────────────────────────────────────────────────────────
+    EvidenceEntry {
+        artifact_id: "evtx_security",
+        strength: EvidenceStrength::Definitive,
+        caveats: &[
+            "Log can be cleared (event 1102/104); absence of log is itself evidence",
+            "Requires appropriate audit policy to be enabled",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "evtx_sysmon",
+        strength: EvidenceStrength::Definitive,
+        caveats: &[
+            "Requires Sysmon to be installed and configured",
+            "Sysmon config determines what is logged",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "evtx_powershell",
+        strength: EvidenceStrength::Definitive,
+        caveats: &[
+            "Requires script block logging to be enabled (4104)",
+            "AMSI bypass can prevent logging of obfuscated content",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "evtx_system",
+        strength: EvidenceStrength::Strong,
+        caveats: &["Service install/start events useful; can be noisy with false positives"],
+    },
+    // ── Linux ────────────────────────────────────────────────────────────────
+    EvidenceEntry {
+        artifact_id: "linux_bash_history",
+        strength: EvidenceStrength::Circumstantial,
+        caveats: &[
+            "Trivially disabled with HISTSIZE=0 or HISTFILE=/dev/null",
+            "Written at shell exit; killed shells leave no history",
+            "Root can modify or delete",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "linux_auth_log",
+        strength: EvidenceStrength::Strong,
+        caveats: &["rsyslog/syslog-ng must be running; can be cleared by root"],
+    },
+    EvidenceEntry {
+        artifact_id: "linux_wtmp",
+        strength: EvidenceStrength::Strong,
+        caveats: &["Binary format; utmpdump needed; can be edited by root"],
+    },
+    EvidenceEntry {
+        artifact_id: "linux_sudoers_d",
+        strength: EvidenceStrength::Definitive,
+        caveats: &[
+            "Presence of unexpected rules is high-confidence privilege escalation indicator",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "linux_passwd",
+        strength: EvidenceStrength::Definitive,
+        caveats: &[
+            "World-readable; shows all accounts but no password hashes (those are in shadow)",
+            "Added accounts may be backdoors; compare against baseline",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "linux_shadow",
+        strength: EvidenceStrength::Definitive,
+        caveats: &[
+            "Requires root to read; contains hashed passwords",
+            "Hash format determines crackability; check for weak algorithms (MD5, SHA-256)",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "linux_ssh_private_key",
+        strength: EvidenceStrength::Definitive,
+        caveats: &[
+            "Private key presence proves capability for lateral movement",
+            "Passphrase-protected keys require cracking; unprotected keys are immediately usable",
+        ],
+    },
+];
 
 /// Returns the evidence entry for a given artifact ID, or None if unknown.
-pub fn evidence_for(_artifact_id: &str) -> Option<&'static EvidenceEntry> {
-    todo!("implement evidence lookup")
+pub fn evidence_for(artifact_id: &str) -> Option<&'static EvidenceEntry> {
+    EVIDENCE_TABLE.iter().find(|e| e.artifact_id == artifact_id)
 }
 
 /// Returns all artifacts at or above the given strength threshold.
-pub fn artifacts_with_strength(
-    _min_strength: EvidenceStrength,
-) -> Vec<&'static EvidenceEntry> {
-    todo!("implement strength filter")
+pub fn artifacts_with_strength(min_strength: EvidenceStrength) -> Vec<&'static EvidenceEntry> {
+    EVIDENCE_TABLE
+        .iter()
+        .filter(|e| e.strength >= min_strength)
+        .collect()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::catalog::{CATALOG, TriagePriority};
+    use crate::catalog::{TriagePriority, CATALOG};
 
     #[test]
     fn prefetch_is_definitive() {
@@ -124,8 +447,7 @@ mod tests {
             .collect();
         assert!(
             missing.is_empty(),
-            "Critical-priority artifacts missing from evidence table: {:?}",
-            missing
+            "Critical-priority artifacts missing from evidence table: {missing:?}"
         );
     }
 }

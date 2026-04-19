@@ -44,6 +44,7 @@
 
 pub mod antiforensics;
 pub mod catalog;
+pub mod evidence;
 pub use catalog as artifact;
 pub mod commands;
 pub mod encryption;

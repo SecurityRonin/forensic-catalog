@@ -16,11 +16,7 @@ pub trait CustomDecoder: Send + Sync {
 
     /// Decode raw bytes with an optional name parameter.
     /// Returns a list of (field_name, value) pairs.
-    fn decode(
-        &self,
-        raw: &[u8],
-        name: &str,
-    ) -> Result<Vec<(String, ArtifactValue)>, DecodeError>;
+    fn decode(&self, raw: &[u8], name: &str) -> Result<Vec<(String, ArtifactValue)>, DecodeError>;
 }
 
 /// A runtime-extensible catalog wrapping the static [`CATALOG`].
@@ -35,61 +31,73 @@ pub struct ExtendedCatalog {
 
 impl Default for ExtendedCatalog {
     fn default() -> Self {
-        todo!()
+        Self::new()
     }
 }
 
 impl ExtendedCatalog {
     /// Create a new ExtendedCatalog wrapping the global static CATALOG.
     pub fn new() -> Self {
-        todo!()
+        Self {
+            base: &CATALOG,
+            custom_decoders: Vec::new(),
+            custom_descriptors: Vec::new(),
+        }
     }
 
     /// Register a custom decoder.
-    pub fn register_decoder<D: CustomDecoder + 'static>(&mut self, _decoder: D) {
-        todo!()
+    pub fn register_decoder<D: CustomDecoder + 'static>(&mut self, decoder: D) {
+        self.custom_decoders.push(Box::new(decoder));
     }
 
     /// Register a custom artifact descriptor.
-    pub fn register_descriptor(&mut self, _descriptor: ArtifactDescriptor) {
-        todo!()
+    pub fn register_descriptor(&mut self, descriptor: ArtifactDescriptor) {
+        self.custom_descriptors.push(descriptor);
     }
 
     /// Look up an artifact descriptor by ID, checking custom descriptors first.
-    pub fn by_id(&self, _id: &str) -> Option<&ArtifactDescriptor> {
-        todo!()
+    pub fn by_id(&self, id: &str) -> Option<&ArtifactDescriptor> {
+        self.custom_descriptors
+            .iter()
+            .find(|d| d.id == id)
+            .or_else(|| self.base.by_id(id))
     }
 
     /// Returns the total number of descriptors (base + custom).
     pub fn len(&self) -> usize {
-        todo!()
+        self.base.for_triage().len() + self.custom_descriptors.len()
     }
 
     /// Returns true if there are no descriptors.
     pub fn is_empty(&self) -> bool {
-        todo!()
+        self.len() == 0
     }
 
     /// Find a custom decoder by ID.
-    pub fn custom_decoder(&self, _id: &str) -> Option<&dyn CustomDecoder> {
-        todo!()
+    pub fn custom_decoder(&self, id: &str) -> Option<&dyn CustomDecoder> {
+        self.custom_decoders
+            .iter()
+            .find(|d| d.id() == id)
+            .map(|d| d.as_ref())
     }
 
     /// Returns the number of registered custom decoders.
     pub fn custom_decoder_count(&self) -> usize {
-        todo!()
+        self.custom_decoders.len()
     }
 
     /// Returns the number of registered custom descriptors.
     pub fn custom_descriptor_count(&self) -> usize {
-        todo!()
+        self.custom_descriptors.len()
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::catalog::{ArtifactDescriptor, ArtifactType, DataScope, Decoder, OsScope, TriagePriority, HiveTarget};
+    use crate::catalog::{
+        ArtifactDescriptor, ArtifactType, DataScope, Decoder, OsScope, TriagePriority,
+    };
 
     struct TestDecoder {
         id: String,
@@ -105,9 +113,11 @@ mod tests {
             raw: &[u8],
             _name: &str,
         ) -> Result<Vec<(String, ArtifactValue)>, DecodeError> {
-            let text = std::str::from_utf8(raw)
-                .map_err(|_| DecodeError::InvalidUtf8)?;
-            Ok(vec![("value".to_string(), ArtifactValue::Text(text.to_string()))])
+            let text = std::str::from_utf8(raw).map_err(|_| DecodeError::InvalidUtf8)?;
+            Ok(vec![(
+                "value".to_string(),
+                ArtifactValue::Text(text.to_string()),
+            )])
         }
     }
 
@@ -176,7 +186,9 @@ mod tests {
     #[test]
     fn register_custom_decoder() {
         let mut ec = ExtendedCatalog::new();
-        let decoder = TestDecoder { id: "test_decoder".to_string() };
+        let decoder = TestDecoder {
+            id: "test_decoder".to_string(),
+        };
         ec.register_decoder(decoder);
         assert_eq!(ec.custom_decoder_count(), 1);
     }
@@ -184,7 +196,9 @@ mod tests {
     #[test]
     fn custom_decoder_found_by_id() {
         let mut ec = ExtendedCatalog::new();
-        ec.register_decoder(TestDecoder { id: "my_decoder".to_string() });
+        ec.register_decoder(TestDecoder {
+            id: "my_decoder".to_string(),
+        });
         assert!(ec.custom_decoder("my_decoder").is_some());
         assert!(ec.custom_decoder("nonexistent").is_none());
     }
@@ -192,7 +206,9 @@ mod tests {
     #[test]
     fn custom_decoder_decodes_utf8() {
         let mut ec = ExtendedCatalog::new();
-        ec.register_decoder(TestDecoder { id: "utf8_decoder".to_string() });
+        ec.register_decoder(TestDecoder {
+            id: "utf8_decoder".to_string(),
+        });
         let decoder = ec.custom_decoder("utf8_decoder").unwrap();
         let result = decoder.decode(b"hello world", "").unwrap();
         assert_eq!(result.len(), 1);
@@ -203,7 +219,9 @@ mod tests {
     #[test]
     fn custom_decoder_returns_error_for_invalid_utf8() {
         let mut ec = ExtendedCatalog::new();
-        ec.register_decoder(TestDecoder { id: "utf8_decoder".to_string() });
+        ec.register_decoder(TestDecoder {
+            id: "utf8_decoder".to_string(),
+        });
         let decoder = ec.custom_decoder("utf8_decoder").unwrap();
         let result = decoder.decode(&[0xFF, 0xFE, 0x00], "");
         assert!(result.is_err());

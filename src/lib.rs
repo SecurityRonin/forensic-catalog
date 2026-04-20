@@ -1,46 +1,106 @@
 //! forensic-catalog — DFIR knowledge as code.
 //!
-//! This crate publishes two kinds of knowledge:
+//! 187 forensic artifacts — registry keys, files, event logs, memory regions —
+//! each with a decoder, MITRE ATT&CK mapping, triage priority, and source
+//! citations. Cross-referenced against Sigma rules, KAPE targets, Velociraptor
+//! artifacts, STIX 2.1 observables, YARA templates, and investigation playbooks.
+//! Zero dependencies. Everything in `const`/`static` memory.
 //!
-//! - small static indicator modules such as [`ports`], [`lolbins`], [`paths`],
-//!   and [`persistence`]
-//! - the larger [`catalog`] module, which models concrete forensic artifacts
-//!   with source citations, ATT&CK mappings, triage priority, decode guidance,
-//!   parsing profiles, and carving/signature knowledge
+//! # Quick start
 //!
-//! The published docs are intended to be useful to both developers and DFIR
-//! analysts. If you are new to the crate, start here:
+//! ```rust
+//! use forensic_catalog::catalog::{CATALOG, TriagePriority};
+//! use forensic_catalog::ports::is_suspicious_port;
 //!
-//! - [`catalog::CATALOG`] for the artifact registry
-//! - [`handbook`] for the analyst-facing handbook
-//! - [`references`] for module-level provenance
-//! - [`catalog::all_container_profiles`] for outer parsing layers
-//! - [`catalog::all_container_signatures`] for carving/recognition guidance
-//! - [`catalog::all_parsing_profiles`] for artifact-specific parsing semantics
-//! - [`catalog::all_record_signatures`] for record-level carving/validation
+//! // Boolean checks — no allocation
+//! assert!(is_suspicious_port(4444));
 //!
-//! Practical reading order:
+//! // Critical artifacts, triage order
+//! let critical: Vec<_> = CATALOG.for_triage()
+//!     .into_iter()
+//!     .filter(|d| d.triage_priority == TriagePriority::Critical)
+//!     .collect();
+//! ```
 //!
-//! 1. Find an artifact in [`catalog::CATALOG`]
-//! 2. Check its [`catalog::ArtifactDescriptor::sources`]
-//! 3. Resolve its outer parser with [`catalog::ForensicCatalog::container_profile`]
-//! 4. Resolve carving rules with [`catalog::ForensicCatalog::container_signature`]
-//! 5. Resolve artifact semantics with [`catalog::ForensicCatalog::parsing_profile`]
-//! 6. Resolve record-level carving hints with [`catalog::ForensicCatalog::record_signatures`]
+//! # Module map
 //!
-//! The repository also keeps deeper maintainer docs:
+//! ## Artifact catalog
 //!
-//! - `README.md` for the project overview and architecture diagrams
-//! - `docs/module-sources.md` for the source corpus and knowledge architecture
-//! - `archive/sources/source-inventory.md` for the normalized source inventory
+//! - [`catalog`] / [`artifact`] — 187-entry descriptor registry with decode,
+//!   ATT&CK mapping, triage priority, parsing profiles, and carving signatures.
+//!   Start with [`catalog::CATALOG`].
 //!
-//! Scope boundary:
+//! ## Investigation support
+//!
+//! - [`playbooks`] — six directed investigation paths (lateral movement, credential
+//!   harvesting, persistence, exfiltration, execution, defense evasion)
+//! - [`evidence`] — evidence strength ratings (`Unreliable` → `Definitive`) per artifact
+//! - [`volatility`] — RFC 3227 Order of Volatility; use [`volatility::acquisition_order`]
+//! - [`temporal`] — temporal correlation hints for timeline analysis and timestomp detection
+//! - [`antiforensics_aware`] — per-artifact anti-forensic risk model
+//! - [`version_history`] — artifact changes across OS versions
+//! - [`dependencies`] — artifact dependency graph; use [`dependencies::full_collection_set`]
+//!
+//! ## Detection engineering
+//!
+//! - [`sigma`] — Sigma rule cross-references; [`sigma::sigma_refs_for`]
+//! - [`chainsaw`] — Chainsaw / Hayabusa hunt rule references
+//! - [`navigator`] — ATT&CK Navigator JSON layer generator
+//! - [`yara`] — YARA rule skeleton generator
+//! - [`stix`] — STIX 2.1 observable mappings and indicator patterns
+//!
+//! ## Collection toolchain
+//!
+//! - [`toolchain`] — KAPE targets/modules and Velociraptor artifact names;
+//!   use [`toolchain::kape_target_set`] for deduplicated collection plans
+//! - [`forensicartifacts`] — ForensicArtifacts.com definition names and YAML export
+//! - [`eventids`] — Windows Event ID enrichment (forensic meaning, MITRE, artifact)
+//!
+//! ## Static indicator tables
+//!
+//! These modules export only `&'static` slices and boolean lookups — safe in
+//! `no_std` environments:
+//!
+//! - [`ports`] — suspicious TCP/UDP ports (`is_suspicious_port`)
+//! - [`lolbins`] — Windows LOLBAS + Linux GTFOBins
+//! - [`persistence`] — run keys, cron, LaunchAgents, IFEO, AppInit
+//! - [`processes`] — masquerade targets and offensive process names
+//! - [`commands`] — log-wipe commands, rootkit names
+//! - [`paths`] — suspicious staging and hijack paths
+//! - [`antiforensics`] — anti-forensic tool indicators
+//! - [`encryption`] — encryption tool paths
+//! - [`remote_access`] — LOLRMM / RMM tool indicators
+//! - [`third_party`] — PuTTY, WinSCP, cloud sync, browser registry artifacts
+//! - [`pca`] — Windows 11 Program Compatibility Assistant artifacts
+//! - [`references`] — queryable source map per module
+//! - [`no_std_compat`] — documents and validates the `no_std`-safe API surface
+//!
+//! ## Extension
+//!
+//! - [`plugin`] — runtime decoder plugin architecture ([`plugin::ExtendedCatalog`],
+//!   [`plugin::CustomDecoder`] trait)
+//!
+//! # Parsing stack
+//!
+//! ```text
+//! Raw bytes → ContainerSignature → ContainerProfile → ArtifactDescriptor
+//!          → ArtifactParsingProfile → RecordSignature → Decoder → ArtifactRecord
+//! ```
+//!
+//! All layers queryable via `CATALOG`:
+//!
+//! ```rust
+//! use forensic_catalog::catalog::CATALOG;
+//! let cp = CATALOG.container_profile("windows_registry_hive");
+//! let pp = CATALOG.parsing_profile("userassist_exe");
+//! ```
+//!
+//! # Scope boundary
 //!
 //! This crate is a forensic catalog first, not a full DFIR parsing engine.
 //! Compact stable transforms such as `UserAssist` ROT13 or `FILETIME`
 //! normalization belong here. Large evolving formats such as full hibernation,
-//! WMI repository, or BITS database parsers should stay in separate parser
-//! modules or companion crates.
+//! WMI repository, or BITS database parsers should stay in separate companion crates.
 
 pub mod antiforensics;
 pub mod antiforensics_aware;

@@ -1,26 +1,27 @@
 # Module Source Map
 
-This crate has two layers:
+This crate has three layers:
 
 - small zero-allocation indicator modules such as `ports`, `lolbins`, and `persistence`
-- the larger [`artifact`](../src/artifact.rs) catalog, which models specific artifacts with decode logic, ATT&CK mappings, triage priority, retention, and per-artifact sources
+- the larger [`catalog`](../src/catalog/) module, which models 187 forensic artifacts with decode logic, ATT&CK mappings, triage priority, retention, and per-artifact sources
+- cross-reference modules (`chainsaw`, `dependencies`, `eventids`, `evidence`, `forensicartifacts`, `navigator`, `playbooks`, `plugin`, `sigma`, `stix`, `temporal`, `toolchain`, `version_history`, `volatility`, `yara`) that enrich the catalog with detection, collection, and investigation data
 
 The [`references`](../src/references.rs) module turns module-level provenance into queryable static data.
 
 ## Coverage
 
-`artifact`
-Unified descriptor registry. Current implementation already carries 151 artifact descriptors with embedded `sources`, `related_artifacts`, decode schemas, and triage ordering. This is the richest part of the crate and the best place to keep growing artifact-specific research.
+`catalog`
+Unified descriptor registry split into `src/catalog/` (types, descriptors, decode, containers). Currently carries **187 artifact descriptors** with embedded `sources`, `related_artifacts`, decode schemas, and triage ordering. Covers Windows (registry, EVTX, filesystem, MFT, memory), Linux (journal, auth, cron, SSH), and macOS (LaunchAgents, LaunchDaemons, Keychain, Unified Log, TCC, Safari, Quarantine Events).
 
 Authoritative references:
 - MITRE ATT&CK: https://attack.mitre.org/
 - Harlan Carvey Windows IR: http://windowsir.blogspot.com/
 - Eric Zimmerman tool/index docs: https://ericzimmerman.github.io/#!index.md
+- Apple Platform Security Guide: https://support.apple.com/guide/security/welcome/web
 
 Expansion targets:
-- add more Linux event/log artifacts
-- add macOS descriptor parity instead of path-only coverage
 - normalize ATT&CK mappings where only parent techniques are present
+- add ChromeOS and Android artifacts
 
 `ports`
 Attacker-favored ports tied to C2, Tor, WinRM, and commodity remote access.
@@ -152,6 +153,94 @@ Authoritative references:
 Expansion targets:
 - cross-link PCA records with Prefetch, Amcache, and UserAssist
 - capture PCA coverage limitations more explicitly in user-facing docs
+
+## Cross-Reference and Enrichment Modules
+
+`chainsaw` / `sigma`
+Detection rule cross-references — maps catalog artifacts to Chainsaw/Hayabusa hunt rules and Sigma rule IDs.
+
+Authoritative references:
+- SigmaHQ: https://github.com/SigmaHQ/sigma
+- Hayabusa rules: https://github.com/Yamato-Security/hayabusa-rules
+- Chainsaw: https://github.com/WithSecureLabs/chainsaw
+
+`toolchain`
+KAPE target/module names and Velociraptor artifact names mapped to catalog artifact IDs. Use `kape_target_set()` and `velociraptor_artifact_set()` to compute deduplicated collection plans.
+
+Authoritative references:
+- KAPE documentation: https://ericzimmerman.github.io/KapeDocs/
+- KapeFiles targets: https://github.com/EricZimmerman/KapeFiles
+- Velociraptor artifact exchange: https://docs.velociraptor.app/exchange/
+
+`navigator`
+Generates MITRE ATT&CK Navigator v4.9 JSON layers from catalog coverage. Layers are importable directly at https://mitre-attack.github.io/attack-navigator/
+
+Authoritative references:
+- ATT&CK Navigator: https://github.com/mitre-attack/attack-navigator
+
+`stix`
+Maps catalog artifacts to STIX 2.1 Cyber Observable types (File, WindowsRegistryKey, Process, Directory, NetworkTraffic) and, where possible, `[indicator:pattern]` strings.
+
+Authoritative references:
+- STIX 2.1 specification: https://docs.oasis-open.org/cti/stix/v2.1/stix-v2.1.html
+- OASIS STIX observable types: https://docs.oasis-open.org/cti/stix/v2.1/os/stix-v2.1-os.html#_mlbmudhl16lr
+
+`forensicartifacts`
+Maps catalog IDs to ForensicArtifacts.com definition names and can emit minimal YAML compatible with the ForensicArtifacts schema (without any external YAML library).
+
+Authoritative references:
+- ForensicArtifacts: https://github.com/ForensicArtifacts/artifacts
+- ForensicArtifacts spec: https://github.com/ForensicArtifacts/artifacts/blob/main/docs/Artifacts%20definition%20format%20and%20how%20to%20write%20new%20artifacts.asciidoc
+
+`yara`
+Generates YARA rule skeletons from catalog metadata (key paths, file paths, magic bytes from ContainerSignature). Output is valid YARA syntax ready for analyst refinement.
+
+Authoritative references:
+- YARA documentation: https://yara.readthedocs.io/
+
+`dependencies`
+Artifact dependency graph — models `ContainedIn`, `ContextFrom`, `TemporalCorrelation`, `AlternativeSource`, and `DecodingPrerequisite` relationships. Use `full_collection_set()` to compute the transitive closure of artifacts needed for a given investigation.
+
+`evidence`
+Evidence strength model (Unreliable → Definitive) with analyst caveats. Derived from practitioner experience and common artifact reliability guides.
+
+Authoritative references:
+- SANS Digital Forensics blog: https://www.sans.org/blog/
+- RFC 3227: https://www.rfc-editor.org/rfc/rfc3227
+
+`volatility`
+RFC 3227 Order of Volatility encoded as static data. Five tiers: Volatile (RAM) → RotatingBuffer (event logs) → ActivityDriven (prefetch) → Persistent (registry) → Residual (slack space).
+
+Authoritative references:
+- RFC 3227: https://www.rfc-editor.org/rfc/rfc3227
+
+`antiforensics_aware`
+Per-artifact anti-forensic risk model — maps each artifact to attacker techniques that can destroy or corrupt it, with detection hints.
+
+Authoritative references:
+- MITRE ATT&CK T1070: https://attack.mitre.org/techniques/T1070/
+
+`temporal`
+Temporal correlation hints for timeline analysis and timestomp detection. Documents which artifact pairs should be compared and what discrepancies indicate.
+
+`version_history`
+Documents artifact format, location, and behavior changes across OS versions (Win7, Win8, Win10, Win11, macOS versions, Linux distros).
+
+`playbooks`
+Six directed investigation paths: `lateral_movement_rdp`, `credential_harvesting`, `persistence_hunt`, `data_exfiltration`, `execution_trace`, `defense_evasion`. Each step names an artifact, explains what to look for, and lists which follow-on artifacts it unlocks.
+
+`eventids`
+Windows Event ID enrichment — 16+ high-value event IDs with forensic descriptions, MITRE technique mappings, and associations to catalog artifact IDs (which log channel/file contains them).
+
+Authoritative references:
+- Ultimate Windows Security encyclopedia: https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/
+- Microsoft event log reference: https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/plan/appendix-l--events-to-monitor
+
+`plugin`
+Runtime decoder plugin architecture — `ExtendedCatalog` wraps the static `CATALOG` with heap-allocated custom decoders and descriptors, enabling third-party extensions without modifying the core library.
+
+`no_std_compat`
+Documents and validates which APIs are available in `no_std` environments. All static indicator modules and catalog static slice access work without allocation.
 
 ## Full-Blog Archive
 

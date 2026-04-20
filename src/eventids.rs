@@ -156,17 +156,20 @@ pub static EVENT_ID_TABLE: &[EventIdEntry] = &[
 
 /// Look up enrichment for an event ID.
 pub fn event_entry(event_id: u32) -> Option<&'static EventIdEntry> {
-    todo!("implement event_entry lookup")
+    EVENT_ID_TABLE.iter().find(|e| e.event_id == event_id)
 }
 
 /// Look up all events associated with a catalog artifact.
 pub fn events_for_artifact(artifact_id: &str) -> Vec<&'static EventIdEntry> {
-    todo!("implement events_for_artifact lookup")
+    EVENT_ID_TABLE
+        .iter()
+        .filter(|e| e.artifact_ids.contains(&artifact_id))
+        .collect()
 }
 
 /// Return all high-value event IDs.
 pub fn high_value_events() -> Vec<&'static EventIdEntry> {
-    todo!("implement high_value_events")
+    EVENT_ID_TABLE.iter().filter(|e| e.high_value).collect()
 }
 
 #[cfg(test)]

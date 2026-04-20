@@ -1,3 +1,6 @@
+[workspace]
+members = [".", "crates/fcatalog"]
+
 [package]
 name = "forensic-catalog"
 version = "0.1.0"

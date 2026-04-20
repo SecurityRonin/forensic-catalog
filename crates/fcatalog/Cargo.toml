@@ -1,0 +1,12 @@
+[package]
+name = "fcatalog"
+version = "0.1.0"
+edition = "2021"
+description = "TUI/CLI explorer for forensic-catalog"
+
+[[bin]]
+name = "fcatalog"
+path = "src/main.rs"
+
+[dependencies]
+forensic-catalog = { path = "../.." }

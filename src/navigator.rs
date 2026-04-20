@@ -10,18 +10,55 @@ use std::collections::HashMap;
 ///
 /// Returns a JSON string directly importable into the ATT&CK Navigator
 /// at https://mitre-attack.github.io/attack-navigator/
-pub fn generate_navigator_layer(_layer_name: &str) -> String {
-    todo!("implement ATT&CK Navigator layer generator")
+pub fn generate_navigator_layer(layer_name: &str) -> String {
+    let coverage = technique_coverage();
+
+    let mut techniques_json = Vec::new();
+    let mut sorted: Vec<(&str, &Vec<&str>)> = coverage.iter().map(|(k, v)| (*k, v)).collect();
+    sorted.sort_by_key(|(k, _)| *k);
+
+    for (technique_id, artifact_ids) in &sorted {
+        let count = artifact_ids.len();
+        let color = match count {
+            1 => "#cce5ff",
+            2 => "#66b3ff",
+            _ => "#0066cc",
+        };
+        let comment = format!("{count} artifact{}", if count == 1 { "" } else { "s" });
+        techniques_json.push(format!(
+            r#"    {{"techniqueID": "{technique_id}", "score": {count}, "color": "{color}", "comment": "{comment}"}}"#,
+        ));
+    }
+
+    let techniques_str = techniques_json.join(",\n");
+
+    format!(
+        r#"{{
+  "name": "{layer_name}",
+  "versions": {{"attack": "14", "navigator": "4.9", "layer": "4.5"}},
+  "domain": "enterprise-attack",
+  "description": "forensic-catalog coverage",
+  "techniques": [
+{techniques_str}
+  ]
+}}"#,
+    )
 }
 
 /// Returns a map of technique ID → artifact IDs for coverage reporting.
 pub fn technique_coverage() -> HashMap<&'static str, Vec<&'static str>> {
-    todo!("implement technique_coverage")
+    let mut map: HashMap<&'static str, Vec<&'static str>> = HashMap::new();
+    for descriptor in CATALOG.list() {
+        for &technique in descriptor.mitre_techniques {
+            map.entry(technique).or_default().push(descriptor.id);
+        }
+    }
+    map
 }
 
 /// Returns the count of unique ATT&CK techniques covered by the catalog.
 pub fn covered_technique_count() -> usize {
-    todo!("implement covered_technique_count")
+    technique_coverage().len()
 }
 
 #[cfg(test)]

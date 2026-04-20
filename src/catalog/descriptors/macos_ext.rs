@@ -1,0 +1,492 @@
+//! Extended macOS artifact descriptors.
+//!
+//! Sources: Velociraptor macOS artifacts, ForensicArtifacts/artifacts (macOS YAML),
+//! APOLLO modules (mac4n6), Magnet Forensics, mac4n6.com, Sarah Edwards research.
+
+#![allow(clippy::too_many_lines)]
+
+use super::super::types::{
+    ArtifactDescriptor, ArtifactType, DataScope, Decoder, FieldSchema, HiveTarget, OsScope,
+    TriagePriority, ValueType,
+};
+
+pub(crate) static MACOS_FSEVENTS: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_fsevents",
+    name: "FSEvents Log",
+    artifact_type: ArtifactType::Directory,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/.fseventsd/"),
+    scope: DataScope::System,
+    os_scope: OsScope::MacOS,
+    decoder: Decoder::Identity,
+    meaning: "FSEvents daemon binary log records every file-system create/delete/rename/chmod event volume-wide with event flags and monotonic event ID. Critical for reconstructing file activity even after deletion — records outlive the files. Correlate with $MFT for Windows-equivalent timeline analysis.",
+    mitre_techniques: &["T1070.004", "T1083"],
+    fields: &[
+        FieldSchema { name: "path", value_type: ValueType::Text, description: "File-system path of the event", is_uid_component: true },
+        FieldSchema { name: "flags", value_type: ValueType::UnsignedInt, description: "FSEvent flags (Created/Removed/Modified/Renamed/etc.)", is_uid_component: false },
+        FieldSchema { name: "event_id", value_type: ValueType::UnsignedInt, description: "Monotonic FSEvent ID for ordering", is_uid_component: false },
+    ],
+    retention: Some("Rotated by kernel; typically weeks to months of history"),
+    triage_priority: TriagePriority::Critical,
+    related_artifacts: &["macos_unified_log", "macos_spotlight_store"],
+    sources: &[
+        "https://www.mac4n6.com/blog/2016/2/1/the-hitchhikers-guide-to-the-fseventsd",
+        "https://github.com/nicowillis/fseventparser",
+    ],
+};
+
+pub(crate) static MACOS_SPOTLIGHT_STORE: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_spotlight_store",
+    name: "Spotlight Metadata Store",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/.Spotlight-V100/Store-V2/*/store.db"),
+    scope: DataScope::System,
+    os_scope: OsScope::MacOS,
+    decoder: Decoder::Identity,
+    meaning: "Spotlight metadata database indexes file metadata (name, kind, dates, author, GPS) for every file ever seen by the volume, including deleted ones. Reveals user document activity, application usage, and file provenance well after file deletion.",
+    mitre_techniques: &["T1083"],
+    fields: &[
+        FieldSchema { name: "file_path", value_type: ValueType::Text, description: "Indexed file path", is_uid_component: true },
+        FieldSchema { name: "last_used_date", value_type: ValueType::Timestamp, description: "Last access timestamp from metadata", is_uid_component: false },
+    ],
+    retention: Some("Rebuilt on re-index; history spans volume lifetime"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["macos_fsevents", "macos_knowledgec"],
+    sources: &[
+        "https://www.mac4n6.com/blog/2016/2/22/spotlight-on-spotlight",
+        "https://forensicswiki.xyz/wiki/index.php?title=Spotlight",
+    ],
+};
+
+pub(crate) static MACOS_DOCK_PLIST: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_dock_plist",
+    name: "Dock Configuration Plist (recent apps)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/Users/*/Library/Preferences/com.apple.dock.plist"),
+    scope: DataScope::User,
+    os_scope: OsScope::MacOS,
+    decoder: Decoder::Identity,
+    meaning: "Stores Dock layout including persistent items, recent apps/documents/servers, and minimized windows. The `recent-apps` array is a reliable execution artifact showing recently launched applications including those since removed from the system.",
+    mitre_techniques: &["T1059"],
+    fields: &[
+        FieldSchema { name: "recent_app_path", value_type: ValueType::Text, description: "Bundle path of recently launched application", is_uid_component: true },
+    ],
+    retention: Some("Updated on each app launch; recent-apps list capped"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["macos_knowledgec", "macos_sfl2_recent_items"],
+    sources: &["https://www.mac4n6.com/blog/2016/6/2/ode-to-the-dock"],
+};
+
+pub(crate) static MACOS_LOGIN_ITEMS_PLIST: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_login_items_plist",
+    name: "Login Items Plist",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/Users/*/Library/Preferences/com.apple.loginitems.plist"),
+    scope: DataScope::User,
+    os_scope: OsScope::MacOS,
+    decoder: Decoder::Identity,
+    meaning: "Records user-level Login Items (persistence mechanism). Each entry specifies a bundle or binary that launches at user login. Malware frequently abuses Login Items for persistence — a primary macOS persistence vector.",
+    mitre_techniques: &["T1547.015"],
+    fields: &[
+        FieldSchema { name: "item_path", value_type: ValueType::Text, description: "Path of the login item", is_uid_component: true },
+        FieldSchema { name: "hide", value_type: ValueType::Bool, description: "Whether the item launches hidden", is_uid_component: false },
+    ],
+    retention: Some("Persistent until item is removed"),
+    triage_priority: TriagePriority::Critical,
+    related_artifacts: &["macos_launch_agents_user", "macos_launch_daemons"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1547/015/",
+        "https://www.sentinelone.com/blog/how-malware-persists-on-macos/",
+    ],
+};
+
+pub(crate) static MACOS_SFL2_RECENT_ITEMS: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_sfl2_recent_items",
+    name: "SFL2 Recent Documents",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/Users/*/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.RecentDocuments.sfl2"),
+    scope: DataScope::User,
+    os_scope: OsScope::MacOS12Plus,
+    decoder: Decoder::Identity,
+    meaning: "SFL2 (Shared File List v2, macOS 10.12+) binary plist tracking recently opened documents system-wide. Reveals user document activity even for files since deleted. Supersedes com.apple.recentitems.plist on modern systems.",
+    mitre_techniques: &["T1217"],
+    fields: &[
+        FieldSchema { name: "file_path", value_type: ValueType::Text, description: "Bookmark-resolved path of recent document", is_uid_component: true },
+    ],
+    retention: Some("Capped list, rotated by system"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["macos_dock_plist", "macos_knowledgec"],
+    sources: &["https://www.mac4n6.com/blog/2016/6/21/introduction-to-sfl-and-sfl2-files"],
+};
+
+pub(crate) static MACOS_SFL2_RECENT_SERVERS: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_sfl2_recent_servers",
+    name: "SFL2 Recent Servers",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/Users/*/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.RecentServers.sfl2"),
+    scope: DataScope::User,
+    os_scope: OsScope::MacOS12Plus,
+    decoder: Decoder::Identity,
+    meaning: "Tracks recently connected network servers (SMB, AFP, NFS, WebDAV). Critical for lateral movement and data exfiltration investigations — shows remote file server connections with server URLs.",
+    mitre_techniques: &["T1021.002"],
+    fields: &[
+        FieldSchema { name: "server_url", value_type: ValueType::Text, description: "URL of the recently connected server", is_uid_component: true },
+    ],
+    retention: Some("Capped recent list"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["macos_sfl2_recent_items"],
+    sources: &["https://www.mac4n6.com/blog/2016/6/21/introduction-to-sfl-and-sfl2-files"],
+};
+
+pub(crate) static MACOS_WIFI_PLIST: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_wifi_plist",
+    name: "Known Wi-Fi Networks (airport preferences)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/Library/Preferences/SystemConfiguration/com.apple.airport.preferences.plist"),
+    scope: DataScope::System,
+    os_scope: OsScope::MacOS,
+    decoder: Decoder::Identity,
+    meaning: "Ordered list of all known Wi-Fi networks: SSIDs, security type, last join time, BSSID. Reveals historical network connections and geolocation context. Key for placing a device at a location or identifying rogue access points.",
+    mitre_techniques: &["T1016"],
+    fields: &[
+        FieldSchema { name: "ssid", value_type: ValueType::Text, description: "Wi-Fi network SSID", is_uid_component: true },
+        FieldSchema { name: "bssid", value_type: ValueType::Text, description: "Access point MAC address", is_uid_component: false },
+        FieldSchema { name: "last_joined", value_type: ValueType::Timestamp, description: "Last connection timestamp", is_uid_component: false },
+    ],
+    retention: Some("Persistent; manually cleared or limited by OS"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["macos_unified_log"],
+    sources: &["https://www.mac4n6.com/blog/2016/6/3/ode-to-the-network"],
+};
+
+pub(crate) static MACOS_SCREEN_TIME_DB: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_screen_time_db",
+    name: "Screen Time Database",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/Users/*/Library/Application Support/com.apple.ScreenTime/RMAdminStore-Local.sqlite"),
+    scope: DataScope::User,
+    os_scope: OsScope::MacOS12Plus,
+    decoder: Decoder::Identity,
+    meaning: "Screen Time SQLite database recording per-app and per-domain usage durations by day. Provides a granular timeline of application and web activity even when browser history is cleared — a secondary execution evidence source.",
+    mitre_techniques: &["T1217"],
+    fields: &[
+        FieldSchema { name: "bundle_id", value_type: ValueType::Text, description: "Application bundle ID", is_uid_component: true },
+        FieldSchema { name: "usage_seconds", value_type: ValueType::UnsignedInt, description: "Time spent in app (seconds)", is_uid_component: false },
+    ],
+    retention: Some("Rolling 30-day window"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["macos_knowledgec", "macos_dock_plist"],
+    sources: &["https://www.mac4n6.com/blog/2019/6/20/screen-time-in-ios-12-macos-mojave"],
+};
+
+pub(crate) static MACOS_TCC_SYSTEM_DB: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_tcc_system_db",
+    name: "TCC System Database (root-level)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/Library/Application Support/com.apple.TCC/TCC.db"),
+    scope: DataScope::System,
+    os_scope: OsScope::MacOS12Plus,
+    decoder: Decoder::Identity,
+    meaning: "System-level TCC (Transparency Consent Control) database covering FDA, accessibility, camera, microphone, screen recording, and contacts permissions for system services and admin-granted access. Complements the per-user TCC.db — malware targeting root-level TCC can grant itself full-disk access.",
+    mitre_techniques: &["T1548"],
+    fields: &[
+        FieldSchema { name: "client", value_type: ValueType::Text, description: "Bundle ID or binary path requesting permission", is_uid_component: true },
+        FieldSchema { name: "service", value_type: ValueType::Text, description: "TCC service (kTCCServiceScreenCapture etc.)", is_uid_component: false },
+        FieldSchema { name: "auth_value", value_type: ValueType::UnsignedInt, description: "0=denied, 2=allowed", is_uid_component: false },
+    ],
+    retention: Some("Persistent"),
+    triage_priority: TriagePriority::Critical,
+    related_artifacts: &["macos_tcc_db"],
+    sources: &[
+        "https://attack.mitre.org/techniques/T1548/",
+        "https://www.rainforestqa.com/blog/macos-tcc-db-deep-dive",
+    ],
+};
+
+pub(crate) static MACOS_SMS_DB: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_sms_db",
+    name: "iMessage / SMS Database (chat.db)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/Users/*/Library/Messages/chat.db"),
+    scope: DataScope::User,
+    os_scope: OsScope::MacOS,
+    decoder: Decoder::Identity,
+    meaning: "iMessage and SMS SQLite database on macOS (mirrored from iPhone via Continuity). Contains message text, participants, timestamps, attachments, and read receipts. Critical for communications analysis in insider threat and fraud investigations.",
+    mitre_techniques: &["T1530"],
+    fields: &[
+        FieldSchema { name: "handle_id", value_type: ValueType::Text, description: "Sender/recipient phone number or Apple ID", is_uid_component: true },
+        FieldSchema { name: "message_date", value_type: ValueType::Timestamp, description: "Message send/receive timestamp (Mac absolute time)", is_uid_component: false },
+        FieldSchema { name: "text", value_type: ValueType::Text, description: "Message body text", is_uid_component: false },
+    ],
+    retention: Some("Indefinite unless manually deleted or iCloud limit reached"),
+    triage_priority: TriagePriority::Critical,
+    related_artifacts: &["macos_knowledgec"],
+    sources: &[
+        "https://www.mac4n6.com/blog/2020/7/28/imessage-artifacts-in-macos-catalina",
+        "https://github.com/mac4n6/APOLLO",
+    ],
+};
+
+pub(crate) static MACOS_NOTES_DB: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_notes_db",
+    name: "Apple Notes Database",
+    artifact_type: ArtifactType::Directory,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/Users/*/Library/Containers/com.apple.Notes/Data/Library/CoreData/ExternalRecords/"),
+    scope: DataScope::User,
+    os_scope: OsScope::MacOS,
+    decoder: Decoder::Identity,
+    meaning: "Apple Notes CoreData store. Notes content (including attachments) and modification timestamps. Frequently used by users to store sensitive information (passwords, plans, communications) — important for insider threat and fraud cases.",
+    mitre_techniques: &["T1005"],
+    fields: &[
+        FieldSchema { name: "title", value_type: ValueType::Text, description: "Note title", is_uid_component: true },
+        FieldSchema { name: "modification_date", value_type: ValueType::Timestamp, description: "Last modification timestamp", is_uid_component: false },
+    ],
+    retention: Some("Persistent; syncs via iCloud"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["macos_sms_db"],
+    sources: &["https://github.com/mac4n6/APOLLO"],
+};
+
+pub(crate) static MACOS_PHOTOS_DB: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_photos_db",
+    name: "Photos Library Database",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/Users/*/Pictures/Photos Library.photoslibrary/database/Photos.sqlite"),
+    scope: DataScope::User,
+    os_scope: OsScope::MacOS,
+    decoder: Decoder::Identity,
+    meaning: "Photos app SQLite database recording all photos/videos with EXIF metadata, GPS coordinates, facial recognition tags, and import sources. Geolocation and timeline evidence — GPS data can place the device at a specific location.",
+    mitre_techniques: &["T1005"],
+    fields: &[
+        FieldSchema { name: "filename", value_type: ValueType::Text, description: "Photo/video filename", is_uid_component: true },
+        FieldSchema { name: "gps_latitude", value_type: ValueType::Text, description: "GPS latitude from EXIF", is_uid_component: false },
+        FieldSchema { name: "gps_longitude", value_type: ValueType::Text, description: "GPS longitude from EXIF", is_uid_component: false },
+        FieldSchema { name: "capture_date", value_type: ValueType::Timestamp, description: "Photo capture timestamp", is_uid_component: false },
+    ],
+    retention: Some("Persistent; syncs to iCloud Photos"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["macos_knowledgec"],
+    sources: &["https://github.com/mac4n6/APOLLO"],
+};
+
+pub(crate) static MACOS_ICLOUD_DRIVE_DB: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_icloud_drive_db",
+    name: "iCloud Drive Local Metadata",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/Users/*/Library/Application Support/CloudDocs/session/db/client.db"),
+    scope: DataScope::User,
+    os_scope: OsScope::MacOS,
+    decoder: Decoder::Identity,
+    meaning: "iCloud Drive local metadata database. Records files synced to/from iCloud, modification timestamps, and sync state. Critical for identifying cloud-based data exfiltration — shows what was uploaded even if local files are deleted.",
+    mitre_techniques: &["T1567.002"],
+    fields: &[
+        FieldSchema { name: "relative_path", value_type: ValueType::Text, description: "File path relative to iCloud Drive root", is_uid_component: true },
+        FieldSchema { name: "mtime", value_type: ValueType::Timestamp, description: "Last modification time", is_uid_component: false },
+    ],
+    retention: Some("Updated on sync; reflects cloud state"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["macos_fsevents", "macos_spotlight_store"],
+    sources: &["https://www.mac4n6.com/blog/2020/3/21/icloud-drive-forensics"],
+};
+
+pub(crate) static MACOS_LOCATIOND_CLIENTS: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_locationd_clients",
+    name: "Location Services Client Authorization",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/private/var/db/locationd/clients.plist"),
+    scope: DataScope::System,
+    os_scope: OsScope::MacOS,
+    decoder: Decoder::Identity,
+    meaning: "Records which applications have requested location services and their authorization status. Reveals apps with location access — critical for detecting surveillance tools, stalkerware, or unauthorized location tracking apps.",
+    mitre_techniques: &["T1430"],
+    fields: &[
+        FieldSchema { name: "bundle_id", value_type: ValueType::Text, description: "Application bundle ID", is_uid_component: true },
+        FieldSchema { name: "authorized", value_type: ValueType::Bool, description: "Whether location access is authorized", is_uid_component: false },
+    ],
+    retention: Some("Persistent"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["macos_tcc_db", "macos_tcc_system_db"],
+    sources: &["https://www.mac4n6.com/blog/2019/6/20/ios-and-macos-location-services"],
+};
+
+pub(crate) static MACOS_LOCKDOWND_LOG: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_lockdownd_log",
+    name: "Lockdownd Log (iOS device pairing)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/private/var/log/lockdownd.log"),
+    scope: DataScope::System,
+    os_scope: OsScope::MacOS,
+    decoder: Decoder::Identity,
+    meaning: "Lockdown daemon log recording USB/Lightning device pairing events with iOS devices — establishes which iPhones/iPads were connected and when. Critical for mobile device investigations, establishing device-to-Mac relationships.",
+    mitre_techniques: &["T1052.001"],
+    fields: &[
+        FieldSchema { name: "device_udid", value_type: ValueType::Text, description: "iOS device UDID", is_uid_component: true },
+        FieldSchema { name: "pair_event", value_type: ValueType::Text, description: "Pairing event type", is_uid_component: false },
+    ],
+    retention: Some("Rotated"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["macos_unified_log"],
+    sources: &["https://www.mac4n6.com/blog/2016/4/22/ios-device-pairing-records"],
+};
+
+pub(crate) static MACOS_INSTALLER_RECEIPTS: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_installer_receipts",
+    name: "Third-Party Package Receipts",
+    artifact_type: ArtifactType::Directory,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/Library/Receipts/"),
+    scope: DataScope::System,
+    os_scope: OsScope::MacOS,
+    decoder: Decoder::Identity,
+    meaning: "Package receipts for third-party pkg installs. Each plist records package name, version, install date, and file list. Reveals software installation history including malicious packages — install timestamp persists even after app removal.",
+    mitre_techniques: &["T1072"],
+    fields: &[
+        FieldSchema { name: "package_id", value_type: ValueType::Text, description: "Package identifier", is_uid_component: true },
+        FieldSchema { name: "install_date", value_type: ValueType::Timestamp, description: "Package installation timestamp", is_uid_component: false },
+    ],
+    retention: Some("Persistent after install; removed by uninstallers that clean up"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["macos_install_history", "macos_gatekeeper_logs"],
+    sources: &["https://www.mac4n6.com/blog/2016/6/22/macos-application-installation-history"],
+};
+
+pub(crate) static MACOS_SAFARI_LOCALSTORAGE: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_safari_localstorage",
+    name: "Safari HTML5 LocalStorage",
+    artifact_type: ArtifactType::Directory,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/Users/*/Library/Safari/LocalStorage/"),
+    scope: DataScope::User,
+    os_scope: OsScope::MacOS,
+    decoder: Decoder::Identity,
+    meaning: "Safari HTML5 LocalStorage databases (per origin). May contain session tokens, user credentials cached by web apps, and browsing state not visible in standard history — critical for web session hijacking investigations.",
+    mitre_techniques: &["T1539"],
+    fields: &[
+        FieldSchema { name: "origin", value_type: ValueType::Text, description: "Web origin (scheme+host+port)", is_uid_component: true },
+    ],
+    retention: Some("Persistent until cleared"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["macos_safari_history", "macos_safari_downloads"],
+    sources: &["https://www.mac4n6.com/blog/2016/6/23/safari-history"],
+};
+
+pub(crate) static MACOS_NOTIFICATION_CENTER_DB: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_notification_center_db",
+    name: "Notification Center Database",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/Users/*/Library/Application Support/com.apple.notificationcenter/db2/db"),
+    scope: DataScope::User,
+    os_scope: OsScope::MacOS,
+    decoder: Decoder::Identity,
+    meaning: "Notification Center SQLite database. Records all delivered notifications with app, title, body, and timestamp — provides a timeline of alerts even when the originating app logs are cleared. Captures security alerts, email previews, and messages.",
+    mitre_techniques: &["T1217"],
+    fields: &[
+        FieldSchema { name: "app_id", value_type: ValueType::Text, description: "Application that sent the notification", is_uid_component: true },
+        FieldSchema { name: "delivered_date", value_type: ValueType::Timestamp, description: "Notification delivery timestamp", is_uid_component: false },
+        FieldSchema { name: "body", value_type: ValueType::Text, description: "Notification body text", is_uid_component: false },
+    ],
+    retention: Some("Rolling window, typically days"),
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["macos_knowledgec", "macos_sms_db"],
+    sources: &["https://www.mac4n6.com/blog/2019/6/20/notification-center"],
+};
+
+pub(crate) static MACOS_MDM_ENROLLMENT: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_mdm_enrollment",
+    name: "MDM Enrollment State",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/Library/Preferences/com.apple.mdmclient.plist"),
+    scope: DataScope::System,
+    os_scope: OsScope::MacOS,
+    decoder: Decoder::Identity,
+    meaning: "MDM enrollment state plist recording MDM server URL, enrollment user, and push token. Establishes whether device is managed; important for enterprise investigations and detecting rogue MDM enrollment used as a persistence mechanism.",
+    mitre_techniques: &["T1098"],
+    fields: &[
+        FieldSchema { name: "mdm_server_url", value_type: ValueType::Text, description: "MDM server URL", is_uid_component: true },
+        FieldSchema { name: "enrolled_user", value_type: ValueType::Text, description: "Enrollment user identity", is_uid_component: false },
+    ],
+    retention: Some("Persistent until MDM unenrollment"),
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["macos_tcc_system_db"],
+    sources: &["https://www.mac4n6.com/blog/2020/9/15/mdm-forensics"],
+};
+
+pub(crate) static MACOS_ASL_LOGS: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_asl_logs",
+    name: "Apple System Log (ASL) Binary Logs",
+    artifact_type: ArtifactType::Directory,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/private/var/log/asl/"),
+    scope: DataScope::System,
+    os_scope: OsScope::MacOS,
+    decoder: Decoder::Identity,
+    meaning: "Legacy Apple System Log binary files (pre-Unified Log, macOS 10.11 and earlier, but may persist on upgraded systems). Contains authentication, kext load, sudo, and daemon messages useful for historical analysis on older Mac images.",
+    mitre_techniques: &["T1562.002"],
+    fields: &[
+        FieldSchema { name: "sender", value_type: ValueType::Text, description: "Process that generated the message", is_uid_component: true },
+        FieldSchema { name: "message", value_type: ValueType::Text, description: "Log message text", is_uid_component: false },
+    ],
+    retention: Some("Rotated periodically; older files compressed"),
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["macos_unified_log"],
+    sources: &["https://www.mac4n6.com/blog/2016/2/5/asl-logging"],
+};
+
+pub(crate) static MACOS_DIAGNOSTIC_REPORTS: ArtifactDescriptor = ArtifactDescriptor {
+    id: "macos_diagnostic_reports",
+    name: "Diagnostic Reports (crash logs)",
+    artifact_type: ArtifactType::Directory,
+    hive: None,
+    key_path: "",
+    value_name: None,    file_path: Some("/Library/Logs/DiagnosticReports/"),
+    scope: DataScope::System,
+    os_scope: OsScope::MacOS,
+    decoder: Decoder::Identity,
+    meaning: "System-wide crash and hang reports (.ips/.crash format). Reveals process names, code-signing info, entitlements, exception types, and exact timestamps of application failures — useful for anti-forensics and malware crash attribution. Unsigned processes appear clearly.",
+    mitre_techniques: &["T1518"],
+    fields: &[
+        FieldSchema { name: "process_name", value_type: ValueType::Text, description: "Crashed process name", is_uid_component: true },
+        FieldSchema { name: "crash_time", value_type: ValueType::Timestamp, description: "Crash timestamp", is_uid_component: false },
+        FieldSchema { name: "code_signing_id", value_type: ValueType::Text, description: "Code signing identifier", is_uid_component: false },
+    ],
+    retention: Some("Up to ~100 reports retained"),
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["macos_unified_log"],
+    sources: &["https://www.mac4n6.com/blog/2016/4/18/crash-logs-in-os-x"],
+};

@@ -380,6 +380,35 @@ pub static VOLATILITY_TABLE: &[VolatilityEntry] = &[
         volatility: VolatilityClass::Volatile,
         rationale: "RAM; lost on power-off",
     },
+    // Extended Windows registry Critical artifacts
+    VolatilityEntry { artifact_id: "credential_providers", volatility: VolatilityClass::Persistent, rationale: "Registry key; persistent until deleted" },
+    VolatilityEntry { artifact_id: "scheduled_task_registry_cache", volatility: VolatilityClass::Persistent, rationale: "Registry cache; survives XML task file deletion" },
+    VolatilityEntry { artifact_id: "winlogon_notify", volatility: VolatilityClass::Persistent, rationale: "Registry key; persistent until deleted" },
+    VolatilityEntry { artifact_id: "usb_stor_enum", volatility: VolatilityClass::Persistent, rationale: "Registry key; survives device removal" },
+    VolatilityEntry { artifact_id: "setupapi_dev_log", volatility: VolatilityClass::Persistent, rationale: "Log file; retained until manually cleared" },
+    VolatilityEntry { artifact_id: "terminal_server_client_servers_ext", volatility: VolatilityClass::Persistent, rationale: "Registry key; persists across sessions" },
+    // Extended Windows EVTX Critical artifacts
+    VolatilityEntry { artifact_id: "evtx_task_scheduler", volatility: VolatilityClass::RotatingBuffer, rationale: "Event log; rotated on size limit" },
+    VolatilityEntry { artifact_id: "evtx_rdp_client", volatility: VolatilityClass::RotatingBuffer, rationale: "Event log; rotated on size limit" },
+    VolatilityEntry { artifact_id: "evtx_rdp_inbound", volatility: VolatilityClass::RotatingBuffer, rationale: "Event log; rotated on size limit" },
+    VolatilityEntry { artifact_id: "evtx_rdp_session", volatility: VolatilityClass::RotatingBuffer, rationale: "Event log; rotated on size limit" },
+    VolatilityEntry { artifact_id: "evtx_winrm", volatility: VolatilityClass::RotatingBuffer, rationale: "Event log; rotated on size limit" },
+    VolatilityEntry { artifact_id: "evtx_wmi_activity", volatility: VolatilityClass::RotatingBuffer, rationale: "Event log; rotated on size limit" },
+    VolatilityEntry { artifact_id: "evtx_defender", volatility: VolatilityClass::RotatingBuffer, rationale: "Event log; rotated on size limit" },
+    VolatilityEntry { artifact_id: "evtx_netlogon", volatility: VolatilityClass::RotatingBuffer, rationale: "Event log; rotated on size limit" },
+    VolatilityEntry { artifact_id: "evtx_lsa_protection", volatility: VolatilityClass::RotatingBuffer, rationale: "Event log; rotated on size limit" },
+    // Extended macOS Critical artifacts
+    VolatilityEntry { artifact_id: "macos_fsevents", volatility: VolatilityClass::RotatingBuffer, rationale: "FSEvents log; rotated as volume fills" },
+    VolatilityEntry { artifact_id: "macos_login_items_plist", volatility: VolatilityClass::Persistent, rationale: "Plist file; persistent until deleted" },
+    VolatilityEntry { artifact_id: "macos_tcc_system_db", volatility: VolatilityClass::Persistent, rationale: "SQLite DB; persistent until reset" },
+    VolatilityEntry { artifact_id: "macos_sms_db", volatility: VolatilityClass::Persistent, rationale: "SQLite DB; persistent until deleted" },
+    // Extended Linux Critical artifacts
+    VolatilityEntry { artifact_id: "linux_auditd_log", volatility: VolatilityClass::RotatingBuffer, rationale: "Log file; rotated by logrotate" },
+    VolatilityEntry { artifact_id: "linux_secure_log", volatility: VolatilityClass::RotatingBuffer, rationale: "Log file; rotated by logrotate" },
+    VolatilityEntry { artifact_id: "linux_apache_access_log", volatility: VolatilityClass::RotatingBuffer, rationale: "Log file; rotated by logrotate" },
+    VolatilityEntry { artifact_id: "linux_nginx_access_log", volatility: VolatilityClass::RotatingBuffer, rationale: "Log file; rotated by logrotate" },
+    VolatilityEntry { artifact_id: "linux_selinux_config", volatility: VolatilityClass::Persistent, rationale: "Config file; persistent until modified" },
+    VolatilityEntry { artifact_id: "linux_proc_modules", volatility: VolatilityClass::Volatile, rationale: "Virtual FS; lost on reboot" },
 ];
 
 /// Returns the volatility entry for a given artifact ID, or `None` if unknown.

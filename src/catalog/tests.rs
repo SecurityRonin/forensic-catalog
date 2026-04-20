@@ -168,7 +168,7 @@ mod decode_tests {
     #[test]
     fn catalog_has_entries() {
         assert!(!CATALOG.list().is_empty());
-        assert_eq!(CATALOG.list().len(), 187);
+        assert_eq!(CATALOG.list().len(), 284);
     }
 
     #[test]
@@ -2955,5 +2955,105 @@ mod memory_tests {
         for d in &mem {
             assert!(!d.mitre_techniques.is_empty(), "{} has no MITRE mappings", d.id);
         }
+    }
+}
+
+// ── Extension artifact tests (windows_registry_ext, windows_evtx_ext, macos_ext, linux_ext) ──
+
+#[cfg(test)]
+mod extension_tests {
+    use super::*;
+
+    #[test]
+    fn catalog_grows_to_at_least_284() {
+        assert!(
+            CATALOG.list().len() >= 284,
+            "expected ≥ 284 artifacts, got {}",
+            CATALOG.list().len()
+        );
+    }
+
+    // Windows registry extension spot-checks
+    #[test]
+    fn credential_providers_exists() {
+        assert!(CATALOG.by_id("credential_providers").is_some());
+    }
+
+    #[test]
+    fn known_dlls_exists() {
+        assert!(CATALOG.by_id("known_dlls").is_some());
+    }
+
+    #[test]
+    fn usb_stor_enum_exists() {
+        assert!(CATALOG.by_id("usb_stor_enum").is_some());
+    }
+
+    #[test]
+    fn ifeo_global_flag_exists() {
+        assert!(CATALOG.by_id("ifeo_global_flag").is_some());
+    }
+
+    // Windows EVTX extension spot-checks
+    #[test]
+    fn evtx_task_scheduler_exists() {
+        assert!(CATALOG.by_id("evtx_task_scheduler").is_some());
+    }
+
+    #[test]
+    fn evtx_rdp_inbound_exists() {
+        assert!(CATALOG.by_id("evtx_rdp_inbound").is_some());
+    }
+
+    #[test]
+    fn evtx_defender_exists() {
+        assert!(CATALOG.by_id("evtx_defender").is_some());
+    }
+
+    #[test]
+    fn evtx_wmi_activity_exists() {
+        assert!(CATALOG.by_id("evtx_wmi_activity").is_some());
+    }
+
+    // macOS extension spot-checks
+    #[test]
+    fn macos_fsevents_exists() {
+        assert!(CATALOG.by_id("macos_fsevents").is_some());
+    }
+
+    #[test]
+    fn macos_tcc_system_db_exists() {
+        assert!(CATALOG.by_id("macos_tcc_system_db").is_some());
+    }
+
+    #[test]
+    fn macos_wifi_plist_exists() {
+        assert!(CATALOG.by_id("macos_wifi_plist").is_some());
+    }
+
+    #[test]
+    fn macos_mdm_enrollment_exists() {
+        assert!(CATALOG.by_id("macos_mdm_enrollment").is_some());
+    }
+
+    // Linux extension spot-checks
+    #[test]
+    fn linux_auditd_log_exists() {
+        assert!(CATALOG.by_id("linux_auditd_log").is_some());
+    }
+
+    #[test]
+    fn linux_apparmor_profiles_exists() {
+        assert!(CATALOG.by_id("linux_apparmor_profiles").is_some());
+    }
+
+    #[test]
+    fn linux_docker_container_logs_exists() {
+        assert!(CATALOG.by_id("linux_docker_container_logs").is_some());
+    }
+
+    #[test]
+    fn linux_selinux_config_exists() {
+        assert!(CATALOG.by_id("linux_selinux_config").is_some());
     }
 }

@@ -403,6 +403,35 @@ pub static EVIDENCE_TABLE: &[EvidenceEntry] = &[
         strength: EvidenceStrength::Definitive,
         caveats: &["Credentials in memory (LSASS); most valuable live artifact"],
     },
+    // Extended Windows registry Critical artifacts
+    EvidenceEntry { artifact_id: "credential_providers", strength: EvidenceStrength::Strong, caveats: &["Registry key; may be modified by legitimate security products"] },
+    EvidenceEntry { artifact_id: "scheduled_task_registry_cache", strength: EvidenceStrength::Definitive, caveats: &["Survives XML task file deletion; high-fidelity persistence evidence"] },
+    EvidenceEntry { artifact_id: "winlogon_notify", strength: EvidenceStrength::Definitive, caveats: &["Obsolete on Vista+; presence itself is highly suspicious"] },
+    EvidenceEntry { artifact_id: "usb_stor_enum", strength: EvidenceStrength::Strong, caveats: &["Device serial numbers persist; device may have been removed"] },
+    EvidenceEntry { artifact_id: "setupapi_dev_log", strength: EvidenceStrength::Strong, caveats: &["First connection timestamps are reliable; log may be cleared"] },
+    EvidenceEntry { artifact_id: "terminal_server_client_servers_ext", strength: EvidenceStrength::Strong, caveats: &["Reveals UsernameHint used for RDP — near-definitive lateral movement evidence"] },
+    // Extended Windows EVTX Critical artifacts
+    EvidenceEntry { artifact_id: "evtx_task_scheduler", strength: EvidenceStrength::Definitive, caveats: &["Event log; may be cleared by attackers"] },
+    EvidenceEntry { artifact_id: "evtx_rdp_client", strength: EvidenceStrength::Definitive, caveats: &["Outbound RDP; proves this host pivoted to another"] },
+    EvidenceEntry { artifact_id: "evtx_rdp_inbound", strength: EvidenceStrength::Definitive, caveats: &["1149 events confirm source IP before session; not easily faked"] },
+    EvidenceEntry { artifact_id: "evtx_rdp_session", strength: EvidenceStrength::Definitive, caveats: &["Session lifecycle with timestamps; event 39 = RDP hijack"] },
+    EvidenceEntry { artifact_id: "evtx_winrm", strength: EvidenceStrength::Definitive, caveats: &["Confirms PowerShell Remoting lateral movement with account"] },
+    EvidenceEntry { artifact_id: "evtx_wmi_activity", strength: EvidenceStrength::Definitive, caveats: &["5861 = permanent WMI subscription — near-certain persistence"] },
+    EvidenceEntry { artifact_id: "evtx_defender", strength: EvidenceStrength::Definitive, caveats: &["Detection events survive file deletion; tamper events are highly suspicious"] },
+    EvidenceEntry { artifact_id: "evtx_netlogon", strength: EvidenceStrength::Definitive, caveats: &["5827/5828 = ZeroLogon exploitation attempt — very low false-positive rate"] },
+    EvidenceEntry { artifact_id: "evtx_lsa_protection", strength: EvidenceStrength::Strong, caveats: &["PPL changes indicate credential dumping preparation"] },
+    // Extended macOS Critical artifacts
+    EvidenceEntry { artifact_id: "macos_fsevents", strength: EvidenceStrength::Definitive, caveats: &["Kernel-level; not easily tampered; covers all file system activity"] },
+    EvidenceEntry { artifact_id: "macos_login_items_plist", strength: EvidenceStrength::Strong, caveats: &["Persistence mechanism; SFL2 format varies by OS version"] },
+    EvidenceEntry { artifact_id: "macos_tcc_system_db", strength: EvidenceStrength::Definitive, caveats: &["System-wide privacy permissions; requires SIP bypass to tamper"] },
+    EvidenceEntry { artifact_id: "macos_sms_db", strength: EvidenceStrength::Strong, caveats: &["iMessage/SMS content; may be partially encrypted or unavailable without cloud sync"] },
+    // Extended Linux Critical artifacts
+    EvidenceEntry { artifact_id: "linux_auditd_log", strength: EvidenceStrength::Definitive, caveats: &["Kernel-level syscall auditing; attacker must disable auditd to evade"] },
+    EvidenceEntry { artifact_id: "linux_secure_log", strength: EvidenceStrength::Strong, caveats: &["Authentication events; quality depends on PAM configuration"] },
+    EvidenceEntry { artifact_id: "linux_apache_access_log", strength: EvidenceStrength::Definitive, caveats: &["Web exploitation primary source; attacker may delete or tamper"] },
+    EvidenceEntry { artifact_id: "linux_nginx_access_log", strength: EvidenceStrength::Definitive, caveats: &["Web exploitation primary source; attacker may delete or tamper"] },
+    EvidenceEntry { artifact_id: "linux_selinux_config", strength: EvidenceStrength::Strong, caveats: &["Disabled SELinux is itself a strong indicator of attacker activity"] },
+    EvidenceEntry { artifact_id: "linux_proc_modules", strength: EvidenceStrength::Definitive, caveats: &["Live kernel modules; rootkit detection; lost on reboot"] },
 ];
 
 /// Returns the evidence entry for a given artifact ID, or None if unknown.

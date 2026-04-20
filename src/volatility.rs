@@ -751,6 +751,32 @@ pub static VOLATILITY_TABLE: &[VolatilityEntry] = &[
         volatility: VolatilityClass::Persistent,
         rationale: "Exists for lifetime of user profile",
     },
+    // Phase 3 — net-new Critical persistence artifacts
+    VolatilityEntry {
+        artifact_id: "active_setup",
+        volatility: VolatilityClass::Persistent,
+        rationale: "Registry key persists until explicitly deleted",
+    },
+    VolatilityEntry {
+        artifact_id: "lsa_auth_packages",
+        volatility: VolatilityClass::Persistent,
+        rationale: "Registry value persists across reboots; requires reboot to take effect",
+    },
+    VolatilityEntry {
+        artifact_id: "lsa_security_packages",
+        volatility: VolatilityClass::Persistent,
+        rationale: "Registry value persists across reboots; requires reboot to take effect",
+    },
+    VolatilityEntry {
+        artifact_id: "print_monitor_dlls",
+        volatility: VolatilityClass::Persistent,
+        rationale: "Registry key persists until explicitly deleted",
+    },
+    VolatilityEntry {
+        artifact_id: "services_hklm",
+        volatility: VolatilityClass::Persistent,
+        rationale: "Registry key persists until service key deletion",
+    },
 ];
 
 /// Returns the volatility entry for a given artifact ID, or `None` if unknown.

@@ -168,7 +168,7 @@ mod decode_tests {
     #[test]
     fn catalog_has_entries() {
         assert!(!CATALOG.list().is_empty());
-        assert_eq!(CATALOG.list().len(), 354);
+        assert_eq!(CATALOG.list().len(), 361);
     }
 
     #[test]
@@ -3072,7 +3072,7 @@ mod phase2_registry_tests {
     #[test]
     fn catalog_count_includes_phase2() {
         // Updated to 354 after phase-2b file artifact additions
-        assert_eq!(CATALOG.list().len(), 354);
+        assert_eq!(CATALOG.list().len(), 361);
     }
 
     #[test]
@@ -3217,7 +3217,7 @@ mod phase2b_files_tests {
     fn catalog_count_includes_phase2b() {
         // phase2a adds 30 registry artifacts (284→314), phase2b adds 40 file artifacts (314→354)
         // Note: chrome_login_data was already present from Phase 1; not duplicated here.
-        assert_eq!(CATALOG.list().len(), 354);
+        assert_eq!(CATALOG.list().len(), 361);
     }
 
     #[test]
@@ -3506,6 +3506,144 @@ mod phase2b_files_tests {
             assert!(
                 CATALOG.by_id(id).is_some(),
                 "missing phase-2b artifact: {id}"
+            );
+        }
+    }
+}
+
+#[cfg(test)]
+mod phase3_persistence_tests {
+    use super::*;
+
+    #[test]
+    fn catalog_count_includes_phase3() {
+        // phase3 adds 7 net-new artifacts not already in catalog (354 → 361)
+        // Note: winlogon_shell, winlogon_userinit, appinit_dlls, boot_execute,
+        //       ifeo_debugger, netsh_helper_dlls, mountpoints2 were already present.
+        assert_eq!(CATALOG.list().len(), 361);
+    }
+
+    // ── Pre-existing artifacts verified present ───────────────────────────────
+
+    #[test]
+    fn winlogon_shell_already_exists() {
+        let d = CATALOG.by_id("winlogon_shell").unwrap();
+        assert!(d.mitre_techniques.contains(&"T1547.004") || d.mitre_techniques.contains(&"T1547"));
+    }
+
+    #[test]
+    fn winlogon_userinit_already_exists() {
+        let d = CATALOG.by_id("winlogon_userinit").unwrap();
+        assert!(d.mitre_techniques.contains(&"T1547.004") || d.mitre_techniques.contains(&"T1547"));
+    }
+
+    #[test]
+    fn appinit_dlls_already_exists() {
+        let d = CATALOG.by_id("appinit_dlls").unwrap();
+        assert!(d.mitre_techniques.contains(&"T1546.010") || d.mitre_techniques.contains(&"T1546"));
+    }
+
+    #[test]
+    fn boot_execute_already_exists() {
+        let d = CATALOG.by_id("boot_execute").unwrap();
+        assert!(d.mitre_techniques.contains(&"T1547.001") || d.mitre_techniques.contains(&"T1542"));
+    }
+
+    #[test]
+    fn ifeo_debugger_already_exists() {
+        let d = CATALOG.by_id("ifeo_debugger").unwrap();
+        assert!(d.mitre_techniques.contains(&"T1546.012") || d.mitre_techniques.contains(&"T1546"));
+    }
+
+    #[test]
+    fn netsh_helper_dlls_already_exists() {
+        let d = CATALOG.by_id("netsh_helper_dlls").unwrap();
+        assert!(d.mitre_techniques.contains(&"T1546.007") || d.mitre_techniques.contains(&"T1546"));
+    }
+
+    #[test]
+    fn mountpoints2_already_exists() {
+        let d = CATALOG.by_id("mountpoints2").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1091")
+                || d.mitre_techniques.contains(&"T1135")
+                || d.mitre_techniques.contains(&"T1025")
+        );
+    }
+
+    // ── Net-new phase-3 artifacts (ext3) ─────────────────────────────────────
+
+    #[test]
+    fn active_setup_exists() {
+        let d = CATALOG.by_id("active_setup").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::Critical);
+        assert!(d.mitre_techniques.contains(&"T1547.014"));
+    }
+
+    #[test]
+    fn lsa_auth_packages_exists() {
+        let d = CATALOG.by_id("lsa_auth_packages").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::Critical);
+        assert!(d.mitre_techniques.contains(&"T1547.002"));
+    }
+
+    #[test]
+    fn lsa_security_packages_exists() {
+        let d = CATALOG.by_id("lsa_security_packages").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::Critical);
+        assert!(d.mitre_techniques.contains(&"T1547.005"));
+    }
+
+    #[test]
+    fn lsa_notification_packages_exists() {
+        let d = CATALOG.by_id("lsa_notification_packages").unwrap();
+        assert!(d.mitre_techniques.contains(&"T1547.008"));
+    }
+
+    #[test]
+    fn screensaver_persistence_exists() {
+        let d = CATALOG.by_id("screensaver_persistence").unwrap();
+        assert!(d.mitre_techniques.contains(&"T1546.002"));
+    }
+
+    #[test]
+    fn print_monitor_dlls_exists() {
+        let d = CATALOG.by_id("print_monitor_dlls").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::Critical);
+        assert!(d.mitre_techniques.contains(&"T1547.010"));
+    }
+
+    #[test]
+    fn services_hklm_exists() {
+        let d = CATALOG.by_id("services_hklm").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::Critical);
+        assert!(d.mitre_techniques.contains(&"T1543.003"));
+    }
+
+    #[test]
+    fn all_phase3_ids_present() {
+        let ids = [
+            // pre-existing (verified above)
+            "winlogon_shell",
+            "winlogon_userinit",
+            "appinit_dlls",
+            "boot_execute",
+            "ifeo_debugger",
+            "netsh_helper_dlls",
+            "mountpoints2",
+            // net-new from ext3
+            "active_setup",
+            "lsa_auth_packages",
+            "lsa_security_packages",
+            "lsa_notification_packages",
+            "screensaver_persistence",
+            "print_monitor_dlls",
+            "services_hklm",
+        ];
+        for id in &ids {
+            assert!(
+                CATALOG.by_id(id).is_some(),
+                "missing phase-3 artifact: {id}"
             );
         }
     }

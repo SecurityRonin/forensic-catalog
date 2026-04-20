@@ -12,6 +12,7 @@ mod windows_evtx_ext;
 mod windows_files_ext;
 mod windows_registry_ext;
 mod windows_registry_ext2;
+mod windows_registry_ext3;
 
 use super::types::{
     ArtifactDescriptor, ArtifactType, BinaryField, BinaryFieldType, DataScope, Decoder,
@@ -6390,4 +6391,14 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     windows_files_ext::COPILOT_RECALL_UKG,
     windows_files_ext::NTUSER_DAT_FILE,
     windows_files_ext::USRCLASS_DAT_FILE,
+    // Phase-3 net-new persistence artifacts not yet in catalog (windows_registry_ext3)
+    // Note: winlogon_shell, winlogon_userinit, appinit_dlls, boot_execute,
+    //       ifeo_debugger, netsh_helper_dlls, mountpoints2 already exist above.
+    windows_registry_ext3::ACTIVE_SETUP,
+    windows_registry_ext3::LSA_AUTH_PACKAGES,
+    windows_registry_ext3::LSA_SECURITY_PACKAGES,
+    windows_registry_ext3::LSA_NOTIFICATION_PACKAGES,
+    windows_registry_ext3::SCREENSAVER_PERSISTENCE,
+    windows_registry_ext3::PRINT_MONITOR_DLLS,
+    windows_registry_ext3::SERVICES_HKLM,
 ];

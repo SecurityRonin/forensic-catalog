@@ -482,6 +482,12 @@ pub static EVIDENCE_TABLE: &[EvidenceEntry] = &[
     EvidenceEntry { artifact_id: "sum_db", strength: EvidenceStrength::Definitive, caveats: &["Windows Server only; requires ESE/JET parser; timestamps in local server time — convert to UTC"] },
     EvidenceEntry { artifact_id: "copilot_recall_ukg", strength: EvidenceStrength::Definitive, caveats: &["Requires Copilot+ hardware with Recall enabled; VBS/PPLA protects live DB; accessible from acquired image"] },
     EvidenceEntry { artifact_id: "ntuser_dat_file", strength: EvidenceStrength::Definitive, caveats: &["Single hive provides all HKCU artifacts; transaction logs (.LOG1/.LOG2) must be applied for current state"] },
+    // Phase 3 — net-new Critical persistence artifacts
+    EvidenceEntry { artifact_id: "active_setup", strength: EvidenceStrength::Definitive, caveats: &["Rogue sub-key presence is definitive; compare StubPath against known-good baseline; last-write time indicates installation"] },
+    EvidenceEntry { artifact_id: "lsa_auth_packages", strength: EvidenceStrength::Definitive, caveats: &["Any non-msv1_0 DLL is definitive IOC; requires reboot to activate; compare against Windows baseline"] },
+    EvidenceEntry { artifact_id: "lsa_security_packages", strength: EvidenceStrength::Definitive, caveats: &["Any non-Microsoft SSP DLL is definitive IOC; cross-reference DLL hash with threat intel"] },
+    EvidenceEntry { artifact_id: "print_monitor_dlls", strength: EvidenceStrength::Definitive, caveats: &["Rogue Driver value in any sub-key is definitive; PrintNightmare (CVE-2021-1675) may leave forensic artifacts"] },
+    EvidenceEntry { artifact_id: "services_hklm", strength: EvidenceStrength::Definitive, caveats: &["New service sub-key creation time is definitive; ImagePath outside System32/SysWOW64 is suspicious; correlate with EVTX 7045"] },
 ];
 
 /// Returns the evidence entry for a given artifact ID, or None if unknown.

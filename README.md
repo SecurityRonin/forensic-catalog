@@ -54,6 +54,38 @@ Every DFIR tool eventually accumulates a hand-rolled list of artifact paths, MIT
 
 ---
 
+## What's in the catalog
+
+187 artifacts across Windows, Linux, and macOS, organized by investigative category:
+
+**Execution evidence** — UserAssist (ROT13 decoded), Prefetch files (`%SystemRoot%\Prefetch`), Shimcache / AppCompatCache (`SYSTEM\CurrentControlSet\Control\Session Manager\AppCompatCache`), Amcache (`Amcache.hve`), BAM/DAM (`SYSTEM\CurrentControlSet\Services\bam`), MUICache, SRUM database (`SRUDB.dat`), AppShim database (`C:\Windows\apppatch\sysmain.sdb`), Windows Timeline (`ActivitiesCache.db`), Background Activity Moderator
+
+**Persistence** — Run / RunOnce keys (HKLM + HKCU), Scheduled tasks (`C:\Windows\System32\Tasks`), Startup folders, Active Setup, IFEO debugger hijacking, AppInit DLLs, Logon scripts, WMI subscriptions and MOF files, Services ImagePath, Boot Execute, Print monitors, Time providers, LSA authentication packages, Browser Helper Objects, COM hijacking CLSID (HKCU), Winlogon shell/userinit, Screensaver executable, Netsh helper DLLs, Password filter DLLs
+
+**Registry MRU and shell history** — ShellBags (`USRCLASS.DAT\Local Settings\Software\Microsoft\Windows\Shell`), Jump Lists (AutomaticDestinations + CustomDestinations), LNK files (`%APPDATA%\Microsoft\Windows\Recent`), OpenSave MRU, LastVisited MRU, Run MRU, TypedURLs + TypedURLsTime, TypedPaths, WordWheelQuery, MRU Recent Documents
+
+**File system** — `$MFT` (NTFS Master File Table), USN Journal (`$UsnJrnl:$J`), Recycle Bin (`$I`/`$R` pairs), Thumbcache (`thumbcache_*.db`), Windows Search database (`Windows.edb`)
+
+**Windows Event Logs** — Security log (logon/logoff 4624/4625, explicit credentials 4648, process creation 4688), System log, PowerShell/ScriptBlock log (4104), Sysmon operational log (`Microsoft-Windows-Sysmon/Operational`)
+
+**Credential artifacts** — SAM hive (`%SystemRoot%\System32\config\SAM`), LSA secrets (`SECURITY\Policy\Secrets`), DPAPI master keys (user + SYSTEM), DPAPI credential files and credential history, Windows Credential Manager vaults (user + system), Windows Hello / NGC keys, machine and user certificate stores, WDIGEST caching policy, Domain Cached Credentials 2 (DCC2 / MSCachev2)
+
+**Network and remote access** — RDP bitmap cache (`Default.rdp` + `Cache\`), RDP client server history (`NTUSER.DAT\Software\Microsoft\Terminal Server Client`), VPN / RAS phonebook, WinSCP saved sessions, PuTTY sessions and host keys, WiFi profiles (`%ProgramData%\Microsoft\Wlansvc\Profiles`), WinSock LSP (`SYSTEM\CurrentControlSet\Services\WinSock2`), NetworkList profiles, network interfaces, MountPoints2, MountedDevices, portable devices
+
+**Cloud, browser, and third-party** — Chrome cookies and login data, Edge WebCache / ESE database, Firefox `logins.json` + `key4.db`, WinRAR history, cloud sync client paths (OneDrive, Dropbox, Google Drive, Box)
+
+**Active Directory and domain** — `NTDS.dit` (Active Directory database), SYSTEM hive boot key (for NTDS decryption), DPAPI SYSTEM master key (credential decryption prerequisite)
+
+**Database artifacts** — BITS job database (`qmgr*.dat`), hiberfil.sys (hibernation file), pagefile.sys, SRUM sub-tables (app resource, network usage, energy usage, push notification)
+
+**Memory forensics** — Running processes, active network connections, loaded kernel/user modules, in-memory registry hives, LSASS credential material
+
+**macOS** — LaunchAgents (user + system), LaunchDaemons, emond rules, Unified Log, CoreAnalytics, KnowledgeC (`knowledgeC.db`), Keychain (user), TCC database, Quarantine Events, Safari history + downloads, Gatekeeper install history, bash/zsh session logs
+
+**Linux** — bash/zsh/sh history and rc files, cron jobs (`/etc/cron.*`, user crontab, anacron, at queue), systemd units and timers (system + user), XDG autostart, init.d / rc.local, SSH keys and `authorized_keys`, `sshd_config`, sudoers.d, `/etc/passwd` and `/etc/shadow`, auth.log, systemd journal, `wtmp`/`btmp`/`utmp`/`lastlog`, `ld.so.preload` / `ld.so.conf.d`, PAM configuration, udev rules, NetworkManager dispatcher, cloud credentials (AWS `~/.aws/credentials`, Azure, GCP service account, Kubernetes `~/.kube/config`), Docker config, GPG private keys, GNOME Keyring, KDE KWallet, git credentials, netrc
+
+---
+
 ## Decode a raw artifact
 
 ```rust

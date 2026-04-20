@@ -3,6 +3,13 @@
 version = 3
 
 [[package]]
+name = "fcatalog"
+version = "0.1.0"
+dependencies = [
+ "forensic-catalog",
+]
+
+[[package]]
 name = "forensic-catalog"
 version = "0.1.0"
 dependencies = [

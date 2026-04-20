@@ -16,7 +16,8 @@ categories = ["science", "data-structures"]
 readme = "README.md"
 
 [features]
-default = []
+default = ["std"]
+std = []
 serde = ["dep:serde"]
 
 [dependencies]

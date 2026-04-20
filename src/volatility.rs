@@ -605,6 +605,152 @@ pub static VOLATILITY_TABLE: &[VolatilityEntry] = &[
         volatility: VolatilityClass::Persistent,
         rationale: "Registry key; persistent until channel re-enabled",
     },
+    // Phase-2b Extended Windows file Critical artifacts
+    VolatilityEntry {
+        artifact_id: "chrome_history",
+        volatility: VolatilityClass::ActivityDriven,
+        rationale: "Overwritten by browser activity; no size limit",
+    },
+    VolatilityEntry {
+        artifact_id: "edge_chromium_history",
+        volatility: VolatilityClass::ActivityDriven,
+        rationale: "Overwritten by browser activity; no size limit",
+    },
+    VolatilityEntry {
+        artifact_id: "edge_chromium_login_data",
+        volatility: VolatilityClass::Persistent,
+        rationale: "Persists until credential explicitly removed",
+    },
+    VolatilityEntry {
+        artifact_id: "firefox_places",
+        volatility: VolatilityClass::ActivityDriven,
+        rationale: "Overwritten by browser activity; no size limit",
+    },
+    VolatilityEntry {
+        artifact_id: "psreadline_history",
+        volatility: VolatilityClass::ActivityDriven,
+        rationale: "Oldest lines evicted at 4096-line limit",
+    },
+    VolatilityEntry {
+        artifact_id: "psreadline_history_system",
+        volatility: VolatilityClass::ActivityDriven,
+        rationale: "Oldest lines evicted at 4096-line limit",
+    },
+    VolatilityEntry {
+        artifact_id: "powershell_transcripts",
+        volatility: VolatilityClass::Persistent,
+        rationale: "Accumulate indefinitely; not auto-rotated",
+    },
+    VolatilityEntry {
+        artifact_id: "teamviewer_connection_log",
+        volatility: VolatilityClass::Persistent,
+        rationale: "Appended per session; not auto-cleared",
+    },
+    VolatilityEntry {
+        artifact_id: "anydesk_trace_user",
+        volatility: VolatilityClass::RotatingBuffer,
+        rationale: "Rotated at size limit; .old retains previous",
+    },
+    VolatilityEntry {
+        artifact_id: "anydesk_trace_system",
+        volatility: VolatilityClass::RotatingBuffer,
+        rationale: "Rotated at size limit",
+    },
+    VolatilityEntry {
+        artifact_id: "anydesk_connection_trace",
+        volatility: VolatilityClass::Persistent,
+        rationale: "Appended; grows until manually cleared",
+    },
+    VolatilityEntry {
+        artifact_id: "anydesk_file_transfer_log",
+        volatility: VolatilityClass::Persistent,
+        rationale: "Appended; grows until manually cleared",
+    },
+    VolatilityEntry {
+        artifact_id: "screenconnect_session_db",
+        volatility: VolatilityClass::Persistent,
+        rationale: "SQLite DB; retained until manually cleared",
+    },
+    VolatilityEntry {
+        artifact_id: "dropbox_instance_db",
+        volatility: VolatilityClass::Persistent,
+        rationale: "SQLite DB; persists until Dropbox uninstalled",
+    },
+    VolatilityEntry {
+        artifact_id: "onedrive_metadata",
+        volatility: VolatilityClass::Persistent,
+        rationale: "SQLite DB; persists; ODL logs rotate",
+    },
+    VolatilityEntry {
+        artifact_id: "google_drive_fs_metadata",
+        volatility: VolatilityClass::Persistent,
+        rationale: "SQLite DB; persists until Drive uninstalled",
+    },
+    VolatilityEntry {
+        artifact_id: "teams_indexed_db",
+        volatility: VolatilityClass::ActivityDriven,
+        rationale: "LevelDB cache; grows with Teams usage",
+    },
+    VolatilityEntry {
+        artifact_id: "slack_indexed_db",
+        volatility: VolatilityClass::ActivityDriven,
+        rationale: "LevelDB cache; grows with Slack usage",
+    },
+    VolatilityEntry {
+        artifact_id: "discord_local_storage",
+        volatility: VolatilityClass::Persistent,
+        rationale: "Persists until Discord uninstalled or cleared",
+    },
+    VolatilityEntry {
+        artifact_id: "signal_database",
+        volatility: VolatilityClass::Persistent,
+        rationale: "SQLCipher SQLite; persists until user deletes",
+    },
+    VolatilityEntry {
+        artifact_id: "signal_config_json",
+        volatility: VolatilityClass::Persistent,
+        rationale: "Regenerated only on fresh install; otherwise permanent",
+    },
+    VolatilityEntry {
+        artifact_id: "certutil_cache",
+        volatility: VolatilityClass::Persistent,
+        rationale: "CryptNet cache; persists until explicitly flushed",
+    },
+    VolatilityEntry {
+        artifact_id: "sdb_custom_files",
+        volatility: VolatilityClass::Persistent,
+        rationale: "Installed SDB files persist until explicitly removed",
+    },
+    VolatilityEntry {
+        artifact_id: "iis_w3svc_logs",
+        volatility: VolatilityClass::RotatingBuffer,
+        rationale: "Rotated daily; retention per IIS config",
+    },
+    VolatilityEntry {
+        artifact_id: "iis_config_applicationhost",
+        volatility: VolatilityClass::Persistent,
+        rationale: "Persistent IIS config; modified by admin or attacker",
+    },
+    VolatilityEntry {
+        artifact_id: "dns_debug_log",
+        volatility: VolatilityClass::RotatingBuffer,
+        rationale: "Single file rotated at configured size limit",
+    },
+    VolatilityEntry {
+        artifact_id: "sum_db",
+        volatility: VolatilityClass::Persistent,
+        rationale: "Up to 2 years retention; rolled annually",
+    },
+    VolatilityEntry {
+        artifact_id: "copilot_recall_ukg",
+        volatility: VolatilityClass::ActivityDriven,
+        rationale: "Rolling 90-day window; older screenshots purged",
+    },
+    VolatilityEntry {
+        artifact_id: "ntuser_dat_file",
+        volatility: VolatilityClass::Persistent,
+        rationale: "Exists for lifetime of user profile",
+    },
 ];
 
 /// Returns the volatility entry for a given artifact ID, or `None` if unknown.

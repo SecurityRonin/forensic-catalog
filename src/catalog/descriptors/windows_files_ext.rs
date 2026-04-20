@@ -1088,7 +1088,7 @@ pub(crate) static NTUSER_DAT_FILE: ArtifactDescriptor = ArtifactDescriptor {
     ],
     retention: Some("Exists for lifetime of user profile"),
     triage_priority: TriagePriority::Critical,
-    related_artifacts: &["usrclass_dat_file", "shellbags_user", "run_key_hkcu_run"],
+    related_artifacts: &["usrclass_dat_file", "shellbags_user", "run_key_hkcu"],
     sources: &[
         "https://attack.mitre.org/techniques/T1012/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/RegistryHivesUser.tkape",

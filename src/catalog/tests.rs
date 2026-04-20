@@ -168,7 +168,7 @@ mod decode_tests {
     #[test]
     fn catalog_has_entries() {
         assert!(!CATALOG.list().is_empty());
-        assert_eq!(CATALOG.list().len(), 314);
+        assert_eq!(CATALOG.list().len(), 354);
     }
 
     #[test]
@@ -3071,7 +3071,8 @@ mod phase2_registry_tests {
 
     #[test]
     fn catalog_count_includes_phase2() {
-        assert_eq!(CATALOG.list().len(), 314);
+        // Updated to 354 after phase-2b file artifact additions
+        assert_eq!(CATALOG.list().len(), 354);
     }
 
     #[test]
@@ -3214,8 +3215,9 @@ mod phase2b_files_tests {
 
     #[test]
     fn catalog_count_includes_phase2b() {
-        // phase2a adds 30 registry artifacts (284→314), phase2b adds 41 file artifacts (314→355)
-        assert_eq!(CATALOG.list().len(), 355);
+        // phase2a adds 30 registry artifacts (284→314), phase2b adds 40 file artifacts (314→354)
+        // Note: chrome_login_data was already present from Phase 1; not duplicated here.
+        assert_eq!(CATALOG.list().len(), 354);
     }
 
     #[test]

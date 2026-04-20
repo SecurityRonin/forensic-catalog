@@ -9,6 +9,7 @@
 mod linux_ext;
 mod macos_ext;
 mod windows_evtx_ext;
+mod windows_files_ext;
 mod windows_registry_ext;
 mod windows_registry_ext2;
 
@@ -6348,4 +6349,45 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     windows_registry_ext2::PREFETCH_STATUS,
     windows_registry_ext2::FIREWALL_RULES,
     windows_registry_ext2::EVENT_LOG_CHANNEL_STATUS,
+    // Phase-2b Extended Windows file and directory artifacts (windows_files_ext)
+    windows_files_ext::CHROME_HISTORY,
+    windows_files_ext::CHROME_WEB_DATA,
+    windows_files_ext::EDGE_CHROMIUM_HISTORY,
+    windows_files_ext::EDGE_CHROMIUM_LOGIN_DATA,
+    windows_files_ext::FIREFOX_PLACES,
+    windows_files_ext::FIREFOX_FORM_HISTORY,
+    windows_files_ext::FIREFOX_SESSION_RESTORE,
+    windows_files_ext::PSREADLINE_HISTORY,
+    windows_files_ext::PSREADLINE_HISTORY_SYSTEM,
+    windows_files_ext::POWERSHELL_TRANSCRIPTS,
+    windows_files_ext::TEAMVIEWER_CONNECTION_LOG,
+    windows_files_ext::TEAMVIEWER_APP_LOG,
+    windows_files_ext::ANYDESK_TRACE_USER,
+    windows_files_ext::ANYDESK_TRACE_SYSTEM,
+    windows_files_ext::ANYDESK_CONNECTION_TRACE,
+    windows_files_ext::ANYDESK_FILE_TRANSFER_LOG,
+    windows_files_ext::SCREENCONNECT_SESSION_DB,
+    windows_files_ext::RUSTDESK_LOGS,
+    windows_files_ext::DROPBOX_INSTANCE_DB,
+    windows_files_ext::ONEDRIVE_METADATA,
+    windows_files_ext::GOOGLE_DRIVE_FS_METADATA,
+    windows_files_ext::MEGASYNC_DATA,
+    windows_files_ext::TEAMS_INDEXED_DB,
+    windows_files_ext::SLACK_INDEXED_DB,
+    windows_files_ext::DISCORD_LOCAL_STORAGE,
+    windows_files_ext::SIGNAL_DATABASE,
+    windows_files_ext::SIGNAL_CONFIG_JSON,
+    windows_files_ext::WINDOWS_SEARCH_EDB,
+    windows_files_ext::EVENT_TRANSCRIPT_DB,
+    windows_files_ext::CERTUTIL_CACHE,
+    windows_files_ext::SDB_CUSTOM_FILES,
+    windows_files_ext::WER_REPORTS,
+    windows_files_ext::IIS_W3SVC_LOGS,
+    windows_files_ext::IIS_CONFIG_APPLICATIONHOST,
+    windows_files_ext::DNS_DEBUG_LOG,
+    windows_files_ext::DHCP_SERVER_LOG,
+    windows_files_ext::SUM_DB,
+    windows_files_ext::COPILOT_RECALL_UKG,
+    windows_files_ext::NTUSER_DAT_FILE,
+    windows_files_ext::USRCLASS_DAT_FILE,
 ];

@@ -19,21 +19,212 @@ pub struct KapeMapping {
     pub velociraptor_artifacts: &'static [&'static str],
 }
 
-pub static KAPE_MAPPINGS: &[KapeMapping] = &[];
+pub static KAPE_MAPPINGS: &[KapeMapping] = &[
+    // ── Execution ──────────────────────────────────────────────────────────────
+    KapeMapping {
+        artifact_id: "prefetch_dir",
+        kape_targets: &["!BasicCollection", "Prefetch"],
+        kape_modules: &["PECmd"],
+        velociraptor_artifacts: &["Windows.Forensics.Prefetch"],
+    },
+    KapeMapping {
+        artifact_id: "prefetch_file",
+        kape_targets: &["!BasicCollection", "Prefetch"],
+        kape_modules: &["PECmd"],
+        velociraptor_artifacts: &["Windows.Forensics.Prefetch"],
+    },
+    KapeMapping {
+        artifact_id: "amcache_app_file",
+        kape_targets: &["Amcache", "!BasicCollection"],
+        kape_modules: &["AmcacheParser"],
+        velociraptor_artifacts: &["Windows.Forensics.Amcache"],
+    },
+    KapeMapping {
+        artifact_id: "shimcache",
+        kape_targets: &["AppCompatCache", "!BasicCollection"],
+        kape_modules: &["AppCompatCacheParser"],
+        velociraptor_artifacts: &["Windows.Registry.AppCompatCache"],
+    },
+    KapeMapping {
+        artifact_id: "userassist_exe",
+        kape_targets: &["!BasicCollection", "RegistryHives"],
+        kape_modules: &["RECmd"],
+        velociraptor_artifacts: &["Windows.Registry.UserAssist"],
+    },
+    KapeMapping {
+        artifact_id: "userassist_folder",
+        kape_targets: &["!BasicCollection", "RegistryHives"],
+        kape_modules: &["RECmd"],
+        velociraptor_artifacts: &["Windows.Registry.UserAssist"],
+    },
+    KapeMapping {
+        artifact_id: "bam_user",
+        kape_targets: &["BAM_DAM", "!BasicCollection"],
+        kape_modules: &["RECmd"],
+        velociraptor_artifacts: &["Windows.Registry.BAM"],
+    },
+    // ── File System / MFT ──────────────────────────────────────────────────────
+    KapeMapping {
+        artifact_id: "mft_file",
+        kape_targets: &["$MFT", "!BasicCollection"],
+        kape_modules: &["MFTECmd"],
+        velociraptor_artifacts: &["Windows.NTFS.MFT"],
+    },
+    // ── LNK / Jump Lists ──────────────────────────────────────────────────────
+    KapeMapping {
+        artifact_id: "lnk_files",
+        kape_targets: &["LNKFilesAndJumpLists", "!BasicCollection"],
+        kape_modules: &["LECmd"],
+        velociraptor_artifacts: &["Windows.Forensics.Lnk"],
+    },
+    KapeMapping {
+        artifact_id: "lnk_files_office",
+        kape_targets: &["LNKFilesAndJumpLists", "!BasicCollection"],
+        kape_modules: &["LECmd"],
+        velociraptor_artifacts: &["Windows.Forensics.Lnk"],
+    },
+    // ── Event Logs ────────────────────────────────────────────────────────────
+    KapeMapping {
+        artifact_id: "evtx_dir",
+        kape_targets: &["EventLogs", "!SANS_Triage"],
+        kape_modules: &["EvtxECmd"],
+        velociraptor_artifacts: &["Windows.EventLogs.Evtx"],
+    },
+    KapeMapping {
+        artifact_id: "evtx_security",
+        kape_targets: &["EventLogs", "!SANS_Triage"],
+        kape_modules: &["EvtxECmd"],
+        velociraptor_artifacts: &["Windows.EventLogs.Evtx"],
+    },
+    KapeMapping {
+        artifact_id: "evtx_system",
+        kape_targets: &["EventLogs", "!SANS_Triage"],
+        kape_modules: &["EvtxECmd"],
+        velociraptor_artifacts: &["Windows.EventLogs.Evtx"],
+    },
+    KapeMapping {
+        artifact_id: "evtx_powershell",
+        kape_targets: &["EventLogs", "!SANS_Triage"],
+        kape_modules: &["EvtxECmd"],
+        velociraptor_artifacts: &[
+            "Windows.EventLogs.Evtx",
+            "Windows.EventLogs.PowerShell.ScriptBlock",
+        ],
+    },
+    KapeMapping {
+        artifact_id: "evtx_sysmon",
+        kape_targets: &["EventLogs", "!SANS_Triage"],
+        kape_modules: &["EvtxECmd"],
+        velociraptor_artifacts: &["Windows.EventLogs.Evtx", "Windows.Sysmon.Events"],
+    },
+    // ── Registry / Credentials ────────────────────────────────────────────────
+    KapeMapping {
+        artifact_id: "sam_users",
+        kape_targets: &["SAM", "!SANS_Triage"],
+        kape_modules: &["RECmd"],
+        velociraptor_artifacts: &["Windows.Registry.SAM"],
+    },
+    KapeMapping {
+        artifact_id: "ntds_dit",
+        kape_targets: &["NTDS", "!SANS_Triage"],
+        kape_modules: &["ntdsutil"],
+        velociraptor_artifacts: &["Windows.Carving.NTDS"],
+    },
+    // ── Linux — shell history & sessions ──────────────────────────────────────
+    KapeMapping {
+        artifact_id: "linux_bash_history",
+        kape_targets: &[],
+        kape_modules: &[],
+        velociraptor_artifacts: &["Linux.Forensics.BashHistory"],
+    },
+    KapeMapping {
+        artifact_id: "linux_zsh_history",
+        kape_targets: &[],
+        kape_modules: &[],
+        velociraptor_artifacts: &["Linux.Forensics.ZshHistory"],
+    },
+    KapeMapping {
+        artifact_id: "linux_wtmp",
+        kape_targets: &[],
+        kape_modules: &[],
+        velociraptor_artifacts: &["Linux.Sys.Wtmp"],
+    },
+    // ── Linux — logs ──────────────────────────────────────────────────────────
+    KapeMapping {
+        artifact_id: "linux_auth_log",
+        kape_targets: &[],
+        kape_modules: &[],
+        velociraptor_artifacts: &["Linux.Sys.AuthLog"],
+    },
+    KapeMapping {
+        artifact_id: "linux_journal_dir",
+        kape_targets: &[],
+        kape_modules: &[],
+        velociraptor_artifacts: &["Linux.Sys.Journal"],
+    },
+    // ── Linux — accounts / credentials ───────────────────────────────────────
+    KapeMapping {
+        artifact_id: "linux_passwd",
+        kape_targets: &[],
+        kape_modules: &[],
+        velociraptor_artifacts: &["Linux.Sys.Users"],
+    },
+    KapeMapping {
+        artifact_id: "linux_shadow",
+        kape_targets: &[],
+        kape_modules: &[],
+        velociraptor_artifacts: &["Linux.Sys.Users"],
+    },
+    // ── Linux — persistence ───────────────────────────────────────────────────
+    KapeMapping {
+        artifact_id: "linux_user_crontab",
+        kape_targets: &[],
+        kape_modules: &[],
+        velociraptor_artifacts: &["Linux.Sys.Crontab"],
+    },
+    KapeMapping {
+        artifact_id: "linux_crontab_system",
+        kape_targets: &[],
+        kape_modules: &[],
+        velociraptor_artifacts: &["Linux.Sys.Crontab"],
+    },
+    KapeMapping {
+        artifact_id: "linux_ssh_authorized_keys",
+        kape_targets: &[],
+        kape_modules: &[],
+        velociraptor_artifacts: &["Linux.Forensics.SSH.AuthorizedKeys"],
+    },
+];
 
 /// Returns the KAPE mapping for a given artifact ID.
-pub fn kape_mapping_for(_artifact_id: &str) -> Option<&'static KapeMapping> {
-    todo!("implement kape_mapping_for")
+pub fn kape_mapping_for(artifact_id: &str) -> Option<&'static KapeMapping> {
+    KAPE_MAPPINGS
+        .iter()
+        .find(|m| m.artifact_id == artifact_id)
 }
 
 /// Returns all unique KAPE target names needed to collect the given artifact IDs.
-pub fn kape_target_set(_artifact_ids: &[&str]) -> Vec<&'static str> {
-    todo!("implement kape_target_set")
+pub fn kape_target_set(artifact_ids: &[&str]) -> Vec<&'static str> {
+    let mut targets: Vec<&'static str> = artifact_ids
+        .iter()
+        .filter_map(|id| kape_mapping_for(id))
+        .flat_map(|m| m.kape_targets.iter().copied())
+        .collect();
+    targets.sort_unstable();
+    targets.dedup();
+    targets
 }
 
 /// Returns all unique Velociraptor artifact names for the given artifact IDs.
-pub fn velociraptor_artifact_set(_artifact_ids: &[&str]) -> Vec<&'static str> {
-    todo!("implement velociraptor_artifact_set")
+pub fn velociraptor_artifact_set(artifact_ids: &[&str]) -> Vec<&'static str> {
+    let mut arts: Vec<&'static str> = artifact_ids
+        .iter()
+        .filter_map(|id| kape_mapping_for(id))
+        .flat_map(|m| m.velociraptor_artifacts.iter().copied())
+        .collect();
+    arts.sort_unstable();
+    arts.dedup();
+    arts
 }
 
 #[cfg(test)]

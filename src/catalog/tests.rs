@@ -2917,3 +2917,43 @@ mod macos_tests {
         }
     }
 }
+
+#[cfg(test)]
+mod memory_tests {
+    use super::*;
+
+    #[test]
+    fn memory_region_artifacts_exist() {
+        let mem: Vec<_> = CATALOG
+            .list()
+            .iter()
+            .filter(|d| matches!(d.artifact_type, ArtifactType::MemoryRegion))
+            .collect();
+        assert!(mem.len() >= 3, "Should have at least 3 MemoryRegion artifacts");
+    }
+
+    #[test]
+    fn mem_running_processes_exists() {
+        assert!(CATALOG.by_id("mem_running_processes").is_some());
+    }
+
+    #[test]
+    fn mem_user_credentials_is_critical() {
+        let d = CATALOG
+            .by_id("mem_user_credentials")
+            .expect("mem_user_credentials missing");
+        assert_eq!(d.triage_priority, TriagePriority::Critical);
+    }
+
+    #[test]
+    fn memory_artifacts_have_mitre_mappings() {
+        let mem: Vec<_> = CATALOG
+            .list()
+            .iter()
+            .filter(|d| matches!(d.artifact_type, ArtifactType::MemoryRegion))
+            .collect();
+        for d in &mem {
+            assert!(!d.mitre_techniques.is_empty(), "{} has no MITRE mappings", d.id);
+        }
+    }
+}

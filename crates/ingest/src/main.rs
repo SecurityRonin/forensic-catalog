@@ -1,3 +1,4 @@
+mod normalize;
 mod record;
 
 fn main() {

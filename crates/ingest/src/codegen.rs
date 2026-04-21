@@ -1,3 +1,179 @@
+//! Code generation: emit valid `ArtifactDescriptor` Rust statics from `IngestRecord`s.
+
+use crate::record::{IngestRecord, IngestType};
+
+/// Map a hive string to the `HiveTarget` variant name.
+fn hive_variant(hive: &str) -> &'static str {
+    let upper = hive.to_ascii_uppercase();
+    if upper.contains("HKLM\\SYSTEM") || upper.contains("HKEY_LOCAL_MACHINE\\SYSTEM") {
+        "HklmSystem"
+    } else if upper.contains("HKLM\\SOFTWARE")
+        || upper.contains("HKEY_LOCAL_MACHINE\\SOFTWARE")
+    {
+        "HklmSoftware"
+    } else if upper.contains("HKLM\\SAM")
+        || upper.contains("HKEY_LOCAL_MACHINE\\SAM")
+    {
+        "HklmSam"
+    } else if upper.contains("HKLM\\SECURITY")
+        || upper.contains("HKEY_LOCAL_MACHINE\\SECURITY")
+    {
+        "HklmSecurity"
+    } else if upper.contains("HKCU\\SOFTWARE\\CLASSES")
+        || upper.contains("HKEY_CURRENT_USER\\SOFTWARE\\CLASSES")
+    {
+        "UsrClass"
+    } else if upper.contains("HKCU") || upper.contains("HKEY_CURRENT_USER") || upper.contains("NTUSER") {
+        "NtUser"
+    } else if upper.contains("AMCACHE") {
+        "Amcache"
+    } else if upper.contains("BCD") {
+        "Bcd"
+    } else {
+        "None"
+    }
+}
+
+/// Map an `IngestType` to the `ArtifactType` variant name.
+fn artifact_type_variant(t: &IngestType) -> &'static str {
+    match t {
+        IngestType::RegistryKey => "RegistryKey",
+        IngestType::RegistryValue => "RegistryValue",
+        IngestType::File => "File",
+        IngestType::Directory => "Directory",
+        IngestType::EventLog => "EventLog",
+    }
+}
+
+/// Map triage priority string to `TriagePriority` variant.
+fn triage_variant(p: &str) -> &'static str {
+    match p.to_ascii_lowercase().as_str() {
+        "critical" => "Critical",
+        "high" => "High",
+        "low" => "Low",
+        _ => "Medium",
+    }
+}
+
+/// Escape a string for use inside a Rust string literal (double-quote delimited).
+fn escape_rust_str(s: &str) -> String {
+    s.replace('\\', "\\\\").replace('"', "\\\"")
+}
+
+/// Convert a snake_case ID to SCREAMING_SNAKE_CASE for the static name.
+fn to_static_name(id: &str) -> String {
+    id.to_ascii_uppercase()
+}
+
+/// Generate a `pub(crate) static NAME: ArtifactDescriptor = ...;` from an `IngestRecord`.
+pub fn generate_static(rec: &IngestRecord) -> String {
+    let static_name = to_static_name(&rec.id);
+    let artifact_type = artifact_type_variant(&rec.artifact_type);
+
+    // Hive field
+    let hive_field = if let Some(ref h) = rec.hive {
+        format!("Some(HiveTarget::{})", hive_variant(h))
+    } else {
+        "None".to_string()
+    };
+
+    // key_path — use raw strings to avoid double-escaping backslashes
+    let key_path = rec.key_path.replace('\\', "\\\\");
+
+    // value_name
+    let value_name_field = match &rec.value_name {
+        Some(v) => format!("Some(\"{}\")", escape_rust_str(v)),
+        None => "None".to_string(),
+    };
+
+    // file_path
+    let file_path_field = match &rec.file_path {
+        Some(p) => format!("Some(\"{}\")", escape_rust_str(p)),
+        None => "None".to_string(),
+    };
+
+    // scope: registry artifacts are system, file artifacts are mixed
+    let scope = match &rec.artifact_type {
+        IngestType::RegistryKey | IngestType::RegistryValue => {
+            if rec.hive.as_deref().map(|h| h.to_ascii_uppercase().contains("HKCU")).unwrap_or(false) {
+                "DataScope::User"
+            } else {
+                "DataScope::System"
+            }
+        }
+        _ => "DataScope::Mixed",
+    };
+
+    // MITRE techniques slice
+    let mitre = if rec.mitre_techniques.is_empty() {
+        "&[]".to_string()
+    } else {
+        let items: Vec<String> = rec
+            .mitre_techniques
+            .iter()
+            .map(|t| format!("\"{}\"", escape_rust_str(t)))
+            .collect();
+        format!("&[{}]", items.join(", "))
+    };
+
+    // Sources slice
+    let sources = if rec.sources.is_empty() {
+        "&[]".to_string()
+    } else {
+        let items: Vec<String> = rec
+            .sources
+            .iter()
+            .map(|s| format!("\"{}\"", escape_rust_str(s)))
+            .collect();
+        format!("&[{}]", items.join(", "))
+    };
+
+    let triage = triage_variant(&rec.triage_priority);
+    let meaning = escape_rust_str(&rec.meaning);
+    let name = escape_rust_str(&rec.name);
+
+    format!(
+        r#"pub(crate) static {static_name}: ArtifactDescriptor = ArtifactDescriptor {{
+    id: "{id}",
+    name: "{name}",
+    artifact_type: ArtifactType::{artifact_type},
+    hive: {hive_field},
+    key_path: "{key_path}",
+    value_name: {value_name_field},
+    file_path: {file_path_field},
+    scope: {scope},
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "{meaning}",
+    mitre_techniques: {mitre},
+    fields: &[],
+    retention: None,
+    triage_priority: TriagePriority::{triage},
+    related_artifacts: &[],
+    sources: {sources},
+}};
+"#,
+        id = rec.id,
+    )
+}
+
+/// Generate the file header comment and `#![allow]` attribute for a generated module.
+pub fn generate_module_header(source_name: &str, count: usize) -> String {
+    format!(
+        r#"// AUTO-GENERATED by forensicnomicon ingest pipeline.
+// Source: {source_name}
+// Entries: {count}
+// Do not edit manually — re-run `cargo run -p ingest` to regenerate.
+#![allow(clippy::too_many_lines)]
+
+use forensicnomicon::catalog::{{
+    ArtifactDescriptor, ArtifactType, DataScope, Decoder, HiveTarget, OsScope,
+    TriagePriority,
+}};
+"#
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -111,7 +287,7 @@ mod tests {
     }
 
     #[test]
-    fn generate_module_header() {
+    fn generate_module_header_contains_source_and_count() {
         let header = generate_module_header("regedit", 42);
         assert!(header.contains("regedit"), "missing source name in header");
         assert!(header.contains("42"), "missing count in header");

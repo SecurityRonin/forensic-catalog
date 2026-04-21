@@ -1,3 +1,4 @@
+mod codegen;
 mod dedup;
 mod normalize;
 mod record;

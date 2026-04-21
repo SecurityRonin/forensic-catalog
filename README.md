@@ -1,11 +1,13 @@
+<p align="center">
+  <img src="assets/forensicnomicon-banner.png" alt="forensicnomicon" width="520" />
+</p>
+
 [![crates.io](https://img.shields.io/crates/v/forensicnomicon?style=for-the-badge&logo=rust)](https://crates.io/crates/forensicnomicon)
 [![docs.rs](https://img.shields.io/docsrs/forensicnomicon?style=for-the-badge)](https://docs.rs/forensicnomicon)
 [![CI](https://img.shields.io/github/actions/workflow/status/SecurityRonin/forensicnomicon/ci.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/SecurityRonin/forensicnomicon/actions/workflows/ci.yml)
 [![license](https://img.shields.io/crates/l/forensicnomicon?style=for-the-badge)](LICENSE)
 [![rust](https://img.shields.io/badge/rust-1.75+-orange?style=for-the-badge&logo=rust)](https://www.rust-lang.org)
 [![Sponsor](https://img.shields.io/github/sponsors/h4x0r?style=for-the-badge&logo=github&label=Sponsor&color=ea4aaa)](https://github.com/sponsors/h4x0r)
-
-# forensicnomicon
 
 **Stop hardcoding artifact paths and MITRE tags into your DFIR tool.**
 

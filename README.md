@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="assets/forensicnomicon-banner.png" alt="forensicnomicon" width="520" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/forensicnomicon-banner-dark.png" />
+    <img src="assets/forensicnomicon-banner-transparent.png" alt="Forensicnomicon" width="520" />
+  </picture>
 </p>
 
 [![crates.io](https://img.shields.io/crates/v/forensicnomicon?style=for-the-badge&logo=rust)](https://crates.io/crates/forensicnomicon)

@@ -1,9 +1,17 @@
 //! forensicnomicon — the comprehensive DFIR artifact catalog.
 //!
-//! 187 forensic artifacts — registry keys, files, event logs, memory regions —
-//! each with a decoder, MITRE ATT&CK mapping, triage priority, and source
-//! citations. Cross-referenced against Sigma rules, KAPE targets, Velociraptor
-//! artifacts, STIX 2.1 observables, YARA templates, and investigation playbooks.
+//! **6,548 forensic artifacts** — registry keys, files, event logs, memory
+//! regions — each with a decoder, MITRE ATT&CK mapping, triage priority, and
+//! source citations. Cross-referenced against Sigma rules, KAPE targets,
+//! Velociraptor artifacts, STIX 2.1 observables, YARA templates, and
+//! investigation playbooks.
+//!
+//! 361 entries are fully hand-curated (decoded field schemas, MITRE tags,
+//! triage priorities, analyst caveats). The remaining 6,187 are generated from
+//! seven authoritative corpora — KAPE targets (2,422), ForensicArtifacts YAML
+//! (2,545), EVTX/ETW channels (995), Velociraptor (122), RECmd batch files
+//! (44), 20-browser static list (37), and NirSoft paths (22).
+//!
 //! Zero dependencies. Everything in `const`/`static` memory.
 //!
 //! # Quick start
@@ -26,7 +34,7 @@
 //!
 //! ## Artifact catalog
 //!
-//! - [`catalog`] / [`artifact`] — 187-entry descriptor registry with decode,
+//! - [`catalog`] / [`artifact`] — 6,548-entry descriptor registry with decode,
 //!   ATT&CK mapping, triage priority, parsing profiles, and carving signatures.
 //!   Start with [`catalog::CATALOG`].
 //!

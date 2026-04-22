@@ -3,7 +3,7 @@
 This crate has three layers:
 
 - small zero-allocation indicator modules such as `ports`, `lolbins`, and `persistence`
-- the larger [`catalog`](../src/catalog/) module, which models 187 forensic artifacts with decode logic, ATT&CK mappings, triage priority, retention, and per-artifact sources
+- the larger [`catalog`](../src/catalog/) module, which models **6,548 forensic artifacts** with decode logic, ATT&CK mappings, triage priority, retention, and per-artifact sources
 - cross-reference modules (`chainsaw`, `dependencies`, `eventids`, `evidence`, `forensicartifacts`, `navigator`, `playbooks`, `plugin`, `sigma`, `stix`, `temporal`, `toolchain`, `version_history`, `volatility`, `yara`) that enrich the catalog with detection, collection, and investigation data
 
 The [`references`](../src/references.rs) module turns module-level provenance into queryable static data.
@@ -11,7 +11,29 @@ The [`references`](../src/references.rs) module turns module-level provenance in
 ## Coverage
 
 `catalog`
-Unified descriptor registry split into `src/catalog/` (types, descriptors, decode, containers). Currently carries **187 artifact descriptors** with embedded `sources`, `related_artifacts`, decode schemas, and triage ordering. Covers Windows (registry, EVTX, filesystem, MFT, memory), Linux (journal, auth, cron, SSH), and macOS (LaunchAgents, LaunchDaemons, Keychain, Unified Log, TCC, Safari, Quarantine Events).
+Unified descriptor registry split into `src/catalog/` (types, descriptors, decode, containers). Carries **6,548 artifact descriptors** total: 361 fully hand-curated entries with embedded `sources`, `related_artifacts`, decode schemas, and triage ordering; and 6,187 generated entries produced by the `crates/ingest` mass-import pipeline from seven authoritative corpora.
+
+Curated coverage: Windows (registry, EVTX, filesystem, MFT, memory), Linux (journal, auth, cron, SSH), and macOS (LaunchAgents, LaunchDaemons, Keychain, Unified Log, TCC, Safari, Quarantine Events).
+
+Generated coverage (via `crates/ingest`):
+
+| Source | Entries | Corpus |
+|--------|---------|--------|
+| KAPE targets | 2,422 | `EricZimmerman/KapeFiles` (~500 `.tkape` files) |
+| ForensicArtifacts YAML | 2,545 | `forensicartifacts/artifacts` YAML corpus |
+| EVTX / ETW channels | 995 | `nasbench/EVTX-ETW-Resources` CSV |
+| Velociraptor artifacts | 122 | `Velocidex/velociraptor` YAML parameters |
+| RECmd batch files | 44 | `RECmd_Batch_MC.reb` + `Kroll_Batch.reb` |
+| Browser paths (static) | 37 | 20 browsers: Chrome, Edge, Firefox, Brave, Opera, Vivaldi, Safari, IE, Tor, and others |
+| NirSoft paths (static) | 22 | NirSoft utility artifact documentation |
+
+`ingest` (mass-import pipeline binary at `crates/ingest`)
+Fetches, parses, normalizes, deduplicates, and generates `ArtifactDescriptor` Rust source from each corpus. Outputs files to `src/catalog/descriptors/generated/` for human review before committing.
+
+Run to refresh:
+```bash
+cargo run -p ingest -- --source all
+```
 
 Authoritative references:
 - MITRE ATT&CK: https://attack.mitre.org/

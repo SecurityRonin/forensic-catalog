@@ -14,14 +14,14 @@
 
 **Stop hardcoding artifact paths and MITRE tags into your DFIR tool.**
 
-187 forensic artifacts — registry keys, files, event logs, memory regions — each with a decoder, MITRE ATT&CK mapping, triage priority, Sigma/KAPE/Velociraptor cross-references, and source citations. Embed it all in one line.
+**6,548 forensic artifacts** — registry keys, files, event logs, memory regions — each with a decoder, MITRE ATT&CK mapping, triage priority, Sigma/KAPE/Velociraptor cross-references, and source citations. Embed it all in one line.
 
 ```toml
 [dependencies]
 forensicnomicon = "0.1"
 ```
 
-Zero dependencies. No I/O. Everything lives in `const` memory.
+Zero dependencies. No I/O. Everything lives in `const`/`static` memory.
 
 ---
 
@@ -61,33 +61,51 @@ Every DFIR tool eventually accumulates a hand-rolled list of artifact paths, MIT
 
 ## What's in the catalog
 
-187 artifacts across Windows, Linux, and macOS, organized by investigative category:
+**6,548 artifacts** across Windows, Linux, macOS, and cloud environments — 361 fully hand-curated entries (with decoders, MITRE tags, triage priorities, and investigator caveats) plus 6,187 generated from seven authoritative DFIR source corpora.
 
-**Execution evidence** — UserAssist (ROT13 decoded), Prefetch files (`%SystemRoot%\Prefetch`), Shimcache / AppCompatCache (`SYSTEM\CurrentControlSet\Control\Session Manager\AppCompatCache`), Amcache (`Amcache.hve`), BAM/DAM (`SYSTEM\CurrentControlSet\Services\bam`), MUICache, SRUM database (`SRUDB.dat`), AppShim database (`C:\Windows\apppatch\sysmain.sdb`), Windows Timeline (`ActivitiesCache.db`), Background Activity Moderator
+### Curated entries (361)
 
-**Persistence** — Run / RunOnce keys (HKLM + HKCU), Scheduled tasks (`C:\Windows\System32\Tasks`), Startup folders, Active Setup, IFEO debugger hijacking, AppInit DLLs, Logon scripts, WMI subscriptions and MOF files, Services ImagePath, Boot Execute, Print monitors, Time providers, LSA authentication packages, Browser Helper Objects, COM hijacking CLSID (HKCU), Winlogon shell/userinit, Screensaver executable, Netsh helper DLLs, Password filter DLLs
+These carry the most metadata: decoded field schemas, `related_artifacts`, `retention`, and analyst-written `meaning` strings.
 
-**Registry MRU and shell history** — ShellBags (`USRCLASS.DAT\Local Settings\Software\Microsoft\Windows\Shell`), Jump Lists (AutomaticDestinations + CustomDestinations), LNK files (`%APPDATA%\Microsoft\Windows\Recent`), OpenSave MRU, LastVisited MRU, Run MRU, TypedURLs + TypedURLsTime, TypedPaths, WordWheelQuery, MRU Recent Documents
+**Execution evidence** — UserAssist (ROT13 decoded), Prefetch, Shimcache / AppCompatCache, Amcache, BAM/DAM, MUICache, SRUM database, AppShim, Windows Timeline, Background Activity Moderator
 
-**File system** — `$MFT` (NTFS Master File Table), USN Journal (`$UsnJrnl:$J`), Recycle Bin (`$I`/`$R` pairs), Thumbcache (`thumbcache_*.db`), Windows Search database (`Windows.edb`)
+**Persistence** — Run / RunOnce keys (HKLM + HKCU), Scheduled tasks, Startup folders, Active Setup, IFEO debugger hijacking, AppInit DLLs, Logon scripts, WMI subscriptions and MOF files, Services ImagePath, Boot Execute, Print monitors, Time providers, LSA authentication / security / notification packages, Browser Helper Objects, COM hijacking (HKCU), Winlogon shell/userinit, Screensaver executable, Netsh helper DLLs, Password filter DLLs, services HKLM root
 
-**Windows Event Logs** — Security log (logon/logoff 4624/4625, explicit credentials 4648, process creation 4688), System log, PowerShell/ScriptBlock log (4104), Sysmon operational log (`Microsoft-Windows-Sysmon/Operational`)
+**Registry MRU and shell history** — ShellBags, Jump Lists, LNK files, OpenSave MRU, LastVisited MRU, Run MRU, TypedURLs, TypedPaths, WordWheelQuery, MRU Recent Documents
 
-**Credential artifacts** — SAM hive (`%SystemRoot%\System32\config\SAM`), LSA secrets (`SECURITY\Policy\Secrets`), DPAPI master keys (user + SYSTEM), DPAPI credential files and credential history, Windows Credential Manager vaults (user + system), Windows Hello / NGC keys, machine and user certificate stores, WDIGEST caching policy, Domain Cached Credentials 2 (DCC2 / MSCachev2)
+**File system** — `$MFT`, USN Journal, Recycle Bin, Thumbcache, Windows Search database
 
-**Network and remote access** — RDP bitmap cache (`Default.rdp` + `Cache\`), RDP client server history (`NTUSER.DAT\Software\Microsoft\Terminal Server Client`), VPN / RAS phonebook, WinSCP saved sessions, PuTTY sessions and host keys, WiFi profiles (`%ProgramData%\Microsoft\Wlansvc\Profiles`), WinSock LSP (`SYSTEM\CurrentControlSet\Services\WinSock2`), NetworkList profiles, network interfaces, MountPoints2, MountedDevices, portable devices
+**Windows Event Logs** — Security, System, PowerShell/ScriptBlock (4104), Sysmon, and 22 additional named channels (RDP client/inbound/session, WinRM, WMI activity, Defender, BITS client, Code Integrity, AppLocker, Firewall, NTLM, SMB, PowerShell Classic, Task Scheduler)
 
-**Cloud, browser, and third-party** — Chrome cookies and login data, Edge WebCache / ESE database, Firefox `logins.json` + `key4.db`, WinRAR history, cloud sync client paths (OneDrive, Dropbox, Google Drive, Box)
+**Credential artifacts** — SAM hive, LSA secrets, DPAPI master keys, DPAPI credential files, Windows Credential Manager vaults, Windows Hello / NGC keys, certificate stores, WDIGEST caching policy, DCC2 / MSCachev2
 
-**Active Directory and domain** — `NTDS.dit` (Active Directory database), SYSTEM hive boot key (for NTDS decryption), DPAPI SYSTEM master key (credential decryption prerequisite)
+**Network and remote access** — RDP bitmap cache, RDP client server history, VPN / RAS phonebook, WinSCP sessions, PuTTY sessions and host keys, WiFi profiles, WinSock LSP, NetworkList profiles, MountPoints2, MountedDevices, portable devices
 
-**Database artifacts** — BITS job database (`qmgr*.dat`), hiberfil.sys (hibernation file), pagefile.sys, SRUM sub-tables (app resource, network usage, energy usage, push notification)
+**Cloud, browser, and third-party** — Chrome, Edge, Firefox credential stores; RAT/RMM (TeamViewer, AnyDesk, ScreenConnect, RustDesk); cloud sync (OneDrive, Dropbox, Google Drive FS, MEGAsync); communications (Teams, Slack, Discord, Signal); WinRAR history
 
-**Memory forensics** — Running processes, active network connections, loaded kernel/user modules, in-memory registry hives, LSASS credential material
+**Active Directory** — `NTDS.dit`, SYSTEM boot key (for NTDS decryption), DPAPI SYSTEM master key
 
-**macOS** — LaunchAgents (user + system), LaunchDaemons, emond rules, Unified Log, CoreAnalytics, KnowledgeC (`knowledgeC.db`), Keychain (user), TCC database, Quarantine Events, Safari history + downloads, Gatekeeper install history, bash/zsh session logs
+**Database artifacts** — BITS job database, hiberfil.sys, pagefile.sys, SRUM sub-tables
 
-**Linux** — bash/zsh/sh history and rc files, cron jobs (`/etc/cron.*`, user crontab, anacron, at queue), systemd units and timers (system + user), XDG autostart, init.d / rc.local, SSH keys and `authorized_keys`, `sshd_config`, sudoers.d, `/etc/passwd` and `/etc/shadow`, auth.log, systemd journal, `wtmp`/`btmp`/`utmp`/`lastlog`, `ld.so.preload` / `ld.so.conf.d`, PAM configuration, udev rules, NetworkManager dispatcher, cloud credentials (AWS `~/.aws/credentials`, Azure, GCP service account, Kubernetes `~/.kube/config`), Docker config, GPG private keys, GNOME Keyring, KDE KWallet, git credentials, netrc
+**Memory forensics** — Running processes, network connections, loaded modules, in-memory registry hives, LSASS credential material
+
+**macOS** — LaunchAgents (user + system), LaunchDaemons, emond, Unified Log, CoreAnalytics, KnowledgeC, Keychain, TCC database, Quarantine Events, Safari history/downloads, Gatekeeper history, bash/zsh sessions
+
+**Linux** — bash/zsh history, cron jobs, systemd units and timers, XDG autostart, SSH keys and authorized_keys, sshd_config, sudoers, `/etc/passwd` and shadow, auth.log, systemd journal, wtmp/btmp/utmp/lastlog, ld.so.preload, PAM, udev rules, NetworkManager dispatcher, cloud credentials (AWS, Azure, GCP, Kubernetes), Docker config, GPG keys, GNOME Keyring, KDE KWallet, git credentials, netrc
+
+### Generated entries (6,187)
+
+Produced by the `crates/ingest` pipeline — each entry has a location, decoder, OS scope, and source citation.
+
+| Source | Entries | Coverage |
+|--------|---------|----------|
+| KAPE targets (`EricZimmerman/KapeFiles`) | 2,422 | File and directory collection targets across ~500 `.tkape` files |
+| ForensicArtifacts YAML (`forensicartifacts/artifacts`) | 2,545 | Registry keys, files, and directories from the open artifact corpus |
+| EVTX / ETW channels (`nasbench/EVTX-ETW-Resources`) | 995 | Every Windows ETW provider channel with a recorded event |
+| Velociraptor artifacts (`Velocidex/velociraptor`) | 122 | Registry and file paths extracted from Velociraptor artifact YAML parameters |
+| RECmd batch files (`EricZimmerman/RECmd`) | 44 | Registry keys from `RECmd_Batch_MC.reb` and `Kroll_Batch.reb` |
+| Browser artifacts (static, 20 browsers) | 37 | History, cookies, logins, and profile dirs for Chrome, Edge, Firefox, Brave, Opera, Vivaldi, Safari, IE, Tor, and others |
+| NirSoft tools (static) | 22 | Forensically significant paths documented by NirSoft utilities |
 
 ---
 
@@ -162,8 +180,8 @@ use forensicnomicon::toolchain::{kape_mapping_for, kape_target_set, velociraptor
 
 // Single artifact
 let m = kape_mapping_for("prefetch_dir").unwrap();
-// m.kape_targets    — &["Prefetch", "!BasicCollection"]
-// m.velociraptor_artifacts — &["Windows.Forensics.Prefetch"]
+// m.kape_targets              — &["Prefetch", "!BasicCollection"]
+// m.velociraptor_artifacts    — &["Windows.Forensics.Prefetch"]
 
 // Build a deduplicated collection plan for multiple artifacts
 let targets = kape_target_set(&["evtx_security", "mft_file", "prefetch_dir"]);
@@ -337,15 +355,28 @@ let rs  = CATALOG.record_signatures("userassist_exe");
 
 ## `fnomicon` CLI
 
-A companion CLI binary for interactive exploration:
+A companion CLI binary for interactive catalog exploration:
 
 ```
-$ cargo install fnomicon
+$ cargo install --path crates/fcatalog
 $ fnomicon list
 $ fnomicon search prefetch
 $ fnomicon show userassist_exe
 $ fnomicon triage
 ```
+
+---
+
+## Mass-import pipeline
+
+The `crates/ingest` binary refreshes the generated entries from upstream sources. Run it when source corpora publish updates:
+
+```bash
+cargo run -p ingest -- --source all --output src/catalog/descriptors/generated/
+# Review the diff, then commit.
+```
+
+Individual sources: `--source kape`, `--source fa`, `--source evtx`, `--source velociraptor`, `--source regedit`, `--source browsers`, `--source nirsoft`.
 
 ---
 

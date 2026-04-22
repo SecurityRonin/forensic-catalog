@@ -2,14 +2,21 @@
 
 This handbook is the analyst-facing entry point for `forensicnomicon`.
 
-Use it when you need to answer questions like:
+The catalog currently holds **6,548 artifacts** — 361 fully hand-curated entries
+(with decoded field schemas, MITRE tags, triage priorities, and analyst caveats)
+and 6,187 generated from seven authoritative DFIR source corpora (KAPE targets,
+ForensicArtifacts YAML, EVTX/ETW channels, Velociraptor, RECmd batch files,
+browser paths, and NirSoft paths). All entries carry a location, OS scope,
+decoder, and source citation.
+
+Use this handbook when you need to answer questions like:
 
 - what artifacts matter first during triage?
 - where should I look for execution, persistence, or credential evidence?
 - how does this crate model parsing and carving knowledge?
 - which source material justifies a given artifact or module?
 
-The crate is still a reference and knowledge model, not a full parser suite.
+The crate is a reference and knowledge model, not a full parser suite.
 Use it to identify, prioritize, and interpret artifacts, then pair it with
 collection and parsing tools as needed.
 

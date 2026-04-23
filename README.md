@@ -302,7 +302,7 @@ use forensicnomicon::{
 | `eventids` | Windows Event ID enrichment | `event_entry(u32)`, `events_for_artifact(&str)` |
 | `evidence` | Evidence strength / reliability ratings | `evidence_for(&str)`, `artifacts_with_strength(min)` |
 | `forensicartifacts` | ForensicArtifacts.com YAML interop | `fa_ref_for(&str)`, `to_fa_yaml(&str)` |
-| `navigator` | ATT&CK Navigator JSON layer | `generate_navigator_layer(&str)` |
+| `navigator` | ATT&CK Navigator JSON layer + all covered techniques | `generate_navigator_layer(&str)`, `covered_techniques()` |
 | `playbooks` | Directed investigation paths | `playbook_by_id(&str)`, `playbooks_for_artifact(&str)` |
 | `plugin` | Runtime decoder plugin architecture | `ExtendedCatalog`, `CustomDecoder` trait |
 | `sigma` | Sigma rule cross-references | `sigma_refs_for(&str)` |

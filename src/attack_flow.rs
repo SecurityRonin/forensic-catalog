@@ -487,4 +487,145 @@ mod tests {
             assert!(!t.technique_id.is_empty());
         }
     }
+
+    // ── CTID-sourced flow tests (RED: these fail until the real data is added) ──
+
+    /// The corpus must contain at least 5 flows (the 5 real CTID flows).
+    #[test]
+    fn ctid_flow_count_at_least_five() {
+        assert!(
+            ATTACK_FLOWS.len() >= 5,
+            "expected at least 5 flows from CTID corpus, got {}",
+            ATTACK_FLOWS.len()
+        );
+    }
+
+    /// Black Basta Ransomware flow from CTID corpus must exist.
+    #[test]
+    fn ctid_black_basta_ransomware_flow_exists() {
+        let f = flow_by_id("black_basta_ransomware")
+            .expect("flow 'black_basta_ransomware' must exist (CTID corpus)");
+        assert!(f.name.contains("Black Basta"), "name should contain 'Black Basta'");
+    }
+
+    /// Black Basta must have its first real technique T1566.001 (spearphishing attachment).
+    #[test]
+    fn ctid_black_basta_has_t1566_001() {
+        let f = flow_by_id("black_basta_ransomware")
+            .expect("flow 'black_basta_ransomware' must exist");
+        assert!(
+            f.actions.iter().any(|a| a.technique_id == "T1566.001"),
+            "black_basta_ransomware must contain T1566.001 (Spearphishing Attachment)"
+        );
+    }
+
+    /// Black Basta must have T1486 (ransomware encryption).
+    #[test]
+    fn ctid_black_basta_has_t1486() {
+        let f = flow_by_id("black_basta_ransomware")
+            .expect("flow 'black_basta_ransomware' must exist");
+        assert!(
+            f.actions.iter().any(|a| a.technique_id == "T1486"),
+            "black_basta_ransomware must contain T1486 (Data Encrypted for Impact)"
+        );
+    }
+
+    /// Cobalt Kitty Campaign flow from CTID corpus must exist.
+    #[test]
+    fn ctid_cobalt_kitty_campaign_flow_exists() {
+        let f = flow_by_id("cobalt_kitty_campaign")
+            .expect("flow 'cobalt_kitty_campaign' must exist (CTID corpus)");
+        assert!(f.name.contains("Cobalt Kitty"), "name should contain 'Cobalt Kitty'");
+    }
+
+    /// Cobalt Kitty must have T1566.002 (spearphishing link — its initial access).
+    #[test]
+    fn ctid_cobalt_kitty_has_t1566_002() {
+        let f = flow_by_id("cobalt_kitty_campaign")
+            .expect("flow 'cobalt_kitty_campaign' must exist");
+        assert!(
+            f.actions.iter().any(|a| a.technique_id == "T1566.002"),
+            "cobalt_kitty_campaign must contain T1566.002 (Spearphishing Link)"
+        );
+    }
+
+    /// SolarWinds supply-chain flow from CTID corpus must exist.
+    #[test]
+    fn ctid_solarwinds_supply_chain_flow_exists() {
+        let f = flow_by_id("solarwinds_supply_chain")
+            .expect("flow 'solarwinds_supply_chain' must exist (CTID corpus)");
+        assert!(f.name.contains("SolarWinds"), "name should contain 'SolarWinds'");
+    }
+
+    /// SolarWinds must have T1195.002 (supply chain compromise — its hallmark technique).
+    #[test]
+    fn ctid_solarwinds_has_t1195_002() {
+        let f = flow_by_id("solarwinds_supply_chain")
+            .expect("flow 'solarwinds_supply_chain' must exist");
+        assert!(
+            f.actions.iter().any(|a| a.technique_id == "T1195.002"),
+            "solarwinds_supply_chain must contain T1195.002 (Compromise Software Supply Chain)"
+        );
+    }
+
+    /// Conti Ransomware flow from CTID corpus must exist.
+    #[test]
+    fn ctid_conti_ransomware_flow_exists() {
+        let f = flow_by_id("conti_ransomware")
+            .expect("flow 'conti_ransomware' must exist (CTID corpus)");
+        assert!(f.name.contains("Conti"), "name should contain 'Conti'");
+    }
+
+    /// Conti must have T1486 (ransomware encryption).
+    #[test]
+    fn ctid_conti_ransomware_has_t1486() {
+        let f = flow_by_id("conti_ransomware")
+            .expect("flow 'conti_ransomware' must exist");
+        assert!(
+            f.actions.iter().any(|a| a.technique_id == "T1486"),
+            "conti_ransomware must contain T1486 (Data Encrypted for Impact)"
+        );
+    }
+
+    /// BumbleBee Round 2 flow from CTID corpus must exist.
+    #[test]
+    fn ctid_bumblbee_round2_flow_exists() {
+        let f = flow_by_id("bumblbee_round2")
+            .expect("flow 'bumblbee_round2' must exist (CTID corpus)");
+        assert!(f.name.contains("BumbleBee"), "name should contain 'BumbleBee'");
+    }
+
+    /// BumbleBee must have T1003.001 (LSASS credential dumping).
+    #[test]
+    fn ctid_bumblbee_round2_has_t1003_001() {
+        let f = flow_by_id("bumblbee_round2")
+            .expect("flow 'bumblbee_round2' must exist");
+        assert!(
+            f.actions.iter().any(|a| a.technique_id == "T1003.001"),
+            "bumblbee_round2 must contain T1003.001 (LSASS Memory)"
+        );
+    }
+
+    /// All CTID flows must have their real technique IDs (not empty strings).
+    #[test]
+    fn ctid_flows_have_nonempty_technique_ids() {
+        let ctid_ids = [
+            "black_basta_ransomware",
+            "cobalt_kitty_campaign",
+            "solarwinds_supply_chain",
+            "conti_ransomware",
+            "bumblbee_round2",
+        ];
+        for id in ctid_ids {
+            if let Some(f) = flow_by_id(id) {
+                for action in f.actions {
+                    assert!(
+                        !action.technique_id.is_empty(),
+                        "flow '{}' has an action with empty technique_id: '{}'",
+                        id, action.name
+                    );
+                }
+            }
+        }
+    }
 }

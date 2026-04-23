@@ -1,16 +1,16 @@
 //! forensicnomicon — the comprehensive DFIR artifact catalog.
 //!
-//! **6,548 forensic artifacts** — registry keys, files, event logs, memory
-//! regions — each with a decoder, MITRE ATT&CK mapping, triage priority, and
-//! source citations. Cross-referenced against Sigma rules, KAPE targets,
-//! Velociraptor artifacts, STIX 2.1 observables, YARA templates, and
-//! investigation playbooks.
+//! **6,548 forensic artifacts**, each enriched beyond just a path.
+//! Other registries tell you where an artifact lives. forensicnomicon tells
+//! you what it means, how to decode it, how reliable it is as evidence,
+//! when to acquire it, what else to collect alongside it, and which detection
+//! rules apply — all compiled into your binary at zero runtime cost.
 //!
-//! 361 entries are fully hand-curated (decoded field schemas, MITRE tags,
-//! triage priorities, analyst caveats). The remaining 6,187 are generated from
-//! seven authoritative corpora — KAPE targets (2,422), ForensicArtifacts YAML
-//! (2,545), EVTX/ETW channels (995), Velociraptor (122), RECmd batch files
-//! (44), 20-browser static list (37), and NirSoft paths (22).
+//! 361 entries are fully curated with all enrichments. The remaining 6,187
+//! are generated from seven authoritative corpora — KAPE targets (2,422),
+//! ForensicArtifacts YAML (2,545), EVTX/ETW channels (995), Velociraptor
+//! (122), RECmd batch files (44), browser paths (37), NirSoft (22) — and
+//! carry location, OS scope, decoder, and source citation.
 //!
 //! Zero dependencies. Everything in `const`/`static` memory.
 //!
@@ -18,16 +18,22 @@
 //!
 //! ```rust
 //! use forensicnomicon::catalog::{CATALOG, TriagePriority};
-//! use forensicnomicon::ports::is_suspicious_port;
+//! use forensicnomicon::evidence::evidence_for;
+//! use forensicnomicon::volatility::acquisition_order;
 //!
-//! // Boolean checks — no allocation
-//! assert!(is_suspicious_port(4444));
+//! // Acquisition order for live response (RFC 3227 — most volatile first)
+//! let order = acquisition_order();
 //!
-//! // Critical artifacts, triage order
+//! // What to triage first
 //! let critical: Vec<_> = CATALOG.for_triage()
 //!     .into_iter()
 //!     .filter(|d| d.triage_priority == TriagePriority::Critical)
 //!     .collect();
+//!
+//! // How reliable is this artifact as evidence?
+//! let e = evidence_for("userassist_exe").unwrap();
+//! // e.strength → EvidenceStrength::Strong
+//! // e.caveats  → &["Key can be cleared; absence does not prove non-execution"]
 //! ```
 //!
 //! # Module map
@@ -38,26 +44,26 @@
 //!   ATT&CK mapping, triage priority, parsing profiles, and carving signatures.
 //!   Start with [`catalog::CATALOG`].
 //!
-//! ## Investigation support
+//! ## Enrichments — investigation
 //!
 //! - [`playbooks`] — six directed investigation paths (lateral movement, credential
 //!   harvesting, persistence, exfiltration, execution, defense evasion)
-//! - [`evidence`] — evidence strength ratings (`Unreliable` → `Definitive`) per artifact
+//! - [`evidence`] — evidence strength ratings (`Unreliable` → `Definitive`) with analyst caveats
 //! - [`volatility`] — RFC 3227 Order of Volatility; use [`volatility::acquisition_order`]
-//! - [`temporal`] — temporal correlation hints for timeline analysis and timestomp detection
-//! - [`antiforensics_aware`] — per-artifact anti-forensic risk model
-//! - [`version_history`] — artifact changes across OS versions
+//! - [`temporal`] — temporal correlation hints for timeline and timestomp detection
+//! - [`antiforensics_aware`] — per-artifact anti-forensic tampering risk
+//! - [`version_history`] — artifact format and location changes across OS versions
 //! - [`dependencies`] — artifact dependency graph; use [`dependencies::full_collection_set`]
 //!
-//! ## Detection engineering
+//! ## Enrichments — detection
 //!
-//! - [`sigma`] — Sigma rule cross-references; [`sigma::sigma_refs_for`]
+//! - [`sigma`] — Sigma rule references per artifact; [`sigma::sigma_refs_for`]
 //! - [`chainsaw`] — Chainsaw / Hayabusa hunt rule references
 //! - [`navigator`] — ATT&CK Navigator JSON layer generator
 //! - [`yara`] — YARA rule skeleton generator
 //! - [`stix`] — STIX 2.1 observable mappings and indicator patterns
 //!
-//! ## Collection toolchain
+//! ## Enrichments — collection toolchain
 //!
 //! - [`toolchain`] — KAPE targets/modules and Velociraptor artifact names;
 //!   use [`toolchain::kape_target_set`] for deduplicated collection plans

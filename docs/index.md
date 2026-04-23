@@ -2,11 +2,28 @@
 
 This handbook is the analyst-facing entry point for `forensicnomicon`.
 
-The catalog currently holds **6,548 artifacts** — 361 fully hand-curated entries
-(with decoded field schemas, MITRE tags, triage priorities, and analyst caveats)
-and 6,187 generated from seven authoritative DFIR source corpora (KAPE targets,
-ForensicArtifacts YAML, EVTX/ETW channels, Velociraptor, RECmd batch files,
-browser paths, and NirSoft paths). All entries carry a location, OS scope,
+## What this crate does
+
+Most artifact registries tell you *where* an artifact lives. forensicnomicon
+tells you what it **means** — and gives your tool the structured knowledge to
+act on that meaning automatically.
+
+Every artifact entry carries a set of **enrichments**:
+
+| Enrichment | What it answers |
+|---|---|
+| **Decode** | How to turn raw bytes into structured fields (ROT13, FILETIME, MRU order, binary layout) |
+| **Meaning** | What the artifact proves forensically and how it differs from similar artifacts |
+| **Reliability** | Evidence strength (`Unreliable` → `Definitive`) and analyst caveats |
+| **Triage priority** | `Critical` / `High` / `Medium` / `Low` — what to look at first in a constrained window |
+| **Volatility** | RFC 3227 class (`Volatile` → `Residual`) — acquisition order for live response |
+| **Dependencies** | What else you need to collect or decrypt this artifact |
+| **Detection pivots** | MITRE ATT&CK techniques, Sigma rules, YARA templates, Chainsaw rules |
+
+The catalog holds **6,548 artifacts** total. 361 are fully curated with all
+enrichments above. The remaining 6,187 are generated from seven authoritative
+corpora (KAPE targets, ForensicArtifacts YAML, EVTX/ETW channels, Velociraptor,
+RECmd batch files, browser paths, NirSoft paths) and carry location, OS scope,
 decoder, and source citation.
 
 Use this handbook when you need to answer questions like:
@@ -16,17 +33,19 @@ Use this handbook when you need to answer questions like:
 - how does this crate model parsing and carving knowledge?
 - which source material justifies a given artifact or module?
 
-The crate is a reference and knowledge model, not a full parser suite.
-Use it to identify, prioritize, and interpret artifacts, then pair it with
-collection and parsing tools as needed.
+The crate is a knowledge and enrichment model, not a full parser suite. Use it
+to identify, prioritize, and interpret artifacts; pair it with collection and
+parsing tools for the rest.
 
 ## Reading Order
 
-1. Start with [`crate::catalog::CATALOG`] for the full artifact registry.
-2. Use [`crate::catalog::ForensicCatalog::for_triage`] to find high-value artifacts first.
-3. Use [`crate::catalog::ForensicCatalog::by_mitre`] to pivot from ATT&CK techniques to artifact families.
-4. Use [`crate::references`] for module-level provenance.
-5. Use container, parsing, and signature profiles when you need to understand acquisition, decoding, or carving boundaries.
+1. Start with [`crate::catalog::CATALOG`] — query by triage priority, MITRE technique, or keyword.
+2. Use [`crate::volatility::acquisition_order`] to determine what to collect first on a live machine.
+3. Use [`crate::evidence::evidence_for`] to understand how reliable each artifact is as evidence.
+4. Use [`crate::dependencies::full_collection_set`] to compute the transitive artifact set for an investigation.
+5. Use [`crate::playbooks`] for directed investigation paths from a trigger artifact.
+6. Use [`crate::references`] for module-level provenance.
+7. Use container, parsing, and signature profiles when you need acquisition, decoding, or carving boundaries.
 
 ## Core Knowledge Layers
 

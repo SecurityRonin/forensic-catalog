@@ -118,6 +118,7 @@
 
 pub mod antiforensics;
 pub mod antiforensics_aware;
+pub mod attack;
 pub mod catalog;
 pub mod chainsaw;
 pub mod dependencies;

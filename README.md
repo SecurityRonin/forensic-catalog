@@ -12,37 +12,57 @@
 [![rust](https://img.shields.io/badge/rust-1.75+-orange?style=for-the-badge&logo=rust)](https://www.rust-lang.org)
 [![Sponsor](https://img.shields.io/github/sponsors/h4x0r?style=for-the-badge&logo=github&label=Sponsor&color=ea4aaa)](https://github.com/sponsors/h4x0r)
 
-**Stop hardcoding artifact paths and MITRE tags into your DFIR tool.**
+**6,548 forensic artifacts. Every one enriched.**
 
-**6,548 forensic artifacts** — registry keys, files, event logs, memory regions — each with a decoder, MITRE ATT&CK mapping, triage priority, Sigma/KAPE/Velociraptor cross-references, and source citations. Embed it all in one line.
+Other artifact registries tell you *where* an artifact lives. forensicnomicon tells you what it **means**, how to **decode** it, how **reliable** it is as evidence, when to **grab** it, what else to **collect** alongside it, and which **detection rules** apply — all compiled into your binary, zero I/O, zero dependencies.
 
 ```toml
 [dependencies]
 forensicnomicon = "0.1"
 ```
 
-Zero dependencies. No I/O. Everything lives in `const`/`static` memory.
+---
+
+## What "enriched" means
+
+Take `UserAssist` — a registry key at `NTUSER.DAT\...\Explorer\UserAssist\{GUID}\Count`. Every artifact registry gives you that path. forensicnomicon gives you:
+
+| Enrichment | What you get |
+|---|---|
+| **Decode** | Value names are ROT13; payload is a 72-byte struct — run count at offset 4, last execution FILETIME at offset 60 |
+| **Meaning** | Proves a specific user account interactively launched a program — not just that it ran (cf. Prefetch) |
+| **Reliability** | `Strong` — but the key can be cleared; absence isn't proof of non-execution |
+| **Triage priority** | `Critical` — look at this before lower-signal artifacts in a constrained window |
+| **Volatility** | `Persistent` (on-disk registry) — grab RAM first per RFC 3227; this survives reboot |
+| **Dependencies** | Requires `NTUSER.DAT` hive; DPAPI decrypt needs master keys first |
+| **Detection pivots** | Maps to `T1204.002`; 3 Sigma rules, YARA template, ATT&CK Navigator layer entry |
+
+Every artifact in the catalog carries these enrichments as compiled-in `static` data — queryable, cross-referenceable, zero overhead.
 
 ---
 
 ## See it in 30 seconds
 
 ```rust
-use forensicnomicon::ports::is_suspicious_port;
 use forensicnomicon::catalog::{CATALOG, TriagePriority};
+use forensicnomicon::evidence::evidence_for;
+use forensicnomicon::volatility::acquisition_order;
 
-// Boolean port check — no allocations
-assert!(is_suspicious_port(4444)); // Metasploit default
+// What to collect first on a live machine (RFC 3227 order)
+let order = acquisition_order(); // RAM → event logs → registry → disk
 
-// What to look at first — Critical artifacts, ordered by triage priority
-let critical = CATALOG
+// What to look at first in triage
+let critical: Vec<_> = CATALOG
     .for_triage()
     .into_iter()
     .filter(|d| d.triage_priority == TriagePriority::Critical)
-    .collect::<Vec<_>>();
-```
+    .collect();
 
-If that looks useful, keep reading.
+// How reliable is this artifact as evidence?
+let e = evidence_for("userassist_exe").unwrap();
+// e.strength  → EvidenceStrength::Strong
+// e.caveats   → &["Key can be cleared; absence does not prove non-execution"]
+```
 
 ---
 
@@ -50,12 +70,12 @@ If that looks useful, keep reading.
 
 Every DFIR tool eventually accumulates a hand-rolled list of artifact paths, MITRE tags, and triage rules scattered across constants, comments, and config files. That list drifts, goes uncited, and becomes a maintenance burden.
 
-`forensicnomicon` is that list, structured:
+forensicnomicon is that list — structured, cited, and enriched:
 
-- Each artifact has a **known location** (hive, key path, file path), a **decoder**, a **triage priority**, and **authoritative source URLs** — all in one `const`-constructible struct
-- The catalog is **queryable** — by MITRE technique, triage priority, keyword, or structured filter
-- **Cross-referenced** — Sigma rules, KAPE targets, Velociraptor artifacts, STIX patterns, YARA templates, and investigation playbooks all resolve from the same artifact ID
-- **Zero deps** — no supply-chain risk, embeds in any binary
+- **6,548 artifacts** with location, decoder, OS scope, and source citation
+- **361 fully curated** with triage priority, evidence strength, volatility class, dependencies, and detection pivots
+- **Queryable** — by MITRE technique, triage priority, keyword, or structured filter
+- **Zero deps** — no supply-chain risk, embeds in any binary, `no_std` compatible
 
 ---
 
@@ -271,9 +291,9 @@ use forensicnomicon::{
 
 ---
 
-## Cross-reference modules
+## Enrichment modules
 
-| Module | What it provides | Key API |
+| Module | Enrichment | Key API |
 |---|---|---|
 | `chainsaw` | Chainsaw / Hayabusa hunt rule references | `hunt_rules_for(&str)`, `rules_for_tool(HuntTool)` |
 | `dependencies` | Artifact dependency graph | `dependencies_of(&str)`, `full_collection_set(&[&str])` |

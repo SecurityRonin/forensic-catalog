@@ -57,6 +57,8 @@
 //!
 //! ## Enrichments — detection
 //!
+//! - [`attack`] — MITRE ATT&CK integration: shared [`attack::AttackTechnique`] type + YARA rule name prefix lookup
+//! - [`attack_flow`] — campaign graph layer: 5 pre-built adversary scenarios with artifact evidence mapping
 //! - [`sigma`] — Sigma rule references per artifact; [`sigma::sigma_refs_for`]
 //! - [`chainsaw`] — Chainsaw / Hayabusa hunt rule references
 //! - [`navigator`] — ATT&CK Navigator JSON layer generator
@@ -117,8 +119,9 @@
 //! WMI repository, or BITS database parsers should stay in separate companion crates.
 
 pub mod antiforensics;
+pub mod attack_flow;
 pub mod antiforensics_aware;
-pub mod attack;
+pub mod mitre;
 pub mod catalog;
 pub mod chainsaw;
 pub mod dependencies;

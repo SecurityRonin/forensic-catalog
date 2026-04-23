@@ -57,7 +57,7 @@
 //!
 //! ## Enrichments — detection
 //!
-//! - [`attack`] — MITRE ATT&CK integration: shared [`attack::AttackTechnique`] type + YARA rule name prefix lookup
+//! - [`mitre`] — MITRE ATT&CK integration: shared [`mitre::AttackTechnique`] type + YARA rule name prefix lookup
 //! - [`attack_flow`] — campaign graph layer: 5 pre-built adversary scenarios with artifact evidence mapping
 //! - [`sigma`] — Sigma rule references per artifact; [`sigma::sigma_refs_for`]
 //! - [`chainsaw`] — Chainsaw / Hayabusa hunt rule references
@@ -122,6 +122,9 @@ pub mod antiforensics;
 pub mod attack_flow;
 pub mod antiforensics_aware;
 pub mod mitre;
+/// Backwards-compatible re-export of [`mitre`] for existing consumers (e.g. blazehash).
+#[doc(hidden)]
+pub use mitre as attack;
 pub mod catalog;
 pub mod chainsaw;
 pub mod dependencies;

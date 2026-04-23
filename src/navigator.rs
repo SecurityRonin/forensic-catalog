@@ -3,6 +3,7 @@
 //! Generates MITRE ATT&CK Navigator JSON layers showing which techniques
 //! have catalog artifact coverage and how many artifacts cover each technique.
 
+use crate::mitre::AttackTechnique;
 use crate::catalog::CATALOG;
 use std::collections::HashMap;
 
@@ -59,6 +60,25 @@ pub fn technique_coverage() -> HashMap<&'static str, Vec<&'static str>> {
 /// Returns the count of unique ATT&CK techniques covered by the catalog.
 pub fn covered_technique_count() -> usize {
     technique_coverage().len()
+}
+
+/// Returns all ATT&CK techniques covered by the catalog as typed structs.
+///
+/// Each returned [`AttackTechnique`] has `tactic` set to `"unknown"` because
+/// the catalog stores technique IDs only, not tactic context. Use
+/// [`crate::attack::lookup_attack_for_rule_name`] or the ATT&CK STIX bundle
+/// to resolve tactic context for specific techniques.
+pub fn covered_techniques() -> Vec<AttackTechnique> {
+    let mut techniques: Vec<&'static str> = technique_coverage().into_keys().collect();
+    techniques.sort_unstable();
+    techniques
+        .into_iter()
+        .map(|id| AttackTechnique {
+            technique_id: id,
+            tactic: "unknown",
+            name: id,
+        })
+        .collect()
 }
 
 #[cfg(test)]

@@ -295,6 +295,8 @@ use forensicnomicon::{
 
 | Module | Enrichment | Key API |
 |---|---|---|
+| `attack_flow` | Adversary campaign graph (5 scenarios, artifact evidence mapping) | `flow_by_id(&str)`, `flows_for_artifact(&str)`, `artifacts_in_flow(&str)` |
+| `mitre` | MITRE ATT&CK integration: shared `AttackTechnique` type + YARA prefix lookup | `lookup_attack_for_rule_name(&str)` |
 | `chainsaw` | Chainsaw / Hayabusa hunt rule references | `hunt_rules_for(&str)`, `rules_for_tool(HuntTool)` |
 | `dependencies` | Artifact dependency graph | `dependencies_of(&str)`, `full_collection_set(&[&str])` |
 | `eventids` | Windows Event ID enrichment | `event_entry(u32)`, `events_for_artifact(&str)` |

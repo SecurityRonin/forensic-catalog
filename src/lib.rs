@@ -122,9 +122,6 @@ pub mod antiforensics;
 pub mod attack_flow;
 pub mod antiforensics_aware;
 pub mod mitre;
-/// Backwards-compatible re-export of [`mitre`] for existing consumers (e.g. blazehash).
-#[doc(hidden)]
-pub use mitre as attack;
 pub mod catalog;
 pub mod chainsaw;
 pub mod dependencies;

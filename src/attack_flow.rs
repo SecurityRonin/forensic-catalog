@@ -2,14 +2,14 @@
 //!
 //! Models adversary campaigns as directed sequences of ATT&CK actions, each
 //! mapped to the forensicnomicon artifact IDs that provide evidence of that
-//! action. Inspired by the CTID Attack Flow specification:
-//! <https://center-for-threat-informed-defense.github.io/attack-flow/>
+//! action. Flow data is sourced from the CTID Attack Flow corpus:
+//! <https://github.com/center-for-threat-informed-defense/attack-flow/tree/main/corpus>
 //!
 //! # Data model
 //!
-//! An [`AttackFlow`] is a named campaign scenario (e.g. ransomware double
-//! extortion, lateral movement via PtH). It contains an ordered sequence of
-//! [`FlowAction`] steps. Each step carries:
+//! An [`AttackFlow`] is a named campaign scenario (e.g. ransomware, APT lateral
+//! movement). It contains an ordered sequence of [`FlowAction`] steps. Each
+//! step carries:
 //!
 //! - the ATT&CK technique it represents
 //! - the forensicnomicon artifact IDs that provide evidence of it
@@ -20,8 +20,8 @@
 //! ```rust
 //! use forensicnomicon::attack_flow::{flow_by_id, artifacts_in_flow};
 //!
-//! let flow = flow_by_id("ransomware_double_extortion").unwrap();
-//! let artifacts = artifacts_in_flow("ransomware_double_extortion");
+//! let flow = flow_by_id("black_basta_ransomware").unwrap();
+//! let artifacts = artifacts_in_flow("black_basta_ransomware");
 //! assert!(!artifacts.is_empty());
 //! ```
 
@@ -67,51 +67,189 @@ pub struct AttackFlow {
     pub actions: &'static [FlowAction],
 }
 
-// ── Static campaign graph ────────────────────────────────────────────────────
+// ── Static campaign graph (sourced from CTID Attack Flow corpus) ─────────────
+//
+// Each flow is derived from a real .afb file in:
+// https://github.com/center-for-threat-informed-defense/attack-flow/tree/main/corpus
+//
+// Action nodes are topologically sorted (BFS from root actions) preserving
+// the original causal graph. `leads_to` encodes the directed edges between
+// actions as indices into the actions slice.
 
-static RANSOMWARE_DOUBLE_EXTORTION_ACTIONS: &[FlowAction] = &[
+// ── Black Basta Ransomware ────────────────────────────────────────────────────
+// Source: "Black Basta Ransomware.afb" (CTID corpus, author: Lauren Parker, MITRE)
+// 38 action nodes; main execution chain shown with branching preserved.
+
+static BLACK_BASTA_ACTIONS: &[FlowAction] = &[
+    // [0] Root: spearphishing attachment delivery
     FlowAction {
         technique_id: "T1566.001",
         tactic: "initial-access",
         name: "Phishing: Spearphishing Attachment",
-        artifact_ids: &["evtx_security", "evtx_sysmon", "lnk_files"],
+        artifact_ids: &["evtx_security", "lnk_files"],
         leads_to: &[1],
     },
+    // [1]
+    FlowAction {
+        technique_id: "T1140",
+        tactic: "defense-evasion",
+        name: "Deobfuscate/Decode Files or Information",
+        artifact_ids: &["evtx_powershell", "prefetch_dir"],
+        leads_to: &[2],
+    },
+    // [2]
+    FlowAction {
+        technique_id: "T1204.002",
+        tactic: "execution",
+        name: "User Execution: Malicious File",
+        artifact_ids: &["lnk_files", "prefetch_dir", "amcache_app_file"],
+        leads_to: &[3],
+    },
+    // [3]
     FlowAction {
         technique_id: "T1059.001",
         tactic: "execution",
-        name: "PowerShell",
+        name: "Command and Scripting Interpreter: PowerShell",
         artifact_ids: &["powershell_history", "evtx_powershell", "psreadline_history"],
-        leads_to: &[2],
-    },
-    FlowAction {
-        technique_id: "T1547.001",
-        tactic: "persistence",
-        name: "Boot or Logon Autostart Execution: Registry Run Keys",
-        artifact_ids: &["run_key_hkcu", "run_key_hklm"],
-        leads_to: &[3],
-    },
-    FlowAction {
-        technique_id: "T1003.001",
-        tactic: "credential-access",
-        name: "OS Credential Dumping: LSASS Memory",
-        artifact_ids: &["evtx_security", "evtx_sysmon", "prefetch_dir"],
         leads_to: &[4],
     },
+    // [4] DLL Search Order Hijacking loads C2 beacon
+    FlowAction {
+        technique_id: "T1574",
+        tactic: "defense-evasion",
+        name: "Hijack Execution Flow: DLL Search Order Hijacking",
+        artifact_ids: &["evtx_sysmon", "prefetch_dir"],
+        leads_to: &[5],
+    },
+    // [5] Regsvr32 proxy execution
+    FlowAction {
+        technique_id: "T1218",
+        tactic: "defense-evasion",
+        name: "System Binary Proxy Execution: Regsvr32",
+        artifact_ids: &["prefetch_dir", "shimcache", "amcache_app_file"],
+        leads_to: &[6, 7],
+    },
+    // [6] Persistence: Windows Service
+    FlowAction {
+        technique_id: "T1543.003",
+        tactic: "persistence",
+        name: "Create or Modify System Process: Windows Service",
+        artifact_ids: &["services_hklm", "evtx_system"],
+        leads_to: &[8],
+    },
+    // [7] Persistence: Create Account
+    FlowAction {
+        technique_id: "T1136",
+        tactic: "persistence",
+        name: "Create Account",
+        artifact_ids: &["evtx_security", "sam_users"],
+        leads_to: &[9],
+    },
+    // [8] Ingress Tool Transfer (Cobalt Strike, etc.)
+    FlowAction {
+        technique_id: "T1105",
+        tactic: "command-and-control",
+        name: "Ingress Tool Transfer",
+        artifact_ids: &["evtx_security", "srum_network_usage"],
+        leads_to: &[10, 11, 12],
+    },
+    // [9] Account Manipulation / Group Policy for lateral movement
+    FlowAction {
+        technique_id: "T1098",
+        tactic: "privilege-escalation",
+        name: "Account Manipulation",
+        artifact_ids: &["evtx_security", "sam_users"],
+        leads_to: &[],
+    },
+    // [10] Remote Access Software (Atera, ScreenConnect)
+    FlowAction {
+        technique_id: "T1219",
+        tactic: "command-and-control",
+        name: "Remote Access Software",
+        artifact_ids: &["evtx_security", "evtx_sysmon"],
+        leads_to: &[13],
+    },
+    // [11] Disable or Modify Tools
+    FlowAction {
+        technique_id: "T1562.001",
+        tactic: "defense-evasion",
+        name: "Impair Defenses: Disable or Modify Tools",
+        artifact_ids: &["evtx_security", "evtx_system"],
+        leads_to: &[13],
+    },
+    // [12] File and Directory Discovery
+    FlowAction {
+        technique_id: "T1083",
+        tactic: "discovery",
+        name: "File and Directory Discovery",
+        artifact_ids: &["evtx_sysmon", "prefetch_dir"],
+        leads_to: &[14],
+    },
+    // [13] RDP lateral movement
+    FlowAction {
+        technique_id: "T1021.001",
+        tactic: "lateral-movement",
+        name: "Remote Services: Remote Desktop Protocol",
+        artifact_ids: &["evtx_rdp_inbound", "evtx_rdp_client", "evtx_security"],
+        leads_to: &[15],
+    },
+    // [14] Archive before exfil
+    FlowAction {
+        technique_id: "T1560",
+        tactic: "collection",
+        name: "Archive Collected Data: Archive via Utility",
+        artifact_ids: &["mft_file", "prefetch_dir"],
+        leads_to: &[16],
+    },
+    // [15] Service Execution post-lateral-movement
+    FlowAction {
+        technique_id: "T1569.002",
+        tactic: "execution",
+        name: "System Services: Service Execution",
+        artifact_ids: &["evtx_system", "evtx_security"],
+        leads_to: &[17, 18, 19],
+    },
+    // [16] Exfiltration over web service
     FlowAction {
         technique_id: "T1041",
         tactic: "exfiltration",
         name: "Exfiltration Over C2 Channel",
-        artifact_ids: &["evtx_security", "srum_network_usage", "dns_debug_log"],
-        leads_to: &[5],
+        artifact_ids: &["srum_network_usage", "evtx_security", "dns_debug_log"],
+        leads_to: &[],
     },
+    // [17] Service Stop
+    FlowAction {
+        technique_id: "T1489",
+        tactic: "impact",
+        name: "Service Stop",
+        artifact_ids: &["evtx_system", "evtx_security"],
+        leads_to: &[20],
+    },
+    // [18] Disable security tools pre-encryption
+    FlowAction {
+        technique_id: "T1562",
+        tactic: "defense-evasion",
+        name: "Impair Defenses: Disable or Modify System Firewall",
+        artifact_ids: &["evtx_security", "evtx_system"],
+        leads_to: &[20],
+    },
+    // [19] Safe Mode Boot evasion
+    FlowAction {
+        technique_id: "T1112",
+        tactic: "defense-evasion",
+        name: "Modify Registry",
+        artifact_ids: &["evtx_security", "usn_journal"],
+        leads_to: &[20],
+    },
+    // [20] Inhibit System Recovery (VSS deletion)
     FlowAction {
         technique_id: "T1490",
         tactic: "impact",
         name: "Inhibit System Recovery",
-        artifact_ids: &["evtx_system", "usn_journal", "evtx_security"],
-        leads_to: &[6],
+        artifact_ids: &["evtx_system", "usn_journal"],
+        leads_to: &[21],
     },
+    // [21] Data Encrypted for Impact
     FlowAction {
         technique_id: "T1486",
         tactic: "impact",
@@ -121,111 +259,301 @@ static RANSOMWARE_DOUBLE_EXTORTION_ACTIONS: &[FlowAction] = &[
     },
 ];
 
-static LATERAL_MOVEMENT_PTH_ACTIONS: &[FlowAction] = &[
+// ── Cobalt Kitty Campaign ─────────────────────────────────────────────────────
+// Source: "Cobalt Kitty Campaign.afb" (CTID corpus)
+// Vietnamese APT targeting corporations via spearphishing; 27 action nodes.
+
+static COBALT_KITTY_ACTIONS: &[FlowAction] = &[
+    // [0] Spearphishing Link (TA0001)
+    FlowAction {
+        technique_id: "T1566.002",
+        tactic: "initial-access",
+        name: "Spearphishing Link",
+        artifact_ids: &["evtx_security", "chrome_history"],
+        leads_to: &[1],
+    },
+    // [1] PowerShell execution from link
+    FlowAction {
+        technique_id: "T1059.001",
+        tactic: "execution",
+        name: "PowerShell",
+        artifact_ids: &["powershell_history", "evtx_powershell", "psreadline_history"],
+        leads_to: &[2, 3],
+    },
+    // [2] Decode/deobfuscate payloads
+    FlowAction {
+        technique_id: "T1140",
+        tactic: "defense-evasion",
+        name: "Deobfuscate/Decode Files or Information",
+        artifact_ids: &["evtx_powershell", "prefetch_dir"],
+        leads_to: &[4],
+    },
+    // [3] Spearphishing Attachment (parallel initial vector)
+    FlowAction {
+        technique_id: "T1566.001",
+        tactic: "initial-access",
+        name: "Spearphishing Attachment",
+        artifact_ids: &["evtx_security", "lnk_files"],
+        leads_to: &[5],
+    },
+    // [4] DLL Side-Loading (Cobalt Strike)
+    FlowAction {
+        technique_id: "T1574",
+        tactic: "defense-evasion",
+        name: "DLL Side-Loading",
+        artifact_ids: &["evtx_sysmon", "prefetch_dir"],
+        leads_to: &[6],
+    },
+    // [5] Scheduled Task from attachment
+    FlowAction {
+        technique_id: "T1053.005",
+        tactic: "persistence",
+        name: "Scheduled Task",
+        artifact_ids: &["scheduled_tasks_dir", "evtx_task_scheduler"],
+        leads_to: &[],
+    },
+    // [6] Regsvr32 proxy execution
+    FlowAction {
+        technique_id: "T1218",
+        tactic: "defense-evasion",
+        name: "System Binary Proxy Execution: Regsvr32",
+        artifact_ids: &["prefetch_dir", "shimcache", "amcache_app_file"],
+        leads_to: &[7, 8, 9],
+    },
+    // [7] C2 via DNS
+    FlowAction {
+        technique_id: "T1071",
+        tactic: "command-and-control",
+        name: "Application Layer Protocol: DNS",
+        artifact_ids: &["evtx_security", "dns_debug_log"],
+        leads_to: &[],
+    },
+    // [8] C2 via Mail Protocols
+    FlowAction {
+        technique_id: "T1071",
+        tactic: "command-and-control",
+        name: "Application Layer Protocol: Mail Protocols",
+        artifact_ids: &["evtx_security", "srum_network_usage"],
+        leads_to: &[],
+    },
+    // [9] LSA Secrets credential dumping
+    FlowAction {
+        technique_id: "T1003",
+        tactic: "credential-access",
+        name: "OS Credential Dumping: LSA Secrets",
+        artifact_ids: &["evtx_security", "prefetch_dir"],
+        leads_to: &[10, 11, 12],
+    },
+    // [10] SMB lateral movement
+    FlowAction {
+        technique_id: "T1021.002",
+        tactic: "lateral-movement",
+        name: "Remote Services: SMB/Windows Admin Shares",
+        artifact_ids: &["evtx_security", "evtx_system"],
+        leads_to: &[],
+    },
+    // [11] Pass the Hash
+    FlowAction {
+        technique_id: "T1550",
+        tactic: "lateral-movement",
+        name: "Use Alternate Authentication Material: Pass the Hash",
+        artifact_ids: &["evtx_security", "evtx_rdp_inbound"],
+        leads_to: &[],
+    },
+    // [12] WMI lateral movement
+    FlowAction {
+        technique_id: "T1047",
+        tactic: "execution",
+        name: "Windows Management Instrumentation",
+        artifact_ids: &["evtx_wmi_activity", "evtx_security"],
+        leads_to: &[],
+    },
+    // Persistence mechanisms (roots with no incoming edge in CTID flow)
+    // [13]
+    FlowAction {
+        technique_id: "T1547.001",
+        tactic: "persistence",
+        name: "Registry Run Keys / Startup Folder",
+        artifact_ids: &["run_key_hkcu", "run_key_hklm"],
+        leads_to: &[],
+    },
+    // [14]
+    FlowAction {
+        technique_id: "T1543.003",
+        tactic: "persistence",
+        name: "Windows Service",
+        artifact_ids: &["services_hklm", "evtx_system"],
+        leads_to: &[],
+    },
+    // Discovery nodes
+    // [15]
+    FlowAction {
+        technique_id: "T1018",
+        tactic: "discovery",
+        name: "Remote System Discovery",
+        artifact_ids: &["evtx_security", "dns_debug_log"],
+        leads_to: &[],
+    },
+    // [16]
+    FlowAction {
+        technique_id: "T1046",
+        tactic: "discovery",
+        name: "Network Service Discovery",
+        artifact_ids: &["evtx_security", "dns_debug_log"],
+        leads_to: &[],
+    },
+];
+
+// ── SolarWinds Supply Chain ───────────────────────────────────────────────────
+// Source: "SolarWinds.afb" (CTID corpus)
+// Nation-state supply-chain compromise via SolarWinds Orion; 33 action nodes.
+
+static SOLARWINDS_ACTIONS: &[FlowAction] = &[
+    // [0] Compromise Software Supply Chain (root)
+    FlowAction {
+        technique_id: "T1195.002",
+        tactic: "initial-access",
+        name: "Supply Chain Compromise: Compromise Software Supply Chain",
+        artifact_ids: &["evtx_security", "amcache_app_file"],
+        leads_to: &[1],
+    },
+    // [1] Service Execution of trojanized SolarWinds binary
+    FlowAction {
+        technique_id: "T1569.002",
+        tactic: "execution",
+        name: "System Services: Service Execution",
+        artifact_ids: &["evtx_system", "evtx_security"],
+        leads_to: &[2, 3],
+    },
+    // [2] Time-based evasion (dormancy period)
+    FlowAction {
+        technique_id: "T1497",
+        tactic: "defense-evasion",
+        name: "Virtualization/Sandbox Evasion: Time Based Evasion",
+        artifact_ids: &["evtx_sysmon", "prefetch_dir"],
+        leads_to: &[4],
+    },
+    // [3] Security Software Discovery
+    FlowAction {
+        technique_id: "T1518",
+        tactic: "discovery",
+        name: "Software Discovery: Security Software Discovery",
+        artifact_ids: &["evtx_sysmon", "prefetch_dir"],
+        leads_to: &[4],
+    },
+    // [4] Masquerading — match legitimate SolarWinds name
+    FlowAction {
+        technique_id: "T1036",
+        tactic: "defense-evasion",
+        name: "Masquerading: Match Legitimate Name or Location",
+        artifact_ids: &["prefetch_dir", "shimcache", "amcache_app_file"],
+        leads_to: &[5],
+    },
+    // [5] Image File Execution Options injection for persistence
+    FlowAction {
+        technique_id: "T1546",
+        tactic: "persistence",
+        name: "Event Triggered Execution: Image File Execution Options Injection",
+        artifact_ids: &["run_key_hklm", "evtx_sysmon"],
+        leads_to: &[6],
+    },
+    // [6] Windows Service persistence
+    FlowAction {
+        technique_id: "T1543.003",
+        tactic: "persistence",
+        name: "Create or Modify System Process: Windows Service",
+        artifact_ids: &["services_hklm", "evtx_system"],
+        leads_to: &[7],
+    },
+    // [7] Registry modification for C2 config
+    FlowAction {
+        technique_id: "T1112",
+        tactic: "defense-evasion",
+        name: "Modify Registry",
+        artifact_ids: &["evtx_security", "usn_journal"],
+        leads_to: &[8],
+    },
+    // [8] Masquerading for network traffic blending
+    FlowAction {
+        technique_id: "T1036",
+        tactic: "defense-evasion",
+        name: "Masquerading: Rename System Utilities",
+        artifact_ids: &["prefetch_dir", "shimcache"],
+        leads_to: &[9],
+    },
+    // [9] WMI for execution on compromised hosts
+    FlowAction {
+        technique_id: "T1047",
+        tactic: "execution",
+        name: "Windows Management Instrumentation",
+        artifact_ids: &["evtx_wmi_activity", "evtx_security"],
+        leads_to: &[10],
+    },
+    // [10] Indicator Removal (log clearing)
+    FlowAction {
+        technique_id: "T1070",
+        tactic: "defense-evasion",
+        name: "Indicator Removal on Host",
+        artifact_ids: &["evtx_security", "evtx_system", "usn_journal"],
+        leads_to: &[11],
+    },
+    // [11] Disable Windows Event Logging
+    FlowAction {
+        technique_id: "T1562",
+        tactic: "defense-evasion",
+        name: "Impair Defenses: Disable Windows Event Logging",
+        artifact_ids: &["evtx_security", "evtx_system"],
+        leads_to: &[12],
+    },
+    // [12] Disable or Modify Tools (AV/EDR)
+    FlowAction {
+        technique_id: "T1562.001",
+        tactic: "defense-evasion",
+        name: "Impair Defenses: Disable or Modify Tools",
+        artifact_ids: &["evtx_security", "evtx_system"],
+        leads_to: &[13, 14],
+    },
+    // [13] Valid Accounts (stolen credentials)
     FlowAction {
         technique_id: "T1078",
         tactic: "defense-evasion",
         name: "Valid Accounts",
         artifact_ids: &["evtx_security", "windows_vault_user"],
-        leads_to: &[1],
+        leads_to: &[],
     },
-    FlowAction {
-        technique_id: "T1003.002",
-        tactic: "credential-access",
-        name: "OS Credential Dumping: Security Account Manager",
-        artifact_ids: &["sam_users", "evtx_security", "prefetch_dir"],
-        leads_to: &[2],
-    },
-    FlowAction {
-        technique_id: "T1550.002",
-        tactic: "lateral-movement",
-        name: "Use Alternate Authentication Material: Pass the Hash",
-        artifact_ids: &["evtx_security", "evtx_rdp_inbound"],
-        leads_to: &[3],
-    },
-    FlowAction {
-        technique_id: "T1021.001",
-        tactic: "lateral-movement",
-        name: "Remote Services: Remote Desktop Protocol",
-        artifact_ids: &["evtx_rdp_inbound", "evtx_rdp_client", "evtx_security"],
-        leads_to: &[4],
-    },
+    // [14] Scheduled Task persistence
     FlowAction {
         technique_id: "T1053.005",
         tactic: "persistence",
-        name: "Scheduled Task/Job: Scheduled Task",
-        artifact_ids: &["scheduled_tasks_dir", "evtx_task_scheduler", "scheduled_task_registry_cache"],
-        leads_to: &[],
+        name: "Scheduled Task",
+        artifact_ids: &["scheduled_tasks_dir", "evtx_task_scheduler"],
+        leads_to: &[15],
     },
-];
-
-static CREDENTIAL_THEFT_PERSISTENCE_ACTIONS: &[FlowAction] = &[
+    // [15] System Information Discovery
     FlowAction {
-        technique_id: "T1566.002",
-        tactic: "initial-access",
-        name: "Phishing: Spearphishing Link",
-        artifact_ids: &["evtx_security", "chrome_history", "firefox_places"],
-        leads_to: &[1],
-    },
-    FlowAction {
-        technique_id: "T1555.003",
-        tactic: "credential-access",
-        name: "Credentials from Password Stores: Credentials from Web Browsers",
-        artifact_ids: &["chrome_login_data", "firefox_logins", "edge_chromium_login_data"],
-        leads_to: &[2],
-    },
-    FlowAction {
-        technique_id: "T1555",
-        tactic: "credential-access",
-        name: "Credentials from Password Stores",
-        artifact_ids: &["dpapi_masterkey_user", "dpapi_cred_user", "windows_vault_user"],
-        leads_to: &[3],
-    },
-    FlowAction {
-        technique_id: "T1546.015",
-        tactic: "persistence",
-        name: "Event Triggered Execution: Component Object Model Hijacking",
-        artifact_ids: &["run_key_hkcu", "usrclass_dat_file"],
-        leads_to: &[4],
-    },
-    FlowAction {
-        technique_id: "T1070.004",
-        tactic: "defense-evasion",
-        name: "Indicator Removal: File Deletion",
-        artifact_ids: &["recycle_bin", "usn_journal", "mft_file"],
-        leads_to: &[],
-    },
-];
-
-static LIVING_OFF_THE_LAND_ACTIONS: &[FlowAction] = &[
-    FlowAction {
-        technique_id: "T1059.001",
-        tactic: "execution",
-        name: "Command and Scripting Interpreter: PowerShell",
-        artifact_ids: &["powershell_history", "evtx_powershell", "prefetch_dir"],
-        leads_to: &[1, 2],
-    },
-    FlowAction {
-        technique_id: "T1218",
-        tactic: "defense-evasion",
-        name: "System Binary Proxy Execution",
-        artifact_ids: &["prefetch_dir", "shimcache", "amcache_app_file"],
-        leads_to: &[3],
-    },
-    FlowAction {
-        technique_id: "T1012",
+        technique_id: "T1082",
         tactic: "discovery",
-        name: "Query Registry",
-        artifact_ids: &["evtx_sysmon", "prefetch_dir", "powershell_history"],
-        leads_to: &[3],
+        name: "System Information Discovery",
+        artifact_ids: &["evtx_sysmon", "prefetch_dir"],
+        leads_to: &[16, 17],
     },
+    // [16] Data from Local System
     FlowAction {
-        technique_id: "T1027",
-        tactic: "defense-evasion",
-        name: "Obfuscated Files or Information",
-        artifact_ids: &["evtx_powershell", "prefetch_dir", "amcache_app_file"],
-        leads_to: &[4],
+        technique_id: "T1005",
+        tactic: "collection",
+        name: "Data from Local System",
+        artifact_ids: &["mft_file", "usn_journal"],
+        leads_to: &[],
     },
+    // [17] Archive Collected Data
+    FlowAction {
+        technique_id: "T1560",
+        tactic: "collection",
+        name: "Archive Collected Data: Archive via Utility",
+        artifact_ids: &["mft_file", "prefetch_dir"],
+        leads_to: &[18],
+    },
+    // [18] Exfiltration to Cloud Storage
     FlowAction {
         technique_id: "T1041",
         tactic: "exfiltration",
@@ -233,67 +561,352 @@ static LIVING_OFF_THE_LAND_ACTIONS: &[FlowAction] = &[
         artifact_ids: &["srum_network_usage", "evtx_security", "dns_debug_log"],
         leads_to: &[],
     },
-];
-
-static WMI_PERSISTENCE_ACTIONS: &[FlowAction] = &[
+    // Additional discovery/credential nodes (no incoming edges in CTID flow)
+    // [19]
     FlowAction {
-        technique_id: "T1059.001",
-        tactic: "execution",
-        name: "PowerShell",
-        artifact_ids: &["powershell_history", "evtx_powershell"],
-        leads_to: &[1],
+        technique_id: "T1482",
+        tactic: "discovery",
+        name: "Domain Trust Discovery",
+        artifact_ids: &["evtx_security", "evtx_sysmon"],
+        leads_to: &[],
     },
+    // [20]
     FlowAction {
-        technique_id: "T1546.003",
-        tactic: "persistence",
-        name: "Event Triggered Execution: Windows Management Instrumentation Event Subscription",
-        artifact_ids: &["wmi_subscriptions", "wmi_mof_dir", "evtx_wmi_activity"],
-        leads_to: &[2],
-    },
-    FlowAction {
-        technique_id: "T1070.001",
-        tactic: "defense-evasion",
-        name: "Indicator Removal: Clear Windows Event Logs",
-        artifact_ids: &["evtx_security", "evtx_system", "usn_journal"],
+        technique_id: "T1558",
+        tactic: "credential-access",
+        name: "Steal or Forge Kerberos Tickets: Kerberoasting",
+        artifact_ids: &["evtx_security", "evtx_sysmon"],
         leads_to: &[],
     },
 ];
 
-/// All available attack flow scenarios.
+// ── Conti Ransomware ──────────────────────────────────────────────────────────
+// Source: "Conti Ransomware.afb" (CTID corpus)
+// RaaS group using Cobalt Strike; 19 action nodes.
+
+static CONTI_RANSOMWARE_ACTIONS: &[FlowAction] = &[
+    // [0] Spearphishing Attachment (initial access)
+    FlowAction {
+        technique_id: "T1566.001",
+        tactic: "initial-access",
+        name: "Phishing: Spearphishing Attachment",
+        artifact_ids: &["evtx_security", "lnk_files"],
+        leads_to: &[1],
+    },
+    // [1] JavaScript execution (macro/script in attachment)
+    FlowAction {
+        technique_id: "T1059",
+        tactic: "execution",
+        name: "Command and Scripting Interpreter: JavaScript",
+        artifact_ids: &["prefetch_dir", "amcache_app_file"],
+        leads_to: &[2],
+    },
+    // [2] Ingress Tool Transfer (Cobalt Strike beacon)
+    FlowAction {
+        technique_id: "T1105",
+        tactic: "command-and-control",
+        name: "Ingress Tool Transfer",
+        artifact_ids: &["evtx_security", "srum_network_usage"],
+        leads_to: &[3],
+    },
+    // [3] Rundll32 proxy execution
+    FlowAction {
+        technique_id: "T1218",
+        tactic: "defense-evasion",
+        name: "System Binary Proxy Execution: Rundll32",
+        artifact_ids: &["prefetch_dir", "shimcache", "amcache_app_file"],
+        leads_to: &[4],
+    },
+    // [4] Access Token Manipulation
+    FlowAction {
+        technique_id: "T1134",
+        tactic: "privilege-escalation",
+        name: "Access Token Manipulation",
+        artifact_ids: &["evtx_security"],
+        leads_to: &[5],
+    },
+    // [5] SMB lateral movement with elevated token
+    FlowAction {
+        technique_id: "T1021.002",
+        tactic: "lateral-movement",
+        name: "Remote Services: SMB/Windows Admin Shares",
+        artifact_ids: &["evtx_security", "evtx_system"],
+        leads_to: &[6],
+    },
+    // [6] Ingress Tool Transfer to lateral host
+    FlowAction {
+        technique_id: "T1105",
+        tactic: "command-and-control",
+        name: "Ingress Tool Transfer (lateral host)",
+        artifact_ids: &["evtx_security", "srum_network_usage"],
+        leads_to: &[7, 8, 9],
+    },
+    // [7] Remote System Discovery
+    FlowAction {
+        technique_id: "T1018",
+        tactic: "discovery",
+        name: "Remote System Discovery",
+        artifact_ids: &["evtx_security", "dns_debug_log"],
+        leads_to: &[],
+    },
+    // [8] System Owner/User Discovery
+    FlowAction {
+        technique_id: "T1033",
+        tactic: "discovery",
+        name: "System Owner/User Discovery",
+        artifact_ids: &["evtx_sysmon", "prefetch_dir"],
+        leads_to: &[],
+    },
+    // [9] Network Service Discovery
+    FlowAction {
+        technique_id: "T1046",
+        tactic: "discovery",
+        name: "Network Service Discovery",
+        artifact_ids: &["evtx_security", "dns_debug_log"],
+        leads_to: &[10],
+    },
+    // [10] RDP lateral movement
+    FlowAction {
+        technique_id: "T1021.001",
+        tactic: "lateral-movement",
+        name: "Remote Services: Remote Desktop Protocol",
+        artifact_ids: &["evtx_rdp_inbound", "evtx_rdp_client", "evtx_security"],
+        leads_to: &[11],
+    },
+    // [11] Domain Account discovery
+    FlowAction {
+        technique_id: "T1087",
+        tactic: "discovery",
+        name: "Account Discovery: Domain Account",
+        artifact_ids: &["evtx_security", "evtx_sysmon"],
+        leads_to: &[12],
+    },
+    // [12] Group Policy Modification (mass deployment)
+    FlowAction {
+        technique_id: "T1484",
+        tactic: "defense-evasion",
+        name: "Domain Policy Modification: Group Policy Modification",
+        artifact_ids: &["evtx_security", "evtx_system"],
+        leads_to: &[13],
+    },
+    // [13] Disable or Modify Tools (AV before encryption)
+    FlowAction {
+        technique_id: "T1562.001",
+        tactic: "defense-evasion",
+        name: "Impair Defenses: Disable or Modify Tools",
+        artifact_ids: &["evtx_security", "evtx_system"],
+        leads_to: &[14],
+    },
+    // [14] SMB Admin Shares for payload distribution
+    FlowAction {
+        technique_id: "T1021.002",
+        tactic: "lateral-movement",
+        name: "Remote Services: SMB/Windows Admin Shares (payload drop)",
+        artifact_ids: &["evtx_security", "evtx_system"],
+        leads_to: &[15],
+    },
+    // [15] Data Encrypted for Impact
+    FlowAction {
+        technique_id: "T1486",
+        tactic: "impact",
+        name: "Data Encrypted for Impact",
+        artifact_ids: &["mft_file", "usn_journal", "recycle_bin"],
+        leads_to: &[],
+    },
+];
+
+// ── DFIR BumbleBee Round 2 ────────────────────────────────────────────────────
+// Source: "DFIR - BumbleBee Round 2.afb" (CTID corpus)
+// BumbleBee loader → Cobalt Strike → RDP → remote access; 19 action nodes.
+
+static BUMBLBEE_ROUND2_ACTIONS: &[FlowAction] = &[
+    // [0] Shortcut Modification (LNK persistence / initial execution)
+    FlowAction {
+        technique_id: "T1547.009",
+        tactic: "persistence",
+        name: "Boot or Logon Autostart Execution: Shortcut Modification",
+        artifact_ids: &["lnk_files", "run_key_hkcu"],
+        leads_to: &[1, 2],
+    },
+    // [1] Ingress Tool Transfer (BumbleBee drops Cobalt Strike)
+    FlowAction {
+        technique_id: "T1105",
+        tactic: "command-and-control",
+        name: "Ingress Tool Transfer",
+        artifact_ids: &["evtx_security", "srum_network_usage"],
+        leads_to: &[3],
+    },
+    // [2] Command and Scripting Interpreter (initial command execution)
+    FlowAction {
+        technique_id: "T1059",
+        tactic: "execution",
+        name: "Command and Scripting Interpreter",
+        artifact_ids: &["prefetch_dir", "amcache_app_file"],
+        leads_to: &[4, 5, 6],
+    },
+    // [3] Rundll32 proxy execution (Cobalt Strike)
+    FlowAction {
+        technique_id: "T1218",
+        tactic: "defense-evasion",
+        name: "System Binary Proxy Execution: Rundll32",
+        artifact_ids: &["prefetch_dir", "shimcache", "amcache_app_file"],
+        leads_to: &[7],
+    },
+    // [4] Network Share Discovery
+    FlowAction {
+        technique_id: "T1135",
+        tactic: "discovery",
+        name: "Network Share Discovery",
+        artifact_ids: &["evtx_security", "evtx_sysmon"],
+        leads_to: &[],
+    },
+    // [5] Domain Account Discovery
+    FlowAction {
+        technique_id: "T1087",
+        tactic: "discovery",
+        name: "Account Discovery: Domain Account",
+        artifact_ids: &["evtx_security", "evtx_sysmon"],
+        leads_to: &[],
+    },
+    // [6] Domain Trust Discovery
+    FlowAction {
+        technique_id: "T1482",
+        tactic: "discovery",
+        name: "Domain Trust Discovery",
+        artifact_ids: &["evtx_security", "evtx_sysmon"],
+        leads_to: &[],
+    },
+    // [7] Process Injection
+    FlowAction {
+        technique_id: "T1055",
+        tactic: "defense-evasion",
+        name: "Process Injection",
+        artifact_ids: &["evtx_sysmon", "prefetch_dir"],
+        leads_to: &[],
+    },
+    // [8] Application Layer Protocol C2 (from parallel root)
+    FlowAction {
+        technique_id: "T1071",
+        tactic: "command-and-control",
+        name: "Application Layer Protocol",
+        artifact_ids: &["evtx_security", "dns_debug_log"],
+        leads_to: &[9],
+    },
+    // [9] Account Discovery (via C2 session)
+    FlowAction {
+        technique_id: "T1087",
+        tactic: "discovery",
+        name: "Account Discovery",
+        artifact_ids: &["evtx_security", "evtx_sysmon"],
+        leads_to: &[10],
+    },
+    // [10] LSASS Memory credential dumping
+    FlowAction {
+        technique_id: "T1003.001",
+        tactic: "credential-access",
+        name: "OS Credential Dumping: LSASS Memory",
+        artifact_ids: &["evtx_security", "evtx_sysmon", "prefetch_dir"],
+        leads_to: &[11],
+    },
+    // [11] RDP lateral movement
+    FlowAction {
+        technique_id: "T1021.001",
+        tactic: "lateral-movement",
+        name: "Remote Services: Remote Desktop Protocol",
+        artifact_ids: &["evtx_rdp_inbound", "evtx_rdp_client", "evtx_security"],
+        leads_to: &[12],
+    },
+    // [12] Remote Access Software (AnyDesk/TeamViewer)
+    FlowAction {
+        technique_id: "T1219",
+        tactic: "command-and-control",
+        name: "Remote Access Software",
+        artifact_ids: &["evtx_security", "evtx_sysmon"],
+        leads_to: &[13],
+    },
+    // [13] Domain Account creation for persistence
+    FlowAction {
+        technique_id: "T1136",
+        tactic: "persistence",
+        name: "Create Account: Domain Account",
+        artifact_ids: &["evtx_security", "sam_users"],
+        leads_to: &[14],
+    },
+    // [14] System Network Configuration Discovery
+    FlowAction {
+        technique_id: "T1016",
+        tactic: "discovery",
+        name: "System Network Configuration Discovery",
+        artifact_ids: &["evtx_sysmon"],
+        leads_to: &[15],
+    },
+    // [15] Remote Access Software (second stage, different host)
+    FlowAction {
+        technique_id: "T1219",
+        tactic: "command-and-control",
+        name: "Remote Access Software (persistence)",
+        artifact_ids: &["evtx_security", "evtx_sysmon"],
+        leads_to: &[16],
+    },
+    // [16] RDP lateral movement (second hop)
+    FlowAction {
+        technique_id: "T1021.001",
+        tactic: "lateral-movement",
+        name: "Remote Services: Remote Desktop Protocol (second hop)",
+        artifact_ids: &["evtx_rdp_inbound", "evtx_rdp_client"],
+        leads_to: &[17],
+    },
+    // [17] Windows Command Shell
+    FlowAction {
+        technique_id: "T1059.003",
+        tactic: "execution",
+        name: "Command and Scripting Interpreter: Windows Command Shell",
+        artifact_ids: &["prefetch_dir", "evtx_sysmon"],
+        leads_to: &[],
+    },
+];
+
+/// All available attack flow scenarios, sourced from the CTID Attack Flow corpus.
 static ATTACK_FLOWS: &[AttackFlow] = &[
     AttackFlow {
-        id: "ransomware_double_extortion",
-        name: "Ransomware — Double Extortion",
-        description: "Phishing delivery → PowerShell execution → credential access \
-                       → data exfiltration → shadow copy deletion → encryption",
-        actions: RANSOMWARE_DOUBLE_EXTORTION_ACTIONS,
+        id: "black_basta_ransomware",
+        name: "Black Basta Ransomware",
+        description: "RaaS double-extortion campaign: spearphishing → deobfuscation \
+                       → PowerShell → DLL hijack → C2 → lateral movement via RDP \
+                       → VSS deletion → data encryption; observed since April 2022",
+        actions: BLACK_BASTA_ACTIONS,
     },
     AttackFlow {
-        id: "lateral_movement_pth",
-        name: "Lateral Movement via Pass-the-Hash",
-        description: "Credential access via SAM dump → PtH → RDP lateral movement \
-                       → scheduled task persistence on target",
-        actions: LATERAL_MOVEMENT_PTH_ACTIONS,
+        id: "cobalt_kitty_campaign",
+        name: "Cobalt Kitty Campaign",
+        description: "Vietnamese APT (OceanLotus/APT32) operation: spearphishing link \
+                       and attachment → PowerShell → DLL side-loading → Cobalt Strike \
+                       → LSA credential dumping → SMB/PtH/WMI lateral movement",
+        actions: COBALT_KITTY_ACTIONS,
     },
     AttackFlow {
-        id: "credential_theft_persistence",
-        name: "Browser Credential Theft → Persistence",
-        description: "Spearphishing link → browser credential harvest → DPAPI vault \
-                       → COM hijack persistence → file deletion anti-forensics",
-        actions: CREDENTIAL_THEFT_PERSISTENCE_ACTIONS,
+        id: "solarwinds_supply_chain",
+        name: "SolarWinds Supply Chain Attack",
+        description: "Nation-state supply-chain intrusion: trojanized SolarWinds Orion \
+                       update → dormancy evasion → masquerading → Windows Service \
+                       persistence → Kerberoasting → data collection → exfiltration",
+        actions: SOLARWINDS_ACTIONS,
     },
     AttackFlow {
-        id: "living_off_the_land",
-        name: "Living-off-the-Land Execution",
-        description: "LOLBin abuse → PowerShell → system binary proxy execution \
-                       → registry discovery → obfuscation → C2 exfiltration",
-        actions: LIVING_OFF_THE_LAND_ACTIONS,
+        id: "conti_ransomware",
+        name: "Conti Ransomware",
+        description: "RaaS group campaign: spearphishing → JavaScript execution → \
+                       Cobalt Strike C2 → token manipulation → SMB/RDP lateral movement \
+                       → Group Policy for mass AV disable → encryption",
+        actions: CONTI_RANSOMWARE_ACTIONS,
     },
     AttackFlow {
-        id: "wmi_persistence",
-        name: "WMI Event Subscription Persistence",
-        description: "PowerShell drops WMI event subscription → event log clearing",
-        actions: WMI_PERSISTENCE_ACTIONS,
+        id: "bumblbee_round2",
+        name: "DFIR - BumbleBee Round 2",
+        description: "BumbleBee loader campaign: LNK shortcut → Cobalt Strike via \
+                       Rundll32 → LSASS credential dumping → RDP lateral movement \
+                       → AnyDesk remote access → domain account creation",
+        actions: BUMBLBEE_ROUND2_ACTIONS,
     },
 ];
 
@@ -360,9 +973,9 @@ mod tests {
 
     #[test]
     fn flow_by_id_returns_correct_flow() {
-        let f = flow_by_id("ransomware_double_extortion").unwrap();
-        assert_eq!(f.id, "ransomware_double_extortion");
-        assert!(f.name.contains("Ransomware"));
+        let f = flow_by_id("black_basta_ransomware").unwrap();
+        assert_eq!(f.id, "black_basta_ransomware");
+        assert!(f.name.contains("Black Basta"));
     }
 
     #[test]
@@ -443,7 +1056,7 @@ mod tests {
             !flows.is_empty(),
             "powershell_history should appear in at least one flow"
         );
-        assert!(flows.iter().any(|f| f.id == "ransomware_double_extortion"));
+        assert!(flows.iter().any(|f| f.id == "black_basta_ransomware"));
     }
 
     #[test]
@@ -456,8 +1069,8 @@ mod tests {
     fn flows_for_technique_finds_ransomware() {
         let flows = flows_for_technique("T1486");
         assert!(
-            flows.iter().any(|f| f.id == "ransomware_double_extortion"),
-            "T1486 should be in ransomware_double_extortion"
+            flows.iter().any(|f| f.id == "black_basta_ransomware"),
+            "T1486 should be in black_basta_ransomware"
         );
     }
 
@@ -471,7 +1084,8 @@ mod tests {
 
     #[test]
     fn flow_action_technique_method_returns_correct_struct() {
-        let flow = flow_by_id("ransomware_double_extortion").unwrap();
+        let flow = flow_by_id("black_basta_ransomware").unwrap();
+        // The last action in the Black Basta flow is T1486 (Data Encrypted for Impact)
         let last = flow.actions.last().unwrap();
         let t = last.technique();
         assert_eq!(t.technique_id, "T1486");

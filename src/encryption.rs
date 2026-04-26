@@ -111,6 +111,15 @@ pub fn is_encryption_tool_path(path: &str) -> bool {
     all_encryption_paths().any(|entry| lower.contains(&entry.to_ascii_lowercase()))
 }
 
+pub const RANSOMWARE_EXTENSIONS: &[&str] = &[];
+
+/// Returns `true` if `ext` matches a known ransomware file extension (case-insensitive).
+///
+/// Pass the extension with or without a leading dot (`.wcry` or `wcry`).
+pub fn is_ransomware_extension(_ext: &str) -> bool {
+    todo!()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -166,5 +175,55 @@ mod tests {
     #[test]
     fn is_encryption_tool_path_unrelated_returns_false() {
         assert!(!is_encryption_tool_path(r"SOFTWARE\Microsoft\Office"));
+    }
+
+    // --- RANSOMWARE_EXTENSIONS / is_ransomware_extension ---
+    #[test]
+    fn ransomware_extensions_contains_wcry() {
+        assert!(RANSOMWARE_EXTENSIONS.contains(&".wcry"));
+    }
+    #[test]
+    fn ransomware_extensions_contains_locky() {
+        assert!(RANSOMWARE_EXTENSIONS.contains(&".locky"));
+    }
+    #[test]
+    fn ransomware_extensions_contains_conti() {
+        assert!(RANSOMWARE_EXTENSIONS.contains(&".conti"));
+    }
+    #[test]
+    fn detects_wcry_with_dot() {
+        assert!(is_ransomware_extension(".wcry"));
+    }
+    #[test]
+    fn detects_wcry_without_dot() {
+        assert!(is_ransomware_extension("wcry"));
+    }
+    #[test]
+    fn detects_locky_uppercase() {
+        assert!(is_ransomware_extension(".LOCKY"));
+    }
+    #[test]
+    fn detects_ryuk() {
+        assert!(is_ransomware_extension(".ryuk"));
+    }
+    #[test]
+    fn detects_conti() {
+        assert!(is_ransomware_extension(".conti"));
+    }
+    #[test]
+    fn detects_blackcat() {
+        assert!(is_ransomware_extension(".BlackCat"));
+    }
+    #[test]
+    fn does_not_flag_docx() {
+        assert!(!is_ransomware_extension(".docx"));
+    }
+    #[test]
+    fn does_not_flag_exe() {
+        assert!(!is_ransomware_extension(".exe"));
+    }
+    #[test]
+    fn empty_string_not_ransomware_ext() {
+        assert!(!is_ransomware_extension(""));
     }
 }

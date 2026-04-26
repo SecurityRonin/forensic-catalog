@@ -7060,6 +7060,11 @@ pub fn flows_for_technique(technique_id: &str) -> Vec<&'static AttackFlow> {
         .collect()
 }
 
+/// Returns `true` if the given ATT&CK technique ID appears in any flow in the CTID corpus.
+pub fn is_technique_in_known_campaign(_technique_id: &str) -> bool {
+    todo!()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -7863,5 +7868,35 @@ mod tests {
             f.actions.iter().any(|a| a.technique_id == "T1078"),
             "whispergate must contain T1078"
         );
+    }
+
+    // --- is_technique_in_known_campaign ---
+    #[test]
+    fn t1566_001_in_known_campaign() {
+        assert!(is_technique_in_known_campaign("T1566.001"));
+    }
+    #[test]
+    fn t1486_in_known_campaign() {
+        assert!(is_technique_in_known_campaign("T1486"));
+    }
+    #[test]
+    fn t1003_001_in_known_campaign() {
+        assert!(is_technique_in_known_campaign("T1003.001"));
+    }
+    #[test]
+    fn t1195_002_in_known_campaign() {
+        assert!(is_technique_in_known_campaign("T1195.002"));
+    }
+    #[test]
+    fn technique_lookup_is_case_insensitive() {
+        assert!(is_technique_in_known_campaign("t1486"));
+    }
+    #[test]
+    fn nonexistent_technique_not_in_campaign() {
+        assert!(!is_technique_in_known_campaign("T9999.999"));
+    }
+    #[test]
+    fn empty_string_not_in_campaign() {
+        assert!(!is_technique_in_known_campaign(""));
     }
 }

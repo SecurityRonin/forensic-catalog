@@ -147,6 +147,13 @@ pub fn identify_remote_access_tool(path: &str) -> Option<&'static str> {
     }
 }
 
+pub const KNOWN_RAT_NAMES: &[&str] = &[];
+
+/// Returns `true` if `name` matches a known malicious RAT / backdoor name (case-insensitive).
+pub fn is_known_rat_name(_name: &str) -> bool {
+    todo!()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -238,5 +245,47 @@ mod tests {
             None,
             "Unknown path should return None"
         );
+    }
+
+    // --- KNOWN_RAT_NAMES / is_known_rat_name ---
+    #[test]
+    fn rat_names_contains_njrat() {
+        assert!(KNOWN_RAT_NAMES.contains(&"njrat"));
+    }
+    #[test]
+    fn rat_names_contains_remcos() {
+        assert!(KNOWN_RAT_NAMES.contains(&"remcos"));
+    }
+    #[test]
+    fn rat_names_contains_asyncrat() {
+        assert!(KNOWN_RAT_NAMES.contains(&"asyncrat"));
+    }
+    #[test]
+    fn detects_njrat_exact() {
+        assert!(is_known_rat_name("njrat"));
+    }
+    #[test]
+    fn detects_njrat_exe() {
+        assert!(is_known_rat_name("njrat.exe"));
+    }
+    #[test]
+    fn detects_quasar_uppercase() {
+        assert!(is_known_rat_name("QUASAR"));
+    }
+    #[test]
+    fn detects_asyncrat() {
+        assert!(is_known_rat_name("asyncrat"));
+    }
+    #[test]
+    fn detects_remcos_rat_variant() {
+        assert!(is_known_rat_name("remcosrat"));
+    }
+    #[test]
+    fn does_not_flag_teamviewer_as_rat() {
+        assert!(!is_known_rat_name("teamviewer"));
+    }
+    #[test]
+    fn empty_string_not_rat() {
+        assert!(!is_known_rat_name(""));
     }
 }

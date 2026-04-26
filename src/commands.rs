@@ -108,6 +108,37 @@ pub fn is_download_tool_usage(cmd: &str) -> bool {
         .any(|p| lower.contains(&p.to_ascii_lowercase()))
 }
 
+pub const WMI_ABUSE_PATTERNS: &[&str] = &[];
+pub const CREDENTIAL_DUMP_PATTERNS: &[&str] = &[];
+pub const RECON_PATTERNS: &[&str] = &[];
+pub const LATERAL_MOVEMENT_PATTERNS: &[&str] = &[];
+pub const DEFENSE_EVASION_PATTERNS: &[&str] = &[];
+
+/// Returns `true` if `cmd` contains a WMI-based execution or abuse pattern (case-insensitive).
+pub fn is_wmi_abuse(_cmd: &str) -> bool {
+    todo!()
+}
+
+/// Returns `true` if `cmd` contains a credential-dumping pattern (case-insensitive).
+pub fn is_credential_dumping_command(_cmd: &str) -> bool {
+    todo!()
+}
+
+/// Returns `true` if `cmd` contains a discovery/reconnaissance pattern (case-insensitive).
+pub fn is_recon_command(_cmd: &str) -> bool {
+    todo!()
+}
+
+/// Returns `true` if `cmd` contains a lateral-movement pattern (case-insensitive).
+pub fn is_lateral_movement_command(_cmd: &str) -> bool {
+    todo!()
+}
+
+/// Returns `true` if `cmd` contains a defense-evasion pattern (case-insensitive).
+pub fn is_defense_evasion_command(_cmd: &str) -> bool {
+    todo!()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -232,5 +263,189 @@ mod tests {
     #[test]
     fn empty_string_not_download_tool() {
         assert!(!is_download_tool_usage(""));
+    }
+
+    // --- WMI_ABUSE_PATTERNS / is_wmi_abuse ---
+    #[test]
+    fn wmi_patterns_contains_wmic_process_call() {
+        assert!(WMI_ABUSE_PATTERNS.contains(&"wmic process call create"));
+    }
+    #[test]
+    fn wmi_patterns_contains_invoke_wmimethod() {
+        assert!(WMI_ABUSE_PATTERNS.contains(&"Invoke-WMIMethod"));
+    }
+    #[test]
+    fn detects_wmic_process_call_create() {
+        assert!(is_wmi_abuse("wmic process call create \"cmd.exe /c whoami\""));
+    }
+    #[test]
+    fn detects_invoke_wmimethod() {
+        assert!(is_wmi_abuse("Invoke-WMIMethod -Class Win32_Process -Name Create"));
+    }
+    #[test]
+    fn detects_get_wmiobject_shadowcopy() {
+        assert!(is_wmi_abuse("Get-WmiObject Win32_ShadowCopy | Remove-WmiObject"));
+    }
+    #[test]
+    fn wmi_is_case_insensitive() {
+        assert!(is_wmi_abuse("WMIC PROCESS CALL CREATE \"cmd.exe\""));
+    }
+    #[test]
+    fn does_not_flag_get_process_as_wmi() {
+        assert!(!is_wmi_abuse("Get-Process svchost"));
+    }
+    #[test]
+    fn empty_string_not_wmi_abuse() {
+        assert!(!is_wmi_abuse(""));
+    }
+
+    // --- CREDENTIAL_DUMP_PATTERNS / is_credential_dumping_command ---
+    #[test]
+    fn cred_dump_patterns_contains_procdump_ma() {
+        assert!(CREDENTIAL_DUMP_PATTERNS.contains(&"procdump -ma"));
+    }
+    #[test]
+    fn cred_dump_patterns_contains_sekurlsa() {
+        assert!(CREDENTIAL_DUMP_PATTERNS.contains(&"sekurlsa::"));
+    }
+    #[test]
+    fn detects_procdump_ma_lsass() {
+        assert!(is_credential_dumping_command("procdump -ma lsass.exe lsass.dmp"));
+    }
+    #[test]
+    fn detects_sekurlsa_logonpasswords() {
+        assert!(is_credential_dumping_command("sekurlsa::logonpasswords"));
+    }
+    #[test]
+    fn detects_comsvcs_minidump() {
+        assert!(is_credential_dumping_command(
+            "rundll32 comsvcs.dll MiniDump 624 lsass.dmp full"
+        ));
+    }
+    #[test]
+    fn detects_invoke_mimikatz_cred_dump() {
+        assert!(is_credential_dumping_command("Invoke-Mimikatz -DumpCreds"));
+    }
+    #[test]
+    fn does_not_flag_dir_as_cred_dump() {
+        assert!(!is_credential_dumping_command("dir C:\\Windows"));
+    }
+    #[test]
+    fn empty_string_not_cred_dump() {
+        assert!(!is_credential_dumping_command(""));
+    }
+
+    // --- RECON_PATTERNS / is_recon_command ---
+    #[test]
+    fn recon_patterns_contains_net_user() {
+        assert!(RECON_PATTERNS.contains(&"net user"));
+    }
+    #[test]
+    fn recon_patterns_contains_whoami() {
+        assert!(RECON_PATTERNS.contains(&"whoami"));
+    }
+    #[test]
+    fn detects_net_user_domain() {
+        assert!(is_recon_command("net user /domain"));
+    }
+    #[test]
+    fn detects_whoami_priv() {
+        assert!(is_recon_command("whoami /priv"));
+    }
+    #[test]
+    fn detects_ipconfig_all() {
+        assert!(is_recon_command("ipconfig /all"));
+    }
+    #[test]
+    fn detects_arp_a() {
+        assert!(is_recon_command("arp -a"));
+    }
+    #[test]
+    fn detects_systeminfo() {
+        assert!(is_recon_command("systeminfo"));
+    }
+    #[test]
+    fn does_not_flag_notepad_as_recon() {
+        assert!(!is_recon_command("notepad.exe C:\\file.txt"));
+    }
+    #[test]
+    fn empty_string_not_recon() {
+        assert!(!is_recon_command(""));
+    }
+
+    // --- LATERAL_MOVEMENT_PATTERNS / is_lateral_movement_command ---
+    #[test]
+    fn lateral_patterns_contains_psexec() {
+        assert!(LATERAL_MOVEMENT_PATTERNS.contains(&"psexec"));
+    }
+    #[test]
+    fn lateral_patterns_contains_enter_pssession() {
+        assert!(LATERAL_MOVEMENT_PATTERNS.contains(&"Enter-PSSession"));
+    }
+    #[test]
+    fn detects_psexec_unc() {
+        assert!(is_lateral_movement_command("psexec \\\\server cmd.exe"));
+    }
+    #[test]
+    fn detects_wmiexec() {
+        assert!(is_lateral_movement_command("wmiexec.py admin@192.168.1.1"));
+    }
+    #[test]
+    fn detects_enter_pssession() {
+        assert!(is_lateral_movement_command("Enter-PSSession -ComputerName dc01"));
+    }
+    #[test]
+    fn detects_smbexec() {
+        assert!(is_lateral_movement_command("smbexec.py domain/user@host"));
+    }
+    #[test]
+    fn does_not_flag_ping_as_lateral() {
+        assert!(!is_lateral_movement_command("ping 192.168.1.1"));
+    }
+    #[test]
+    fn empty_string_not_lateral_movement() {
+        assert!(!is_lateral_movement_command(""));
+    }
+
+    // --- DEFENSE_EVASION_PATTERNS / is_defense_evasion_command ---
+    #[test]
+    fn defense_evasion_patterns_contains_vssadmin() {
+        assert!(DEFENSE_EVASION_PATTERNS.contains(&"vssadmin delete shadows"));
+    }
+    #[test]
+    fn defense_evasion_patterns_contains_bcdedit() {
+        assert!(DEFENSE_EVASION_PATTERNS.contains(&"bcdedit /set recoveryenabled no"));
+    }
+    #[test]
+    fn detects_vssadmin_delete_shadows() {
+        assert!(is_defense_evasion_command(
+            "vssadmin delete shadows /all /quiet"
+        ));
+    }
+    #[test]
+    fn detects_bcdedit_recovery() {
+        assert!(is_defense_evasion_command("bcdedit /set recoveryenabled no"));
+    }
+    #[test]
+    fn detects_set_mppreference_disable() {
+        assert!(is_defense_evasion_command(
+            "Set-MpPreference -DisableRealtimeMonitoring $true"
+        ));
+    }
+    #[test]
+    fn detects_netsh_firewall_disable() {
+        assert!(is_defense_evasion_command(
+            "netsh advfirewall set allprofiles state off"
+        ));
+    }
+    #[test]
+    fn does_not_flag_net_start_as_evasion() {
+        assert!(!is_defense_evasion_command(
+            "net start \"network location awareness\""
+        ));
+    }
+    #[test]
+    fn empty_string_not_defense_evasion() {
+        assert!(!is_defense_evasion_command(""));
     }
 }

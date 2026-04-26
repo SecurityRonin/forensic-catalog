@@ -49,6 +49,16 @@ pub fn is_suspicious_temp_path(path: &str) -> bool {
         || lower.contains("%tmp%")
 }
 
+/// Returns `true` if `path` is a known attacker staging location beyond `/tmp` and `%TEMP%`.
+pub fn is_suspicious_staging_path(_path: &str) -> bool {
+    todo!()
+}
+
+/// Returns `true` if `path` falls in a directory commonly abused for DLL hijacking.
+pub fn is_hijackable_dll_path(_path: &str) -> bool {
+    todo!()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -154,5 +164,81 @@ mod tests {
     #[test]
     fn empty_string_not_suspicious() {
         assert!(!is_suspicious_temp_path(""));
+    }
+
+    // --- is_suspicious_staging_path ---
+    #[test]
+    fn flags_dev_shm() {
+        assert!(is_suspicious_staging_path("/dev/shm/payload.sh"));
+    }
+    #[test]
+    fn flags_users_public() {
+        assert!(is_suspicious_staging_path(r"C:\Users\Public\stager.exe"));
+    }
+    #[test]
+    fn flags_programdata() {
+        assert!(is_suspicious_staging_path(r"C:\ProgramData\update.exe"));
+    }
+    #[test]
+    fn flags_windows_tasks() {
+        assert!(is_suspicious_staging_path(r"C:\Windows\Tasks\evil.exe"));
+    }
+    #[test]
+    fn flags_recycle_bin() {
+        assert!(is_suspicious_staging_path(r"C:\$Recycle.Bin\evil.exe"));
+    }
+    #[test]
+    fn flags_windows_temp_staging() {
+        assert!(is_suspicious_staging_path(r"C:\Windows\Temp\dropper.exe"));
+    }
+    #[test]
+    fn does_not_flag_program_files() {
+        assert!(!is_suspicious_staging_path(r"C:\Program Files\MyApp\app.exe"));
+    }
+    #[test]
+    fn does_not_flag_system32_staging() {
+        assert!(!is_suspicious_staging_path(r"C:\Windows\System32\svchost.exe"));
+    }
+    #[test]
+    fn empty_string_not_staging_path() {
+        assert!(!is_suspicious_staging_path(""));
+    }
+
+    // --- is_hijackable_dll_path ---
+    #[test]
+    fn flags_dll_in_users_dir() {
+        assert!(is_hijackable_dll_path(
+            r"C:\Users\victim\Documents\version.dll"
+        ));
+    }
+    #[test]
+    fn flags_dll_in_appdata() {
+        assert!(is_hijackable_dll_path(
+            r"C:\Users\victim\AppData\Roaming\evil.dll"
+        ));
+    }
+    #[test]
+    fn flags_dll_in_downloads() {
+        assert!(is_hijackable_dll_path(r"C:\Users\victim\Downloads\dbghelp.dll"));
+    }
+    #[test]
+    fn flags_dll_in_programdata() {
+        assert!(is_hijackable_dll_path(r"C:\ProgramData\Temp\hijack.dll"));
+    }
+    #[test]
+    fn flags_dll_in_temp() {
+        assert!(is_hijackable_dll_path(r"C:\Windows\Temp\evil.dll"));
+    }
+    #[test]
+    fn does_not_flag_system32_dll() {
+        assert!(!is_hijackable_dll_path(r"C:\Windows\System32\ntdll.dll"));
+    }
+    #[test]
+    fn does_not_flag_exe_in_appdata() {
+        assert!(!is_hijackable_dll_path(r"C:\Users\victim\AppData\Local\app.exe"));
+    }
+    #[test]
+    fn empty_string_not_hijackable() {
+        assert!(!is_hijackable_dll_path(""));
     }
 }

@@ -53,6 +53,19 @@ pub fn is_known_malware_process(name: &str) -> bool {
         .any(|t| t.to_ascii_lowercase() == lower)
 }
 
+pub const CREDENTIAL_ACCESS_TOOLS: &[&str] = &[];
+pub const LSASS_ACCESS_TOOLS: &[&str] = &[];
+
+/// Returns `true` if `name` matches a known credential-access tool (case-insensitive).
+pub fn is_credential_access_tool(_name: &str) -> bool {
+    todo!()
+}
+
+/// Returns `true` if `name` matches a tool known to access LSASS memory (case-insensitive).
+pub fn is_lsass_access_tool(_name: &str) -> bool {
+    todo!()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -130,5 +143,77 @@ mod tests {
     #[test]
     fn empty_string_not_malware_process() {
         assert!(!is_known_malware_process(""));
+    }
+
+    // --- CREDENTIAL_ACCESS_TOOLS / is_credential_access_tool ---
+    #[test]
+    fn credential_tools_contains_mimikatz() {
+        assert!(CREDENTIAL_ACCESS_TOOLS.contains(&"mimikatz"));
+    }
+    #[test]
+    fn credential_tools_contains_pypykatz() {
+        assert!(CREDENTIAL_ACCESS_TOOLS.contains(&"pypykatz"));
+    }
+    #[test]
+    fn credential_tools_contains_procdump() {
+        assert!(CREDENTIAL_ACCESS_TOOLS.contains(&"procdump"));
+    }
+    #[test]
+    fn detects_mimikatz_exact() {
+        assert!(is_credential_access_tool("mimikatz"));
+    }
+    #[test]
+    fn detects_mimikatz_exe() {
+        assert!(is_credential_access_tool("mimikatz.exe"));
+    }
+    #[test]
+    fn detects_pypykatz_uppercase() {
+        assert!(is_credential_access_tool("PYPYKATZ"));
+    }
+    #[test]
+    fn detects_crackmapexec() {
+        assert!(is_credential_access_tool("crackmapexec"));
+    }
+    #[test]
+    fn does_not_flag_calc_as_cred_tool() {
+        assert!(!is_credential_access_tool("calc.exe"));
+    }
+    #[test]
+    fn empty_string_not_cred_tool() {
+        assert!(!is_credential_access_tool(""));
+    }
+
+    // --- LSASS_ACCESS_TOOLS / is_lsass_access_tool ---
+    #[test]
+    fn lsass_tools_contains_procdump() {
+        assert!(LSASS_ACCESS_TOOLS.contains(&"procdump"));
+    }
+    #[test]
+    fn lsass_tools_contains_comsvcs() {
+        assert!(LSASS_ACCESS_TOOLS.contains(&"comsvcs.dll"));
+    }
+    #[test]
+    fn detects_procdump_exe() {
+        assert!(is_lsass_access_tool("procdump.exe"));
+    }
+    #[test]
+    fn detects_comsvcs_dll() {
+        assert!(is_lsass_access_tool("comsvcs.dll"));
+    }
+    #[test]
+    fn detects_nanodump() {
+        assert!(is_lsass_access_tool("nanodump"));
+    }
+    #[test]
+    fn lsass_tool_case_insensitive() {
+        assert!(is_lsass_access_tool("PROCDUMP64.EXE"));
+    }
+    #[test]
+    fn does_not_flag_notepad_as_lsass_tool() {
+        assert!(!is_lsass_access_tool("notepad.exe"));
+    }
+    #[test]
+    fn empty_string_not_lsass_tool() {
+        assert!(!is_lsass_access_tool(""));
     }
 }

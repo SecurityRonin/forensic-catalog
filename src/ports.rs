@@ -41,6 +41,19 @@ pub fn is_suspicious_port(port: u16) -> bool {
     SUSPICIOUS_PORTS.contains(&port)
 }
 
+pub const C2_FRAMEWORK_PORTS: &[u16] = &[];
+pub const DATABASE_PORTS: &[u16] = &[];
+
+/// Returns `true` if `port` is a known C2 framework port.
+pub fn is_c2_port(_port: u16) -> bool {
+    todo!()
+}
+
+/// Returns `true` if `port` is a well-known database server port.
+pub fn is_database_port(_port: u16) -> bool {
+    todo!()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -127,5 +140,77 @@ mod tests {
     #[test]
     fn suspicious_ports_contains_radmin_4899() {
         assert!(SUSPICIOUS_PORTS.contains(&4899), "4899 (Radmin) missing");
+    }
+
+    // --- C2_FRAMEWORK_PORTS / is_c2_port ---
+    #[test]
+    fn c2_ports_contains_4444() {
+        assert!(C2_FRAMEWORK_PORTS.contains(&4444));
+    }
+    #[test]
+    fn c2_ports_contains_50050() {
+        assert!(C2_FRAMEWORK_PORTS.contains(&50050));
+    }
+    #[test]
+    fn c2_ports_contains_8443() {
+        assert!(C2_FRAMEWORK_PORTS.contains(&8443));
+    }
+    #[test]
+    fn detects_metasploit_c2_port() {
+        assert!(is_c2_port(4444));
+    }
+    #[test]
+    fn detects_cobalt_strike_c2_port() {
+        assert!(is_c2_port(50050));
+    }
+    #[test]
+    fn detects_havoc_c2_port() {
+        assert!(is_c2_port(60000));
+    }
+    #[test]
+    fn port_80_not_c2() {
+        assert!(!is_c2_port(80));
+    }
+    #[test]
+    fn port_443_not_c2() {
+        assert!(!is_c2_port(443));
+    }
+    #[test]
+    fn port_22_not_c2() {
+        assert!(!is_c2_port(22));
+    }
+
+    // --- DATABASE_PORTS / is_database_port ---
+    #[test]
+    fn database_ports_contains_mssql() {
+        assert!(DATABASE_PORTS.contains(&1433));
+    }
+    #[test]
+    fn database_ports_contains_mysql() {
+        assert!(DATABASE_PORTS.contains(&3306));
+    }
+    #[test]
+    fn database_ports_contains_postgres() {
+        assert!(DATABASE_PORTS.contains(&5432));
+    }
+    #[test]
+    fn detects_mssql_port() {
+        assert!(is_database_port(1433));
+    }
+    #[test]
+    fn detects_redis_port() {
+        assert!(is_database_port(6379));
+    }
+    #[test]
+    fn detects_mongodb_port() {
+        assert!(is_database_port(27017));
+    }
+    #[test]
+    fn port_80_not_database() {
+        assert!(!is_database_port(80));
+    }
+    #[test]
+    fn port_4444_not_database() {
+        assert!(!is_database_port(4444));
     }
 }

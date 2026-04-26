@@ -73,6 +73,13 @@ pub fn is_linux_lolbin(name: &str) -> bool {
         .any(|b| b.to_ascii_lowercase() == lower)
 }
 
+/// Returns `true` if `name` is a LOLBin on either Windows or Linux (case-insensitive).
+///
+/// Convenience wrapper that calls [`is_windows_lolbin`] and [`is_linux_lolbin`].
+pub fn is_lolbin(_name: &str) -> bool {
+    todo!()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -150,5 +157,43 @@ mod tests {
     #[test]
     fn empty_string_not_linux_lolbin() {
         assert!(!is_linux_lolbin(""));
+    }
+
+    // --- is_lolbin (unified) ---
+    #[test]
+    fn lolbin_detects_windows_certutil() {
+        assert!(is_lolbin("certutil.exe"));
+    }
+    #[test]
+    fn lolbin_detects_linux_nc() {
+        assert!(is_lolbin("nc"));
+    }
+    #[test]
+    fn lolbin_detects_powershell() {
+        assert!(is_lolbin("powershell.exe"));
+    }
+    #[test]
+    fn lolbin_detects_bash() {
+        assert!(is_lolbin("bash"));
+    }
+    #[test]
+    fn lolbin_does_not_flag_notepad() {
+        assert!(!is_lolbin("notepad.exe"));
+    }
+    #[test]
+    fn lolbin_does_not_flag_grep() {
+        assert!(!is_lolbin("grep"));
+    }
+    #[test]
+    fn lolbin_case_insensitive_windows() {
+        assert!(is_lolbin("MSHTA.EXE"));
+    }
+    #[test]
+    fn lolbin_case_insensitive_linux() {
+        assert!(is_lolbin("PYTHON3"));
+    }
+    #[test]
+    fn empty_string_not_lolbin() {
+        assert!(!is_lolbin(""));
     }
 }

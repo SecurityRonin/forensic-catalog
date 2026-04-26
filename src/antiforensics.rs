@@ -103,6 +103,20 @@ pub fn is_timestomp_indicator(s: &str) -> bool {
         .any(|t| lower.contains(&t.to_ascii_lowercase()))
 }
 
+pub const SECURE_DELETE_TOOLS: &[&str] = &[];
+pub const SHADOW_COPY_DELETION_PATTERNS: &[&str] = &[];
+
+/// Returns `true` if `name` matches a known secure-delete tool (case-insensitive exact match).
+pub fn is_secure_delete_tool(_name: &str) -> bool {
+    todo!()
+}
+
+/// Returns `true` if `cmd` contains a Volume Shadow Copy / backup destruction pattern
+/// (case-insensitive substring match).
+pub fn is_shadow_copy_deletion_command(_cmd: &str) -> bool {
+    todo!()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -229,5 +243,83 @@ mod tests {
     #[test]
     fn empty_string_not_timestomp() {
         assert!(!is_timestomp_indicator(""));
+    }
+
+    // --- SECURE_DELETE_TOOLS / is_secure_delete_tool ---
+    #[test]
+    fn secure_delete_tools_contains_sdelete() {
+        assert!(SECURE_DELETE_TOOLS.contains(&"sdelete"));
+    }
+    #[test]
+    fn secure_delete_tools_contains_bleachbit() {
+        assert!(SECURE_DELETE_TOOLS.contains(&"bleachbit"));
+    }
+    #[test]
+    fn detects_sdelete_exact() {
+        assert!(is_secure_delete_tool("sdelete"));
+    }
+    #[test]
+    fn detects_sdelete64_exe() {
+        assert!(is_secure_delete_tool("sdelete64.exe"));
+    }
+    #[test]
+    fn detects_bleachbit_case_insensitive() {
+        assert!(is_secure_delete_tool("BLEACHBIT.EXE"));
+    }
+    #[test]
+    fn detects_eraser() {
+        assert!(is_secure_delete_tool("eraser"));
+    }
+    #[test]
+    fn does_not_flag_del_as_secure_delete() {
+        assert!(!is_secure_delete_tool("del"));
+    }
+    #[test]
+    fn empty_string_not_secure_delete() {
+        assert!(!is_secure_delete_tool(""));
+    }
+
+    // --- SHADOW_COPY_DELETION_PATTERNS / is_shadow_copy_deletion_command ---
+    #[test]
+    fn shadow_patterns_contains_vssadmin() {
+        assert!(SHADOW_COPY_DELETION_PATTERNS.contains(&"vssadmin delete shadows"));
+    }
+    #[test]
+    fn shadow_patterns_contains_wmic_shadowcopy() {
+        assert!(SHADOW_COPY_DELETION_PATTERNS.contains(&"wmic shadowcopy delete"));
+    }
+    #[test]
+    fn shadow_patterns_contains_bcdedit() {
+        assert!(SHADOW_COPY_DELETION_PATTERNS.contains(&"bcdedit /set recoveryenabled no"));
+    }
+    #[test]
+    fn detects_vssadmin_delete() {
+        assert!(is_shadow_copy_deletion_command(
+            "vssadmin delete shadows /all /quiet"
+        ));
+    }
+    #[test]
+    fn detects_wmic_shadowcopy_delete() {
+        assert!(is_shadow_copy_deletion_command(
+            "wmic shadowcopy delete /nointeractive"
+        ));
+    }
+    #[test]
+    fn detects_bcdedit_recovery_shadow() {
+        assert!(is_shadow_copy_deletion_command(
+            "bcdedit /set recoveryenabled no"
+        ));
+    }
+    #[test]
+    fn detects_wbadmin_delete_catalog() {
+        assert!(is_shadow_copy_deletion_command("wbadmin delete catalog -quiet"));
+    }
+    #[test]
+    fn does_not_flag_vssadmin_list() {
+        assert!(!is_shadow_copy_deletion_command("vssadmin list shadows"));
+    }
+    #[test]
+    fn empty_string_not_shadow_deletion() {
+        assert!(!is_shadow_copy_deletion_command(""));
     }
 }

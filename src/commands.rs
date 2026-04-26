@@ -108,17 +108,33 @@ pub fn is_download_tool_usage(cmd: &str) -> bool {
         .any(|p| lower.contains(&p.to_ascii_lowercase()))
 }
 
+/// Substrings indicative of WMI-based code execution or lateral movement.
+///
+/// These patterns represent WMI invocations that have no common legitimate use and are
+/// almost exclusively seen in offensive tradecraft. Generic WMI queries (`Get-WmiObject`,
+/// `wmic os get`) are intentionally excluded — they are used routinely by administrators
+/// and would produce unacceptable false-positive rates. Shadow-copy deletion via WMI is
+/// covered by [`DEFENSE_EVASION_PATTERNS`] and [`SHADOW_COPY_DELETION_PATTERNS`].
+///
+/// Sources:
+/// - MITRE ATT&CK T1047 — Windows Management Instrumentation:
+///   <https://attack.mitre.org/techniques/T1047/>
+/// - MITRE ATT&CK T1021.006 — Remote Services: Windows Remote Management (WMI lateral
+///   movement via `wmic /node:`):
+///   <https://attack.mitre.org/techniques/T1021/006/>
+/// - MITRE ATT&CK T1562.001 — Impair Defenses: Disable or Modify Tools (`wmic product`
+///   used to silently uninstall AV/EDR):
+///   <https://attack.mitre.org/techniques/T1562/001/>
+/// - Red Canary — "Detecting WMI-Based Command Execution" (process creation via
+///   `Win32_Process.Create`, type-accelerator abuse):
+///   <https://redcanary.com/blog/threat-detection/wmi-command-execution/>
 pub const WMI_ABUSE_PATTERNS: &[&str] = &[
-    "wmic process call create",
-    "Invoke-WMIMethod",
-    "Invoke-CimMethod",
-    "Get-WmiObject",
-    "gwmi ",
-    "wmic os get",
-    "wmic computersystem",
-    "wmic shadowcopy",
-    "wmic /node:",
-    "[wmiclass]",
+    "wmic process call create", // T1047: process creation bypassing parent-child EDR visibility
+    "wmic /node:",              // T1021.006: remote WMI lateral movement
+    "Invoke-WMIMethod",         // T1047: WMI method dispatch (typically Win32_Process.Create)
+    "Invoke-CimMethod",         // T1047: CIM method dispatch
+    "[wmiclass]", // T1047: PowerShell WMI type-accelerator (e.g. [wmiclass]"Win32_Process")
+    "wmic product where", // T1562.001: silent AV/EDR uninstall via WMI product call
 ];
 
 pub const CREDENTIAL_DUMP_PATTERNS: &[&str] = &[
@@ -377,6 +393,10 @@ mod tests {
         assert!(WMI_ABUSE_PATTERNS.contains(&"Invoke-WMIMethod"));
     }
     #[test]
+    fn wmi_patterns_contains_wmic_node_remote() {
+        assert!(WMI_ABUSE_PATTERNS.contains(&"wmic /node:"));
+    }
+    #[test]
     fn detects_wmic_process_call_create() {
         assert!(is_wmi_abuse(
             "wmic process call create \"cmd.exe /c whoami\""
@@ -389,9 +409,21 @@ mod tests {
         ));
     }
     #[test]
-    fn detects_get_wmiobject_shadowcopy() {
+    fn detects_wmic_node_lateral_movement() {
         assert!(is_wmi_abuse(
-            "Get-WmiObject Win32_ShadowCopy | Remove-WmiObject"
+            "wmic /node:192.168.1.5 process call create cmd"
+        ));
+    }
+    #[test]
+    fn detects_wmiclass_type_accelerator() {
+        assert!(is_wmi_abuse(
+            "$wmi = [wmiclass]\"Win32_Process\"; $wmi.Create(\"calc.exe\")"
+        ));
+    }
+    #[test]
+    fn detects_wmic_product_uninstall_av() {
+        assert!(is_wmi_abuse(
+            "wmic product where name=\"Carbon Black\" call uninstall"
         ));
     }
     #[test]

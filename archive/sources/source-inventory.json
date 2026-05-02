@@ -4,7 +4,7 @@
     "directories": "archive/sources/catalog-directories.json",
     "manual": "archive/sources/manual-sources.json"
   },
-  "total_sources": 84,
+  "total_sources": 92,
   "sources": [
     {
       "id": "aboutdfir-blogs",
@@ -52,6 +52,19 @@
       "kind": "rss-feed",
       "html_url": "https://aboutdfir.com/",
       "feed_url": "https://aboutdfir.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "abuse-ch-blog",
+      "title": "abuse.ch blog",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://abuse.ch/",
+      "feed_url": "https://abuse.ch/blog/feed/",
       "update_strategy": "rss",
       "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
       "sources": [
@@ -319,6 +332,45 @@
       ]
     },
     {
+      "id": "lofl-project-rmm-c2-indicators",
+      "title": "LOFL Project (RMM C2 indicators)",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://lofl-project.github.io/",
+      "feed_url": "https://github.com/LOFL-Project/LOFL-Project.github.io/commits/main.atom",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "loldrivers-byovd",
+      "title": "LOLDrivers (BYOVD)",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.loldrivers.io/",
+      "feed_url": "https://github.com/magicsword-io/LOLDrivers/commits/main.atom",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "loobins-macos",
+      "title": "LOOBins (macOS)",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://loobins.io/",
+      "feed_url": "https://github.com/infosecB/LOOBins/commits/main.atom",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
       "id": "mac4n6",
       "title": "mac4n6",
       "category": "feed",
@@ -345,12 +397,38 @@
       ]
     },
     {
+      "id": "malwarebazaar-malware-samples",
+      "title": "MalwareBazaar — malware samples",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://bazaar.abuse.ch/",
+      "feed_url": "https://bazaar.abuse.ch/rss/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
       "id": "malwarebytes-labs",
       "title": "Malwarebytes Labs",
       "category": "feed",
       "kind": "rss-feed",
       "html_url": "https://blog.malwarebytes.com/",
       "feed_url": "https://blog.malwarebytes.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "misp-taxonomies",
+      "title": "MISP taxonomies",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.misp-project.org/",
+      "feed_url": "https://github.com/MISP/misp-taxonomies/commits/main.atom",
       "update_strategy": "rss",
       "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
       "sources": [
@@ -449,12 +527,38 @@
       ]
     },
     {
+      "id": "threatfox-ioc-sharing",
+      "title": "ThreatFox — IOC sharing",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://threatfox.abuse.ch/",
+      "feed_url": "https://threatfox.abuse.ch/rss/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
       "id": "tisiphone-net",
       "title": "tisiphone.net",
       "category": "feed",
       "kind": "rss-feed",
       "html_url": "https://tisiphone.net/",
       "feed_url": "https://tisiphone.net/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "urlhaus-malware-distribution-urls",
+      "title": "URLhaus — malware distribution URLs",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://urlhaus.abuse.ch/",
+      "feed_url": "https://urlhaus.abuse.ch/rss/",
       "update_strategy": "rss",
       "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
       "sources": [
@@ -1008,29 +1112,31 @@
       ]
     },
     {
-      "id": "gtfobins",
-      "title": "GTFOBins",
+      "id": "gtfobins-linux",
+      "title": "GTFOBins (Linux)",
       "category": "primary-reference",
       "kind": "knowledge-base",
       "html_url": "https://gtfobins.github.io/",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Unix GTFOBins reference.",
+      "feed_url": "https://github.com/GTFOBins/GTFOBins.github.io/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "lolbas",
-      "title": "LOLBAS Project",
+      "id": "lolbas-project-windows",
+      "title": "LOLBAS Project (Windows)",
       "category": "primary-reference",
       "kind": "knowledge-base",
       "html_url": "https://lolbas-project.github.io/",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Windows LOLBAS reference.",
+      "feed_url": "https://github.com/LOLBAS-Project/LOLBAS/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {

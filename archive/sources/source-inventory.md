@@ -7,7 +7,7 @@ Generated from:
 
 Category counts:
 - directory: 3
-- feed: 35
+- feed: 43
 - knowledge-base: 36
 - practitioner-blog: 1
 - primary-reference: 9
@@ -24,6 +24,8 @@ Category counts:
 ## feed
 
 - AboutDFIR: https://aboutdfir.com/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- abuse.ch blog: https://abuse.ch/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Amped Software blog: https://blog.ampedsoftware.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
@@ -65,11 +67,21 @@ Category counts:
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Krebs on Security: https://krebsonsecurity.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
+- LOFL Project (RMM C2 indicators): https://lofl-project.github.io/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- LOLDrivers (BYOVD): https://www.loldrivers.io/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- LOOBins (macOS): https://loobins.io/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
 - mac4n6: https://www.mac4n6.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Magnet Forensics: https://www.magnetforensics.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
+- MalwareBazaar — malware samples: https://bazaar.abuse.ch/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
 - Malwarebytes Labs: https://blog.malwarebytes.com/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- MISP taxonomies: https://www.misp-project.org/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - MSAB: https://www.msab.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
@@ -85,7 +97,11 @@ Category counts:
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - This Week In 4n6: https://thisweekin4n6.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
+- ThreatFox — IOC sharing: https://threatfox.abuse.ch/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
 - tisiphone.net: https://tisiphone.net/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- URLhaus — malware distribution URLs: https://urlhaus.abuse.ch/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - VMware Carbon Black: https://www.carbonblack.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
@@ -180,10 +196,10 @@ Category counts:
   update: `manual-review`; kind: `documentation`; sources: `manual`
 - Eric Zimmerman documentation: https://ericzimmerman.github.io/#!index.md
   update: `manual-review`; kind: `documentation`; sources: `manual`
-- GTFOBins: https://gtfobins.github.io/
-  update: `manual-review`; kind: `knowledge-base`; sources: `manual`
-- LOLBAS Project: https://lolbas-project.github.io/
-  update: `manual-review`; kind: `knowledge-base`; sources: `manual`
+- GTFOBins (Linux): https://gtfobins.github.io/
+  update: `rss`; kind: `knowledge-base`; sources: `manual, opml`
+- LOLBAS Project (Windows): https://lolbas-project.github.io/
+  update: `rss`; kind: `knowledge-base`; sources: `manual, opml`
 - Microsoft Learn: https://learn.microsoft.com/
   update: `manual-review`; kind: `documentation`; sources: `manual`
 - MITRE ATT&CK: https://attack.mitre.org/

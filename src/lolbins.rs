@@ -958,4 +958,102 @@ mod tests {
     fn empty_string_not_lolbas() {
         assert!(!is_lolbas(""));
     }
+
+    // ── LOFL Windows expansion — RED ─────────────────────────────────────────
+    // LOFL binaries merged into LOLBAS_WINDOWS
+    #[test]
+    fn lolbas_windows_contains_psexec() {
+        assert!(LOLBAS_WINDOWS.contains(&"psexec.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_reg() {
+        assert!(LOLBAS_WINDOWS.contains(&"reg.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_net() {
+        assert!(LOLBAS_WINDOWS.contains(&"net.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_wevtutil() {
+        assert!(LOLBAS_WINDOWS.contains(&"wevtutil.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_nltest() {
+        assert!(LOLBAS_WINDOWS.contains(&"nltest.exe"));
+    }
+    #[test]
+    fn is_lolbas_windows_detects_psexec() {
+        assert!(is_lolbas_windows("psexec.exe"));
+    }
+    #[test]
+    fn is_lolbas_windows_detects_psexec_uppercase() {
+        assert!(is_lolbas_windows("PSEXEC.EXE"));
+    }
+    // LOFL_WINDOWS_CMDLETS
+    #[test]
+    fn lofl_windows_cmdlets_exists() {
+        assert!(!LOFL_WINDOWS_CMDLETS.is_empty());
+    }
+    #[test]
+    fn lofl_windows_cmdlets_contains_invoke_command() {
+        assert!(LOFL_WINDOWS_CMDLETS.contains(&"Invoke-Command"));
+    }
+    #[test]
+    fn lofl_windows_cmdlets_contains_get_aduser() {
+        assert!(LOFL_WINDOWS_CMDLETS.contains(&"Get-ADUser"));
+    }
+    #[test]
+    fn is_lofl_windows_cmdlet_detects_invoke_command() {
+        assert!(is_lofl_windows_cmdlet("Invoke-Command"));
+    }
+    #[test]
+    fn is_lofl_windows_cmdlet_case_insensitive() {
+        assert!(is_lofl_windows_cmdlet("invoke-command"));
+    }
+    #[test]
+    fn is_lofl_windows_cmdlet_rejects_unknown() {
+        assert!(!is_lofl_windows_cmdlet("Write-FakeOutput"));
+    }
+    // LOFL_WINDOWS_MMC
+    #[test]
+    fn lofl_windows_mmc_exists() {
+        assert!(!LOFL_WINDOWS_MMC.is_empty());
+    }
+    #[test]
+    fn lofl_windows_mmc_contains_compmgmt() {
+        assert!(LOFL_WINDOWS_MMC.contains(&"compmgmt.msc"));
+    }
+    #[test]
+    fn lofl_windows_mmc_contains_eventvwr() {
+        assert!(LOFL_WINDOWS_MMC.contains(&"eventvwr.msc"));
+    }
+    #[test]
+    fn is_lofl_windows_mmc_detects_compmgmt() {
+        assert!(is_lofl_windows_mmc("compmgmt.msc"));
+    }
+    #[test]
+    fn is_lofl_windows_mmc_case_insensitive() {
+        assert!(is_lofl_windows_mmc("COMPMGMT.MSC"));
+    }
+    // LOFL_WINDOWS_WMI
+    #[test]
+    fn lofl_windows_wmi_exists() {
+        assert!(!LOFL_WINDOWS_WMI.is_empty());
+    }
+    #[test]
+    fn lofl_windows_wmi_contains_win32_process() {
+        assert!(LOFL_WINDOWS_WMI.contains(&"Win32_Process"));
+    }
+    #[test]
+    fn lofl_windows_wmi_contains_win32_shadowcopy() {
+        assert!(LOFL_WINDOWS_WMI.contains(&"Win32_ShadowCopy"));
+    }
+    #[test]
+    fn is_lofl_windows_wmi_detects_win32_process() {
+        assert!(is_lofl_windows_wmi("Win32_Process"));
+    }
+    #[test]
+    fn is_lofl_windows_wmi_case_insensitive() {
+        assert!(is_lofl_windows_wmi("win32_process"));
+    }
 }

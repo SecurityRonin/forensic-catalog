@@ -207,7 +207,13 @@ impl AbusableSite {
 /// Wildcard entries (e.g. `"*.amazonaws.com"`) denote entire subdomains
 /// where the abuse pattern applies across all tenants.
 pub const ABUSABLE_SITES: &[AbusableSite] = &[
-    // ── Code repositories ──────────────────────────────────────────────────
+    // ╔══════════════════════════════════════════════════════════════════════╗
+    // ║  CRITICAL  — cannot block without breaking core business operations  ║
+    // ║  Strategy: detect + alert; allowlist by IP range or authenticated    ║
+    // ║  user-agent where possible. Never block outright.                    ║
+    // ╚══════════════════════════════════════════════════════════════════════╝
+
+    // ── Code repositories (Critical) ───────────────────────────────────────
     AbusableSite {
         domain: "raw.githubusercontent.com",
         provider: "GitHub",
@@ -224,32 +230,8 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::Critical,
         mitre_techniques: &["T1105", "T1583.001"],
     },
-    AbusableSite {
-        domain: "*.github.io",
-        provider: "GitHub",
-        legitimate_category: SiteCategory::CodeRepository,
-        abuse_tags: TAG_PHISHING | TAG_C2,
-        blocking_risk: BlockingRisk::High,
-        mitre_techniques: &["T1102", "T1583.001"],
-    },
-    AbusableSite {
-        domain: "gitlab.com",
-        provider: "GitLab",
-        legitimate_category: SiteCategory::CodeRepository,
-        abuse_tags: TAG_DOWNLOAD | TAG_PHISHING | TAG_C2,
-        blocking_risk: BlockingRisk::High,
-        mitre_techniques: &["T1102", "T1105", "T1583.001"],
-    },
-    AbusableSite {
-        domain: "bitbucket.org",
-        provider: "Atlassian",
-        legitimate_category: SiteCategory::CodeRepository,
-        abuse_tags: TAG_DOWNLOAD | TAG_PHISHING,
-        blocking_risk: BlockingRisk::High,
-        mitre_techniques: &["T1105", "T1583.001"],
-    },
 
-    // ── Cloud storage ──────────────────────────────────────────────────────
+    // ── Cloud storage (Critical) ───────────────────────────────────────────
     AbusableSite {
         domain: "*.amazonaws.com",
         provider: "Amazon Web Services",
@@ -275,6 +257,91 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         mitre_techniques: &["T1102", "T1105", "T1567.002"],
     },
     AbusableSite {
+        domain: "drive.google.com",
+        provider: "Google",
+        legitimate_category: SiteCategory::CloudStorage,
+        abuse_tags: TAG_PHISHING | TAG_DOWNLOAD | TAG_EXFIL,
+        blocking_risk: BlockingRisk::Critical,
+        mitre_techniques: &["T1105", "T1567.002"],
+    },
+    AbusableSite {
+        domain: "docs.google.com",
+        provider: "Google",
+        legitimate_category: SiteCategory::Collaboration,
+        abuse_tags: TAG_PHISHING | TAG_C2,
+        blocking_risk: BlockingRisk::Critical,
+        mitre_techniques: &["T1102", "T1566.002"],
+    },
+    AbusableSite {
+        domain: "storage.googleapis.com",
+        provider: "Google Cloud",
+        legitimate_category: SiteCategory::CloudStorage,
+        abuse_tags: TAG_PHISHING | TAG_DOWNLOAD | TAG_EXFIL | TAG_C2,
+        blocking_risk: BlockingRisk::Critical,
+        mitre_techniques: &["T1102", "T1105", "T1567.002"],
+    },
+
+    // ── CDN (Critical) ─────────────────────────────────────────────────────
+    AbusableSite {
+        domain: "*.cloudfront.net",
+        provider: "Amazon CloudFront",
+        legitimate_category: SiteCategory::Cdn,
+        abuse_tags: TAG_PHISHING | TAG_C2 | TAG_DOWNLOAD,
+        blocking_risk: BlockingRisk::Critical,
+        mitre_techniques: &["T1102", "T1105"],
+    },
+
+    // ── Collaboration (Critical) ───────────────────────────────────────────
+    AbusableSite {
+        domain: "sharepoint.com",
+        provider: "Microsoft",
+        legitimate_category: SiteCategory::Collaboration,
+        abuse_tags: TAG_PHISHING | TAG_DOWNLOAD | TAG_EXFIL,
+        blocking_risk: BlockingRisk::Critical,
+        mitre_techniques: &["T1105", "T1566.002", "T1567.002"],
+    },
+
+    // ╔══════════════════════════════════════════════════════════════════════╗
+    // ║  HIGH  — blocking causes significant friction; prefer proxy          ║
+    // ║  inspection, DLP rules, and anomaly alerting over outright blocks.   ║
+    // ╚══════════════════════════════════════════════════════════════════════╝
+
+    // ── Code repositories (High) ───────────────────────────────────────────
+    AbusableSite {
+        domain: "*.github.io",
+        provider: "GitHub",
+        legitimate_category: SiteCategory::CodeRepository,
+        abuse_tags: TAG_PHISHING | TAG_C2,
+        blocking_risk: BlockingRisk::High,
+        mitre_techniques: &["T1102", "T1583.001"],
+    },
+    AbusableSite {
+        domain: "gitlab.com",
+        provider: "GitLab",
+        legitimate_category: SiteCategory::CodeRepository,
+        abuse_tags: TAG_DOWNLOAD | TAG_PHISHING | TAG_C2,
+        blocking_risk: BlockingRisk::High,
+        mitre_techniques: &["T1102", "T1105", "T1583.001"],
+    },
+    AbusableSite {
+        domain: "bitbucket.org",
+        provider: "Atlassian",
+        legitimate_category: SiteCategory::CodeRepository,
+        abuse_tags: TAG_DOWNLOAD | TAG_PHISHING,
+        blocking_risk: BlockingRisk::High,
+        mitre_techniques: &["T1105", "T1583.001"],
+    },
+    AbusableSite {
+        domain: "gist.github.com",
+        provider: "GitHub",
+        legitimate_category: SiteCategory::PasteService,
+        abuse_tags: TAG_C2 | TAG_DOWNLOAD,
+        blocking_risk: BlockingRisk::High,
+        mitre_techniques: &["T1102", "T1105"],
+    },
+
+    // ── Cloud storage (High) ───────────────────────────────────────────────
+    AbusableSite {
         domain: "1drv.ms",
         provider: "Microsoft OneDrive",
         legitimate_category: SiteCategory::CloudStorage,
@@ -291,39 +358,15 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         mitre_techniques: &["T1102", "T1105", "T1567.002"],
     },
     AbusableSite {
-        domain: "mega.nz",
-        provider: "Mega Limited",
+        domain: "firebasestorage.googleapis.com",
+        provider: "Google Firebase",
         legitimate_category: SiteCategory::CloudStorage,
-        abuse_tags: TAG_PHISHING | TAG_DOWNLOAD | TAG_EXFIL,
-        blocking_risk: BlockingRisk::Medium,
-        mitre_techniques: &["T1105", "T1567.002"],
-    },
-    AbusableSite {
-        domain: "drive.google.com",
-        provider: "Google",
-        legitimate_category: SiteCategory::CloudStorage,
-        abuse_tags: TAG_PHISHING | TAG_DOWNLOAD | TAG_EXFIL,
-        blocking_risk: BlockingRisk::Critical,
-        mitre_techniques: &["T1105", "T1567.002"],
-    },
-    AbusableSite {
-        domain: "docs.google.com",
-        provider: "Google",
-        legitimate_category: SiteCategory::Collaboration,
-        abuse_tags: TAG_PHISHING | TAG_C2,
-        blocking_risk: BlockingRisk::Critical,
-        mitre_techniques: &["T1102", "T1566.002"],
+        abuse_tags: TAG_PHISHING | TAG_EXFIL | TAG_C2 | TAG_DOWNLOAD,
+        blocking_risk: BlockingRisk::High,
+        mitre_techniques: &["T1102", "T1105", "T1567.002"],
     },
 
-    // ── CDN / cloud hosting ────────────────────────────────────────────────
-    AbusableSite {
-        domain: "*.cloudfront.net",
-        provider: "Amazon CloudFront",
-        legitimate_category: SiteCategory::Cdn,
-        abuse_tags: TAG_PHISHING | TAG_C2 | TAG_DOWNLOAD,
-        blocking_risk: BlockingRisk::Critical,
-        mitre_techniques: &["T1102", "T1105"],
-    },
+    // ── Cloud hosting (High) ───────────────────────────────────────────────
     AbusableSite {
         domain: "*.workers.dev",
         provider: "Cloudflare Workers",
@@ -341,14 +384,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         mitre_techniques: &["T1102"],
     },
     AbusableSite {
-        domain: "*.herokuapp.com",
-        provider: "Heroku",
-        legitimate_category: SiteCategory::CloudHosting,
-        abuse_tags: TAG_PHISHING | TAG_DOWNLOAD | TAG_EXFIL | TAG_C2,
-        blocking_risk: BlockingRisk::Medium,
-        mitre_techniques: &["T1102", "T1105", "T1567.002"],
-    },
-    AbusableSite {
         domain: "*.web.app",
         provider: "Google Firebase",
         legitimate_category: SiteCategory::CloudHosting,
@@ -356,20 +391,47 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::High,
         mitre_techniques: &["T1102"],
     },
+
+    // ── Messaging (High) ───────────────────────────────────────────────────
     AbusableSite {
-        domain: "firebasestorage.googleapis.com",
-        provider: "Google Firebase",
-        legitimate_category: SiteCategory::CloudStorage,
-        abuse_tags: TAG_PHISHING | TAG_EXFIL | TAG_C2 | TAG_DOWNLOAD,
+        domain: "slack.com",
+        provider: "Slack",
+        legitimate_category: SiteCategory::Messaging,
+        abuse_tags: TAG_C2,
         blocking_risk: BlockingRisk::High,
-        mitre_techniques: &["T1102", "T1105", "T1567.002"],
+        mitre_techniques: &["T1102"],
+    },
+
+    // ── Collaboration (High) ───────────────────────────────────────────────
+    AbusableSite {
+        domain: "notion.so",
+        provider: "Notion",
+        legitimate_category: SiteCategory::Collaboration,
+        abuse_tags: TAG_PHISHING | TAG_C2,
+        blocking_risk: BlockingRisk::High,
+        mitre_techniques: &["T1102"],
+    },
+
+    // ╔══════════════════════════════════════════════════════════════════════╗
+    // ║  MEDIUM  — blocking is feasible with an exception process.           ║
+    // ║  Evaluate per-org tolerance; block at DNS/proxy where possible.      ║
+    // ╚══════════════════════════════════════════════════════════════════════╝
+
+    // ── Cloud storage / hosting (Medium) ──────────────────────────────────
+    AbusableSite {
+        domain: "mega.nz",
+        provider: "Mega Limited",
+        legitimate_category: SiteCategory::CloudStorage,
+        abuse_tags: TAG_PHISHING | TAG_DOWNLOAD | TAG_EXFIL,
+        blocking_risk: BlockingRisk::Medium,
+        mitre_techniques: &["T1105", "T1567.002"],
     },
     AbusableSite {
-        domain: "storage.googleapis.com",
-        provider: "Google Cloud",
-        legitimate_category: SiteCategory::CloudStorage,
+        domain: "*.herokuapp.com",
+        provider: "Heroku",
+        legitimate_category: SiteCategory::CloudHosting,
         abuse_tags: TAG_PHISHING | TAG_DOWNLOAD | TAG_EXFIL | TAG_C2,
-        blocking_risk: BlockingRisk::Critical,
+        blocking_risk: BlockingRisk::Medium,
         mitre_techniques: &["T1102", "T1105", "T1567.002"],
     },
     AbusableSite {
@@ -381,7 +443,7 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         mitre_techniques: &["T1102", "T1105"],
     },
 
-    // ── Messaging ──────────────────────────────────────────────────────────
+    // ── Messaging (Medium) ─────────────────────────────────────────────────
     AbusableSite {
         domain: "discord.com",
         provider: "Discord",
@@ -406,16 +468,33 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::Medium,
         mitre_techniques: &["T1102", "T1567"],
     },
+
+    // ── Collaboration (Medium) ─────────────────────────────────────────────
     AbusableSite {
-        domain: "slack.com",
-        provider: "Slack",
-        legitimate_category: SiteCategory::Messaging,
-        abuse_tags: TAG_C2,
-        blocking_risk: BlockingRisk::High,
+        domain: "trello.com",
+        provider: "Atlassian",
+        legitimate_category: SiteCategory::Collaboration,
+        abuse_tags: TAG_C2 | TAG_PHISHING,
+        blocking_risk: BlockingRisk::Medium,
         mitre_techniques: &["T1102"],
     },
 
-    // ── Paste services ─────────────────────────────────────────────────────
+    // ── URL shorteners (Medium) ────────────────────────────────────────────
+    AbusableSite {
+        domain: "t.co",
+        provider: "Twitter/X",
+        legitimate_category: SiteCategory::UrlShortener,
+        abuse_tags: TAG_PHISHING,
+        blocking_risk: BlockingRisk::Medium,
+        mitre_techniques: &["T1566.002"],
+    },
+
+    // ╔══════════════════════════════════════════════════════════════════════╗
+    // ║  LOW  — block at DNS and proxy layer; minimal legitimate enterprise  ║
+    // ║  use. Exception requests are a yellow flag worth investigating.      ║
+    // ╚══════════════════════════════════════════════════════════════════════╝
+
+    // ── Paste services (Low) ───────────────────────────────────────────────
     AbusableSite {
         domain: "pastebin.com",
         provider: "Pastebin",
@@ -440,56 +519,14 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::Low,
         mitre_techniques: &["T1102", "T1105"],
     },
-    AbusableSite {
-        domain: "gist.github.com",
-        provider: "GitHub",
-        legitimate_category: SiteCategory::PasteService,
-        abuse_tags: TAG_C2 | TAG_DOWNLOAD,
-        blocking_risk: BlockingRisk::High,
-        mitre_techniques: &["T1102", "T1105"],
-    },
 
-    // ── Collaboration / productivity ───────────────────────────────────────
-    AbusableSite {
-        domain: "sharepoint.com",
-        provider: "Microsoft",
-        legitimate_category: SiteCategory::Collaboration,
-        abuse_tags: TAG_PHISHING | TAG_DOWNLOAD | TAG_EXFIL,
-        blocking_risk: BlockingRisk::Critical,
-        mitre_techniques: &["T1105", "T1566.002", "T1567.002"],
-    },
-    AbusableSite {
-        domain: "notion.so",
-        provider: "Notion",
-        legitimate_category: SiteCategory::Collaboration,
-        abuse_tags: TAG_PHISHING | TAG_C2,
-        blocking_risk: BlockingRisk::High,
-        mitre_techniques: &["T1102"],
-    },
-    AbusableSite {
-        domain: "trello.com",
-        provider: "Atlassian",
-        legitimate_category: SiteCategory::Collaboration,
-        abuse_tags: TAG_C2 | TAG_PHISHING,
-        blocking_risk: BlockingRisk::Medium,
-        mitre_techniques: &["T1102"],
-    },
-
-    // ── URL shorteners ─────────────────────────────────────────────────────
+    // ── URL shorteners (Low) ───────────────────────────────────────────────
     AbusableSite {
         domain: "bit.ly",
         provider: "Bitly",
         legitimate_category: SiteCategory::UrlShortener,
         abuse_tags: TAG_PHISHING | TAG_DOWNLOAD,
         blocking_risk: BlockingRisk::Low,
-        mitre_techniques: &["T1566.002"],
-    },
-    AbusableSite {
-        domain: "t.co",
-        provider: "Twitter/X",
-        legitimate_category: SiteCategory::UrlShortener,
-        abuse_tags: TAG_PHISHING,
-        blocking_risk: BlockingRisk::Medium,
         mitre_techniques: &["T1566.002"],
     },
     AbusableSite {

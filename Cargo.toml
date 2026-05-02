@@ -25,3 +25,7 @@ serde = { version = "1", features = ["derive"], optional = true }
 
 [dev-dependencies]
 serde_json = "1"
+
+[[example]]
+name = "dump_lol"
+required-features = ["serde"]

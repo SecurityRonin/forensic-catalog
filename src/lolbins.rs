@@ -1,3 +1,68 @@
+//! Living Off the Land Binaries and Scripts (LOLBAS) + Living Off Foreign Land (LOFL)
+//! across Windows, Linux, and macOS — all six upstream datasets in a single module.
+//!
+//! # Taxonomy
+//!
+//! **LOL (Living Off the Land):** Abuse of binaries, scripts, and libraries
+//! that ship with the OS itself. On Windows these are catalogued by the LOLBAS
+//! Project; on Linux by GTFOBins; on macOS by the LOOBins project.
+//!
+//! **LOFL (Living Off Foreign Land):** Abuse of *third-party* admin tools that
+//! are commonly installed on enterprise endpoints — Sysinternals, cloud CLIs,
+//! container runtimes, language runtimes, and so on. The LOFL Project catalogues
+//! Windows tools; this module adds the first published macOS LOFL catalog
+//! (`research/macos-lofl-catalog.yaml`).
+//!
+//! From a **detection standpoint the distinction is immaterial**: both LOL and
+//! LOFL binaries appear identically in process telemetry, Prefetch, AmCache,
+//! and EDR telemetry. Unifying them in a single lookup table — as GTFOBins
+//! already does for Linux — produces fewer missed detections and eliminates the
+//! need for callers to query two separate lists.
+//!
+//! # The six constants
+//!
+//! | Constant | Artifact type | Detection source |
+//! |----------|---------------|-----------------|
+//! | [`LOLBAS_WINDOWS`] | Process name (`.exe`), script (`.vbs`/`.cmd`) | Prefetch, Sysmon, EDR process telemetry |
+//! | [`LOLBAS_LINUX`] | Process name (no extension) | auditd `execve`, eBPF, EDR |
+//! | [`LOLBAS_MACOS`] | Process name (no extension) | macOS ESF / Endpoint Security, audit.log |
+//! | [`LOFL_WINDOWS_CMDLETS`] | PowerShell cmdlet name | ScriptBlock log (Event 4104), PSReadLine history |
+//! | [`LOFL_WINDOWS_MMC`] | `.msc` filename | LNK files, UserAssist MRU, Jump Lists |
+//! | [`LOFL_WINDOWS_WMI`] | WMI class name | WMI Activity log (Event 5861), `Get-CimInstance` |
+//!
+//! # Upstream sources
+//!
+//! - LOLBAS Project (Windows native): <https://lolbas-project.github.io/>
+//! - LOFL Project (Windows admin tools + cmdlets + MMC + WMI): <https://lofl-project.github.io/>
+//! - GTFOBins (Linux unified): <https://gtfobins.github.io/>
+//! - LOOBins (macOS native): <https://loobins.io/>
+//! - macOS LOFL catalog (first published, this repo): `research/macos-lofl-catalog.yaml`
+//!
+//! # Unified lookup
+//!
+//! Use [`is_lolbas`] to query all three platform LOLBAS lists at once.
+//! Use [`is_lolbas_windows`], [`is_lolbas_linux`], or [`is_lolbas_macos`] for
+//! platform-specific lookups. All comparisons are case-insensitive.
+//!
+//! ```rust
+//! use forensicnomicon::lolbins::{is_lolbas, is_lolbas_windows, is_lolbas_macos};
+//! use forensicnomicon::lolbins::{is_lofl_windows_cmdlet, is_lofl_windows_wmi};
+//!
+//! assert!(is_lolbas("certutil.exe"));        // Windows LOLBAS
+//! assert!(is_lolbas("bash"));                // Linux GTFOBins
+//! assert!(is_lolbas("osascript"));           // macOS LOOBins
+//! assert!(is_lolbas("kubectl"));             // macOS LOFL (also Linux GTFOBins)
+//! assert!(is_lofl_windows_cmdlet("Invoke-Command")); // PowerShell LOFL
+//! assert!(is_lofl_windows_wmi("Win32_Process"));     // WMI LOFL
+//! ```
+//!
+//! # macOS LOFL catalog — first-of-its-kind research
+//!
+//! The macOS LOFL section of [`LOLBAS_MACOS`] (tools installed via Homebrew,
+//! pip, npm, cargo, etc.) is the **first published macOS LOFL catalog anywhere**.
+//! It covers 80 tools with 276 documented abuse techniques across 71 ATT&CK IDs.
+//! The raw YAML data lives in `research/macos-lofl-catalog.yaml`.
+
 /// Windows LOLBAS — unified LOL (native) + LOFL (foreign admin tools).
 ///
 /// Sources:

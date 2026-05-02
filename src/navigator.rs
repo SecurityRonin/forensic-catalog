@@ -3,8 +3,8 @@
 //! Generates MITRE ATT&CK Navigator JSON layers showing which techniques
 //! have catalog artifact coverage and how many artifacts cover each technique.
 
-use crate::mitre::AttackTechnique;
 use crate::catalog::CATALOG;
+use crate::mitre::AttackTechnique;
 use std::collections::HashMap;
 
 /// Generate an ATT&CK Navigator layer JSON for the catalog.

@@ -1,3 +1,42 @@
+//! Cloud services, CDNs, and online platforms systematically abused by
+//! attackers for phishing, C2, payload delivery, and data exfiltration.
+//!
+//! # Why BlockingRisk is the key dimension
+//!
+//! Attackers do not choose sites like `raw.githubusercontent.com` or
+//! `*.amazonaws.com` by accident. They choose them precisely because these
+//! domains carry a [`BlockingRisk`] of `Critical` — defenders cannot block
+//! them without also breaking their own development pipelines, CI/CD systems,
+//! and cloud-deployed workloads. This is the same logic behind LOL/LOFL binary
+//! abuse: the tool's legitimate ubiquity is the defence evasion mechanism.
+//!
+//! `BlockingRisk` is therefore the primary triage dimension. A domain with
+//! `BlockingRisk::Low` (e.g. `pastebin.com`) should be blocked at the proxy
+//! and DNS layers immediately. A domain with `BlockingRisk::Critical` (e.g.
+//! `*.amazonaws.com`) requires a detection-and-alerting strategy instead.
+//! Use [`sites_above_risk`] to find domains in each risk tier.
+//!
+//! # Data sources
+//!
+//! - LOTS Project (Living Off Trusted Sites) — community-maintained catalog of
+//!   domains abused by attackers: <https://lots-project.com/>
+//!   (scraped via `scripts/scrape_lots.py`)
+//! - URLhaus / abuse.ch — active malware distribution URLs with domain metadata:
+//!   <https://urlhaus.abuse.ch/> (synced via `scripts/sync_urlhaus.py`)
+//! - MISP taxonomies — `circl:threat-type` and `enisa:threats` for abuse tag
+//!   alignment: <https://github.com/MISP/misp-taxonomies>
+//!
+//! # ATT&CK coverage
+//!
+//! - T1102 — Web Service (C2 over legitimate hosted services):
+//!   <https://attack.mitre.org/techniques/T1102/>
+//! - T1567 — Exfiltration Over Web Service:
+//!   <https://attack.mitre.org/techniques/T1567/>
+//! - T1105 — Ingress Tool Transfer (payload delivery via trusted domains):
+//!   <https://attack.mitre.org/techniques/T1105/>
+//! - T1566.002 — Phishing: Spearphishing Link (abuse of trusted sharing URLs):
+//!   <https://attack.mitre.org/techniques/T1566/002/>
+
 /// Cloud services, CDNs, and online platforms systematically abused by
 /// attackers for phishing, C2, payload delivery, and data exfiltration.
 ///

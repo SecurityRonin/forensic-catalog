@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/forensicnomicon-banner-dark.png" />
-    <img src="assets/forensicnomicon-banner-transparent.png" alt="Forensicnomicon" width="520" />
+    <img src="assets/forensicnomicon-transparent.png" alt="Forensicnomicon" width="520" />
   </picture>
 </p>
 
@@ -14,7 +14,7 @@
 
 **6,548 forensic artifacts. Every one enriched.**
 
-Other artifact registries tell you *where* an artifact lives. forensicnomicon tells you what it **means**, how to **decode** it, how **reliable** it is as evidence, when to **grab** it, what else to **collect** alongside it, and which **detection rules** apply — all compiled into your binary, zero I/O, zero dependencies.
+The only zero-dependency Rust crate that unifies all six LOL/LOFL datasets across Windows, Linux, and macOS under a single API — plus a 6,548-artifact DFIR catalog with decoders, ATT&CK mappings, and triage priorities compiled into your binary.
 
 ```toml
 [dependencies]
@@ -23,7 +23,103 @@ forensicnomicon = "0.1"
 
 ---
 
-## What "enriched" means
+## LOL + LOFL — all six datasets, one lookup
+
+**LOL (Living Off the Land)** is abuse of binaries and scripts that ship with the OS itself. **LOFL (Living Off Foreign Land)** is abuse of third-party admin tools commonly found on enterprise endpoints — cloud CLIs, container runtimes, Sysinternals, language runtimes, and so on.
+
+From a detection standpoint the distinction is academic: both LOL and LOFL binaries appear identically in process telemetry, Prefetch, AmCache, and EDR alerts. Unifying them in a single lookup — as GTFOBins already does for Linux — produces fewer missed detections.
+
+forensicnomicon is the only Rust library that covers all six upstream datasets:
+
+| Constant | Entries | Upstream source |
+|----------|---------|----------------|
+| `LOLBAS_WINDOWS` | ~114 | [LOLBAS Project](https://lolbas-project.github.io/) (22 native) + [LOFL Project](https://lofl-project.github.io/) (92 admin tools) |
+| `LOLBAS_LINUX` | 478 | [GTFOBins](https://gtfobins.github.io/) — complete, unified LOL + LOFL |
+| `LOLBAS_MACOS` | ~142 | [LOOBins](https://loobins.io/) (64 native) + macOS LOFL catalog (78, first catalog anywhere) |
+| `LOFL_WINDOWS_CMDLETS` | 176 | [LOFL Project](https://lofl-project.github.io/) — PowerShell cmdlets (Event 4104 / PSReadLine) |
+| `LOFL_WINDOWS_MMC` | 59 | [LOFL Project](https://lofl-project.github.io/) — MMC snap-ins (.msc, LNK/UserAssist) |
+| `LOFL_WINDOWS_WMI` | 17 | [LOFL Project](https://lofl-project.github.io/) — WMI classes (Event 5861) |
+
+Each constant maps to a different **artifact type and detection source**:
+
+| Constant | Detection source |
+|----------|----------------|
+| `LOLBAS_WINDOWS` / `LOLBAS_LINUX` / `LOLBAS_MACOS` | Process telemetry, Prefetch, AmCache, EDR |
+| `LOFL_WINDOWS_CMDLETS` | PowerShell ScriptBlock log (Event 4104), PSReadLine history |
+| `LOFL_WINDOWS_MMC` | LNK files, UserAssist MRU, Jump Lists |
+| `LOFL_WINDOWS_WMI` | WMI Activity log (Event 5861), `Get-CimInstance` calls |
+
+```rust
+use forensicnomicon::lolbins::{
+    is_lolbas, is_lolbas_windows, is_lolbas_linux, is_lolbas_macos,
+    is_lofl_windows_cmdlet, is_lofl_windows_mmc, is_lofl_windows_wmi,
+    LOLBAS_WINDOWS, LOLBAS_LINUX, LOLBAS_MACOS,
+    LOFL_WINDOWS_CMDLETS, LOFL_WINDOWS_MMC, LOFL_WINDOWS_WMI,
+};
+
+// Unified cross-platform check
+assert!(is_lolbas("certutil.exe"));   // Windows LOLBAS
+assert!(is_lolbas("bash"));           // Linux GTFOBins
+assert!(is_lolbas("osascript"));      // macOS LOOBins
+assert!(is_lolbas("kubectl"));        // macOS LOFL (also Linux GTFOBins)
+
+// Platform-specific
+assert!(is_lolbas_windows("mshta.exe"));
+assert!(is_lolbas_linux("socat"));
+assert!(is_lolbas_macos("launchctl"));
+
+// Non-binary LOFL types — for log sources beyond process telemetry
+assert!(is_lofl_windows_cmdlet("Invoke-Command")); // Event 4104
+assert!(is_lofl_windows_mmc("compmgmt.msc"));      // UserAssist MRU
+assert!(is_lofl_windows_wmi("Win32_Process"));      // Event 5861
+```
+
+### macOS LOFL catalog — first-of-its-kind research
+
+The macOS LOFL section of `LOLBAS_MACOS` (tools installed via Homebrew, pip, npm, cargo, etc.) is the **first published macOS LOFL catalog anywhere**. It covers 78 tools — cloud CLIs, container runtimes, tunneling tools, offensive security tools, and credential managers — with documented abuse techniques mapped to ATT&CK IDs. The raw YAML data lives in `research/macos-lofl-catalog.yaml`.
+
+---
+
+## Abusable sites — LOT (Living Off Trusted Sites)
+
+The `abusable_sites` module maps domains that attackers use for C2, phishing, payload delivery, and exfiltration — domains that are trusted by enterprises and therefore cannot simply be blocked.
+
+The central insight encoded in `BlockingRisk` is that **attackers choose high-risk sites deliberately**: GitHub and AWS have `BlockingRisk::Critical` precisely because no defender can block them without also breaking their own CI/CD and cloud workloads. Use this field to decide between blocking (low risk) and detection-and-alerting (high/critical risk).
+
+```rust
+use forensicnomicon::abusable_sites::{
+    ABUSABLE_SITES, BlockingRisk, TAG_C2, TAG_EXFIL,
+    is_abusable_site, abusable_site_info, sites_with_tag, sites_above_risk,
+};
+
+// Fast exact lookup
+assert!(is_abusable_site("raw.githubusercontent.com"));
+
+// Rich record
+let site = abusable_site_info("api.telegram.org").unwrap();
+// site.provider          → "Telegram"
+// site.blocking_risk     → BlockingRisk::Medium
+// site.abuse_tags & TAG_C2 != 0 → true
+// site.mitre_techniques  → &["T1102", "T1567"]
+
+// Find everything you can block outright
+let low_risk: Vec<_> = sites_above_risk(BlockingRisk::Low)
+    .filter(|s| s.blocking_risk == BlockingRisk::Low)
+    .collect();
+
+// Find all C2-capable domains that you cannot block
+let critical_c2: Vec<_> = sites_with_tag(TAG_C2)
+    .filter(|s| s.blocking_risk >= BlockingRisk::Critical)
+    .collect();
+```
+
+Data sourced from the [LOTS Project](https://lots-project.com/) and [URLhaus / abuse.ch](https://urlhaus.abuse.ch/), with ATT&CK technique annotations (T1102, T1567, T1105, T1566.002).
+
+---
+
+## Artifact catalog — 6,548 enriched entries
+
+Other artifact registries tell you *where* an artifact lives. forensicnomicon tells you what it **means**, how to **decode** it, how **reliable** it is as evidence, when to **grab** it, what else to **collect** alongside it, and which **detection rules** apply — all compiled into your binary, zero I/O, zero dependencies.
 
 Take `UserAssist` — a registry key at `NTUSER.DAT\...\Explorer\UserAssist\{GUID}\Count`. Every artifact registry gives you that path. forensicnomicon gives you:
 
@@ -74,6 +170,7 @@ forensicnomicon is that list — structured, cited, and enriched:
 
 - **6,548 artifacts** with location, decoder, OS scope, and source citation
 - **361 fully curated** with triage priority, evidence strength, volatility class, dependencies, and detection pivots
+- **All 6 LOL/LOFL datasets** unified — Windows, Linux, macOS; binaries, cmdlets, MMC snap-ins, WMI classes
 - **Queryable** — by MITRE technique, triage priority, keyword, or structured filter
 - **Zero deps** — no supply-chain risk, embeds in any binary, `no_std` compatible
 
@@ -255,13 +352,15 @@ let order = acquisition_order();
 
 ## Indicator tables
 
-Thirteen flat lookup modules — no schema, no decoder, just fast boolean checks:
+Fourteen flat lookup modules — no schema, no decoder, just fast boolean checks:
 
 ```rust
 use forensicnomicon::{
     ports::is_suspicious_port,
-    lolbins::is_windows_lolbin,
-    processes::MALWARE_PROCESS_NAMES,
+    lolbins::is_lolbas,
+    lolbins::is_lofl_windows_cmdlet,
+    abusable_sites::is_abusable_site,
+    processes::is_masquerade_target,
     persistence::WINDOWS_RUN_KEYS,
     remote_access::is_lolrmm_path,
     third_party::identify_application,
@@ -274,9 +373,10 @@ use forensicnomicon::{
 | Module | Covers | Key API |
 |---|---|---|
 | `ports` | C2, Cobalt Strike, Tor, WinRM, RAT defaults | `is_suspicious_port(u16)` |
-| `lolbins` | Windows LOLBAS + Linux GTFOBins | `is_windows_lolbin(&str)`, `is_linux_lolbin(&str)` |
-| `processes` | Known malware / masquerade process names | `MALWARE_PROCESS_NAMES` |
-| `commands` | Log-wipe commands, rootkit names | pattern slices |
+| `lolbins` | All six LOL/LOFL datasets — Windows/Linux/macOS binaries, cmdlets, MMC snap-ins, WMI classes | `is_lolbas(&str)`, `is_lofl_windows_cmdlet(&str)`, `is_lofl_windows_wmi(&str)` |
+| `abusable_sites` | LOTS Project + URLhaus — trusted domains abused for C2/phishing/exfil | `is_abusable_site(&str)`, `sites_above_risk(BlockingRisk)` |
+| `processes` | Known malware / masquerade process names | `is_masquerade_target(&str)`, `is_known_malware_process(&str)` |
+| `commands` | Reverse shells, PowerShell abuse, download cradles, WMI abuse | pattern slices, `is_reverse_shell_pattern(&str)` |
 | `paths` | Suspicious staging and hijack paths | path slices |
 | `persistence` | Run keys, cron/init, LaunchAgents, IFEO, AppInit | `WINDOWS_RUN_KEYS`, `LINUX_PERSISTENCE_PATHS` |
 | `antiforensics` | Log-wipe, timestomping, rootkit indicators | indicator slices |

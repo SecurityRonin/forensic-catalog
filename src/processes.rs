@@ -1,4 +1,16 @@
 /// Legitimate Windows process names commonly masqueraded by attackers.
+///
+/// Attackers name malware after these processes to blend in with normal system
+/// activity. Detection relies on checking parent/child relationships, image path,
+/// and process ancestry — not just the process name.
+///
+/// Sources:
+/// - MITRE ATT&CK T1036.005 — Masquerading: Match Legitimate Name or Location:
+///   <https://attack.mitre.org/techniques/T1036/005/>
+/// - Elastic Security — "Detecting Process Masquerading" detection rule series:
+///   <https://www.elastic.co/guide/en/security/current/masquerading-as-a-windows-system-process.html>
+/// - Microsoft — "Processes that should not be duplicated" (Windows Internals, 7th ed.):
+///   <https://learn.microsoft.com/en-us/sysinternals/resources/windows-internals>
 pub const WINDOWS_MASQUERADE_TARGETS: &[&str] = &[
     "svchost.exe",
     "lsass.exe",
@@ -18,6 +30,19 @@ pub const WINDOWS_MASQUERADE_TARGETS: &[&str] = &[
 ];
 
 /// Well-known malware / offensive-tool process names.
+///
+/// This list covers C2 frameworks, cryptominers, post-exploitation agents,
+/// tunneling tools, and rootkits commonly detected by name in process telemetry.
+///
+/// Sources:
+/// - MITRE ATT&CK T1059 — Command and Scripting Interpreter (C2 agent names):
+///   <https://attack.mitre.org/techniques/T1059/>
+/// - Elastic Security Labs — threat research naming conventions for Sliver, Havoc,
+///   and Brute Ratel C4: <https://www.elastic.co/security-labs/>
+/// - SentinelOne Labs — XMRig and cryptominer process taxonomy:
+///   <https://www.sentinelone.com/labs/>
+/// - BishopFox Sliver C2 framework (process name `sliver`):
+///   <https://github.com/BishopFox/sliver>
 pub const KNOWN_MALWARE_PROCESS_NAMES: &[&str] = &[
     "xmrig",
     "mimikatz",
@@ -93,7 +118,8 @@ pub const CREDENTIAL_ACCESS_TOOLS: &[&str] = &[
 ///   <https://attack.mitre.org/techniques/T1003/001/>
 /// - Elastic Security — "Credential Access via LSASS" detection rule:
 ///   <https://www.elastic.co/guide/en/security/current/credential-access-via-lsass-memory-dump.html>
-/// - Microsoft — Windows Defender credential guard and LSASS protection
+/// - Microsoft — Windows Defender Credential Guard and LSASS protection:
+///   <https://learn.microsoft.com/en-us/windows/security/identity-protection/credential-guard/how-it-works>
 pub const LSASS_ACCESS_TOOLS: &[&str] = &[
     "procdump",
     "procdump64",

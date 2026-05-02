@@ -1730,84 +1730,85 @@ mod tests {
         assert!(is_lofl_windows_wmi("win32_process"));
     }
 
-    // Native PowerShell attack cmdlets (gap vs LOFL Project)
+    // LOLBAS_WINDOWS_CMDLETS — native PS cmdlets are LOL (not LOFL)
+    // Native PS ships with the OS; LOFL = third-party admin tools.
     #[test]
-    fn lofl_windows_cmdlets_contains_invoke_webrequest() {
-        assert!(LOFL_WINDOWS_CMDLETS.contains(&"Invoke-WebRequest"));
+    fn lolbas_windows_cmdlets_contains_invoke_webrequest() {
+        assert!(LOLBAS_WINDOWS_CMDLETS.contains(&"Invoke-WebRequest"));
     }
     #[test]
-    fn lofl_windows_cmdlets_contains_invoke_expression() {
-        assert!(LOFL_WINDOWS_CMDLETS.contains(&"Invoke-Expression"));
+    fn lolbas_windows_cmdlets_contains_invoke_expression() {
+        assert!(LOLBAS_WINDOWS_CMDLETS.contains(&"Invoke-Expression"));
     }
     #[test]
-    fn lofl_windows_cmdlets_contains_invoke_restmethod() {
-        assert!(LOFL_WINDOWS_CMDLETS.contains(&"Invoke-RestMethod"));
+    fn lolbas_windows_cmdlets_contains_invoke_restmethod() {
+        assert!(LOLBAS_WINDOWS_CMDLETS.contains(&"Invoke-RestMethod"));
     }
     #[test]
-    fn lofl_windows_cmdlets_contains_start_bitstransfer() {
-        assert!(LOFL_WINDOWS_CMDLETS.contains(&"Start-BitsTransfer"));
+    fn lolbas_windows_cmdlets_contains_start_bitstransfer() {
+        assert!(LOLBAS_WINDOWS_CMDLETS.contains(&"Start-BitsTransfer"));
     }
     #[test]
-    fn lofl_windows_cmdlets_contains_add_type() {
-        assert!(LOFL_WINDOWS_CMDLETS.contains(&"Add-Type"));
+    fn lolbas_windows_cmdlets_contains_add_type() {
+        assert!(LOLBAS_WINDOWS_CMDLETS.contains(&"Add-Type"));
     }
     #[test]
-    fn lofl_windows_cmdlets_contains_new_object() {
-        assert!(LOFL_WINDOWS_CMDLETS.contains(&"New-Object"));
+    fn lolbas_windows_cmdlets_contains_new_object() {
+        assert!(LOLBAS_WINDOWS_CMDLETS.contains(&"New-Object"));
     }
     #[test]
-    fn lofl_windows_cmdlets_contains_set_executionpolicy() {
-        assert!(LOFL_WINDOWS_CMDLETS.contains(&"Set-ExecutionPolicy"));
+    fn lolbas_windows_cmdlets_contains_set_executionpolicy() {
+        assert!(LOLBAS_WINDOWS_CMDLETS.contains(&"Set-ExecutionPolicy"));
     }
     #[test]
-    fn lofl_windows_cmdlets_contains_compress_archive() {
-        assert!(LOFL_WINDOWS_CMDLETS.contains(&"Compress-Archive"));
+    fn lolbas_windows_cmdlets_contains_compress_archive() {
+        assert!(LOLBAS_WINDOWS_CMDLETS.contains(&"Compress-Archive"));
     }
     #[test]
-    fn lofl_windows_cmdlets_contains_start_process() {
-        assert!(LOFL_WINDOWS_CMDLETS.contains(&"Start-Process"));
+    fn lolbas_windows_cmdlets_contains_start_process() {
+        assert!(LOLBAS_WINDOWS_CMDLETS.contains(&"Start-Process"));
     }
     #[test]
-    fn lofl_windows_cmdlets_contains_register_objectevent() {
-        assert!(LOFL_WINDOWS_CMDLETS.contains(&"Register-ObjectEvent"));
+    fn lolbas_windows_cmdlets_contains_register_objectevent() {
+        assert!(LOLBAS_WINDOWS_CMDLETS.contains(&"Register-ObjectEvent"));
     }
-    // PowerShell built-in aliases — attackers use these to evade keyword detection
+    // LOLBAS_WINDOWS_PS_ALIASES — PS aliases for native LOL cmdlets
     #[test]
-    fn lofl_windows_ps_aliases_exists() {
-        assert!(!LOFL_WINDOWS_PS_ALIASES.is_empty());
-    }
-    #[test]
-    fn lofl_windows_ps_aliases_contains_iex() {
-        assert!(LOFL_WINDOWS_PS_ALIASES.contains(&"iex"));
+    fn lolbas_windows_ps_aliases_exists() {
+        assert!(!LOLBAS_WINDOWS_PS_ALIASES.is_empty());
     }
     #[test]
-    fn lofl_windows_ps_aliases_contains_iwr() {
-        assert!(LOFL_WINDOWS_PS_ALIASES.contains(&"iwr"));
+    fn lolbas_windows_ps_aliases_contains_iex() {
+        assert!(LOLBAS_WINDOWS_PS_ALIASES.contains(&"iex"));
     }
     #[test]
-    fn lofl_windows_ps_aliases_contains_irm() {
-        assert!(LOFL_WINDOWS_PS_ALIASES.contains(&"irm"));
+    fn lolbas_windows_ps_aliases_contains_iwr() {
+        assert!(LOLBAS_WINDOWS_PS_ALIASES.contains(&"iwr"));
     }
     #[test]
-    fn lofl_windows_ps_aliases_contains_wget_ps_alias() {
-        // wget is a PS built-in alias for Invoke-WebRequest (distinct from /usr/bin/wget)
-        assert!(LOFL_WINDOWS_PS_ALIASES.contains(&"wget"));
+    fn lolbas_windows_ps_aliases_contains_irm() {
+        assert!(LOLBAS_WINDOWS_PS_ALIASES.contains(&"irm"));
     }
     #[test]
-    fn lofl_windows_ps_aliases_contains_curl_ps_alias() {
-        // curl is a PS built-in alias for Invoke-WebRequest (PS 5.x; removed in PS 7)
-        assert!(LOFL_WINDOWS_PS_ALIASES.contains(&"curl"));
+    fn lolbas_windows_ps_aliases_contains_wget_ps_alias() {
+        // wget is a PS 5.x built-in alias for Invoke-WebRequest (distinct from /usr/bin/wget)
+        assert!(LOLBAS_WINDOWS_PS_ALIASES.contains(&"wget"));
     }
     #[test]
-    fn is_lofl_windows_ps_alias_detects_iex() {
-        assert!(is_lofl_windows_ps_alias("iex"));
+    fn lolbas_windows_ps_aliases_contains_curl_ps_alias() {
+        // curl is a PS 5.x built-in alias for Invoke-WebRequest (removed in PS 7)
+        assert!(LOLBAS_WINDOWS_PS_ALIASES.contains(&"curl"));
     }
     #[test]
-    fn is_lofl_windows_ps_alias_case_insensitive() {
-        assert!(is_lofl_windows_ps_alias("IEX"));
+    fn is_lolbas_windows_ps_alias_detects_iex() {
+        assert!(is_lolbas_windows_ps_alias("iex"));
     }
     #[test]
-    fn is_lofl_windows_ps_alias_rejects_unknown() {
-        assert!(!is_lofl_windows_ps_alias("notanalias"));
+    fn is_lolbas_windows_ps_alias_case_insensitive() {
+        assert!(is_lolbas_windows_ps_alias("IEX"));
+    }
+    #[test]
+    fn is_lolbas_windows_ps_alias_rejects_unknown() {
+        assert!(!is_lolbas_windows_ps_alias("notanalias"));
     }
 }

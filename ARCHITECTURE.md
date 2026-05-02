@@ -22,7 +22,7 @@ These modules export only `&'static` slices and Boolean lookup functions. They c
 | Module | What it covers | Upstream sources |
 |--------|---------------|-----------------|
 | `lolbins` | All six LOL/LOFL datasets — see below | LOLBAS Project, LOFL Project, GTFOBins, LOOBins, macOS LOFL catalog |
-| `abusable_sites` | Trusted domains abused for C2/phishing/exfil | LOTS Project, URLhaus / abuse.ch |
+| `abusable_sites` | Trusted domains abused for C2/phishing/exfil; `AbusableSite` derives `serde::Serialize` under the `serde` feature | LOTS Project, URLhaus / abuse.ch |
 | `ports` | Suspicious TCP/UDP ports (C2 frameworks, Tor, WinRM) | SANS ISC, Cobalt Strike docs, Tor Project, Microsoft |
 | `persistence` | Run keys, cron paths, LaunchAgent directories | MITRE ATT&CK, Harlan Carvey, Sysinternals Autoruns |
 | `processes` | Masquerade targets, malware process names, LSASS tools | MITRE ATT&CK T1036/T1003, Elastic Security Labs |
@@ -77,14 +77,46 @@ From a detection standpoint the distinction is academic: LOL and LOFL binaries a
 
 ### The six constants and their artifact sources
 
+All six constants are `&[LolbasEntry]`. Every entry in the slice carries a `name`, `mitre_techniques`, `use_cases` bitmask, and `description`.
+
 | Constant | Binary type | Where it shows up in logs |
 |----------|-------------|--------------------------|
 | `LOLBAS_WINDOWS` | `.exe`, `.vbs`, `.cmd` | Process telemetry, Sysmon, Prefetch, AmCache |
 | `LOLBAS_LINUX` | no extension | `auditd execve`, eBPF, EDR |
 | `LOLBAS_MACOS` | no extension | macOS Endpoint Security Framework, Unified Log |
-| `LOFL_WINDOWS_CMDLETS` | PowerShell cmdlet name | ScriptBlock log (Event 4104), PSReadLine history |
-| `LOFL_WINDOWS_MMC` | `.msc` file | LNK files, UserAssist MRU, Jump Lists |
-| `LOFL_WINDOWS_WMI` | WMI class name | WMI Activity log (Event 5861), `Get-CimInstance` calls |
+| `LOLBAS_WINDOWS_CMDLETS` | PowerShell cmdlet name or alias | ScriptBlock log (Event 4104), PSReadLine history, AMSI |
+| `LOLBAS_WINDOWS_MMC` | `.msc` file | LNK files, UserAssist MRU, Jump Lists |
+| `LOLBAS_WINDOWS_WMI` | WMI class name | WMI Activity log (Event 5861), `Get-CimInstance` calls |
+
+### `LolbasEntry` data model
+
+```rust
+pub struct LolbasEntry {
+    pub name: &'static str,                        // canonical name, e.g. "certutil.exe"
+    pub mitre_techniques: &'static [&'static str], // ATT&CK technique IDs
+    pub use_cases: u16,                            // OR-ed UC_* bitmask
+    pub description: &'static str,                // one-line forensic significance
+}
+```
+
+Use `lolbas_entry(catalog, name) -> Option<&LolbasEntry>` for case-insensitive name lookup, and `lolbas_names(catalog) -> impl Iterator<Item=&'static str>` to iterate names.
+
+### `UC_*` use-case bitmask constants
+
+| Constant | Bit | Abuse use-case |
+|----------|-----|----------------|
+| `UC_EXECUTE` | 0 | Arbitrary code or binary execution |
+| `UC_DOWNLOAD` | 1 | Fetch files from the network |
+| `UC_UPLOAD` | 2 | Exfiltrate or send data out |
+| `UC_BYPASS` | 3 | Security control bypass (UAC, AMSI, AWL) |
+| `UC_PERSIST` | 4 | Establish persistence |
+| `UC_RECON` | 5 | Discovery and enumeration |
+| `UC_PROXY` | 6 | Proxy execution of another payload |
+| `UC_DECODE` | 7 | Decode or deobfuscate data |
+| `UC_ARCHIVE` | 8 | Compress or expand archives |
+| `UC_CREDENTIALS` | 9 | Credential access or manipulation |
+| `UC_NETWORK` | 10 | Network configuration or lateral movement |
+| `UC_DEFENSE_EVASION` | 11 | Log clearing, AV disable, etc. |
 
 ### Upstream data sources
 
@@ -179,3 +211,13 @@ cargo run -p ingest -- --source all --output src/catalog/descriptors/generated/
 Sources: KAPE targets, ForensicArtifacts YAML, EVTX/ETW channel list, Velociraptor artifact YAML, RECmd batch files, browser paths, NirSoft tool list.
 
 `crates/fcatalog` — the `fnomicon` CLI binary for interactive catalog exploration.
+
+`crates/4n6query` (package: `forensicnomicon-cli`) — the `4n6query` DFIR query binary. Looks up LOL/LOFL entries across all six catalogs, abusable sites, and dumps machine-readable JSON/YAML snapshots for SIEM/SOAR integration. Requires the `serde` feature of the library crate (declared in its `Cargo.toml`). Supported subcommands:
+
+```
+4n6query lolbas lookup <platform> <name> [--format json|yaml]
+4n6query sites lookup <domain>           [--format json|yaml]
+4n6query dump --format json|yaml         [--dataset all|lolbas|sites]
+```
+
+Platforms: `windows`, `linux`, `macos`, `windows-cmdlet`, `windows-mmc`, `windows-wmi`.

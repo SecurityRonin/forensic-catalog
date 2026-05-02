@@ -33,45 +33,48 @@ forensicnomicon is the only Rust library that covers all six upstream datasets:
 
 | Constant | Entries | Upstream source |
 |----------|---------|----------------|
-| `LOLBAS_WINDOWS` | ~114 | [LOLBAS Project](https://lolbas-project.github.io/) (22 native) + [LOFL Project](https://lofl-project.github.io/) (92 admin tools) |
+| `LOLBAS_WINDOWS` | ~160 | [LOLBAS Project](https://lolbas-project.github.io/) (native binaries) + [LOFL Project](https://lofl-project.github.io/) (admin tools) |
 | `LOLBAS_LINUX` | 478 | [GTFOBins](https://gtfobins.github.io/) — complete, unified LOL + LOFL |
-| `LOLBAS_MACOS` | ~142 | [LOOBins](https://loobins.io/) (64 native) + macOS LOFL catalog (78, first catalog anywhere) |
-| `LOFL_WINDOWS_CMDLETS` | 176 | [LOFL Project](https://lofl-project.github.io/) — PowerShell cmdlets (Event 4104 / PSReadLine) |
-| `LOFL_WINDOWS_MMC` | 59 | [LOFL Project](https://lofl-project.github.io/) — MMC snap-ins (.msc, LNK/UserAssist) |
-| `LOFL_WINDOWS_WMI` | 17 | [LOFL Project](https://lofl-project.github.io/) — WMI classes (Event 5861) |
+| `LOLBAS_MACOS` | ~141 | [LOOBins](https://loobins.io/) (~61 native) + macOS LOFL catalog (~80, first catalog anywhere) |
+| `LOLBAS_WINDOWS_CMDLETS` | ~271 | [LOFL Project](https://lofl-project.github.io/) + native PS attack cmdlets + PS aliases (Event 4104 / PSReadLine) |
+| `LOLBAS_WINDOWS_MMC` | 63 | [LOFL Project](https://lofl-project.github.io/) — MMC snap-ins (.msc, LNK/UserAssist) |
+| `LOLBAS_WINDOWS_WMI` | 24 | [LOFL Project](https://lofl-project.github.io/) — WMI classes (Event 5861) |
 
-Each constant maps to a different **artifact type and detection source**:
+Each constant is a `&[LolbasEntry]` — every entry carries a name, MITRE technique IDs, a `use_cases` bitmask, and a description. Each constant maps to a different **artifact type and detection source**:
 
 | Constant | Detection source |
 |----------|----------------|
 | `LOLBAS_WINDOWS` / `LOLBAS_LINUX` / `LOLBAS_MACOS` | Process telemetry, Prefetch, AmCache, EDR |
-| `LOFL_WINDOWS_CMDLETS` | PowerShell ScriptBlock log (Event 4104), PSReadLine history |
-| `LOFL_WINDOWS_MMC` | LNK files, UserAssist MRU, Jump Lists |
-| `LOFL_WINDOWS_WMI` | WMI Activity log (Event 5861), `Get-CimInstance` calls |
+| `LOLBAS_WINDOWS_CMDLETS` | PowerShell ScriptBlock log (Event 4104), PSReadLine history, AMSI |
+| `LOLBAS_WINDOWS_MMC` | LNK files, UserAssist MRU, Jump Lists |
+| `LOLBAS_WINDOWS_WMI` | WMI Activity log (Event 5861), `Get-CimInstance` calls |
 
 ```rust
 use forensicnomicon::lolbins::{
     is_lolbas, is_lolbas_windows, is_lolbas_linux, is_lolbas_macos,
-    is_lofl_windows_cmdlet, is_lofl_windows_mmc, is_lofl_windows_wmi,
+    is_lolbas_windows_cmdlet, is_lolbas_windows_mmc, is_lolbas_windows_wmi,
+    lolbas_entry, lolbas_names, LolbasEntry,
     LOLBAS_WINDOWS, LOLBAS_LINUX, LOLBAS_MACOS,
-    LOFL_WINDOWS_CMDLETS, LOFL_WINDOWS_MMC, LOFL_WINDOWS_WMI,
+    LOLBAS_WINDOWS_CMDLETS, LOLBAS_WINDOWS_MMC, LOLBAS_WINDOWS_WMI,
+    UC_EXECUTE, UC_DOWNLOAD, UC_BYPASS,
 };
 
 // Unified cross-platform check
-assert!(is_lolbas("certutil.exe"));   // Windows LOLBAS
-assert!(is_lolbas("bash"));           // Linux GTFOBins
-assert!(is_lolbas("osascript"));      // macOS LOOBins
-assert!(is_lolbas("kubectl"));        // macOS LOFL (also Linux GTFOBins)
+assert!(is_lolbas("certutil.exe"));
+assert!(is_lolbas("bash"));
+assert!(is_lolbas("osascript"));
 
-// Platform-specific
-assert!(is_lolbas_windows("mshta.exe"));
-assert!(is_lolbas_linux("socat"));
-assert!(is_lolbas_macos("launchctl"));
+// Rich struct lookup — ATT&CK techniques, use-case bitmask, description
+let entry = lolbas_entry(LOLBAS_WINDOWS, "certutil.exe").unwrap();
+assert_eq!(entry.name, "certutil.exe");
+assert!(entry.use_cases & UC_DOWNLOAD != 0);
+println!("{}", entry.description);
 
-// Non-binary LOFL types — for log sources beyond process telemetry
-assert!(is_lofl_windows_cmdlet("Invoke-Command")); // Event 4104
-assert!(is_lofl_windows_mmc("compmgmt.msc"));      // UserAssist MRU
-assert!(is_lofl_windows_wmi("Win32_Process"));      // Event 5861
+// Non-binary LOFL types
+assert!(is_lolbas_windows_cmdlet("Invoke-Command"));
+assert!(is_lolbas_windows_cmdlet("iex"));     // PS alias
+assert!(is_lolbas_windows_mmc("compmgmt.msc"));
+assert!(is_lolbas_windows_wmi("Win32_Process"));
 ```
 
 ### macOS LOFL catalog — first-of-its-kind research
@@ -114,6 +117,8 @@ let critical_c2: Vec<_> = sites_with_tag(TAG_C2)
 ```
 
 Data sourced from the [LOTS Project](https://lots-project.com/) and [URLhaus / abuse.ch](https://urlhaus.abuse.ch/), with ATT&CK technique annotations (T1102, T1567, T1105, T1566.002).
+
+`AbusableSite` derives `serde::Serialize` under the `serde` feature, so all site records can be serialised directly to JSON or YAML (as used by `4n6query dump`).
 
 ---
 
@@ -170,7 +175,7 @@ forensicnomicon is that list — structured, cited, and enriched:
 
 - **6,548 artifacts** with location, decoder, OS scope, and source citation
 - **361 fully curated** with triage priority, evidence strength, volatility class, dependencies, and detection pivots
-- **All 6 LOL/LOFL datasets** unified — Windows, Linux, macOS; binaries, cmdlets, MMC snap-ins, WMI classes
+- **All 6 LOL/LOFL datasets** unified — Windows, Linux, macOS; binaries, cmdlets, MMC snap-ins, WMI classes — as rich `LolbasEntry` structs with ATT&CK mappings and use-case bitmasks
 - **Queryable** — by MITRE technique, triage priority, keyword, or structured filter
 - **Zero deps** — no supply-chain risk, embeds in any binary, `no_std` compatible
 
@@ -358,7 +363,7 @@ Fourteen flat lookup modules — no schema, no decoder, just fast boolean checks
 use forensicnomicon::{
     ports::is_suspicious_port,
     lolbins::is_lolbas,
-    lolbins::is_lofl_windows_cmdlet,
+    lolbins::is_lolbas_windows_cmdlet,
     abusable_sites::is_abusable_site,
     processes::is_masquerade_target,
     persistence::WINDOWS_RUN_KEYS,
@@ -373,7 +378,7 @@ use forensicnomicon::{
 | Module | Covers | Key API |
 |---|---|---|
 | `ports` | C2, Cobalt Strike, Tor, WinRM, RAT defaults | `is_suspicious_port(u16)` |
-| `lolbins` | All six LOL/LOFL datasets — Windows/Linux/macOS binaries, cmdlets, MMC snap-ins, WMI classes | `is_lolbas(&str)`, `is_lofl_windows_cmdlet(&str)`, `is_lofl_windows_wmi(&str)` |
+| `lolbins` | All six LOL/LOFL datasets — Windows/Linux/macOS binaries, cmdlets, MMC snap-ins, WMI classes | `is_lolbas(&str)`, `is_lolbas_windows_cmdlet(&str)`, `is_lolbas_windows_wmi(&str)`, `lolbas_entry(catalog, name)` |
 | `abusable_sites` | LOTS Project + URLhaus — trusted domains abused for C2/phishing/exfil | `is_abusable_site(&str)`, `sites_above_risk(BlockingRisk)` |
 | `processes` | Known malware / masquerade process names | `is_masquerade_target(&str)`, `is_known_malware_process(&str)` |
 | `commands` | Reverse shells, PowerShell abuse, download cradles, WMI abuse | pattern slices, `is_reverse_shell_pattern(&str)` |
@@ -475,6 +480,46 @@ let rs  = CATALOG.record_signatures("userassist_exe");
 
 ---
 
+## `4n6query` CLI
+
+`4n6query` is the DFIR query binary for the forensicnomicon catalog. Install it from `crates/4n6query` (package: `forensicnomicon-cli`):
+
+```
+$ cargo install --path crates/4n6query
+```
+
+Look up any LOL/LOFL binary, cmdlet, MMC snap-in, or WMI class across any supported platform:
+
+```
+$ 4n6query lolbas lookup windows certutil.exe
+FOUND  certutil.exe  [windows]
+       Encode/decode files and download payloads via certificate utility.
+       MITRE: T1218.001, T1105, T1140, T1027
+
+$ 4n6query lolbas lookup windows-cmdlet Invoke-WebRequest
+$ 4n6query lolbas lookup windows-mmc compmgmt.msc
+$ 4n6query lolbas lookup windows-wmi Win32_Process
+$ 4n6query lolbas lookup linux curl
+$ 4n6query lolbas lookup macos osascript
+
+# Machine-readable output
+$ 4n6query lolbas lookup windows certutil.exe --format json
+$ 4n6query lolbas lookup windows-cmdlet iex --format yaml
+
+# Look up an abusable domain
+$ 4n6query sites lookup raw.githubusercontent.com
+$ 4n6query sites lookup api.telegram.org --format json
+
+# Dump entire datasets for SIEM/SOAR integration
+$ 4n6query dump --format json
+$ 4n6query dump --format yaml --dataset lolbas
+$ 4n6query dump --format json --dataset sites
+```
+
+Supported platforms: `windows`, `linux`, `macos`, `windows-cmdlet`, `windows-mmc`, `windows-wmi`.
+
+---
+
 ## `fnomicon` CLI
 
 A companion CLI binary for interactive catalog exploration:
@@ -508,7 +553,7 @@ Individual sources: `--source kape`, `--source fa`, `--source evtx`, `--source v
 |---|---|---|
 | `serde` | off | `Serialize` / `Deserialize` on all public types |
 
-All static indicators and catalog types work without any feature flag. The `serde` feature adds optional serialization at zero runtime cost when unused.
+All static indicators and catalog types work without any feature flag. The `serde` feature adds optional serialization at zero runtime cost when unused. Under this flag, `LolbasEntry` and `AbusableSite` both derive `serde::Serialize`, enabling direct JSON/YAML output as used by `4n6query`.
 
 ---
 

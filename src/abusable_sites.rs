@@ -668,3 +668,92 @@ mod tests {
         }
     }
 }
+
+#[cfg(all(test, feature = "serde"))]
+mod serde_tests {
+    use super::*;
+
+    #[test]
+    fn site_category_serializes_to_snake_case_string() {
+        let json = serde_json::to_string(&SiteCategory::CodeRepository).unwrap();
+        assert_eq!(json, r#""code_repository""#);
+    }
+
+    #[test]
+    fn blocking_risk_serializes_to_snake_case_string() {
+        let json = serde_json::to_string(&BlockingRisk::Critical).unwrap();
+        assert_eq!(json, r#""critical""#);
+    }
+
+    #[test]
+    fn blocking_risk_all_variants_round_trip() {
+        for risk in [
+            BlockingRisk::Low,
+            BlockingRisk::Medium,
+            BlockingRisk::High,
+            BlockingRisk::Critical,
+        ] {
+            let json = serde_json::to_string(&risk).unwrap();
+            let decoded: BlockingRisk = serde_json::from_str(&json).unwrap();
+            assert_eq!(decoded, risk);
+        }
+    }
+
+    #[test]
+    fn site_category_all_variants_round_trip() {
+        for cat in [
+            SiteCategory::CodeRepository,
+            SiteCategory::CloudStorage,
+            SiteCategory::Cdn,
+            SiteCategory::Messaging,
+            SiteCategory::PasteService,
+            SiteCategory::CloudHosting,
+            SiteCategory::Collaboration,
+            SiteCategory::UrlShortener,
+            SiteCategory::DnsService,
+            SiteCategory::Other,
+        ] {
+            let json = serde_json::to_string(&cat).unwrap();
+            let decoded: SiteCategory = serde_json::from_str(&json).unwrap();
+            assert_eq!(decoded, cat);
+        }
+    }
+
+    #[test]
+    fn abusable_site_serializes_domain_field() {
+        let site = abusable_site_info("raw.githubusercontent.com").unwrap();
+        let json = serde_json::to_string(site).unwrap();
+        let v: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert_eq!(v["domain"], "raw.githubusercontent.com");
+    }
+
+    #[test]
+    fn abusable_site_serializes_blocking_risk_field() {
+        let site = abusable_site_info("raw.githubusercontent.com").unwrap();
+        let json = serde_json::to_string(site).unwrap();
+        let v: serde_json::Value = serde_json::from_str(&json).unwrap();
+        // BlockingRisk::Critical → "critical"
+        assert_eq!(v["blocking_risk"], "critical");
+    }
+
+    #[test]
+    fn abusable_site_serializes_mitre_techniques_as_array() {
+        let site = abusable_site_info("raw.githubusercontent.com").unwrap();
+        let json = serde_json::to_string(site).unwrap();
+        let v: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert!(v["mitre_techniques"].is_array());
+        assert!(v["mitre_techniques"]
+            .as_array()
+            .unwrap()
+            .contains(&serde_json::json!("T1102")));
+    }
+
+    #[test]
+    fn full_catalog_serializes_to_json_array() {
+        let json = serde_json::to_string(ABUSABLE_SITES).unwrap();
+        let arr: Vec<serde_json::Value> = serde_json::from_str(&json).unwrap();
+        assert!(arr.len() >= 30, "expected ≥30 sites, got {}", arr.len());
+        assert!(arr.iter().all(|v| v["domain"].is_string()));
+        assert!(arr.iter().all(|v| v["blocking_risk"].is_string()));
+    }
+}

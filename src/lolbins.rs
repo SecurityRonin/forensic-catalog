@@ -376,4 +376,82 @@ mod tests {
     fn empty_string_not_lolbin() {
         assert!(!is_lolbin(""));
     }
+
+    // ── LOLBAS rename + GTFOBins expansion (RED) ─────────────────────────────
+    #[test]
+    fn lolbas_windows_constant_exists() {
+        assert!(!LOLBAS_WINDOWS.is_empty());
+    }
+    #[test]
+    fn lolbas_linux_constant_exists() {
+        assert!(!LOLBAS_LINUX.is_empty());
+    }
+    #[test]
+    fn lolbas_macos_constant_exists() {
+        assert!(!LOLBAS_MACOS.is_empty());
+    }
+    #[test]
+    fn is_lolbas_windows_detects_certutil() {
+        assert!(is_lolbas_windows("certutil.exe"));
+    }
+    #[test]
+    fn is_lolbas_linux_detects_bash() {
+        assert!(is_lolbas_linux("bash"));
+    }
+    #[test]
+    fn is_lolbas_macos_detects_osascript() {
+        assert!(is_lolbas_macos("osascript"));
+    }
+    #[test]
+    fn is_lolbas_detects_windows() {
+        assert!(is_lolbas("certutil.exe"));
+    }
+    #[test]
+    fn is_lolbas_detects_linux() {
+        assert!(is_lolbas("bash"));
+    }
+    #[test]
+    fn is_lolbas_detects_macos() {
+        assert!(is_lolbas("osascript"));
+    }
+    // GTFOBins expansion — entries not in the original 26-entry list
+    #[test]
+    fn lolbas_linux_contains_7z() {
+        assert!(LOLBAS_LINUX.contains(&"7z"));
+    }
+    #[test]
+    fn lolbas_linux_contains_docker() {
+        assert!(LOLBAS_LINUX.contains(&"docker"));
+    }
+    #[test]
+    fn lolbas_linux_contains_sudo() {
+        assert!(LOLBAS_LINUX.contains(&"sudo"));
+    }
+    #[test]
+    fn is_lolbas_linux_detects_docker() {
+        assert!(is_lolbas_linux("docker"));
+    }
+    #[test]
+    fn is_lolbas_linux_detects_pip() {
+        assert!(is_lolbas_linux("pip"));
+    }
+    #[test]
+    fn is_lolbas_linux_detects_kubectl() {
+        assert!(is_lolbas_linux("kubectl"));
+    }
+    #[test]
+    fn is_lolbas_linux_case_insensitive() {
+        assert!(is_lolbas_linux("DOCKER"));
+    }
+    #[test]
+    fn is_lolbas_not_lolbas_grep() {
+        // grep is NOT in GTFOBins — it has no known shell escape or bypass
+        // (the GTFOBins entry exists but only for data extraction, not privilege esc)
+        // Actually grep IS in GTFOBins — adjust this to a truly absent binary
+        assert!(!is_lolbas("notepad.exe"));
+    }
+    #[test]
+    fn empty_string_not_lolbas() {
+        assert!(!is_lolbas(""));
+    }
 }

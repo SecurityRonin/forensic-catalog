@@ -13,9 +13,9 @@ use forensicnomicon::abusable_sites::{
     abusable_site_info, BlockingRisk, SiteCategory, ABUSABLE_SITES,
 };
 use forensicnomicon::lolbins::{
-    is_lolbas_linux, is_lolbas_macos, is_lolbas_windows, is_lofl_windows_cmdlet,
+    is_lolbas_linux, is_lolbas_macos, is_lolbas_windows, is_lolbas_windows_cmdlet,
     is_lofl_windows_mmc, is_lofl_windows_wmi, LOLBAS_LINUX, LOLBAS_MACOS, LOLBAS_WINDOWS,
-    LOFL_WINDOWS_CMDLETS, LOFL_WINDOWS_MMC, LOFL_WINDOWS_WMI,
+    LOLBAS_WINDOWS_CMDLETS, LOFL_WINDOWS_MMC, LOFL_WINDOWS_WMI,
 };
 use std::process;
 
@@ -144,7 +144,7 @@ fn lolbas_lookup(name: &str, platform: Platform, format: Option<Format>) -> i32 
         Platform::Windows => (LOLBAS_WINDOWS, is_lolbas_windows),
         Platform::Linux => (LOLBAS_LINUX, is_lolbas_linux),
         Platform::Macos => (LOLBAS_MACOS, is_lolbas_macos),
-        Platform::WindowsCmdlet => (LOFL_WINDOWS_CMDLETS, is_lofl_windows_cmdlet),
+        Platform::WindowsCmdlet => (LOLBAS_WINDOWS_CMDLETS, is_lolbas_windows_cmdlet),
         Platform::WindowsMmc => (LOFL_WINDOWS_MMC, is_lofl_windows_mmc),
         Platform::WindowsWmi => (LOFL_WINDOWS_WMI, is_lofl_windows_wmi),
     };
@@ -311,15 +311,15 @@ fn run_dump(format: Format, dataset: Dataset) -> i32 {
             serde_json::to_value(LOLBAS_MACOS).unwrap(),
         );
         obj.insert(
-            "lofl_windows_cmdlets".into(),
-            serde_json::to_value(LOFL_WINDOWS_CMDLETS).unwrap(),
+            "lolbas_windows_cmdlets".into(),
+            serde_json::to_value(LOLBAS_WINDOWS_CMDLETS).unwrap(),
         );
         obj.insert(
-            "lofl_windows_mmc".into(),
+            "lolbas_windows_mmc".into(),
             serde_json::to_value(LOFL_WINDOWS_MMC).unwrap(),
         );
         obj.insert(
-            "lofl_windows_wmi".into(),
+            "lolbas_windows_wmi".into(),
             serde_json::to_value(LOFL_WINDOWS_WMI).unwrap(),
         );
     }

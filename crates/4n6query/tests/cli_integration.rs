@@ -203,9 +203,9 @@ fn dump_json_has_all_six_lolbas_keys() {
         "lolbas_windows",
         "lolbas_linux",
         "lolbas_macos",
-        "lofl_windows_cmdlets",
-        "lofl_windows_mmc",
-        "lofl_windows_wmi",
+        "lolbas_windows_cmdlets",
+        "lolbas_windows_mmc",
+        "lolbas_windows_wmi",
     ] {
         assert!(v[key].is_array(), "missing key: {key}");
         assert!(

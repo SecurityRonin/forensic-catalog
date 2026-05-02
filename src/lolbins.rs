@@ -26,7 +26,7 @@
 //! | [`LOLBAS_WINDOWS`] | Process name (`.exe`), script (`.vbs`/`.cmd`) | Prefetch, Sysmon, EDR process telemetry |
 //! | [`LOLBAS_LINUX`] | Process name (no extension) | auditd `execve`, eBPF, EDR |
 //! | [`LOLBAS_MACOS`] | Process name (no extension) | macOS ESF / Endpoint Security, audit.log |
-//! | [`LOFL_WINDOWS_CMDLETS`] | PowerShell cmdlet name | ScriptBlock log (Event 4104), PSReadLine history |
+//! | [`LOLBAS_WINDOWS_CMDLETS`] | PowerShell cmdlet name or alias | ScriptBlock log (Event 4104), PSReadLine history, AMSI |
 //! | [`LOFL_WINDOWS_MMC`] | `.msc` filename | LNK files, UserAssist MRU, Jump Lists |
 //! | [`LOFL_WINDOWS_WMI`] | WMI class name | WMI Activity log (Event 5861), `Get-CimInstance` |
 //!
@@ -46,13 +46,13 @@
 //!
 //! ```rust
 //! use forensicnomicon::lolbins::{is_lolbas, is_lolbas_windows, is_lolbas_macos};
-//! use forensicnomicon::lolbins::{is_lofl_windows_cmdlet, is_lofl_windows_wmi};
+//! use forensicnomicon::lolbins::{is_lolbas_windows_cmdlet, is_lofl_windows_wmi};
 //!
 //! assert!(is_lolbas("certutil.exe"));        // Windows LOLBAS
 //! assert!(is_lolbas("bash"));                // Linux GTFOBins
 //! assert!(is_lolbas("osascript"));           // macOS LOOBins
 //! assert!(is_lolbas("kubectl"));             // macOS LOFL (also Linux GTFOBins)
-//! assert!(is_lofl_windows_cmdlet("Invoke-Command")); // PowerShell LOFL
+//! assert!(is_lolbas_windows_cmdlet("Invoke-Command")); // PowerShell LOFL
 //! assert!(is_lofl_windows_wmi("Win32_Process"));     // WMI LOFL
 //! ```
 //!
@@ -964,12 +964,38 @@ pub fn is_lolbas(name: &str) -> bool {
     is_lolbas_windows(name) || is_lolbas_linux(name) || is_lolbas_macos(name)
 }
 
-/// Windows LOFL PowerShell cmdlets — abusable built-in and AD module cmdlets.
+/// Windows PowerShell indicators — native LOL cmdlets, built-in aliases, and
+/// LOFL remote-administration module cmdlets — unified into one catalog.
 ///
-/// These appear in PSReadLine history, PowerShell ScriptBlock logs (Event 4104),
-/// and transcription logs — not in process telemetry. Sourced from the LOFL Project:
-/// <https://lofl-project.github.io/>
-pub const LOFL_WINDOWS_CMDLETS: &[&str] = &[
+/// ## Why unified?
+///
+/// From a detection standpoint the distinction between LOL (native PowerShell
+/// cmdlets that ship with Windows) and LOFL (third-party admin module cmdlets
+/// such as RSAT or Active Directory module) is **academic**: PSReadLine history,
+/// PowerShell ScriptBlock logs (Event 4104), AMSI telemetry, and transcription
+/// logs capture all forms identically. A SIEM rule scanning PSReadLine for
+/// `Invoke-WebRequest` must also catch `iwr` and `wget` (PS 5.x alias).
+///
+/// ## Coverage
+///
+/// | Section | Count | Source |
+/// |---------|-------|--------|
+/// | LOFL admin module cmdlets | 176 | LOFL Project — <https://lofl-project.github.io/> |
+/// | Native PS attack cmdlets | ~50 | MITRE ATT&CK T1059.001 — <https://attack.mitre.org/techniques/T1059/001/> |
+/// | Built-in PS aliases | ~45 | PowerShell InitialSessionState — <https://github.com/PowerShell/PowerShell/blob/master/src/System.Management.Automation/engine/InitialSessionState.cs> |
+///
+/// ## Artifact types
+///
+/// - PSReadLine history (`%APPDATA%\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt`)
+/// - PowerShell ScriptBlock log (Event 4104 in Microsoft-Windows-PowerShell/Operational)
+/// - PowerShell transcription logs
+/// - AMSI provider telemetry
+pub const LOLBAS_WINDOWS_CMDLETS: &[&str] = &[
+    // ── LOFL Project admin module cmdlets ───────────────────────────────────
+    // Source: LOFL Project <https://lofl-project.github.io/>
+    // Third-party admin tools (RSAT, AD, DNS, BitLocker, etc.) that are
+    // universally deployed in enterprise environments, making them indistinguishable
+    // from legitimate admin activity — the LOFL evasion mechanism.
     "Add-ADGroupMember",
     "Add-DnsClientNrptRule",
     "Add-EtwTraceProvider",
@@ -1169,6 +1195,166 @@ pub const LOFL_WINDOWS_CMDLETS: &[&str] = &[
     "Unlock-ADAccount",
     "Unregister-ScheduledTask",
     "Write-EventLog",
+    // ── Native PowerShell attack cmdlets (LOL) ───────────────────────────────
+    // These cmdlets ship with Windows/PowerShell itself (not a third-party module).
+    // They appear in every PS installation and are universally abused for
+    // download-and-execute, reflective loading, persistence, and credential theft.
+    //
+    // Sources:
+    // - MITRE ATT&CK T1059.001 — PowerShell: <https://attack.mitre.org/techniques/T1059/001/>
+    // - Atomic Red Team T1059.001: <https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1059.001/T1059.001.md>
+    // - Red Canary Threat Detection Report — "Misbehaving Binaries: LOLbins in the Wild":
+    //   <https://redcanary.com/blog/blog/lolbins-abuse/>
+    // - MITRE ATT&CK T1620 (Reflective Code Loading): <https://attack.mitre.org/techniques/T1620/>
+    // - MITRE ATT&CK T1197 (BITS Jobs): <https://attack.mitre.org/techniques/T1197/>
+    // - MITRE ATT&CK T1546 (Event Triggered Execution): <https://attack.mitre.org/techniques/T1546/>
+    // - MITRE ATT&CK T1115 (Clipboard Data): <https://attack.mitre.org/techniques/T1115/>
+    // - MITRE ATT&CK T1560 (Archive Collected Data): <https://attack.mitre.org/techniques/T1560/>
+    //
+    // ── Execution ────────────────────────────────────────────────────────────
+    "Invoke-Expression",        // execute arbitrary string as code (T1059.001); alias: iex
+    "Invoke-WebRequest",        // HTTP/S download (T1059.001, T1105); aliases: iwr, wget, curl (PS5)
+    "Invoke-RestMethod",        // REST C2 and downloads (T1059.001, T1071.001); alias: irm
+    "Invoke-Item",              // execute file via shell association (T1204.002); alias: ii
+    "Start-Process",            // process execution with hidden window (T1059.001); aliases: saps, start
+    "New-Object",               // instantiate Net.WebClient, COM shell, ADODB.Stream (T1059.001)
+    "Add-Type",                 // compile and load C#/VB.NET inline — reflective loading (T1620)
+    "Start-Job",                // background execution to avoid blocking (T1059.001); alias: sajb
+    "Import-Module",            // load PS modules and attack toolkits (T1059.001); alias: ipmo
+    "Install-Module",           // download modules from PSGallery — supply chain (T1059.001)
+    //
+    // ── Defense evasion ──────────────────────────────────────────────────────
+    "Set-ExecutionPolicy",      // bypass script execution restrictions (T1059.001)
+    "Unblock-File",             // remove Zone.Identifier ADS — bypass MotW (T1553.005)
+    "Set-MpPreference",         // configure Defender exclusions (T1562.001)
+    "Remove-MpPreference",      // remove Defender settings — weaken defenses (T1562.001)
+    "Mount-DiskImage",          // mount ISO/VHD — bypass MotW (T1553.005)
+    "Dismount-DiskImage",       // cleanup after payload extraction (T1070.004)
+    //
+    // ── Persistence ──────────────────────────────────────────────────────────
+    "Register-ObjectEvent",     // subscribe to .NET events for triggered execution (T1546)
+    "Register-WmiEvent",        // WMI event subscription persistence (T1546.003)
+    "Set-ItemProperty",         // write registry keys — Run key persistence (T1547.001)
+    "New-ItemProperty",         // create new registry values (T1547.001)
+    "New-Service",              // create a Windows service for persistence (T1543.003)
+    "Set-Service",              // modify existing service config (T1543.003)
+    "Enable-PSRemoting",        // enable WinRM remoting on target (T1021.006)
+    //
+    // ── Discovery / reconnaissance ────────────────────────────────────────────
+    "Get-Process",              // enumerate running processes (T1057); aliases: gps, ps
+    "Get-Service",              // enumerate services including security products (T1007); alias: gsv
+    "Get-ChildItem",            // directory/file enumeration (T1083); aliases: gci, ls, dir
+    "Get-ItemProperty",         // read registry values (T1012); alias: gp
+    "Get-WmiObject",            // WMI queries for system info (T1047); alias: gwmi (PS5 only)
+    "Get-CimInstance",          // modern CIM queries (T1047)
+    "Get-WinEvent",             // read event logs (T1654)
+    "Get-HotFix",               // enumerate installed patches (T1518)
+    "Get-NetTCPConnection",     // enumerate active TCP connections (T1049)
+    "Get-NetIPAddress",         // enumerate IP addresses (T1016)
+    "Get-NetAdapter",           // enumerate network adapters (T1016)
+    "Get-LocalUser",            // enumerate local user accounts (T1087.001)
+    "Get-LocalGroup",           // enumerate local groups (T1069.001)
+    "Get-LocalGroupMember",     // enumerate group membership (T1069.001)
+    "Get-ComputerInfo",         // full system fingerprint (T1082)
+    "Get-SmbShare",             // enumerate network shares (T1135)
+    "Test-Connection",          // ICMP ping sweep — host discovery (T1018)
+    "Test-NetConnection",       // TCP port scan and traceroute (T1046)
+    "Resolve-DnsName",          // DNS lookups — infrastructure mapping (T1018)
+    "Test-Path",                // check file/registry existence (T1083)
+    //
+    // ── Collection ───────────────────────────────────────────────────────────
+    "Get-Clipboard",            // steal clipboard contents (T1115)
+    "Set-Clipboard",            // paste payload into victim clipboard
+    "Compress-Archive",         // zip files for staging before exfil (T1560.001)
+    "Expand-Archive",           // extract delivered payloads from archives
+    "Get-Content",              // read file contents — credential files (T1005); aliases: gc, cat, type
+    "Select-String",            // regex search in files — grep for passwords (T1552.001); alias: sls
+    "Out-File",                 // write output to file — stage data (T1074.001)
+    "Set-Content",              // write file contents — payload drop; alias: sc (PS5)
+    "Add-Content",              // append to files — payload building; alias: ac
+    "Copy-Item",                // copy files — staging for exfil (T1074.001); aliases: cp, cpi, copy
+    "Move-Item",                // move files — staging and cleanup; aliases: mv, mi, move
+    "Remove-Item",              // delete files — anti-forensics (T1070.004); aliases: rm, ri, del, erase, rd, rmdir
+    "Clear-EventLog",           // wipe Windows event logs (T1070.001)
+    //
+    // ── Credential access ─────────────────────────────────────────────────────
+    "ConvertTo-SecureString",   // handle credential objects (T1003)
+    "ConvertFrom-SecureString", // extract plaintext from secure strings (T1003)
+    "Get-Credential",           // prompt user for credentials (T1056.002)
+    "Export-Clixml",            // serialize credentials to XML (T1003)
+    "Import-Clixml",            // deserialize saved credentials (T1003)
+    //
+    // ── Remoting / lateral movement ───────────────────────────────────────────
+    "Enter-PSSession",          // interactive PS remote session (T1021.006); alias: etsn
+    "New-PSSession",            // create persistent remote PS session (T1021.006); alias: nsn
+    "Invoke-WmiMethod",         // remote WMI method execution (T1047); alias: iwmi (PS5)
+    //
+    // ── Network ───────────────────────────────────────────────────────────────
+    "Start-BitsTransfer",       // BITS job for stealthy download/upload (T1197)
+    "New-NetFirewallRule",      // create firewall rule — open ports for C2 (T1562.004)
+    "Disable-NetFirewallRule",  // disable firewall rules (T1562.004)
+    //
+    // ── Built-in PowerShell aliases (LOL) ─────────────────────────────────────
+    // Sourced from PowerShell InitialSessionState (canonical):
+    // <https://github.com/PowerShell/PowerShell/blob/master/src/System.Management.Automation/engine/InitialSessionState.cs>
+    // Detection: PSReadLine history and AMSI capture the alias before resolution.
+    // ScriptBlock logging (Event 4104) may or may not resolve aliases.
+    //
+    // Execution
+    "iex",      // Invoke-Expression — canonical download-and-execute alias (PS5+PS7)
+    "iwr",      // Invoke-WebRequest (PS5+PS7)
+    "irm",      // Invoke-RestMethod (PS5+PS7)
+    "icm",      // Invoke-Command (PS5+PS7)
+    "ii",       // Invoke-Item (PS5+PS7)
+    "saps",     // Start-Process (PS5+PS7)
+    "start",    // Start-Process (PS5+PS7)
+    "ipmo",     // Import-Module (PS5+PS7)
+    "sajb",     // Start-Job (PS5+PS7)
+    // WMI aliases — PS 5.1 only (removed in PS 7)
+    "gwmi",     // Get-WmiObject — extremely common in attack telemetry
+    "iwmi",     // Invoke-WMIMethod
+    // Discovery
+    "gci",      // Get-ChildItem (PS5+PS7)
+    "ls",       // Get-ChildItem (PS5+PS7)
+    "dir",      // Get-ChildItem (PS5+PS7)
+    "gps",      // Get-Process (PS5+PS7)
+    "ps",       // Get-Process (PS5+PS7)
+    "gsv",      // Get-Service (PS5+PS7)
+    // Collection
+    "gc",       // Get-Content (PS5+PS7)
+    "cat",      // Get-Content (PS5+PS7)
+    "type",     // Get-Content (PS5+PS7)
+    "sls",      // Select-String (PS5+PS7)
+    "gp",       // Get-ItemProperty (PS5+PS7)
+    // File manipulation
+    "cp",       // Copy-Item (PS5+PS7)
+    "cpi",      // Copy-Item (PS5+PS7)
+    "copy",     // Copy-Item (PS5+PS7)
+    "mv",       // Move-Item (PS5+PS7)
+    "mi",       // Move-Item (PS5+PS7)
+    "move",     // Move-Item (PS5+PS7)
+    "rm",       // Remove-Item (PS5+PS7)
+    "ri",       // Remove-Item (PS5+PS7)
+    "del",      // Remove-Item (PS5+PS7)
+    "erase",    // Remove-Item (PS5+PS7)
+    "rd",       // Remove-Item (PS5+PS7)
+    "rmdir",    // Remove-Item (PS5+PS7)
+    "ni",       // New-Item (PS5+PS7)
+    "ac",       // Add-Content (PS5+PS7)
+    "sc",       // Set-Content (PS5 only — conflicts with sc.exe Service Control)
+    "si",       // Set-Item (PS5+PS7)
+    "sp",       // Set-ItemProperty (PS5+PS7)
+    // Process/service
+    "spps",     // Stop-Process (PS5+PS7)
+    "kill",     // Stop-Process (PS5+PS7) — used to terminate AV/EDR processes
+    "sasv",     // Start-Service (PS5+PS7)
+    "spsv",     // Stop-Service (PS5+PS7)
+    // Remoting session
+    "etsn",     // Enter-PSSession (PS5+PS7)
+    "nsn",      // New-PSSession (PS5+PS7)
+    // PS 5.x aliases that shadow Unix commands — evasion via ambiguity
+    "wget",     // Invoke-WebRequest (PS5.x only — removed in PS7)
+    "curl",     // Invoke-WebRequest (PS5.x only — removed in PS7 to avoid shadowing /usr/bin/curl)
 ];
 
 /// Windows LOFL MMC snap-ins (`.msc` files).
@@ -1269,14 +1455,16 @@ pub const LOFL_WINDOWS_WMI: &[&str] = &[
     "Win32_SystemDriver",
 ];
 
-/// Returns `true` if `name` matches a known Windows LOFL PowerShell cmdlet
-/// (case-insensitive). Check against PSReadLine history and Event 4104 logs.
-pub fn is_lofl_windows_cmdlet(name: &str) -> bool {
+/// Returns `true` if `name` matches a known Windows PowerShell cmdlet or alias
+/// in the unified catalog (native PS attack cmdlets + PS aliases + LOFL admin cmdlets).
+/// Case-insensitive. Check against PSReadLine history, AMSI, and Event 4104 logs.
+pub fn is_lolbas_windows_cmdlet(name: &str) -> bool {
     let lower = name.to_ascii_lowercase();
-    LOFL_WINDOWS_CMDLETS
+    LOLBAS_WINDOWS_CMDLETS
         .iter()
         .any(|c| c.to_ascii_lowercase() == lower)
 }
+
 
 /// Returns `true` if `name` matches a known Windows LOFL MMC snap-in
 /// (case-insensitive, `.msc` suffix required). Check against LNK files,
@@ -1662,31 +1850,6 @@ mod tests {
     fn is_lolbas_windows_detects_psexec_uppercase() {
         assert!(is_lolbas_windows("PSEXEC.EXE"));
     }
-    // LOFL_WINDOWS_CMDLETS
-    #[test]
-    fn lofl_windows_cmdlets_exists() {
-        assert!(!LOFL_WINDOWS_CMDLETS.is_empty());
-    }
-    #[test]
-    fn lofl_windows_cmdlets_contains_invoke_command() {
-        assert!(LOFL_WINDOWS_CMDLETS.contains(&"Invoke-Command"));
-    }
-    #[test]
-    fn lofl_windows_cmdlets_contains_get_aduser() {
-        assert!(LOFL_WINDOWS_CMDLETS.contains(&"Get-ADUser"));
-    }
-    #[test]
-    fn is_lofl_windows_cmdlet_detects_invoke_command() {
-        assert!(is_lofl_windows_cmdlet("Invoke-Command"));
-    }
-    #[test]
-    fn is_lofl_windows_cmdlet_case_insensitive() {
-        assert!(is_lofl_windows_cmdlet("invoke-command"));
-    }
-    #[test]
-    fn is_lofl_windows_cmdlet_rejects_unknown() {
-        assert!(!is_lofl_windows_cmdlet("Write-FakeOutput"));
-    }
     // LOFL_WINDOWS_MMC
     #[test]
     fn lofl_windows_mmc_exists() {
@@ -1834,12 +1997,5 @@ mod tests {
     #[test]
     fn is_lolbas_windows_cmdlet_rejects_unknown() {
         assert!(!is_lolbas_windows_cmdlet("NotARealCmdlet-XYZ"));
-    }
-    // Deprecated LOFL_WINDOWS_CMDLETS still points to LOLBAS_WINDOWS_CMDLETS
-    #[test]
-    #[allow(deprecated)]
-    fn lofl_windows_cmdlets_deprecated_alias_still_works() {
-        assert!(LOFL_WINDOWS_CMDLETS.contains(&"Get-ADUser"));
-        assert!(is_lofl_windows_cmdlet("Get-ADUser"));
     }
 }

@@ -14,7 +14,7 @@
       <!-- DFIR community resource hub — tool lists, blog directory, training links -->
       <outline type="rss" text="DFIR Diva" title="DFIR Diva" xmlUrl="https://dfirdiva.com/feed" htmlUrl="https://dfirdiva.com/"/>
       <!-- David Cowen — digital forensics deep dives, Sunday Funday challenges, artifact research -->
-      <outline type="rss" text="Digital Forensics Stream" title="Digital Forensics Stream" xmlUrl="https://df-stream.com/feed/" htmlUrl="https://df-stream.com/"/>
+      <!-- df-stream.com removed 2026-05-04: SSL EOF error on all endpoints; certificate issue or site down -->
       <!-- Sarah Edwards — macOS forensics; Apple Silicon artifacts, iOS/macOS artifact walkthrough -->
       <outline type="rss" text="mac4n6" title="mac4n6" xmlUrl="https://www.mac4n6.com/blog?format=rss" htmlUrl="https://www.mac4n6.com/"/>
       <!-- Eric Zimmerman — EZ tools author; Windows artifact deep dives (ShimCache, Registry, MFT) -->
@@ -31,8 +31,7 @@
       <outline type="rss" text="DoubleBlak" title="DoubleBlak" xmlUrl="https://www.doubleblak.com/blogRSS.xml" htmlUrl="https://www.doubleblak.com/"/>
       <!-- Windows forensics, CTF writeups, artifact deep dives -->
       <outline type="rss" text="The Binary Hick" title="The Binary Hick" xmlUrl="https://thebinaryhick.blog/feed/" htmlUrl="https://thebinaryhick.blog/"/>
-      <!-- Windows registry forensics, artifact analysis, incident response techniques -->
-      <outline type="rss" text="forensicmike1" title="forensicmike1" xmlUrl="https://forensicmike1.com/feed/" htmlUrl="https://forensicmike1.com/"/>
+      <!-- forensicmike1.com removed 2026-05-04: /feed/ returns 404 to urllib (Python) and HTML to browsers; no working RSS -->
       <!-- David Cowen — Sunday Funday artifact challenges; HECF live stream content -->
       <outline type="rss" text="HECF / Hacking Exposed Computer Forensics Blog" title="HECF / Hacking Exposed Computer Forensics Blog" xmlUrl="https://www.hecfblog.com/feeds/posts/default" htmlUrl="https://www.hecfblog.com/"/>
       <!-- Lesley Carhart (hacks4pancakes) — incident response, ICS/OT forensics, threat hunting -->

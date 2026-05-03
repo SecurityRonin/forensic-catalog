@@ -153,7 +153,7 @@ def iter_feed_outlines(opml_path: str) -> Iterable[dict[str, str]]:
         kind = outline.attrib.get("type", "rss").lower()
         xml_url = outline.attrib.get("xmlUrl", "")
         html_url = outline.attrib.get("htmlUrl", "")
-        title = outline.attrib.get("title") or outline.attrib.get("text") or xml_url or html_url
+        title = outline.attrib.get("text") or outline.attrib.get("title") or xml_url or html_url
 
         if kind == "web":
             # HTML page monitor — no RSS feed; monitor the page directly

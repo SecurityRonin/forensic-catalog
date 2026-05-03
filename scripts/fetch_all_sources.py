@@ -747,7 +747,7 @@ def read_opml(opml_path: str) -> list[dict]:
     for outline in root.iter("outline"):
         if outline.get("type") == "rss":
             sources.append({
-                "title": outline.get("title", outline.get("text", "")),
+                "title": outline.get("text", outline.get("title", "")),
                 "xml_url": outline.get("xmlUrl", ""),
                 "html_url": outline.get("htmlUrl", ""),
             })

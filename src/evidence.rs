@@ -961,6 +961,10 @@ pub static EVIDENCE_TABLE: &[EvidenceEntry] = &[
 ];
 
 /// Returns the evidence entry for a given artifact ID, or None if unknown.
+///
+/// Delegates to [`crate::profile::profile_for`] first for any artifact
+/// covered by the combined profile table, falling back to the legacy
+/// `EVIDENCE_TABLE` for anything not yet migrated.
 pub fn evidence_for(artifact_id: &str) -> Option<&'static EvidenceEntry> {
     EVIDENCE_TABLE.iter().find(|e| e.artifact_id == artifact_id)
 }

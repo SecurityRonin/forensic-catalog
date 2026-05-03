@@ -122,6 +122,7 @@ pub mod antiforensics;
 pub mod antiforensics_aware;
 pub mod attack_flow;
 pub mod catalog;
+pub mod profile;
 pub mod chainsaw;
 pub mod dependencies;
 pub mod eventids;

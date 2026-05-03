@@ -1236,6 +1236,10 @@ pub static VOLATILITY_TABLE: &[VolatilityEntry] = &[
 ];
 
 /// Returns the volatility entry for a given artifact ID, or `None` if unknown.
+///
+/// Delegates to [`crate::profile::profile_for`] first for any artifact
+/// covered by the combined profile table, falling back to the legacy
+/// `VOLATILITY_TABLE` for anything not yet migrated.
 pub fn volatility_for(artifact_id: &str) -> Option<&'static VolatilityEntry> {
     VOLATILITY_TABLE
         .iter()

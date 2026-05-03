@@ -38,10 +38,12 @@ import json
 import os
 import re
 import sys
+import time
 import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
+from typing import Callable
 
 
 def _load_dotenv(path: str = ".env") -> None:
@@ -233,6 +235,63 @@ def _parse_atom_date(entry: ET.Element, ns: str) -> str:
 # ─── dedup / seen-URL loading ──────────────────────────────────────────────────
 
 _PENDING_URL_RE = re.compile(r"^\- \[[^\]]*\] \[[^\]]*\]\(([^)]+)\)")
+
+
+def locked_write(path: str, transform_fn: Callable[[str], str]) -> None:
+    """
+    Read-modify-write `path` under an exclusive lockfile, cross-platform.
+
+    Uses `path + ".lock"` as the lock. The lockfile contains the writer's PID
+    so stale locks from crashed processes are detected and stolen.
+
+    transform_fn receives the current file content (empty string if file does
+    not exist) and returns the new content to write.
+    """
+    lock_path = path + ".lock"
+
+    # Acquire lock — spin with 0.1s sleep until we own it or steal a dead one
+    while True:
+        try:
+            fd = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            os.write(fd, str(os.getpid()).encode())
+            os.close(fd)
+            break  # we own the lock
+        except FileExistsError:
+            # Check if the locking PID is still alive
+            try:
+                with open(lock_path) as lf:
+                    pid_str = lf.read().strip()
+                pid = int(pid_str)
+                # os.kill(pid, 0) raises OSError if process doesn't exist
+                os.kill(pid, 0)
+                time.sleep(0.1)  # process alive — wait
+            except (OSError, ValueError):
+                # Dead PID or unreadable lockfile — steal it
+                try:
+                    os.remove(lock_path)
+                except OSError:
+                    pass
+
+    try:
+        # Read current content
+        try:
+            with open(path) as f:
+                content = f.read()
+        except OSError:
+            content = ""
+
+        new_content = transform_fn(content)
+
+        # Atomic write via temp file + rename
+        tmp_path = path + ".tmp"
+        with open(tmp_path, "w") as f:
+            f.write(new_content)
+        os.replace(tmp_path, path)
+    finally:
+        try:
+            os.remove(lock_path)
+        except OSError:
+            pass
 
 
 def load_seen_urls(pending_path: str) -> set[str]:
@@ -630,21 +689,20 @@ def rescan_reviewed_entries(pending_path: str) -> int:
     reviewed_re = re.compile(r"^- \[x\] (.*)")
     requeued = 0
 
-    with open(pending_path) as f:
-        lines = f.readlines()
+    def _transform(content: str) -> str:
+        nonlocal requeued
+        requeued = 0
+        new_lines = []
+        for line in content.splitlines(keepends=True):
+            m = reviewed_re.match(line)
+            if m:
+                new_lines.append(f"- [ ] {m.group(1)}\n")
+                requeued += 1
+            else:
+                new_lines.append(line)
+        return "".join(new_lines)
 
-    new_lines = []
-    for line in lines:
-        m = reviewed_re.match(line)
-        if m:
-            new_lines.append(f"- [ ] {m.group(1)}\n")
-            requeued += 1
-        else:
-            new_lines.append(line)
-
-    with open(pending_path, "w") as f:
-        f.writelines(new_lines)
-
+    locked_write(pending_path, _transform)
     return requeued
 
 
@@ -685,8 +743,8 @@ def append_to_pending(
 
     if lines:
         os.makedirs(os.path.dirname(os.path.abspath(pending_path)), exist_ok=True)
-        with open(pending_path, "a") as f:
-            f.writelines(lines)
+        block = "".join(lines)
+        locked_write(pending_path, lambda c: c + block)
 
     return appended, broken
 

@@ -152,7 +152,10 @@ mod profile_tests {
     fn profile_for_mft_has_both_dimensions() {
         // profile_for doesn't exist yet — this test should fail to compile
         let p = crate::profile::profile_for("mft").expect("mft must have a profile");
-        assert_eq!(p.evidence_strength, crate::evidence::EvidenceStrength::Definitive);
+        assert_eq!(
+            p.evidence_strength,
+            crate::evidence::EvidenceStrength::Definitive
+        );
         assert_eq!(p.volatility, crate::volatility::VolatilityClass::Persistent);
         assert!(!p.evidence_caveats.is_empty());
         assert!(!p.volatility_rationale.is_empty());

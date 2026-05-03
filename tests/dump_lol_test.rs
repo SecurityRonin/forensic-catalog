@@ -62,10 +62,7 @@ fn dump_lol_all_json_has_required_keys() {
         "abusable_sites",
     ];
     for key in required_keys {
-        assert!(
-            obj.contains_key(key),
-            "data/all.json is missing key: {key}"
-        );
+        assert!(obj.contains_key(key), "data/all.json is missing key: {key}");
     }
 }
 
@@ -75,11 +72,15 @@ fn dump_lol_lolbas_windows_json_is_nonempty_array() {
     let path = workspace_root().join("data/lolbas_windows.json");
     assert!(path.exists(), "data/lolbas_windows.json does not exist");
 
-    let content =
-        std::fs::read_to_string(&path).expect("cannot read data/lolbas_windows.json");
+    let content = std::fs::read_to_string(&path).expect("cannot read data/lolbas_windows.json");
     let value: serde_json::Value = serde_json::from_str(&content).unwrap();
-    let arr = value.as_array().expect("lolbas_windows.json must be a JSON array");
-    assert!(!arr.is_empty(), "lolbas_windows.json array must not be empty");
+    let arr = value
+        .as_array()
+        .expect("lolbas_windows.json must be a JSON array");
+    assert!(
+        !arr.is_empty(),
+        "lolbas_windows.json array must not be empty"
+    );
 }
 
 #[test]

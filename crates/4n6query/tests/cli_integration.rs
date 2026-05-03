@@ -89,10 +89,9 @@ fn query_macos_binary_osascript_exits_zero() {
 
 #[test]
 fn query_cmdlet_invoke_command_exits_zero() {
-    q().arg("Invoke-Command")
-        .assert()
-        .success()
-        .stdout(predicate::str::contains("Invoke-Command").or(predicate::str::contains("invoke-command")));
+    q().arg("Invoke-Command").assert().success().stdout(
+        predicate::str::contains("Invoke-Command").or(predicate::str::contains("invoke-command")),
+    );
 }
 
 #[test]
@@ -131,8 +130,8 @@ fn query_certutil_json_is_valid() {
         .get_output()
         .stdout
         .clone();
-    let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&out).unwrap())
-        .expect("output is not valid JSON");
+    let v: serde_json::Value =
+        serde_json::from_str(std::str::from_utf8(&out).unwrap()).expect("output is not valid JSON");
     // Top-level must be an object with at least one category key
     assert!(v.is_object(), "expected JSON object");
     assert!(
@@ -150,8 +149,7 @@ fn query_certutil_json_lolbas_array_has_platform_field() {
         .get_output()
         .stdout
         .clone();
-    let v: serde_json::Value =
-        serde_json::from_str(std::str::from_utf8(&out).unwrap()).unwrap();
+    let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&out).unwrap()).unwrap();
     let lolbas = v["lolbas"].as_array().expect("missing lolbas array");
     assert!(!lolbas.is_empty());
     assert!(lolbas[0]["platform"].is_string());
@@ -188,8 +186,7 @@ fn query_github_raw_site_json() {
         .get_output()
         .stdout
         .clone();
-    let v: serde_json::Value =
-        serde_json::from_str(std::str::from_utf8(&out).unwrap()).unwrap();
+    let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&out).unwrap()).unwrap();
     let sites = v["sites"].as_array().expect("missing sites array");
     assert!(!sites.is_empty());
     assert_eq!(sites[0]["domain"], "raw.githubusercontent.com");
@@ -238,8 +235,7 @@ fn query_artifact_json_has_artifacts_array() {
         .get_output()
         .stdout
         .clone();
-    let v: serde_json::Value =
-        serde_json::from_str(std::str::from_utf8(&out).unwrap()).unwrap();
+    let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&out).unwrap()).unwrap();
     let artifacts = v["artifacts"].as_array().expect("missing artifacts array");
     assert!(!artifacts.is_empty());
     assert!(artifacts[0]["id"].is_string());
@@ -265,8 +261,7 @@ fn query_mitre_technique_json_has_artifacts() {
         .get_output()
         .stdout
         .clone();
-    let v: serde_json::Value =
-        serde_json::from_str(std::str::from_utf8(&out).unwrap()).unwrap();
+    let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&out).unwrap()).unwrap();
     let artifacts = v["artifacts"].as_array().expect("missing artifacts array");
     assert!(!artifacts.is_empty());
 }
@@ -302,8 +297,7 @@ fn triage_json_first_entry_is_critical() {
         .get_output()
         .stdout
         .clone();
-    let v: serde_json::Value =
-        serde_json::from_str(std::str::from_utf8(&out).unwrap()).unwrap();
+    let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&out).unwrap()).unwrap();
     let artifacts = v["artifacts"].as_array().expect("missing artifacts array");
     assert!(!artifacts.is_empty());
     assert_eq!(artifacts[0]["triage_priority"], "critical");
@@ -327,8 +321,7 @@ fn dump_json_has_all_expected_keys() {
         .get_output()
         .stdout
         .clone();
-    let v: serde_json::Value =
-        serde_json::from_str(std::str::from_utf8(&out).unwrap()).unwrap();
+    let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&out).unwrap()).unwrap();
     for key in &[
         "lolbas_windows",
         "lolbas_linux",
@@ -360,8 +353,7 @@ fn dump_dataset_lolbas_excludes_sites_and_catalog() {
         .get_output()
         .stdout
         .clone();
-    let v: serde_json::Value =
-        serde_json::from_str(std::str::from_utf8(&out).unwrap()).unwrap();
+    let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&out).unwrap()).unwrap();
     assert!(v["lolbas_windows"].is_array());
     assert!(v.get("abusable_sites").is_none());
     assert!(v.get("catalog").is_none());
@@ -376,8 +368,7 @@ fn dump_dataset_sites_excludes_lolbas() {
         .get_output()
         .stdout
         .clone();
-    let v: serde_json::Value =
-        serde_json::from_str(std::str::from_utf8(&out).unwrap()).unwrap();
+    let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&out).unwrap()).unwrap();
     assert!(v["abusable_sites"].is_array());
     assert!(v.get("lolbas_windows").is_none());
 }
@@ -391,8 +382,7 @@ fn dump_dataset_catalog_excludes_lolbas() {
         .get_output()
         .stdout
         .clone();
-    let v: serde_json::Value =
-        serde_json::from_str(std::str::from_utf8(&out).unwrap()).unwrap();
+    let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&out).unwrap()).unwrap();
     assert!(v["catalog"].is_array());
     assert!(v.get("lolbas_windows").is_none());
 }
@@ -423,7 +413,10 @@ fn triage_scenario_ransomware_exits_zero() {
 fn triage_scenario_ransomware_lists_artifacts() {
     let out = run(&["--triage", "--scenario", "ransomware"]);
     // should include deletion/anti-forensics artifacts
-    assert!(!out.stdout.is_empty(), "ransomware triage must list some artifacts");
+    assert!(
+        !out.stdout.is_empty(),
+        "ransomware triage must list some artifacts"
+    );
 }
 
 #[test]
@@ -458,7 +451,10 @@ fn triage_type_lateral_movement_exits_zero() {
 fn triage_type_lateral_movement_is_not_a_scenario() {
     // lateral-movement is a tactic (--type), not a scenario (--scenario)
     let out = run(&["--triage", "--scenario", "lateral-movement"]);
-    assert_ne!(out.code, 0, "lateral-movement must not be a valid --scenario value");
+    assert_ne!(
+        out.code, 0,
+        "lateral-movement must not be a valid --scenario value"
+    );
 }
 
 #[test]
@@ -477,6 +473,12 @@ fn triage_type_json_is_valid() {
 
 #[test]
 fn triage_scenario_and_type_combined() {
-    let out = run(&["--triage", "--scenario", "ransomware", "--type", "defense-evasion"]);
+    let out = run(&[
+        "--triage",
+        "--scenario",
+        "ransomware",
+        "--type",
+        "defense-evasion",
+    ]);
     assert_eq!(out.code, 0);
 }

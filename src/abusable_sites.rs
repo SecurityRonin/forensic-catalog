@@ -222,7 +222,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::Critical,
         mitre_techniques: &["T1105", "T1583.001"],
     },
-
     // ── Cloud storage (Critical) ───────────────────────────────────────────
     AbusableSite {
         domain: "*.amazonaws.com",
@@ -272,7 +271,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::Critical,
         mitre_techniques: &["T1102", "T1105", "T1567.002"],
     },
-
     // ── CDN (Critical) ─────────────────────────────────────────────────────
     AbusableSite {
         domain: "*.cloudfront.net",
@@ -282,7 +280,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::Critical,
         mitre_techniques: &["T1102", "T1105"],
     },
-
     // ── Collaboration (Critical) ───────────────────────────────────────────
     AbusableSite {
         domain: "sharepoint.com",
@@ -292,7 +289,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::Critical,
         mitre_techniques: &["T1105", "T1566.002", "T1567.002"],
     },
-
     // ╔══════════════════════════════════════════════════════════════════════╗
     // ║  HIGH  — blocking causes significant friction; prefer proxy          ║
     // ║  inspection, DLP rules, and anomaly alerting over outright blocks.   ║
@@ -331,7 +327,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::High,
         mitre_techniques: &["T1102", "T1105"],
     },
-
     // ── Cloud storage (High) ───────────────────────────────────────────────
     AbusableSite {
         domain: "1drv.ms",
@@ -357,7 +352,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::High,
         mitre_techniques: &["T1102", "T1105", "T1567.002"],
     },
-
     // ── Cloud hosting (High) ───────────────────────────────────────────────
     AbusableSite {
         domain: "*.workers.dev",
@@ -383,7 +377,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::High,
         mitre_techniques: &["T1102"],
     },
-
     // ── Messaging (High) ───────────────────────────────────────────────────
     AbusableSite {
         domain: "slack.com",
@@ -393,7 +386,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::High,
         mitre_techniques: &["T1102"],
     },
-
     // ── Collaboration (High) ───────────────────────────────────────────────
     AbusableSite {
         domain: "notion.so",
@@ -403,7 +395,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::High,
         mitre_techniques: &["T1102"],
     },
-
     // ╔══════════════════════════════════════════════════════════════════════╗
     // ║  MEDIUM  — blocking is feasible with an exception process.           ║
     // ║  Evaluate per-org tolerance; block at DNS/proxy where possible.      ║
@@ -434,7 +425,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::Medium,
         mitre_techniques: &["T1102", "T1105"],
     },
-
     // ── Messaging (Medium) ─────────────────────────────────────────────────
     AbusableSite {
         domain: "discord.com",
@@ -460,7 +450,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::Medium,
         mitre_techniques: &["T1102", "T1567"],
     },
-
     // ── Collaboration (Medium) ─────────────────────────────────────────────
     AbusableSite {
         domain: "trello.com",
@@ -470,7 +459,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::Medium,
         mitre_techniques: &["T1102"],
     },
-
     // ── URL shorteners (Medium) ────────────────────────────────────────────
     AbusableSite {
         domain: "t.co",
@@ -480,7 +468,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::Medium,
         mitre_techniques: &["T1566.002"],
     },
-
     // ╔══════════════════════════════════════════════════════════════════════╗
     // ║  LOW  — block at DNS and proxy layer; minimal legitimate enterprise  ║
     // ║  use. Exception requests are a yellow flag worth investigating.      ║
@@ -511,7 +498,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::Low,
         mitre_techniques: &["T1102", "T1105"],
     },
-
     // ── URL shorteners (Low) ───────────────────────────────────────────────
     AbusableSite {
         domain: "bit.ly",
@@ -529,7 +515,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::Low,
         mitre_techniques: &["T1566.002"],
     },
-
     // ╔══════════════════════════════════════════════════════════════════════╗
     // ║  LOTS Project expansion — sourced from https://lots-project.com/     ║
     // ║  175 known entries; gaps against base catalog promoted here.         ║
@@ -554,7 +539,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::Critical,
         mitre_techniques: &["T1105", "T1567.002", "T1566.002"],
     },
-
     // ── Cloudflare Quick Tunnels (Critical) ───────────────────────────────
     // T1090.003 — Multi-hop Proxy; zero-config C2 tunnels through Cloudflare
     AbusableSite {
@@ -565,7 +549,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::Critical,
         mitre_techniques: &["T1090.003", "T1102", "T1105"],
     },
-
     // ── Netlify (Critical CDN/hosting) ────────────────────────────────────
     // T1102/T1583.006 — phishing pages and payload CDN delivery
     AbusableSite {
@@ -576,7 +559,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::Critical,
         mitre_techniques: &["T1102", "T1105", "T1583.006"],
     },
-
     // ── ngrok (High) ──────────────────────────────────────────────────────
     // T1090.003 — NAT-piercing tunnels; dominant Red Team and malware C2 relay
     AbusableSite {
@@ -595,7 +577,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::High,
         mitre_techniques: &["T1090.003", "T1102"],
     },
-
     // ── Box (High) ────────────────────────────────────────────────────────
     // T1567.002 — Exfiltration to Cloud Storage
     AbusableSite {
@@ -606,7 +587,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::High,
         mitre_techniques: &["T1567.002", "T1105", "T1566.002"],
     },
-
     // ── Gitee (High) ──────────────────────────────────────────────────────
     // T1102 — dead-drop resolver; used by APT groups (Lazarus, APT41) as C2
     AbusableSite {
@@ -617,7 +597,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::High,
         mitre_techniques: &["T1102", "T1105", "T1583.001"],
     },
-
     // ── Anonymous file hosts (High) ───────────────────────────────────────
     // T1105 — Ingress Tool Transfer; widely seen in commodity malware delivery
     AbusableSite {
@@ -652,7 +631,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::High,
         mitre_techniques: &["T1105", "T1566.002"],
     },
-
     // ── Webhook / serverless relay (Medium) ───────────────────────────────
     // T1041/T1071 — exfil via webhook; C2 relay through legitimate platforms
     AbusableSite {
@@ -671,7 +649,6 @@ pub const ABUSABLE_SITES: &[AbusableSite] = &[
         blocking_risk: BlockingRisk::Medium,
         mitre_techniques: &["T1041", "T1102"],
     },
-
     // ── IP geolocation / victim-filter APIs (Medium) ──────────────────────
     // T1016/T1590 — network discovery; used in malware check-in/geo-filter
     AbusableSite {
@@ -729,7 +706,9 @@ pub fn abusable_site_info(domain: &str) -> Option<&'static AbusableSite> {
 /// Returns an iterator over all abusable sites tagged with the given `tag`
 /// (one of the `TAG_*` constants).
 pub fn sites_with_tag(tag: u8) -> impl Iterator<Item = &'static AbusableSite> {
-    ABUSABLE_SITES.iter().filter(move |s| s.abuse_tags & tag != 0)
+    ABUSABLE_SITES
+        .iter()
+        .filter(move |s| s.abuse_tags & tag != 0)
 }
 
 /// Returns an iterator over all abusable sites at or above the given
@@ -765,9 +744,7 @@ mod tests {
 
     #[test]
     fn contains_pastebin() {
-        assert!(ABUSABLE_SITES
-            .iter()
-            .any(|s| s.domain == "pastebin.com"));
+        assert!(ABUSABLE_SITES.iter().any(|s| s.domain == "pastebin.com"));
     }
 
     #[test]
@@ -818,8 +795,7 @@ mod tests {
 
     #[test]
     fn sites_with_tag_download_includes_github() {
-        assert!(sites_with_tag(TAG_DOWNLOAD)
-            .any(|s| s.domain == "raw.githubusercontent.com"));
+        assert!(sites_with_tag(TAG_DOWNLOAD).any(|s| s.domain == "raw.githubusercontent.com"));
     }
 
     #[test]
@@ -830,8 +806,7 @@ mod tests {
 
     #[test]
     fn sites_above_risk_critical_includes_aws() {
-        assert!(sites_above_risk(BlockingRisk::Critical)
-            .any(|s| s.domain == "*.amazonaws.com"));
+        assert!(sites_above_risk(BlockingRisk::Critical).any(|s| s.domain == "*.amazonaws.com"));
     }
 
     #[test]

@@ -122,7 +122,6 @@ pub mod antiforensics;
 pub mod antiforensics_aware;
 pub mod attack_flow;
 pub mod catalog;
-pub mod profile;
 pub mod chainsaw;
 pub mod dependencies;
 pub mod eventids;
@@ -132,6 +131,7 @@ pub mod mitre;
 pub mod navigator;
 pub mod playbooks;
 pub mod plugin;
+pub mod profile;
 pub mod sigma;
 pub mod stix;
 pub mod temporal;
@@ -140,15 +140,15 @@ pub mod version_history;
 pub mod volatility;
 pub mod yara;
 pub use catalog as artifact;
-pub mod commands;
 pub mod abusable_sites;
+pub mod commands;
 pub mod encryption;
 pub mod handbook;
 pub mod lolbins;
 pub use lolbins::{
-    lolbas_entry, lolbas_names, LolbasEntry, UC_ARCHIVE, UC_BYPASS, UC_CREDENTIALS,
-    UC_DECODE, UC_DEFENSE_EVASION, UC_DOWNLOAD, UC_EXECUTE, UC_NETWORK, UC_PERSIST,
-    UC_PROXY, UC_RECON, UC_UPLOAD,
+    lolbas_entry, lolbas_names, LolbasEntry, UC_ARCHIVE, UC_BYPASS, UC_CREDENTIALS, UC_DECODE,
+    UC_DEFENSE_EVASION, UC_DOWNLOAD, UC_EXECUTE, UC_NETWORK, UC_PERSIST, UC_PROXY, UC_RECON,
+    UC_UPLOAD,
 };
 pub mod no_std_compat;
 pub mod paths;

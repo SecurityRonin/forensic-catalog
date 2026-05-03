@@ -35,11 +35,7 @@ pub fn volatility_for(artifact_id: &str) -> Option<&'static crate::profile::Arti
 pub fn acquisition_order() -> Vec<&'static crate::profile::ArtifactProfile> {
     let mut entries: Vec<&crate::profile::ArtifactProfile> =
         crate::profile::ARTIFACT_PROFILES.iter().collect();
-    entries.sort_by(|a, b| {
-        b.volatility
-            .cmp(&a.volatility)
-            .then(a.id.cmp(b.id))
-    });
+    entries.sort_by(|a, b| b.volatility.cmp(&a.volatility).then(a.id.cmp(b.id)));
     entries
 }
 
@@ -49,8 +45,7 @@ mod delegation_tests {
 
     #[test]
     fn volatility_table_is_removed() {
-        let p = crate::profile::profile_for("shimcache")
-            .expect("shimcache must have a profile");
+        let p = crate::profile::profile_for("shimcache").expect("shimcache must have a profile");
         assert_eq!(p.volatility, VolatilityClass::Volatile);
     }
 

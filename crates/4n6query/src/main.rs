@@ -30,8 +30,8 @@ use forensicnomicon::abusable_sites::{
 };
 use forensicnomicon::catalog::{TriagePriority, CATALOG};
 use forensicnomicon::lolbins::{
-    lolbas_entry, LolbasEntry, LOLBAS_LINUX, LOLBAS_MACOS, LOLBAS_WINDOWS,
-    LOLBAS_WINDOWS_CMDLETS, LOLBAS_WINDOWS_MMC, LOLBAS_WINDOWS_WMI,
+    lolbas_entry, LolbasEntry, LOLBAS_LINUX, LOLBAS_MACOS, LOLBAS_WINDOWS, LOLBAS_WINDOWS_CMDLETS,
+    LOLBAS_WINDOWS_MMC, LOLBAS_WINDOWS_WMI,
 };
 use std::process;
 
@@ -130,7 +130,11 @@ const ALL_PLATFORMS: &[(Platform, &str, &[LolbasEntry])] = &[
     (Platform::Windows, "windows", LOLBAS_WINDOWS),
     (Platform::Macos, "macos", LOLBAS_MACOS),
     (Platform::Linux, "linux", LOLBAS_LINUX),
-    (Platform::WindowsCmdlet, "windows-cmdlet", LOLBAS_WINDOWS_CMDLETS),
+    (
+        Platform::WindowsCmdlet,
+        "windows-cmdlet",
+        LOLBAS_WINDOWS_CMDLETS,
+    ),
     (Platform::WindowsMmc, "windows-mmc", LOLBAS_WINDOWS_MMC),
     (Platform::WindowsWmi, "windows-wmi", LOLBAS_WINDOWS_WMI),
 ];
@@ -179,7 +183,9 @@ fn is_mitre_id(term: &str) -> bool {
     }
     // Allow exactly T1234 or T1234.567
     digits.len() == 4
-        || (digits.len() == 8 && digits[4] == b'.' && digits[5..].iter().all(|b| b.is_ascii_digit()))
+        || (digits.len() == 8
+            && digits[4] == b'.'
+            && digits[5..].iter().all(|b| b.is_ascii_digit()))
 }
 
 fn run_query(term: &str, platform: Option<Platform>, format: Format) -> i32 {
@@ -187,9 +193,7 @@ fn run_query(term: &str, platform: Option<Platform>, format: Format) -> i32 {
     let lolbas_hits: Vec<(&LolbasEntry, &str)> = ALL_PLATFORMS
         .iter()
         .filter(|(p, _, _)| platform.map_or(true, |pf| pf == *p))
-        .filter_map(|(_, label, dataset)| {
-            lolbas_entry(dataset, term).map(|e| (e, *label))
-        })
+        .filter_map(|(_, label, dataset)| lolbas_entry(dataset, term).map(|e| (e, *label)))
         .collect();
 
     // 2. Abusable site lookup
@@ -209,7 +213,9 @@ fn run_query(term: &str, platform: Option<Platform>, format: Format) -> i32 {
     };
 
     if lolbas_hits.is_empty() && site_hit.is_none() && artifact_hits.is_empty() {
-        eprintln!("Not found: '{term}' — no matches in LOLBins, abusable sites, or artifact catalog");
+        eprintln!(
+            "Not found: '{term}' — no matches in LOLBins, abusable sites, or artifact catalog"
+        );
         return 1;
     }
 
@@ -228,7 +234,10 @@ fn run_query(term: &str, platform: Option<Platform>, format: Format) -> i32 {
                 obj.insert("sites".into(), serde_json::Value::Array(arr));
             }
             if !artifact_hits.is_empty() {
-                let arr: Vec<_> = artifact_hits.iter().map(|d| descriptor_to_json(d)).collect();
+                let arr: Vec<_> = artifact_hits
+                    .iter()
+                    .map(|d| descriptor_to_json(d))
+                    .collect();
                 obj.insert("artifacts".into(), serde_json::Value::Array(arr));
             }
             let val = serde_json::Value::Object(obj);
@@ -251,9 +260,16 @@ fn run_query(term: &str, platform: Option<Platform>, format: Format) -> i32 {
                 }
             }
             if let Some(site) = site_hit {
-                println!("SITE  {}  [{}]", site.domain, risk_label(site.blocking_risk));
+                println!(
+                    "SITE  {}  [{}]",
+                    site.domain,
+                    risk_label(site.blocking_risk)
+                );
                 println!("      Provider : {}", site.provider);
-                println!("      Category : {}", category_label(site.legitimate_category));
+                println!(
+                    "      Category : {}",
+                    category_label(site.legitimate_category)
+                );
                 println!("      MITRE    : {}", site.mitre_techniques.join(", "));
             }
             if !artifact_hits.is_empty() {
@@ -281,11 +297,15 @@ fn run_query(term: &str, platform: Option<Platform>, format: Format) -> i32 {
 /// Map an incident scenario name to relevant MITRE technique prefixes.
 fn techniques_for_scenario(scenario: &str) -> Option<&'static [&'static str]> {
     match scenario {
-        "ransomware"    => Some(&["T1486", "T1490", "T1489", "T1059", "T1204", "T1070", "T1562", "T1003"]),
-        "data-breach"   => Some(&["T1048", "T1041", "T1537", "T1567", "T1005", "T1003", "T1555"]),
-        "bec"           => Some(&["T1566", "T1078", "T1534", "T1114", "T1087"]),
-        "insider"       => Some(&["T1005", "T1039", "T1048", "T1083", "T1217"]),
-        "supply-chain"  => Some(&["T1195", "T1199", "T1553", "T1059", "T1027"]),
+        "ransomware" => Some(&[
+            "T1486", "T1490", "T1489", "T1059", "T1204", "T1070", "T1562", "T1003",
+        ]),
+        "data-breach" => Some(&[
+            "T1048", "T1041", "T1537", "T1567", "T1005", "T1003", "T1555",
+        ]),
+        "bec" => Some(&["T1566", "T1078", "T1534", "T1114", "T1087"]),
+        "insider" => Some(&["T1005", "T1039", "T1048", "T1083", "T1217"]),
+        "supply-chain" => Some(&["T1195", "T1199", "T1553", "T1059", "T1027"]),
         _ => None,
     }
 }
@@ -293,25 +313,30 @@ fn techniques_for_scenario(scenario: &str) -> Option<&'static [&'static str]> {
 /// Map an ATT&CK tactic name to relevant MITRE technique prefixes.
 fn techniques_for_tactic(tactic: &str) -> Option<&'static [&'static str]> {
     match tactic {
-        "execution"           => Some(&["T1059", "T1053", "T1204", "T1047", "T1569", "T1106", "T1129"]),
-        "persistence"         => Some(&["T1053", "T1547", "T1543", "T1546", "T1136", "T1505", "T1197"]),
-        "privilege-escalation"=> Some(&["T1548", "T1134", "T1611", "T1068"]),
-        "defense-evasion"     => Some(&["T1027", "T1036", "T1055", "T1070", "T1218", "T1562", "T1564"]),
-        "credential-access"   => Some(&["T1003", "T1040", "T1555", "T1552", "T1558", "T1110"]),
-        "discovery"           => Some(&["T1012", "T1018", "T1082", "T1083", "T1087", "T1217"]),
-        "lateral-movement"    => Some(&["T1021", "T1080", "T1534", "T1563", "T1570"]),
-        "collection"          => Some(&["T1005", "T1039", "T1056", "T1074", "T1114", "T1113", "T1560"]),
-        "exfiltration"        => Some(&["T1048", "T1041", "T1537", "T1567", "T1011"]),
+        "execution" => Some(&[
+            "T1059", "T1053", "T1204", "T1047", "T1569", "T1106", "T1129",
+        ]),
+        "persistence" => Some(&[
+            "T1053", "T1547", "T1543", "T1546", "T1136", "T1505", "T1197",
+        ]),
+        "privilege-escalation" => Some(&["T1548", "T1134", "T1611", "T1068"]),
+        "defense-evasion" => Some(&[
+            "T1027", "T1036", "T1055", "T1070", "T1218", "T1562", "T1564",
+        ]),
+        "credential-access" => Some(&["T1003", "T1040", "T1555", "T1552", "T1558", "T1110"]),
+        "discovery" => Some(&["T1012", "T1018", "T1082", "T1083", "T1087", "T1217"]),
+        "lateral-movement" => Some(&["T1021", "T1080", "T1534", "T1563", "T1570"]),
+        "collection" => Some(&[
+            "T1005", "T1039", "T1056", "T1074", "T1114", "T1113", "T1560",
+        ]),
+        "exfiltration" => Some(&["T1048", "T1041", "T1537", "T1567", "T1011"]),
         "command-and-control" => Some(&["T1071", "T1090", "T1095", "T1102", "T1105", "T1571"]),
         _ => None,
     }
 }
 
 /// Returns true if any of the artifact's MITRE techniques start with any prefix in `prefixes`.
-fn artifact_matches_prefixes(
-    mitre_techniques: &[&'static str],
-    prefixes: &[&'static str],
-) -> bool {
+fn artifact_matches_prefixes(mitre_techniques: &[&'static str], prefixes: &[&'static str]) -> bool {
     mitre_techniques
         .iter()
         .any(|t| prefixes.iter().any(|p| t.starts_with(p)))
@@ -389,7 +414,12 @@ fn run_triage(format: Format, scenario: Option<&str>, tactic: Option<&str>) -> i
         }
         Format::Human => {
             for d in &hits {
-                println!("[{}]  {}  {}", triage_label(d.triage_priority), d.id, d.name);
+                println!(
+                    "[{}]  {}  {}",
+                    triage_label(d.triage_priority),
+                    d.id,
+                    d.name
+                );
             }
         }
     }
@@ -404,18 +434,43 @@ fn run_dump(format: Format, dataset: Dataset) -> i32 {
     let mut obj = serde_json::Map::new();
 
     if matches!(dataset, Dataset::All | Dataset::Lolbas) {
-        obj.insert("lolbas_windows".into(), serde_json::to_value(LOLBAS_WINDOWS).unwrap());
-        obj.insert("lolbas_linux".into(), serde_json::to_value(LOLBAS_LINUX).unwrap());
-        obj.insert("lolbas_macos".into(), serde_json::to_value(LOLBAS_MACOS).unwrap());
-        obj.insert("lolbas_windows_cmdlets".into(), serde_json::to_value(LOLBAS_WINDOWS_CMDLETS).unwrap());
-        obj.insert("lolbas_windows_mmc".into(), serde_json::to_value(LOLBAS_WINDOWS_MMC).unwrap());
-        obj.insert("lolbas_windows_wmi".into(), serde_json::to_value(LOLBAS_WINDOWS_WMI).unwrap());
+        obj.insert(
+            "lolbas_windows".into(),
+            serde_json::to_value(LOLBAS_WINDOWS).unwrap(),
+        );
+        obj.insert(
+            "lolbas_linux".into(),
+            serde_json::to_value(LOLBAS_LINUX).unwrap(),
+        );
+        obj.insert(
+            "lolbas_macos".into(),
+            serde_json::to_value(LOLBAS_MACOS).unwrap(),
+        );
+        obj.insert(
+            "lolbas_windows_cmdlets".into(),
+            serde_json::to_value(LOLBAS_WINDOWS_CMDLETS).unwrap(),
+        );
+        obj.insert(
+            "lolbas_windows_mmc".into(),
+            serde_json::to_value(LOLBAS_WINDOWS_MMC).unwrap(),
+        );
+        obj.insert(
+            "lolbas_windows_wmi".into(),
+            serde_json::to_value(LOLBAS_WINDOWS_WMI).unwrap(),
+        );
     }
     if matches!(dataset, Dataset::All | Dataset::Sites) {
-        obj.insert("abusable_sites".into(), serde_json::to_value(ABUSABLE_SITES).unwrap());
+        obj.insert(
+            "abusable_sites".into(),
+            serde_json::to_value(ABUSABLE_SITES).unwrap(),
+        );
     }
     if matches!(dataset, Dataset::All | Dataset::Catalog) {
-        let arr: Vec<_> = CATALOG.list().iter().map(|d| descriptor_to_json(d)).collect();
+        let arr: Vec<_> = CATALOG
+            .list()
+            .iter()
+            .map(|d| descriptor_to_json(d))
+            .collect();
         obj.insert("catalog".into(), serde_json::Value::Array(arr));
     }
 

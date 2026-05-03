@@ -951,7 +951,10 @@ mod tests_new_descriptors {
         assert!(
             USERASSIST_FOLDER.name.contains("Shortcut")
                 || USERASSIST_FOLDER.name.contains("LNK")
-                || USERASSIST_FOLDER.meaning.to_lowercase().contains("shortcut"),
+                || USERASSIST_FOLDER
+                    .meaning
+                    .to_lowercase()
+                    .contains("shortcut"),
             "USERASSIST_FOLDER should describe shortcut-initiated launches, \
              not folder navigation. Got name={:?} meaning={:?}",
             USERASSIST_FOLDER.name,
@@ -2840,7 +2843,10 @@ mod tests_batch_d {
         // The generated fa_file_environ_systemdrive_mft stub is triage Low with no
         // MITRE or fields. We need a hand-curated Critical entry: id="mft".
         let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
-        assert!(ids.contains(&"mft"), "CATALOG missing 'mft' — $MFT is Tier 1 IR");
+        assert!(
+            ids.contains(&"mft"),
+            "CATALOG missing 'mft' — $MFT is Tier 1 IR"
+        );
     }
 
     #[test]
@@ -2883,7 +2889,10 @@ mod tests_batch_d {
 
     #[test]
     fn mft_has_authoritative_sources() {
-        assert!(!MFT.sources.is_empty(), "MFT must cite at least one authoritative source");
+        assert!(
+            !MFT.sources.is_empty(),
+            "MFT must cite at least one authoritative source"
+        );
         for src in MFT.sources {
             assert!(
                 src.starts_with("https://"),
@@ -2897,7 +2906,10 @@ mod tests_batch_d {
         // The generated fa_file_extend_usnjrnl stub is triage Low with no MITRE or fields.
         // We need a hand-curated Critical entry: id="usnjrnl".
         let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
-        assert!(ids.contains(&"usnjrnl"), "CATALOG missing 'usnjrnl' — $UsnJrnl is Tier 1 IR");
+        assert!(
+            ids.contains(&"usnjrnl"),
+            "CATALOG missing 'usnjrnl' — $UsnJrnl is Tier 1 IR"
+        );
     }
 
     #[test]
@@ -2941,7 +2953,10 @@ mod tests_batch_d {
 
     #[test]
     fn usnjrnl_has_authoritative_sources() {
-        assert!(!USNJRNL.sources.is_empty(), "USNJRNL must cite at least one authoritative source");
+        assert!(
+            !USNJRNL.sources.is_empty(),
+            "USNJRNL must cite at least one authoritative source"
+        );
         for src in USNJRNL.sources {
             assert!(
                 src.starts_with("https://"),

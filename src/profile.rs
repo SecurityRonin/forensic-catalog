@@ -1795,4 +1795,3 @@ pub static ARTIFACT_PROFILES: &[ArtifactProfile] = &[
 pub fn profile_for(artifact_id: &str) -> Option<&'static ArtifactProfile> {
     ARTIFACT_PROFILES.iter().find(|p| p.id == artifact_id)
 }
-

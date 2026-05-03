@@ -4,14 +4,20 @@
 //!
 //! ```text
 //! 4n6query lolbas lookup <platform> <name> [--format json]
-//! 4n6query sites lookup <domain>          [--format json]
-//! 4n6query dump --format json|yaml        [--dataset all|lolbas|sites]
+//! 4n6query sites lookup <domain>           [--format json]
+//! 4n6query catalog search <keyword>        [--format json]
+//! 4n6query catalog show <id>               [--format json]
+//! 4n6query catalog mitre <technique>       [--format json]
+//! 4n6query catalog triage                  [--format json]
+//! 4n6query catalog list                    [--format json]
+//! 4n6query dump --format json|yaml         [--dataset all|lolbas|sites|catalog]
 //! ```
 
 use clap::{Parser, Subcommand, ValueEnum};
 use forensicnomicon::abusable_sites::{
     abusable_site_info, BlockingRisk, SiteCategory, ABUSABLE_SITES,
 };
+use forensicnomicon::catalog::CATALOG;
 use forensicnomicon::lolbins::{
     lolbas_entry, LOLBAS_LINUX, LOLBAS_MACOS, LOLBAS_WINDOWS, LOLBAS_WINDOWS_CMDLETS,
     LOLBAS_WINDOWS_MMC, LOLBAS_WINDOWS_WMI,
@@ -46,6 +52,11 @@ enum Commands {
     Sites {
         #[command(subcommand)]
         action: SitesAction,
+    },
+    /// Query the 6,548-entry forensic artifact catalog
+    Catalog {
+        #[command(subcommand)]
+        action: CatalogAction,
     },
     /// Dump all data as machine-readable JSON or YAML
     Dump {
@@ -103,11 +114,52 @@ enum Format {
     Yaml,
 }
 
+#[derive(Subcommand)]
+enum CatalogAction {
+    /// Keyword search across artifact name and meaning
+    Search {
+        /// Search keyword (case-insensitive)
+        keyword: String,
+        /// Output format (default: human-readable)
+        #[arg(long, value_enum)]
+        format: Option<Format>,
+    },
+    /// Look up a single artifact by its ID
+    Show {
+        /// Artifact ID (e.g. userassist_exe)
+        id: String,
+        /// Output format (default: human-readable)
+        #[arg(long, value_enum)]
+        format: Option<Format>,
+    },
+    /// List artifacts associated with a MITRE ATT&CK technique
+    Mitre {
+        /// ATT&CK technique ID (e.g. T1547.001)
+        technique: String,
+        /// Output format (default: human-readable)
+        #[arg(long, value_enum)]
+        format: Option<Format>,
+    },
+    /// List artifacts by triage priority (Critical first)
+    Triage {
+        /// Output format (default: human-readable)
+        #[arg(long, value_enum)]
+        format: Option<Format>,
+    },
+    /// List all artifact IDs in the catalog
+    List {
+        /// Output format (default: one ID per line)
+        #[arg(long, value_enum)]
+        format: Option<Format>,
+    },
+}
+
 #[derive(Clone, Copy, ValueEnum)]
 enum Dataset {
     All,
     Lolbas,
     Sites,
+    Catalog,
 }
 
 // ---------------------------------------------------------------------------
@@ -119,6 +171,7 @@ fn main() {
     let exit_code = match cli.command {
         Commands::Lolbas { action } => run_lolbas(action),
         Commands::Sites { action } => run_sites(action),
+        Commands::Catalog { action } => run_catalog(action),
         Commands::Dump { format, dataset } => run_dump(format, dataset),
     };
     process::exit(exit_code);
@@ -296,6 +349,158 @@ fn abuse_tag_labels(tags: u8) -> Vec<&'static str> {
 }
 
 // ---------------------------------------------------------------------------
+// catalog
+// ---------------------------------------------------------------------------
+
+fn run_catalog(action: CatalogAction) -> i32 {
+    match action {
+        CatalogAction::Search { keyword, format } => catalog_search(&keyword, format),
+        CatalogAction::Show { id, format } => catalog_show(&id, format),
+        CatalogAction::Mitre { technique, format } => catalog_mitre(&technique, format),
+        CatalogAction::Triage { format } => catalog_triage(format),
+        CatalogAction::List { format } => catalog_list(format),
+    }
+}
+
+fn descriptor_to_json(d: &forensicnomicon::catalog::ArtifactDescriptor) -> serde_json::Value {
+    serde_json::json!({
+        "id": d.id,
+        "name": d.name,
+        "meaning": d.meaning,
+        "triage_priority": triage_label(d.triage_priority),
+        "mitre_techniques": d.mitre_techniques,
+        "os_scope": format!("{:?}", d.os_scope),
+        "sources": d.sources,
+    })
+}
+
+fn triage_label(p: forensicnomicon::catalog::TriagePriority) -> &'static str {
+    use forensicnomicon::catalog::TriagePriority;
+    match p {
+        TriagePriority::Critical => "critical",
+        TriagePriority::High => "high",
+        TriagePriority::Medium => "medium",
+        TriagePriority::Low => "low",
+        _ => "unknown",
+    }
+}
+
+fn print_descriptor_human(d: &forensicnomicon::catalog::ArtifactDescriptor) {
+    println!("ID       : {}", d.id);
+    println!("Name     : {}", d.name);
+    println!("Priority : {}", triage_label(d.triage_priority));
+    if !d.mitre_techniques.is_empty() {
+        println!("MITRE    : {}", d.mitre_techniques.join(", "));
+    }
+    if !d.meaning.is_empty() {
+        println!("Meaning  : {}", d.meaning);
+    }
+}
+
+fn print_descriptors_human(hits: &[&forensicnomicon::catalog::ArtifactDescriptor]) {
+    for d in hits {
+        println!("[{}]  {}  ({})", triage_label(d.triage_priority), d.id, d.name);
+    }
+}
+
+fn catalog_search(keyword: &str, format: Option<Format>) -> i32 {
+    let hits = CATALOG.filter_by_keyword(keyword);
+    if hits.is_empty() {
+        eprintln!("Not found: no artifacts match '{keyword}'");
+        return 1;
+    }
+    match format {
+        Some(Format::Json) => {
+            let arr: Vec<_> = hits.iter().map(|d| descriptor_to_json(d)).collect();
+            println!("{}", serde_json::to_string_pretty(&arr).unwrap());
+        }
+        Some(Format::Yaml) => {
+            let arr: Vec<_> = hits.iter().map(|d| descriptor_to_json(d)).collect();
+            print!("{}", serde_yaml::to_string(&arr).unwrap());
+        }
+        None => print_descriptors_human(&hits),
+    }
+    0
+}
+
+fn catalog_show(id: &str, format: Option<Format>) -> i32 {
+    match CATALOG.by_id(id) {
+        Some(d) => {
+            match format {
+                Some(Format::Json) => {
+                    println!("{}", serde_json::to_string_pretty(&descriptor_to_json(d)).unwrap());
+                }
+                Some(Format::Yaml) => {
+                    print!("{}", serde_yaml::to_string(&descriptor_to_json(d)).unwrap());
+                }
+                None => print_descriptor_human(d),
+            }
+            0
+        }
+        None => {
+            eprintln!("Not found: no artifact with id '{id}'");
+            1
+        }
+    }
+}
+
+fn catalog_mitre(technique: &str, format: Option<Format>) -> i32 {
+    let hits = CATALOG.by_mitre(technique);
+    if hits.is_empty() {
+        eprintln!("Not found: no artifacts match technique '{technique}'");
+        return 1;
+    }
+    match format {
+        Some(Format::Json) => {
+            let arr: Vec<_> = hits.iter().map(|d| descriptor_to_json(d)).collect();
+            println!("{}", serde_json::to_string_pretty(&arr).unwrap());
+        }
+        Some(Format::Yaml) => {
+            let arr: Vec<_> = hits.iter().map(|d| descriptor_to_json(d)).collect();
+            print!("{}", serde_yaml::to_string(&arr).unwrap());
+        }
+        None => print_descriptors_human(&hits),
+    }
+    0
+}
+
+fn catalog_triage(format: Option<Format>) -> i32 {
+    let hits = CATALOG.for_triage();
+    match format {
+        Some(Format::Json) => {
+            let arr: Vec<_> = hits.iter().map(|d| descriptor_to_json(d)).collect();
+            println!("{}", serde_json::to_string_pretty(&arr).unwrap());
+        }
+        Some(Format::Yaml) => {
+            let arr: Vec<_> = hits.iter().map(|d| descriptor_to_json(d)).collect();
+            print!("{}", serde_yaml::to_string(&arr).unwrap());
+        }
+        None => print_descriptors_human(&hits),
+    }
+    0
+}
+
+fn catalog_list(format: Option<Format>) -> i32 {
+    let all = CATALOG.list();
+    match format {
+        Some(Format::Json) => {
+            let arr: Vec<_> = all.iter().map(|d| descriptor_to_json(d)).collect();
+            println!("{}", serde_json::to_string_pretty(&arr).unwrap());
+        }
+        Some(Format::Yaml) => {
+            let arr: Vec<_> = all.iter().map(|d| descriptor_to_json(d)).collect();
+            print!("{}", serde_yaml::to_string(&arr).unwrap());
+        }
+        None => {
+            for d in all {
+                println!("{}", d.id);
+            }
+        }
+    }
+    0
+}
+
+// ---------------------------------------------------------------------------
 // dump
 // ---------------------------------------------------------------------------
 
@@ -334,6 +539,11 @@ fn run_dump(format: Format, dataset: Dataset) -> i32 {
             "abusable_sites".into(),
             serde_json::to_value(ABUSABLE_SITES).unwrap(),
         );
+    }
+
+    if matches!(dataset, Dataset::All | Dataset::Catalog) {
+        let arr: Vec<_> = CATALOG.list().iter().map(|d| descriptor_to_json(d)).collect();
+        obj.insert("catalog".into(), serde_json::Value::Array(arr));
     }
 
     let value = serde_json::Value::Object(obj);

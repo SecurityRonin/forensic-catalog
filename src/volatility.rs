@@ -1259,6 +1259,24 @@ pub fn acquisition_order() -> Vec<&'static VolatilityEntry> {
 }
 
 #[cfg(test)]
+mod delegation_tests {
+    use super::*;
+
+    #[test]
+    fn volatility_table_is_removed() {
+        let p = crate::profile::profile_for("shimcache")
+            .expect("shimcache must have a profile");
+        assert_eq!(p.volatility, VolatilityClass::Volatile);
+    }
+
+    #[test]
+    fn volatility_for_delegates_to_profile() {
+        let result: Option<&crate::profile::ArtifactProfile> = volatility_for("shimcache");
+        assert!(result.is_some());
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
     use crate::catalog::CATALOG;

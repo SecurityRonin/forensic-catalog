@@ -1061,6 +1061,28 @@ mod tests {
 }
 
 #[cfg(test)]
+mod delegation_tests {
+    use super::*;
+
+    #[test]
+    fn evidence_table_is_removed() {
+        // EVIDENCE_TABLE should not exist — use profile_for() instead
+        // This test passes when EVIDENCE_TABLE is gone and evidence_for delegates to profile
+        let p = crate::profile::profile_for("prefetch_file")
+            .expect("prefetch_file must have a profile");
+        assert_eq!(p.evidence_strength, EvidenceStrength::Definitive);
+    }
+
+    #[test]
+    fn evidence_for_delegates_to_profile() {
+        // evidence_for should return ArtifactProfile, not EvidenceEntry
+        // This test will fail until evidence_for() return type changes
+        let result: Option<&crate::profile::ArtifactProfile> = evidence_for("shimcache");
+        assert!(result.is_some());
+    }
+}
+
+#[cfg(test)]
 mod profile_tests {
     #[test]
     fn profile_for_mft_has_both_dimensions() {

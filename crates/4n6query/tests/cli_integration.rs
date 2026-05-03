@@ -19,6 +19,26 @@ fn q() -> Command {
     Command::cargo_bin("4n6query").unwrap()
 }
 
+/// Lightweight helper for tests that need to inspect exit code + raw stdout/stderr.
+struct Output {
+    code: i32,
+    stdout: String,
+    stderr: String,
+}
+
+fn run(args: &[&str]) -> Output {
+    let out = Command::cargo_bin("4n6query")
+        .unwrap()
+        .args(args)
+        .output()
+        .unwrap();
+    Output {
+        code: out.status.code().unwrap_or(-1),
+        stdout: String::from_utf8_lossy(&out.stdout).into_owned(),
+        stderr: String::from_utf8_lossy(&out.stderr).into_owned(),
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Universal lookup — LOL/LOFL binary
 // ---------------------------------------------------------------------------
@@ -389,4 +409,74 @@ fn help_exits_zero() {
 #[test]
 fn dump_help_exits_zero() {
     q().args(["dump", "--help"]).assert().success();
+}
+
+// ── --triage --scenario ──────────────────────────────────────────────────────
+
+#[test]
+fn triage_scenario_ransomware_exits_zero() {
+    let out = run(&["--triage", "--scenario", "ransomware"]);
+    assert_eq!(out.code, 0, "stderr: {}", out.stderr);
+}
+
+#[test]
+fn triage_scenario_ransomware_lists_artifacts() {
+    let out = run(&["--triage", "--scenario", "ransomware"]);
+    // should include deletion/anti-forensics artifacts
+    assert!(!out.stdout.is_empty(), "ransomware triage must list some artifacts");
+}
+
+#[test]
+fn triage_scenario_unknown_exits_nonzero() {
+    let out = run(&["--triage", "--scenario", "unicorn"]);
+    assert_ne!(out.code, 0, "unknown scenario must exit nonzero");
+}
+
+#[test]
+fn triage_scenario_json_is_valid() {
+    let out = run(&["--triage", "--scenario", "ransomware", "--format", "json"]);
+    assert_eq!(out.code, 0);
+    let _: serde_json::Value = serde_json::from_str(&out.stdout)
+        .expect("--triage --scenario --format json must produce valid JSON");
+}
+
+// ── --triage --type ──────────────────────────────────────────────────────────
+
+#[test]
+fn triage_type_persistence_exits_zero() {
+    let out = run(&["--triage", "--type", "persistence"]);
+    assert_eq!(out.code, 0, "stderr: {}", out.stderr);
+}
+
+#[test]
+fn triage_type_lateral_movement_exits_zero() {
+    let out = run(&["--triage", "--type", "lateral-movement"]);
+    assert_eq!(out.code, 0, "stderr: {}", out.stderr);
+}
+
+#[test]
+fn triage_type_lateral_movement_is_not_a_scenario() {
+    // lateral-movement is a tactic (--type), not a scenario (--scenario)
+    let out = run(&["--triage", "--scenario", "lateral-movement"]);
+    assert_ne!(out.code, 0, "lateral-movement must not be a valid --scenario value");
+}
+
+#[test]
+fn triage_type_unknown_exits_nonzero() {
+    let out = run(&["--triage", "--type", "hacking"]);
+    assert_ne!(out.code, 0, "unknown tactic must exit nonzero");
+}
+
+#[test]
+fn triage_type_json_is_valid() {
+    let out = run(&["--triage", "--type", "execution", "--format", "json"]);
+    assert_eq!(out.code, 0);
+    let _: serde_json::Value = serde_json::from_str(&out.stdout)
+        .expect("--triage --type --format json must produce valid JSON");
+}
+
+#[test]
+fn triage_scenario_and_type_combined() {
+    let out = run(&["--triage", "--scenario", "ransomware", "--type", "defense-evasion"]);
+    assert_eq!(out.code, 0);
 }

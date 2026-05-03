@@ -649,6 +649,7 @@ fn run_playbook(id_arg: &str, format: Format) -> i32 {
                     for (i, step) in pb.steps.iter().enumerate() {
                         println!("  - step: {}", i + 1);
                         println!("    artifact_id: {}", step.artifact_id);
+                        println!("    tactic: {}", step.tactic);
                         println!("    rationale: {}", step.rationale);
                         println!("    look_for: {}", step.look_for);
                         if !step.unlocks.is_empty() {
@@ -662,7 +663,7 @@ fn run_playbook(id_arg: &str, format: Format) -> i32 {
                     println!("Tactics: {}", pb.tactics_covered.join(", "));
                     println!();
                     for (i, step) in pb.steps.iter().enumerate() {
-                        println!("Step {}: {}", i + 1, step.artifact_id);
+                        println!("Step {} [{}]: {}", i + 1, step.tactic, step.artifact_id);
                         println!("  Why:      {}", step.rationale);
                         println!("  Look for: {}", step.look_for);
                         if !step.unlocks.is_empty() {
@@ -685,6 +686,7 @@ fn playbook_to_json(pb: &InvestigationPath) -> serde_json::Value {
         "tactics_covered": pb.tactics_covered,
         "steps": pb.steps.iter().map(|s| serde_json::json!({
             "artifact_id": s.artifact_id,
+            "tactic": s.tactic,
             "rationale": s.rationale,
             "look_for": s.look_for,
             "unlocks": s.unlocks,

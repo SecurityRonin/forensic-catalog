@@ -591,5 +591,81 @@ class TestReadOpmlUsesTextAttribute(unittest.TestCase):
             os.unlink(path)
 
 
+_SANS_HTML_FIXTURE = textwrap.dedent("""\
+<!DOCTYPE html><html><head><title>SANS Blog</title></head><body>
+<script>window.__remixContext = {"state":{"loaderData":{"routes/blog/index":
+{"results":[{"hits":[
+{"contentType":"blog_single_page","title":"Living off the Cloud",
+ "url":"/blog/living-off-the-cloud","createdAt":"2026-04-20T23:47:12.425Z",
+ "description":"Cloud services abused for C2 and data exfiltration."},
+{"contentType":"blog_single_page","title":"ShimCache Forensics Deep Dive",
+ "url":"/blog/shimcache-forensics-deep-dive","createdAt":"2026-03-15T10:00:00.000Z",
+ "description":"How ShimCache tracks execution."},
+{"contentType":"blog_single_page","title":"Windows Prefetch Analysis",
+ "url":"/blog/windows-prefetch-analysis","createdAt":"2026-02-01T08:00:00.000Z",
+ "description":"Prefetch artifact analysis."}
+],"nbHits":949}]}}}}</script>
+<main>
+<a href="/blog/living-off-the-cloud">Living off the Cloud</a>
+<a href="/blog/shimcache-forensics-deep-dive">ShimCache Forensics Deep Dive</a>
+</main>
+</body></html>
+""")
+
+
+class TestParseSansBlogHtml(unittest.TestCase):
+    """parse_sans_blog_html(html) → list[(title, url, date)]
+
+    SANS blog embeds a JSON blob in a <script> tag (Remix/ContentStack SSR).
+    Pure-logic parser — no HTTP.
+    """
+
+    def test_returns_list_of_tuples(self):
+        result = ba.parse_sans_blog_html(_SANS_HTML_FIXTURE)
+        self.assertIsInstance(result, list)
+        for item in result:
+            self.assertEqual(len(item), 3)
+
+    def test_parses_three_posts(self):
+        result = ba.parse_sans_blog_html(_SANS_HTML_FIXTURE)
+        self.assertEqual(len(result), 3)
+
+    def test_url_is_absolute(self):
+        result = ba.parse_sans_blog_html(_SANS_HTML_FIXTURE)
+        for _, url, _ in result:
+            self.assertTrue(url.startswith("https://www.sans.org/blog/"),
+                            f"URL must be absolute: {url}")
+
+    def test_date_is_yyyy_mm_dd(self):
+        result = ba.parse_sans_blog_html(_SANS_HTML_FIXTURE)
+        import re
+        for _, _, date in result:
+            self.assertRegex(date, r"^\d{4}-\d{2}-\d{2}$",
+                             f"Date must be YYYY-MM-DD: {date}")
+
+    def test_first_post_title_correct(self):
+        result = ba.parse_sans_blog_html(_SANS_HTML_FIXTURE)
+        self.assertEqual(result[0][0], "Living off the Cloud")
+
+    def test_empty_html_returns_empty(self):
+        self.assertEqual(ba.parse_sans_blog_html(""), [])
+
+    def test_no_hits_returns_empty(self):
+        self.assertEqual(ba.parse_sans_blog_html("<html><body>no data</body></html>"), [])
+
+    def test_skips_non_blog_content_types(self):
+        """Only contentType=blog_single_page entries should be included."""
+        html = textwrap.dedent("""\
+        <script>{"results":[{"hits":[
+          {"contentType":"page","title":"About","url":"/about","createdAt":"2026-01-01T00:00:00Z"},
+          {"contentType":"blog_single_page","title":"DFIR Post","url":"/blog/dfir-post","createdAt":"2026-01-02T00:00:00Z"}
+        ]}]}</script>
+        """)
+        result = ba.parse_sans_blog_html(html)
+        titles = [t for t, _, _ in result]
+        self.assertNotIn("About", titles)
+        self.assertIn("DFIR Post", titles)
+
+
 if __name__ == "__main__":
     unittest.main()

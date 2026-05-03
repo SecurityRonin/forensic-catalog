@@ -1,5 +1,5 @@
 """
-Tests for scripts/fetch_all_posts.py
+Tests for scripts/fetch_all_sources.py
 
 Tests cover the pure-logic functions (no real HTTP):
   - parse_blogger_feed(xml_text)       → list[tuple[str,str,str]]
@@ -17,10 +17,10 @@ import sys
 import textwrap
 import unittest
 
-# fetch_all_posts.py lives one level up from this test file
+# fetch_all_sources.py lives one level up from this test file
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-import fetch_all_posts as ba  # noqa: E402  (module under test)
+import fetch_all_sources as ba  # noqa: E402  (module under test)
 
 
 BLOGGER_FEED_XML = textwrap.dedent("""\

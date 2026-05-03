@@ -6,13 +6,13 @@ Mark `[x]` when reviewed, `[→]` when artifact tasks were created.
 
 ## 2026-05-03
 
-- [ ] [LNK Files](https://windowsir.blogspot.com/2026/03/lnk-files.html) — Windows Incident Response
+- [x] [LNK Files](https://windowsir.blogspot.com/2026/03/lnk-files.html) — Windows Incident Response
 - [ ] [Links](https://windowsir.blogspot.com/2026/03/links.html) — Windows Incident Response
 - [ ] [Devices](https://windowsir.blogspot.com/2026/02/devices.html) — Windows Incident Response
 - [ ] [Views on AI & the Anthropic Report](https://windowsir.blogspot.com/2026/01/views-on-ai-anthropic-report.html) — Windows Incident Response
-- [ ] [What's on your clipboard?](https://windowsir.blogspot.com/2026/01/whats-on-your-clipboard.html) — Windows Incident Response
+- [x] [What's on your clipboard?](https://windowsir.blogspot.com/2026/01/whats-on-your-clipboard.html) — Windows Incident Response
 - [ ] [Questions I've Been Asked](https://windowsir.blogspot.com/2026/01/questions-ive-been-asked.html) — Windows Incident Response
-- [ ] [Windows Defender Support Logs](https://windowsir.blogspot.com/2026/01/windows-defender-support-logs.html) — Windows Incident Response
+- [x] [Windows Defender Support Logs](https://windowsir.blogspot.com/2026/01/windows-defender-support-logs.html) — Windows Incident Response
 - [ ] [Grab Bag](https://windowsir.blogspot.com/2026/01/grab-bag.html) — Windows Incident Response
 - [ ] [Question on Open Source Tools](https://windowsir.blogspot.com/2025/12/question-on-open-source-tools.html) — Windows Incident Response
 - [ ] [Perspectives on Cybersecurity](https://windowsir.blogspot.com/2025/12/perspectives-on-cybersecurity.html) — Windows Incident Response
@@ -86,8 +86,8 @@ Mark `[x]` when reviewed, `[→]` when artifact tasks were created.
 - [ ] [COVID-19 and the cancellation of everything](http://forensicphotoshop.blogspot.com/2020/03/covid-19-and-cancellation-of-everything.html) — Forensic Multimedia Analysis Blog
 - [ ] [How accurate are satellite images?](http://forensicphotoshop.blogspot.com/2020/03/how-accurate-are-satellite-images.html) — Forensic Multimedia Analysis Blog
 - [ ] [A D.C. judge issues a much-needed opinion on ‘junk science'](http://forensicphotoshop.blogspot.com/2020/02/a-dc-judge-issues-much-needed-opinion.html) — Forensic Multimedia Analysis Blog
-- [ ] [Bissa Scanner Exposed: AI-Assisted Mass Exploitation and Credential Harvesting](https://thedfirreport.com/2026/04/22/bissa-scanner-exposed-ai-assisted-mass-exploitation-and-credential-harvesting/) — The DFIR Report
-- [ ] [Apache ActiveMQ Exploit Leads to LockBit Ransomware](https://thedfirreport.com/2026/02/23/apache-activemq-exploit-leads-to-lockbit-ransomware/) — The DFIR Report
+- [x] [Bissa Scanner Exposed: AI-Assisted Mass Exploitation and Credential Harvesting](https://thedfirreport.com/2026/04/22/bissa-scanner-exposed-ai-assisted-mass-exploitation-and-credential-harvesting/) — The DFIR Report
+- [x] [Apache ActiveMQ Exploit Leads to LockBit Ransomware](https://thedfirreport.com/2026/02/23/apache-activemq-exploit-leads-to-lockbit-ransomware/) — The DFIR Report
 - [ ] [Cat’s Got Your Files: Lynx Ransomware](https://thedfirreport.com/2025/12/17/cats-got-your-files-lynx-ransomware/) — The DFIR Report
 - [ ] [From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira](https://thedfirreport.com/2025/11/04/from-bing-search-to-ransomware-bumblebee-and-adaptixc2-deliver-akira-2/) — The DFIR Report
 - [ ] [From a Single Click: How Lunar Spider Enabled a Near Two-Month Intrusion](https://thedfirreport.com/2025/09/29/from-a-single-click-how-lunar-spider-enabled-a-near-two-month-intrusion/) — The DFIR Report
@@ -144,16 +144,16 @@ Mark `[x]` when reviewed, `[→]` when artifact tasks were created.
 - [ ] [Tune In: The Future of AI-Powered Vulnerability Discovery](https://www.crowdstrike.com/en-us/blog/tune-in-future-of-ai-powered-vulnerability-discovery/) — CrowdStrike blog
 - [ ] [Critrical cPanel flaw mass-exploited in "Sorry" ransomware attacks](https://www.bleepingcomputer.com/news/security/critrical-cpanel-flaw-mass-exploited-in-sorry-ransomware-attacks/) — BleepingComputer
 - [ ] [ConsentFix v3 attacks target Azure with automated OAuth abuse](https://www.bleepingcomputer.com/news/security/consentfix-v3-attacks-target-azure-with-automated-oauth-abuse/) — BleepingComputer
-- [ ] [Adding VirusTotal link to DevToolsLauncher.yml, closes #155](https://github.com/LOLBAS-Project/LOLBAS/commit/db6da5b0308bce011616beb9d818359d8f5ffa2b) — LOLBAS Project (Windows)
-- [ ] [Create Logger.yml (#448)](https://github.com/LOLBAS-Project/LOLBAS/commit/2a21e4a4b4e256b562416412ffcc0ed39768be27) — LOLBAS Project (Windows)
-- [ ] [Create Nmcap.yml (#462)](https://github.com/LOLBAS-Project/LOLBAS/commit/6a6364085becb5edaa6147eb10b573d0d81a094a) — LOLBAS Project (Windows)
-- [ ] [Add App Paths Hijacking (Proxy Execution) to WorkFolders.exe (#490)](https://github.com/LOLBAS-Project/LOLBAS/commit/41458bdce05a062a7fd11dadd412573068ad036a) — LOLBAS Project (Windows)
-- [ ] [Add new Proxy Execution techniques for dxcap.exe and cmstp.exe (#489)](https://github.com/LOLBAS-Project/LOLBAS/commit/fb87ee5f080acb8c865337767f21e71add08ef6e) — LOLBAS Project (Windows)
-- [ ] [Create write.yml (#440)](https://github.com/LOLBAS-Project/LOLBAS/commit/c39a24f3ce946d4535ddbbadbc83ec5d2114e94c) — LOLBAS Project (Windows)
-- [ ] [Adding cipher.exe entry (#274)](https://github.com/LOLBAS-Project/LOLBAS/commit/cea80b95eeafe6eb9ad50837d18330e2236ab6db) — LOLBAS Project (Windows)
-- [ ] [UAC bypass via odbcad32.exe GUI (#460)](https://github.com/LOLBAS-Project/LOLBAS/commit/42a5add3c7d662f86ac24d95dd616cc239cdc944) — LOLBAS Project (Windows)
-- [ ] [Added Sigverif.yml (#469)](https://github.com/LOLBAS-Project/LOLBAS/commit/0c3b8d778607ed338ab8a0a847e0b48c727e74ae) — LOLBAS Project (Windows)
-- [ ] [Create IntelliTrace.yml (#464)](https://github.com/LOLBAS-Project/LOLBAS/commit/b463e865f3ecfb3b17441c798aa5bce381accc67) — LOLBAS Project (Windows)
+- [→] [Adding VirusTotal link to DevToolsLauncher.yml, closes #155](https://github.com/LOLBAS-Project/LOLBAS/commit/db6da5b0308bce011616beb9d818359d8f5ffa2b) — LOLBAS Project (Windows)
+- [→] [Create Logger.yml (#448)](https://github.com/LOLBAS-Project/LOLBAS/commit/2a21e4a4b4e256b562416412ffcc0ed39768be27) — LOLBAS Project (Windows)
+- [→] [Create Nmcap.yml (#462)](https://github.com/LOLBAS-Project/LOLBAS/commit/6a6364085becb5edaa6147eb10b573d0d81a094a) — LOLBAS Project (Windows)
+- [→] [Add App Paths Hijacking (Proxy Execution) to WorkFolders.exe (#490)](https://github.com/LOLBAS-Project/LOLBAS/commit/41458bdce05a062a7fd11dadd412573068ad036a) — LOLBAS Project (Windows)
+- [→] [Add new Proxy Execution techniques for dxcap.exe and cmstp.exe (#489)](https://github.com/LOLBAS-Project/LOLBAS/commit/fb87ee5f080acb8c865337767f21e71add08ef6e) — LOLBAS Project (Windows)
+- [→] [Create write.yml (#440)](https://github.com/LOLBAS-Project/LOLBAS/commit/c39a24f3ce946d4535ddbbadbc83ec5d2114e94c) — LOLBAS Project (Windows)
+- [x] [Adding cipher.exe entry (#274)](https://github.com/LOLBAS-Project/LOLBAS/commit/cea80b95eeafe6eb9ad50837d18330e2236ab6db) — LOLBAS Project (Windows)
+- [→] [UAC bypass via odbcad32.exe GUI (#460)](https://github.com/LOLBAS-Project/LOLBAS/commit/42a5add3c7d662f86ac24d95dd616cc239cdc944) — LOLBAS Project (Windows)
+- [→] [Added Sigverif.yml (#469)](https://github.com/LOLBAS-Project/LOLBAS/commit/0c3b8d778607ed338ab8a0a847e0b48c727e74ae) — LOLBAS Project (Windows)
+- [→] [Create IntelliTrace.yml (#464)](https://github.com/LOLBAS-Project/LOLBAS/commit/b463e865f3ecfb3b17441c798aa5bce381accc67) — LOLBAS Project (Windows)
 - [ ] [Add version constraint for xdg-user-dir](https://github.com/GTFOBins/GTFOBins.github.io/commit/7382261ef936e35896ba70e7a6b833352ffb9a22) — GTFOBins (Linux)
 - [ ] [Fix cpulimit invocation](https://github.com/GTFOBins/GTFOBins.github.io/commit/dacbcc4cfa34fbe5dd8b2f481e8ad3f593505682) — GTFOBins (Linux)
 - [ ] [Fix command syntax in tcpdump instructions](https://github.com/GTFOBins/GTFOBins.github.io/commit/c922862e18dc55edfb272ef1f296530f5f335c33) — GTFOBins (Linux)

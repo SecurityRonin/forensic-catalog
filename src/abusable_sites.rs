@@ -802,3 +802,113 @@ mod serde_tests {
         assert!(arr.iter().all(|v| v["blocking_risk"].is_string()));
     }
 }
+
+// ── ABUSABLE_SITES LOTS Project expansion (RED) ───────────────────────────────
+// Source: https://lots-project.com/ (175 entries as of 2025-Q4)
+//         Gap analysis: 140 entries missing from our 35-entry catalog.
+//         Prioritised by blocking_risk and detection prevalence.
+#[cfg(test)]
+mod expansion_tests {
+    use super::*;
+
+    // Critical — cloud infra / CDN
+    #[test]
+    fn sites_contains_graph_microsoft_com() {
+        // T1071.001/T1530 — O365/Azure C2 and data access; cannot block
+        assert!(abusable_site_info("graph.microsoft.com").is_some());
+    }
+    #[test]
+    fn sites_contains_trycloudflare() {
+        // T1090.003/T1102 — Cloudflare Quick Tunnels; zero-config C2 infra
+        assert!(abusable_site_info("*.trycloudflare.com").is_some());
+    }
+    #[test]
+    fn sites_contains_ngrok() {
+        // T1090.003 — tunnel C2 through NAT; common in Red Team and malware
+        assert!(abusable_site_info("*.ngrok.io").is_some());
+    }
+    #[test]
+    fn sites_contains_netlify() {
+        // T1102/T1583.006 — phishing pages, payload hosting on CDN
+        assert!(abusable_site_info("*.netlify.app").is_some());
+    }
+    #[test]
+    fn sites_contains_onedrive() {
+        // T1567.002 — exfil via OneDrive API; critical-risk Microsoft service
+        assert!(abusable_site_info("onedrive.live.com").is_some());
+    }
+    #[test]
+    fn sites_contains_azure_blob() {
+        // T1105/T1567 — payload staging + exfil on Azure Blob
+        assert!(abusable_site_info("*.blob.core.windows.net").is_some());
+    }
+
+    // High — code hosting / file transfer
+    #[test]
+    fn sites_contains_transfer_sh() {
+        // T1105/T1567 — anonymous file hosting; widely used in post-ex
+        assert!(abusable_site_info("transfer.sh").is_some());
+    }
+    #[test]
+    fn sites_contains_file_io() {
+        // T1105 — temporary file hosting; seen in commodity malware delivery
+        assert!(abusable_site_info("file.io").is_some());
+    }
+    #[test]
+    fn sites_contains_gitee() {
+        // T1102 — Chinese Git hosting; used by APT groups as C2 dead-drop
+        assert!(abusable_site_info("gitee.com").is_some());
+    }
+    #[test]
+    fn sites_contains_box() {
+        // T1567.002 — enterprise file sharing; abused for exfiltration
+        assert!(abusable_site_info("*.box.com").is_some());
+    }
+    #[test]
+    fn sites_contains_4shared() {
+        // T1105 — file hosting; used for payload distribution
+        assert!(abusable_site_info("4shared.com").is_some());
+    }
+    #[test]
+    fn sites_contains_mediafire() {
+        // T1105 — file hosting; used for payload distribution
+        assert!(abusable_site_info("mediafire.com").is_some());
+    }
+
+    // Medium — utility / comms
+    #[test]
+    fn sites_contains_webhook_site() {
+        // T1041/T1071 — exfil via webhook; used in C2 and data capture
+        assert!(abusable_site_info("webhook.site").is_some());
+    }
+    #[test]
+    fn sites_contains_pipedream() {
+        // T1041/T1102 — serverless webhook; C2 relay
+        assert!(abusable_site_info("*.pipedream.net").is_some());
+    }
+    #[test]
+    fn sites_contains_discord_cdn() {
+        // T1102/T1071 — Discord CDN used for payload hosting
+        assert!(abusable_site_info("cdn.discordapp.com").is_some());
+    }
+    #[test]
+    fn sites_contains_ipinfo() {
+        // T1016/T1590 — IP geolocation; used in recon and victim filtering
+        assert!(abusable_site_info("ipinfo.io").is_some());
+    }
+    #[test]
+    fn sites_contains_ipify() {
+        // T1016 — public IP lookup; prevalent in malware check-in logic
+        assert!(abusable_site_info("api.ipify.org").is_some());
+    }
+
+    // Verify counts grew
+    #[test]
+    fn abusable_sites_has_at_least_50_entries() {
+        assert!(
+            ABUSABLE_SITES.len() >= 50,
+            "expected ≥50 sites after LOTS expansion, got {}",
+            ABUSABLE_SITES.len()
+        );
+    }
+}

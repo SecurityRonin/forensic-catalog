@@ -2617,4 +2617,140 @@ mod tests {
     fn lolbas_entry_wmi_win32_process_is_some() {
         assert!(lolbas_entry(LOLBAS_WINDOWS_WMI, "Win32_Process").is_some());
     }
+
+    // ── LOLBAS_WINDOWS catalog expansion (RED) — LOLBAS Project gaps ─────────
+    // Source: https://lolbas-project.github.io/api/lolbas.json
+    #[test]
+    fn lolbas_windows_contains_diskshadow() {
+        // T1003.003/T1490 — VSS shadow copy abuse for NTDS.dit extraction
+        assert!(LOLBAS_WINDOWS.iter().any(|e| e.name == "diskshadow.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_esentutl() {
+        // T1048/T1560 — copy locked files (NTDS.dit), file transfer
+        assert!(LOLBAS_WINDOWS.iter().any(|e| e.name == "esentutl.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_cmdl32() {
+        // T1105 — download via Windows VPN client INF parser
+        assert!(LOLBAS_WINDOWS.iter().any(|e| e.name == "cmdl32.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_certoc() {
+        // T1105/T1218 — certificate operations; download and DLL execution
+        assert!(LOLBAS_WINDOWS.iter().any(|e| e.name == "certoc.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_addinutil() {
+        // T1218 — .NET Add-In utility proxy execution
+        assert!(LOLBAS_WINDOWS.iter().any(|e| e.name == "addinutil.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_winget() {
+        // T1072/T1218 — Windows Package Manager; install/execute arbitrary packages
+        assert!(LOLBAS_WINDOWS.iter().any(|e| e.name == "winget.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_wt() {
+        // T1059.001 — Windows Terminal; spawn arbitrary shells/profiles
+        assert!(LOLBAS_WINDOWS.iter().any(|e| e.name == "wt.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_pktmon() {
+        // T1040 — network packet capture via in-box Windows tool
+        assert!(LOLBAS_WINDOWS.iter().any(|e| e.name == "pktmon.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_desktopimgdownldr() {
+        // T1105 — download arbitrary files via SetupSQM telemetry binary
+        assert!(LOLBAS_WINDOWS.iter().any(|e| e.name == "desktopimgdownldr.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_rdrleakdiag() {
+        // T1003.001 — LSASS memory dump via RDR Leak Diagnostics
+        assert!(LOLBAS_WINDOWS.iter().any(|e| e.name == "rdrleakdiag.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_wsreset() {
+        // T1218/T1548.002 — Windows Store reset; UAC bypass via COM elevation
+        assert!(LOLBAS_WINDOWS.iter().any(|e| e.name == "wsreset.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_tttracer() {
+        // T1218/T1003 — Time Travel Debugging tracer; dumps process memory
+        assert!(LOLBAS_WINDOWS.iter().any(|e| e.name == "tttracer.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_mpcmdrun() {
+        // T1218/T1562.001 — Windows Defender command-line; download + bypass
+        assert!(LOLBAS_WINDOWS.iter().any(|e| e.name == "MpCmdRun.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_syncappvpublishingserver() {
+        // T1218 — App-V publishing server sync; execute arbitrary PowerShell
+        assert!(LOLBAS_WINDOWS
+            .iter()
+            .any(|e| e.name == "SyncAppvPublishingServer.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_infdefaultinstall() {
+        // T1218 — INF file execution via Setup API; proxy + bypass
+        assert!(LOLBAS_WINDOWS.iter().any(|e| e.name == "infdefaultinstall.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_rasautou() {
+        // T1218 — DLL load via RRAS auto-dial manager; proxy execution
+        assert!(LOLBAS_WINDOWS.iter().any(|e| e.name == "rasautou.exe"));
+    }
+    #[test]
+    fn lolbas_windows_contains_pcwrun() {
+        // T1218 — Program Compatibility Wizard runner; proxy execution
+        assert!(LOLBAS_WINDOWS.iter().any(|e| e.name == "pcwrun.exe"));
+    }
+
+    // ── LOLBAS_WINDOWS_WMI expansion (RED) ───────────────────────────────────
+    // Source: https://github.com/mattifestation/WMIFilter
+    //         https://attack.mitre.org/techniques/T1047/
+    #[test]
+    fn lolbas_wmi_contains_win32_pingstatus() {
+        // T1018 — remote host discovery via ICMP ping
+        assert!(LOLBAS_WINDOWS_WMI
+            .iter()
+            .any(|e| e.name == "Win32_PingStatus"));
+    }
+    #[test]
+    fn lolbas_wmi_contains_win32_logicaldisk() {
+        // T1083 — enumerate logical drives for data staging
+        assert!(LOLBAS_WINDOWS_WMI
+            .iter()
+            .any(|e| e.name == "Win32_LogicalDisk"));
+    }
+    #[test]
+    fn lolbas_wmi_contains_win32_useraccount() {
+        // T1087.001 — local account enumeration
+        assert!(LOLBAS_WINDOWS_WMI
+            .iter()
+            .any(|e| e.name == "Win32_UserAccount"));
+    }
+    #[test]
+    fn lolbas_wmi_contains_win32_networkadapterconfiguration() {
+        // T1016 — network configuration discovery
+        assert!(LOLBAS_WINDOWS_WMI
+            .iter()
+            .any(|e| e.name == "Win32_NetworkAdapterConfiguration"));
+    }
+    #[test]
+    fn lolbas_wmi_contains_antivirus_product() {
+        // T1518.001 — security software discovery via SecurityCenter2
+        assert!(LOLBAS_WINDOWS_WMI
+            .iter()
+            .any(|e| e.name == "AntiVirusProduct"));
+    }
+    #[test]
+    fn lolbas_wmi_contains_msft_netfirewallprofile() {
+        // T1562.004 — firewall rule enumeration and disable
+        assert!(LOLBAS_WINDOWS_WMI
+            .iter()
+            .any(|e| e.name == "MSFT_NetFirewallProfile"));
+    }
 }

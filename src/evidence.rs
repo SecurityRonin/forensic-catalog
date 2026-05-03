@@ -1055,3 +1055,29 @@ mod tests {
         );
     }
 }
+
+#[cfg(test)]
+mod profile_tests {
+    #[test]
+    fn profile_for_mft_has_both_dimensions() {
+        // profile_for doesn't exist yet — this test should fail to compile
+        let p = crate::profile::profile_for("mft").expect("mft must have a profile");
+        assert_eq!(p.evidence_strength, crate::evidence::EvidenceStrength::Definitive);
+        assert_eq!(p.volatility, crate::volatility::VolatilityClass::Persistent);
+        assert!(!p.evidence_caveats.is_empty());
+        assert!(!p.volatility_rationale.is_empty());
+    }
+
+    #[test]
+    fn profile_for_missing_returns_none() {
+        assert!(crate::profile::profile_for("this_does_not_exist").is_none());
+    }
+
+    #[test]
+    fn profiles_table_has_no_duplicate_ids() {
+        let mut seen = std::collections::HashSet::new();
+        for p in crate::profile::ARTIFACT_PROFILES {
+            assert!(seen.insert(p.id), "duplicate profile id: {}", p.id);
+        }
+    }
+}

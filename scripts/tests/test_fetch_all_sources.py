@@ -402,5 +402,56 @@ class TestParseRssXml(unittest.TestCase):
         self.assertRegex(date, r"\d{4}-\d{2}-\d{2}")
 
 
+class TestXmlUrlFirstStrategy(unittest.TestCase):
+    """
+    fetch_all_sources should treat xmlUrl as authoritative for non-Blogger,
+    non-GitHub, non-YouTube sources.  WordPress REST API is a fallback only
+    when xmlUrl returns nothing at all — not when it returns a full page.
+    """
+
+    def test_skip_titles_includes_abuse_ch_blog(self):
+        """abuse.ch blog is an IOC-adjacent feed — not artifact documentation."""
+        self.assertIn("abuse.ch blog", ba._SKIP_TITLES)
+
+    def test_xmlurl_strategy_constant_exists(self):
+        """Module must expose XMLURL_ONLY_PLATFORMS documenting non-WP platforms."""
+        # Ghost, HubSpot, Squarespace, Jekyll, Hugo have no WP REST API —
+        # trying it generates noisy 404s.  The strategy document is these platforms.
+        self.assertTrue(
+            hasattr(ba, "_XMLURL_ONLY_PLATFORMS"),
+            "_XMLURL_ONLY_PLATFORMS constant must exist in fetch_all_sources",
+        )
+
+    def test_xmlurl_only_platforms_covers_ghost(self):
+        """Ghost is not WordPress — WP fallback must be skipped."""
+        self.assertIn("ghost.io", ba._XMLURL_ONLY_PLATFORMS)
+
+    def test_xmlurl_only_platforms_covers_squarespace(self):
+        self.assertIn("squarespace.com", ba._XMLURL_ONLY_PLATFORMS)
+
+    def test_xmlurl_only_platforms_covers_hubspot(self):
+        self.assertIn("hubspot.com", ba._XMLURL_ONLY_PLATFORMS)
+
+    def test_classify_ghost_blog_returns_unknown_not_wordpress(self):
+        """dfir.blog is Ghost — classify_blog_source must NOT return 'wordpress'."""
+        # Ghost blogs look like any other HTTPS site; classify must not
+        # assume WordPress for unknown CMS.
+        result = ba.classify_blog_source("https://dfir.blog/")
+        self.assertNotEqual(result, "wordpress")
+
+    def test_should_try_wordpress_false_when_xmlurl_has_entries(self):
+        """Helper: if xmlUrl returned entries, WP fallback must not be tried."""
+        # This is the core logic fix: entries present → skip WP API
+        self.assertFalse(ba._should_try_wordpress(entries=["anything"], xml_url="https://x.com/feed/"))
+
+    def test_should_try_wordpress_true_when_no_entries_and_xml_url(self):
+        """Helper: if xmlUrl returned nothing, try WP as fallback."""
+        self.assertTrue(ba._should_try_wordpress(entries=[], xml_url="https://x.com/feed/"))
+
+    def test_should_try_wordpress_false_when_no_xml_url(self):
+        """No xmlUrl and no entries — can't help, don't try random WP endpoints."""
+        self.assertFalse(ba._should_try_wordpress(entries=[], xml_url=""))
+
+
 if __name__ == "__main__":
     unittest.main()

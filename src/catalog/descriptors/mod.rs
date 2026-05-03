@@ -1743,6 +1743,307 @@ pub static LASTVISITED_MRU: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
+// ── NTFS metadata files ───────────────────────────────────────────────────────
+
+pub(crate) static MFT_FIELDS: &[FieldSchema] = &[
+    FieldSchema {
+        name: "mft_record_number",
+        value_type: ValueType::Integer,
+        description: "Unique 48-bit record number within the $MFT",
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "sequence_number",
+        value_type: ValueType::Integer,
+        description: "Reuse counter — incremented each time a record is deallocated",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "si_created",
+        value_type: ValueType::Timestamp,
+        description: "$STANDARD_INFORMATION created time (spoofable by user-mode tools)",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "si_modified",
+        value_type: ValueType::Timestamp,
+        description: "$STANDARD_INFORMATION last-modified time",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "si_changed",
+        value_type: ValueType::Timestamp,
+        description: "$STANDARD_INFORMATION MFT-record-changed time",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "si_accessed",
+        value_type: ValueType::Timestamp,
+        description: "$STANDARD_INFORMATION last-accessed time",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "fn_created",
+        value_type: ValueType::Timestamp,
+        description: "$FILE_NAME created time — harder to spoof without kernel access",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "fn_modified",
+        value_type: ValueType::Timestamp,
+        description: "$FILE_NAME last-modified time",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "filename",
+        value_type: ValueType::Text,
+        description: "File or directory name from $FILE_NAME attribute",
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "parent_mft_record",
+        value_type: ValueType::Integer,
+        description: "MFT record number of the parent directory",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "file_size",
+        value_type: ValueType::Integer,
+        description: "Logical file size in bytes from $STANDARD_INFORMATION",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "flags",
+        value_type: ValueType::UnsignedInt,
+        description: "Entry flags bitmask: IN_USE (0x01), IS_DIRECTORY (0x02)",
+        is_uid_component: false,
+    },
+];
+
+/// NTFS Master File Table — the complete filesystem map and primary
+/// timestomping detection source (T1070.006).
+///
+/// Every file, directory, and metadata object on an NTFS volume has one MFT
+/// entry. Each entry contains two timestamp sets: `$STANDARD_INFORMATION` (SI)
+/// and `$FILE_NAME` (FN). Timestomping tools (e.g. Meterpreter, SetTimestamp)
+/// modify SI timestamps only; FN timestamps require kernel-level access and are
+/// rarely touched. A discrepancy between SI and FN timestamps — especially
+/// SI timestamps predating the volume creation or FN creation — is a reliable
+/// timestomping indicator.
+///
+/// The $MFT also records $LogFile Sequence Numbers (LSN) in the entry header,
+/// providing an independent ordering of file system events that survives most
+/// Windows log-clearing operations.
+///
+/// # Forensic pivot
+///
+/// - Unallocated entries (flags bit 0 clear) represent recently deleted files;
+///   the $MFT retains the filename and timestamps even after the directory
+///   entry is removed.
+/// - INDX slack in directory entries and MFT slack can recover older filenames.
+/// - Pair with `$UsnJrnl` for operation-level sequencing (create → write → close).
+pub static MFT: ArtifactDescriptor = ArtifactDescriptor {
+    id: "mft",
+    name: "NTFS Master File Table ($MFT)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    // Source: https://learn.microsoft.com/en-us/windows/win32/fileio/master-file-table
+    // $MFT always resides at the beginning of the NTFS volume; accessible via raw disk read.
+    file_path: Some(r"\\.\<volume>\$MFT"),
+    scope: DataScope::System,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "Complete filesystem map with dual timestamps ($STANDARD_INFORMATION vs $FILE_NAME); primary source for timestomping detection and deleted-file recovery",
+    mitre_techniques: &[
+        "T1070.006", // Timestomping — SI vs FN discrepancy
+        "T1070.004", // File Deletion — unallocated entries remain in $MFT
+        "T1564.001", // Hidden Files — SYSTEM/HIDDEN file attribute flags
+    ],
+    fields: MFT_FIELDS,
+    retention: Some("Entries persist until overwritten; allocated space grows monotonically"),
+    triage_priority: TriagePriority::Critical,
+    related_artifacts: &["usnjrnl", "logfile_ntfs", "prefetch_dir"],
+    sources: &[
+        // Primary NTFS specification reference
+        "https://learn.microsoft.com/en-us/windows/win32/fileio/master-file-table",
+        // Timestomping technique + SI vs FN discrepancy
+        "https://attack.mitre.org/techniques/T1070/006/",
+        // SANS FOR508 — MFT analysis methodology
+        "https://www.sans.org/blog/windows-file-system-forensics-ntfs-master-file-table/",
+        // MFTECmd by Eric Zimmerman — primary parsing tool
+        "https://github.com/EricZimmerman/MFTECmd",
+        // MFT forensic overview — 13cubed
+        "https://www.13cubed.com/downloads/Windows_Forensic_Analysis_Poster.pdf",
+        // NTFS $MFT forensics reference
+        "https://www.kazamiya.net/files/MFT_Forensics.pdf",
+    ],
+};
+
+pub(crate) static USNJRNL_FIELDS: &[FieldSchema] = &[
+    FieldSchema {
+        name: "usn",
+        value_type: ValueType::Integer,
+        description: "Update Sequence Number — monotonically increasing journal position",
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "file_reference",
+        value_type: ValueType::Integer,
+        description: "48-bit MFT record number + 16-bit sequence of the affected file",
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "parent_reference",
+        value_type: ValueType::Integer,
+        description: "MFT reference of the parent directory at the time of the event",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "timestamp",
+        value_type: ValueType::Timestamp,
+        description: "Event timestamp as a 64-bit Windows FILETIME",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "reason",
+        value_type: ValueType::UnsignedInt,
+        description: "USN reason bitmask: FILE_CREATE (0x100), FILE_DELETE (0x200), RENAME_OLD_NAME (0x1000), RENAME_NEW_NAME (0x2000), DATA_OVERWRITE (0x1), CLOSE (0x80000000)",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "file_attributes",
+        value_type: ValueType::UnsignedInt,
+        description: "Win32 file attribute flags at the time of the event",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "filename",
+        value_type: ValueType::Text,
+        description: "Filename (not full path) of the affected file or directory",
+        is_uid_component: true,
+    },
+];
+
+/// NTFS Update Sequence Number Journal — operation-level file system log (T1070.004).
+///
+/// The $UsnJrnl records a log entry for every file system operation: creates,
+/// deletes, renames, attribute changes, and security changes. The journal is
+/// stored in the sparse `$J` alternate data stream of the `$Extend\$UsnJrnl`
+/// metadata file; only the tail portion is allocated (sparse head occupies
+/// no disk space).
+///
+/// # Key forensic uses
+///
+/// - **Deleted files**: FILE_DELETE records appear even after the directory
+///   entry is removed and the MFT entry is reallocated. Combined with USN
+///   timestamps, this timestamps the deletion accurately.
+/// - **Rename chains**: consecutive RENAME_OLD_NAME + RENAME_NEW_NAME records
+///   reconstruct the full rename history of a file — commonly used by attackers
+///   who rename tools post-use to hide them from Prefetch name-based queries.
+/// - **Anti-forensics detection**: absence of expected USN records for a known
+///   file activity window (e.g. attacker-cleared the journal) is itself
+///   evidence of tampering.
+///
+/// # Record format
+///
+/// V2 records are 60 bytes minimum + variable-length filename. V3 records (rare)
+/// have a 128-bit file reference instead of 64-bit.
+///
+/// Source: https://learn.microsoft.com/en-us/windows/win32/api/winioctl/ns-winioctl-usn_record_v2
+pub static USNJRNL: ArtifactDescriptor = ArtifactDescriptor {
+    id: "usnjrnl",
+    name: "NTFS USN Change Journal ($UsnJrnl:$J)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    // Source: https://learn.microsoft.com/en-us/windows/win32/api/winioctl/ns-winioctl-usn_record_v2
+    // The $J alternate data stream is the journalled portion; $Max contains the max size config.
+    file_path: Some(r"\\.\<volume>\$Extend\$UsnJrnl:$J"),
+    scope: DataScope::System,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "Operation-level file system log: file creates, deletes, renames, and attribute changes — survives directory-entry deletion and MFT reuse",
+    mitre_techniques: &[
+        "T1070.004", // File Deletion — deletion events persist in journal
+        "T1036.003", // Rename System Utilities — rename chain reconstruction
+        "T1070.006", // Timestomping — USN timestamps cross-validate SI/FN discrepancy
+    ],
+    fields: USNJRNL_FIELDS,
+    retention: Some("Configurable; default ~32 MB rolling window (~days of activity)"),
+    triage_priority: TriagePriority::Critical,
+    related_artifacts: &["mft", "logfile_ntfs", "prefetch_dir"],
+    sources: &[
+        // USN_RECORD_V2 structure specification
+        "https://learn.microsoft.com/en-us/windows/win32/api/winioctl/ns-winioctl-usn_record_v2",
+        // ATT&CK file deletion technique
+        "https://attack.mitre.org/techniques/T1070/004/",
+        // SANS FOR508 — USN Journal forensics
+        "https://www.sans.org/blog/ntfs-usn-change-journal-forensics/",
+        // MFTECmd handles $UsnJrnl parsing
+        "https://github.com/EricZimmerman/MFTECmd",
+        // Velociraptor USN Journal artifact
+        "https://docs.velociraptor.app/artifact_references/pages/windows.ntfs.usnjournalscanner/",
+        // Forensic value of the USN Journal
+        "https://www.magnetforensics.com/blog/ntfs-usn-change-journal/",
+    ],
+};
+
+/// NTFS $LogFile — transaction log used for crash recovery (T1070.006).
+///
+/// Every metadata change on an NTFS volume is first written to `$LogFile`
+/// before being committed to the MFT. This makes `$LogFile` a secondary
+/// timestamp source — LSNs (Log Sequence Numbers) in MFT entry headers
+/// correlate to `$LogFile` records, enabling detection of timestamp injection
+/// that didn't update the LSN chain.
+///
+/// `$LogFile` is typically 64 MB. It wraps around; in practice only a few
+/// hours of very recent metadata operations are recoverable.
+pub static LOGFILE_NTFS: ArtifactDescriptor = ArtifactDescriptor {
+    id: "logfile_ntfs",
+    name: "NTFS Transaction Log ($LogFile)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    // Source: https://learn.microsoft.com/en-us/windows-server/storage/file-server/ntfs-overview
+    file_path: Some(r"\\.\<volume>\$LogFile"),
+    scope: DataScope::System,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "NTFS transaction log with LSNs that cross-validate MFT timestamps; recent metadata operations only",
+    mitre_techniques: &[
+        "T1070.006", // Timestomping — LSN chain verification
+    ],
+    fields: &[
+        FieldSchema {
+            name: "lsn",
+            value_type: ValueType::Integer,
+            description: "Log Sequence Number — monotonically increasing within the volume",
+            is_uid_component: true,
+        },
+        FieldSchema {
+            name: "record_type",
+            value_type: ValueType::Text,
+            description: "NTFS log record type (UPDATE, CHECKPOINT, etc.)",
+            is_uid_component: false,
+        },
+    ],
+    retention: Some("~64 MB rolling window; typically hours of recent activity"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["mft", "usnjrnl"],
+    sources: &[
+        "https://learn.microsoft.com/en-us/windows-server/storage/file-server/ntfs-overview",
+        "https://attack.mitre.org/techniques/T1070/006/",
+        // NTFS Log Tracker — Eric Zimmerman
+        "https://github.com/EricZimmerman/NTFSLogTracker",
+        // $LogFile forensics reference
+        "https://www.sans.org/blog/the-key-to-ntfs-forensics-the-logfile/",
+    ],
+};
+
 /// Windows Prefetch files directory — execution evidence (T1204.002).
 ///
 /// Each `.pf` file records: executable name, run count, last 8 run timestamps,
@@ -6242,6 +6543,9 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     SCHEDULED_TASKS_DIR,
     WDIGEST_CACHING,
     // Batch C — Windows execution evidence
+    MFT,
+    USNJRNL,
+    LOGFILE_NTFS,
     WORDWHEEL_QUERY,
     OPENSAVE_MRU,
     LASTVISITED_MRU,

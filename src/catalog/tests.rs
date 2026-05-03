@@ -168,7 +168,7 @@ mod decode_tests {
     #[test]
     fn catalog_has_entries() {
         assert!(!CATALOG.list().is_empty());
-        assert_eq!(CATALOG.list().len(), 6551);
+        assert_eq!(CATALOG.list().len(), 6554);
     }
 
     #[test]
@@ -2832,6 +2832,123 @@ mod tests_batch_d {
             assert!(ids.contains(expected), "CATALOG missing: {expected}");
         }
     }
+
+    // ── NTFS metadata files (Tier 1 IR artifacts) ─────────────────────────
+
+    #[test]
+    fn mft_exists_in_catalog() {
+        // The generated fa_file_environ_systemdrive_mft stub is triage Low with no
+        // MITRE or fields. We need a hand-curated Critical entry: id="mft".
+        let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
+        assert!(ids.contains(&"mft"), "CATALOG missing 'mft' — $MFT is Tier 1 IR");
+    }
+
+    #[test]
+    fn mft_is_critical_triage() {
+        assert_eq!(
+            MFT.triage_priority,
+            TriagePriority::Critical,
+            "$MFT is a Tier 1 triage artifact — must be Critical"
+        );
+    }
+
+    #[test]
+    fn mft_file_path_is_ntfs_root() {
+        let path = MFT.file_path.expect("$MFT must have a file_path");
+        assert!(
+            path.contains("$MFT"),
+            "$MFT file_path must reference the NTFS $MFT file, got: {path}"
+        );
+    }
+
+    #[test]
+    fn mft_has_si_vs_fn_timestamp_fields() {
+        // The key forensic value of $MFT is detecting timestomping via
+        // discrepancy between $STANDARD_INFORMATION and $FILE_NAME timestamps.
+        let field_names: Vec<&str> = MFT.fields.iter().map(|f| f.name).collect();
+        assert!(
+            field_names.contains(&"si_created") || field_names.contains(&"mft_record_number"),
+            "$MFT fields must include SI timestamps or mft_record_number for timestomping analysis; got: {field_names:?}"
+        );
+    }
+
+    #[test]
+    fn mft_covers_timestomping_technique() {
+        assert!(
+            MFT.mitre_techniques.contains(&"T1070.006"),
+            "$MFT must map to T1070.006 (Timestomping); got: {:?}",
+            MFT.mitre_techniques
+        );
+    }
+
+    #[test]
+    fn mft_has_authoritative_sources() {
+        assert!(!MFT.sources.is_empty(), "MFT must cite at least one authoritative source");
+        for src in MFT.sources {
+            assert!(
+                src.starts_with("https://"),
+                "MFT source must be a URL, not a name stub: {src}"
+            );
+        }
+    }
+
+    #[test]
+    fn usnjrnl_exists_in_catalog() {
+        // The generated fa_file_extend_usnjrnl stub is triage Low with no MITRE or fields.
+        // We need a hand-curated Critical entry: id="usnjrnl".
+        let ids: Vec<&str> = CATALOG.list().iter().map(|d| d.id).collect();
+        assert!(ids.contains(&"usnjrnl"), "CATALOG missing 'usnjrnl' — $UsnJrnl is Tier 1 IR");
+    }
+
+    #[test]
+    fn usnjrnl_is_critical_triage() {
+        assert_eq!(
+            USNJRNL.triage_priority,
+            TriagePriority::Critical,
+            "$UsnJrnl is a Tier 1 triage artifact — must be Critical"
+        );
+    }
+
+    #[test]
+    fn usnjrnl_file_path_references_j_stream() {
+        let path = USNJRNL.file_path.expect("$UsnJrnl must have a file_path");
+        assert!(
+            path.contains("$UsnJrnl") || path.contains("UsnJrnl"),
+            "$UsnJrnl file_path must reference $Extend\\$UsnJrnl, got: {path}"
+        );
+    }
+
+    #[test]
+    fn usnjrnl_has_reason_field_with_bitmask() {
+        // USN V2 records have a `reason` bitfield (FILE_CREATE, FILE_DELETE,
+        // RENAME_OLD_NAME, RENAME_NEW_NAME, CLOSE, etc.) — the primary
+        // forensic value of the journal.
+        let field_names: Vec<&str> = USNJRNL.fields.iter().map(|f| f.name).collect();
+        assert!(
+            field_names.contains(&"reason") || field_names.contains(&"usn_reason"),
+            "$UsnJrnl fields must include the USN reason bitmask field; got: {field_names:?}"
+        );
+    }
+
+    #[test]
+    fn usnjrnl_covers_file_deletion_technique() {
+        assert!(
+            USNJRNL.mitre_techniques.contains(&"T1070.004"),
+            "$UsnJrnl must map to T1070.004 (File Deletion — indicator removal); got: {:?}",
+            USNJRNL.mitre_techniques
+        );
+    }
+
+    #[test]
+    fn usnjrnl_has_authoritative_sources() {
+        assert!(!USNJRNL.sources.is_empty(), "USNJRNL must cite at least one authoritative source");
+        for src in USNJRNL.sources {
+            assert!(
+                src.starts_with("https://"),
+                "USNJRNL source must be a URL, not a name stub: {src}"
+            );
+        }
+    }
 }
 
 #[cfg(test)]
@@ -3139,7 +3256,7 @@ mod phase2_registry_tests {
     #[test]
     fn catalog_count_includes_phase2() {
         // Updated to 354 after phase-2b file artifact additions
-        assert_eq!(CATALOG.list().len(), 6551);
+        assert_eq!(CATALOG.list().len(), 6554);
     }
 
     #[test]
@@ -3284,7 +3401,7 @@ mod phase2b_files_tests {
     fn catalog_count_includes_phase2b() {
         // phase2a adds 30 registry artifacts (284→314), phase2b adds 40 file artifacts (314→354)
         // Note: chrome_login_data was already present from Phase 1; not duplicated here.
-        assert_eq!(CATALOG.list().len(), 6551);
+        assert_eq!(CATALOG.list().len(), 6554);
     }
 
     #[test]
@@ -3587,7 +3704,7 @@ mod phase3_persistence_tests {
         // phase3 adds 7 net-new artifacts not already in catalog (354 → 361)
         // Note: winlogon_shell, winlogon_userinit, appinit_dlls, boot_execute,
         //       ifeo_debugger, netsh_helper_dlls, mountpoints2 were already present.
-        assert_eq!(CATALOG.list().len(), 6551);
+        assert_eq!(CATALOG.list().len(), 6554);
     }
 
     // ── Pre-existing artifacts verified present ───────────────────────────────

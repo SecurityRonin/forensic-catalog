@@ -216,6 +216,21 @@ pub static VOLATILITY_TABLE: &[VolatilityEntry] = &[
         rationale: "SRUM ESE database; rotated by Windows on schedule",
     },
     VolatilityEntry {
+        artifact_id: "mft",
+        volatility: VolatilityClass::Persistent,
+        rationale: "$MFT entries persist until overwritten by new allocations; unallocated entries survive long-term",
+    },
+    VolatilityEntry {
+        artifact_id: "usnjrnl",
+        volatility: VolatilityClass::RotatingBuffer,
+        rationale: "$UsnJrnl:$J is a rolling window (~32 MB); oldest records are overwritten as the journal grows",
+    },
+    VolatilityEntry {
+        artifact_id: "logfile_ntfs",
+        volatility: VolatilityClass::RotatingBuffer,
+        rationale: "$LogFile is ~64 MB; wraps on high-activity systems within hours",
+    },
+    VolatilityEntry {
         artifact_id: "srum_db",
         volatility: VolatilityClass::RotatingBuffer,
         rationale: "SRUM ESE database; records rolled up and purged periodically",

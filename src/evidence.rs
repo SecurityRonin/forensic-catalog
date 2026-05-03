@@ -249,6 +249,34 @@ pub static EVIDENCE_TABLE: &[EvidenceEntry] = &[
         strength: EvidenceStrength::Strong,
         caveats: &["Proves RDP was initiated FROM this machine; does not confirm success"],
     },
+    // ── NTFS metadata ────────────────────────────────────────────────────────
+    EvidenceEntry {
+        artifact_id: "mft",
+        strength: EvidenceStrength::Definitive,
+        caveats: &[
+            "Requires raw disk access or volume shadow copy; locked on live systems",
+            "SI timestamps are user-spoofable; always compare against FN timestamps",
+            "Deleted-file entries may be overwritten if MFT fills up",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "usnjrnl",
+        strength: EvidenceStrength::Strong,
+        caveats: &[
+            "Journal is a rolling window (~32 MB default); older entries are overwritten",
+            "Journal can be cleared by an attacker with sufficient privileges",
+            "$J alternate data stream requires raw NTFS access — not visible via Win32 APIs",
+        ],
+    },
+    EvidenceEntry {
+        artifact_id: "logfile_ntfs",
+        strength: EvidenceStrength::Corroborative,
+        caveats: &[
+            "~64 MB rolling window; typically only hours of recent metadata operations",
+            "Primarily useful for cross-validating MFT LSN chains to detect timestamp injection",
+            "Requires specialised NTFS log parser (e.g. NTFSLogTracker)",
+        ],
+    },
     // ── SRUM ─────────────────────────────────────────────────────────────────
     EvidenceEntry {
         artifact_id: "srum_db",

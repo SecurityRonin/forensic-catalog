@@ -1030,4 +1030,140 @@ mod tests {
             "persistence must NOT be in PLAYBOOKS"
         );
     }
+
+    // ── unlock chain completeness ─────────────────────────────────────────────
+
+    fn step_unlocks<'a>(path: &'a InvestigationPath, artifact_id: &str) -> &'a [&'static str] {
+        path.steps
+            .iter()
+            .find(|s| s.artifact_id == artifact_id)
+            .map(|s| s.unlocks)
+            .unwrap_or(&[])
+    }
+
+    #[test]
+    fn unlock_chains_are_comprehensive() {
+        // Helper: path by id (both statics)
+        let get_path = |id: &str| -> &'static InvestigationPath {
+            INVESTIGATION_PATHS
+                .iter()
+                .chain(PLAYBOOKS.iter())
+                .find(|p| p.id == id)
+                .unwrap_or_else(|| panic!("path '{}' not found", id))
+        };
+
+        // lateral_movement
+        let lm = get_path("lateral_movement");
+        assert!(
+            step_unlocks(lm, "networklist_profiles").contains(&"evtx_security"),
+            "networklist_profiles must unlock evtx_security"
+        );
+        assert!(
+            step_unlocks(lm, "jump_list_auto").contains(&"shellbags_user"),
+            "jump_list_auto must unlock shellbags_user"
+        );
+        assert!(
+            step_unlocks(lm, "bam_user").contains(&"shimcache"),
+            "bam_user must unlock shimcache"
+        );
+
+        // credential_harvesting
+        let ch = get_path("credential_harvesting");
+        assert!(
+            step_unlocks(ch, "dpapi_cred_user").contains(&"chrome_login_data"),
+            "dpapi_cred_user must unlock chrome_login_data"
+        );
+        assert!(
+            step_unlocks(ch, "evtx_security").contains(&"evtx_sysmon"),
+            "credential_harvesting evtx_security must unlock evtx_sysmon"
+        );
+
+        // persistence
+        let pe = get_path("persistence");
+        assert!(
+            step_unlocks(pe, "active_setup_hklm").contains(&"prefetch_file"),
+            "active_setup_hklm must unlock prefetch_file"
+        );
+        assert!(
+            step_unlocks(pe, "services_imagepath").contains(&"prefetch_file"),
+            "services_imagepath must unlock prefetch_file"
+        );
+        assert!(
+            step_unlocks(pe, "ifeo_debugger").contains(&"prefetch_file"),
+            "ifeo_debugger must unlock prefetch_file"
+        );
+
+        // execution_trace
+        let et = get_path("execution_trace");
+        assert!(
+            step_unlocks(et, "shimcache").contains(&"amcache_app_file"),
+            "shimcache must unlock amcache_app_file"
+        );
+        assert!(
+            step_unlocks(et, "amcache_app_file").contains(&"evtx_sysmon"),
+            "amcache_app_file must unlock evtx_sysmon"
+        );
+        assert!(
+            step_unlocks(et, "bam_user").contains(&"shimcache"),
+            "execution_trace bam_user must unlock shimcache"
+        );
+        assert!(
+            step_unlocks(et, "evtx_sysmon").contains(&"usnjrnl"),
+            "evtx_sysmon must unlock usnjrnl"
+        );
+
+        // defense_evasion
+        let de = get_path("defense_evasion");
+        assert!(
+            step_unlocks(de, "mft_file").contains(&"usnjrnl"),
+            "mft_file must unlock usnjrnl"
+        );
+        assert!(
+            step_unlocks(de, "prefetch_file").contains(&"shimcache"),
+            "defense_evasion prefetch_file must unlock shimcache"
+        );
+
+        // ransomware (PLAYBOOK)
+        let rw = get_path("ransomware");
+        assert!(
+            step_unlocks(rw, "recycle_bin").contains(&"lnk_files"),
+            "ransomware recycle_bin must unlock lnk_files"
+        );
+        assert!(
+            step_unlocks(rw, "srum_db").contains(&"srum_network_usage"),
+            "srum_db must unlock srum_network_usage"
+        );
+
+        // data_breach (PLAYBOOK)
+        let db = get_path("data_breach");
+        assert!(
+            step_unlocks(db, "network_drives").contains(&"srum_network_usage"),
+            "network_drives must unlock srum_network_usage"
+        );
+
+        // bec (PLAYBOOK)
+        let bec = get_path("bec");
+        assert!(
+            step_unlocks(bec, "networklist_profiles").contains(&"evtx_security"),
+            "bec networklist_profiles must unlock evtx_security"
+        );
+        assert!(
+            step_unlocks(bec, "lnk_files").contains(&"jump_list_auto"),
+            "bec lnk_files must unlock jump_list_auto"
+        );
+
+        // insider (PLAYBOOK)
+        let ins = get_path("insider");
+        assert!(
+            step_unlocks(ins, "evtx_security").contains(&"srum_network_usage"),
+            "insider evtx_security must unlock srum_network_usage"
+        );
+
+        // supply_chain (PLAYBOOK)
+        let sc = get_path("supply_chain");
+        assert!(
+            step_unlocks(sc, "networklist_profiles").contains(&"evtx_security"),
+            "supply_chain networklist_profiles must unlock evtx_security"
+        );
+    }
 }

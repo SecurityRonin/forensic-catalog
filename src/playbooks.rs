@@ -739,6 +739,27 @@ mod tests {
     use crate::catalog::CATALOG;
 
     #[test]
+    fn all_steps_have_tactic_field() {
+        for path in INVESTIGATION_PATHS.iter().chain(PLAYBOOKS.iter()) {
+            for step in path.steps {
+                assert!(
+                    !step.tactic.is_empty(),
+                    "path '{}' step '{}' is missing tactic",
+                    path.id,
+                    step.artifact_id
+                );
+                assert!(
+                    step.tactic.starts_with("TA"),
+                    "path '{}' step '{}' tactic '{}' must be a TA-prefixed ATT&CK tactic ID",
+                    path.id,
+                    step.artifact_id,
+                    step.tactic
+                );
+            }
+        }
+    }
+
+    #[test]
     fn six_artifact_triggered_playbooks_defined() {
         assert_eq!(
             INVESTIGATION_PATHS.len(),

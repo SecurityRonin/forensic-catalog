@@ -492,16 +492,23 @@ fn playbook_list_exits_zero() {
 }
 
 #[test]
-fn playbook_list_shows_all_six() {
+fn playbook_list_shows_all_eleven() {
     let out = run(&["--playbook"]);
-    // All 6 playbook IDs must appear
+    // All 11 playbook IDs must appear
     for id in &[
+        // Artifact-triggered
         "lateral_movement_rdp",
         "credential_harvesting",
         "persistence_hunt",
         "data_exfiltration",
         "execution_trace",
         "defense_evasion",
+        // Scenario-based
+        "ransomware",
+        "data_breach",
+        "bec",
+        "insider",
+        "supply_chain",
     ] {
         assert!(
             out.stdout.contains(id),
@@ -551,5 +558,5 @@ fn playbook_list_json_is_valid() {
     let v: serde_json::Value = serde_json::from_str(&out.stdout)
         .expect("--playbook list --format json must produce valid JSON");
     assert!(v.is_array(), "JSON list must be an array");
-    assert_eq!(v.as_array().unwrap().len(), 6);
+    assert_eq!(v.as_array().unwrap().len(), 11);
 }

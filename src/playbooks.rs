@@ -332,6 +332,365 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
         ],
     },
+    InvestigationPath {
+        id: "ransomware",
+        trigger: "ransomware",
+        name: "Ransomware Investigation",
+        description: "Collection and analysis checklist for a ransomware incident. \
+            RFC 3227 order: volatile first, then persistent artifacts. \
+            Focus: encryption timeline, initial access, lateral movement, anti-forensics.",
+        tactics_covered: &["TA0040", "TA0001", "TA0008", "TA0005"],
+        steps: &[
+            InvestigationStep {
+                artifact_id: "mft",
+                rationale: "$MFT records every file creation, modification, and deletion. \
+                    Encrypted files show a mass-modification wave in $SI timestamps. \
+                    Compare $SI vs $FN timestamps to detect timestomping before encryption.",
+                look_for: "Mass $SI modification timestamps within a tight window (minutes). \
+                    Files in %TEMP%, %APPDATA%, Recycle Bin created just before encryption. \
+                    New filenames matching ransom note patterns (HOW_TO_DECRYPT, RECOVER_*).",
+                unlocks: &["usnjrnl", "recycle_bin"],
+            },
+            InvestigationStep {
+                artifact_id: "usnjrnl",
+                rationale: "$UsnJrnl:$J logs every file-system operation with reason codes. \
+                    FILE_CREATE + FILE_DELETE bursts identify the staging and encryption sweep.",
+                look_for: "Bulk RENAME_OLD_NAME entries (attacker renaming original files). \
+                    FILE_DELETE immediately after FILE_CREATE (encrypt-then-delete pattern). \
+                    Tool cleanup: malware executable deleted after encryption completes.",
+                unlocks: &["mft"],
+            },
+            InvestigationStep {
+                artifact_id: "evtx_security",
+                rationale: "Event 4688 = process creation (if audited). \
+                    4624/4625 = logon success/failure — establishes attack timeline. \
+                    4648 = explicit credential use (attacker moving laterally before encryption).",
+                look_for: "4688 for ransomware binary process name. \
+                    4648 targeting file servers (attacker encrypting network shares). \
+                    4624 LogonType 3 (network) from unfamiliar hosts before encryption wave.",
+                unlocks: &["evtx_sysmon", "prefetch_file"],
+            },
+            InvestigationStep {
+                artifact_id: "evtx_system",
+                rationale: "Event 7045 = new service installed. \
+                    1102/104 = log clearing (attacker removing evidence after encryption). \
+                    6005/6006 = system start/stop (forced reboots to apply encryption).",
+                look_for: "Service installations in the attack window (PsExec creates services). \
+                    Log clearing event before or after encryption. \
+                    Multiple reboots during off-hours.",
+                unlocks: &["services_imagepath"],
+            },
+            InvestigationStep {
+                artifact_id: "vss_files_not_to_backup",
+                rationale: "Ransomware frequently adds exclusions to prevent VSS from \
+                    backing up files it is about to encrypt, or deletes shadow copies entirely.",
+                look_for: "Additions to FilesNotToBackup or FilesNotToSnapshot registry keys. \
+                    vssadmin delete shadows /all in prefetch or event logs. \
+                    wmic shadowcopy delete in PowerShell history.",
+                unlocks: &["psreadline_history"],
+            },
+            InvestigationStep {
+                artifact_id: "prefetch_file",
+                rationale: "Prefetch proves the ransomware binary executed and records \
+                    the exact timestamp of first and last run plus all DLLs loaded.",
+                look_for: "Unknown executable with single run count (execute-and-delete). \
+                    Tools: vssadmin.exe, wbadmin.exe, bcdedit.exe (shadow/backup deletion). \
+                    Dual-use: net.exe, whoami.exe, ipconfig.exe (recon before encryption).",
+                unlocks: &["amcache_app_file", "shimcache"],
+            },
+            InvestigationStep {
+                artifact_id: "recycle_bin",
+                rationale: "Ransomware may stage or briefly store files in Recycle Bin. \
+                    Attacker tools deleted post-encryption sometimes land here.",
+                look_for: "Deleted executables, scripts, or configuration files. \
+                    Deletion timestamps coinciding with the encryption window.",
+                unlocks: &[],
+            },
+            InvestigationStep {
+                artifact_id: "run_key_hklm",
+                rationale: "Ransomware may establish persistence to resume encryption \
+                    after reboots (common in multi-stage ransomware like LockBit).",
+                look_for: "Entries added to HKLM\\Run or RunOnce during the attack window. \
+                    Unusual executable paths in Temp, AppData, or ProgramData.",
+                unlocks: &["run_key_hkcu", "scheduled_tasks_dir"],
+            },
+            InvestigationStep {
+                artifact_id: "windows_defender_disabled_av",
+                rationale: "Most ransomware disables Windows Defender before encrypting. \
+                    Registry key changes leave forensic evidence even if logs were cleared.",
+                look_for: "DisableAntiVirus=1 or DisableRealtimeMonitoring=1. \
+                    Check modification timestamp against known attack window.",
+                unlocks: &["windows_defender_exclusions_local"],
+            },
+            InvestigationStep {
+                artifact_id: "srum_db",
+                rationale: "SRUM records hourly CPU, network, and storage usage per process. \
+                    Ransomware encryption produces a spike in disk write activity.",
+                look_for: "Process with massive disk write activity in the attack window. \
+                    Network bytes sent from an unknown process (exfiltration before encryption).",
+                unlocks: &[],
+            },
+        ],
+    },
+    InvestigationPath {
+        id: "data_breach",
+        trigger: "data_breach",
+        name: "Data Exfiltration / Breach Investigation",
+        description: "What was accessed, staged, compressed, and sent where. \
+            Focus: data staging, exfil mechanisms, cloud sync abuse, and browser credential theft.",
+        tactics_covered: &["TA0010", "TA0009", "TA0006"],
+        steps: &[
+            InvestigationStep {
+                artifact_id: "usnjrnl",
+                rationale: "USN journal records bulk file copies and archive creation. \
+                    Staging activity shows mass FILE_CREATE events for compressed archives.",
+                look_for: "Bulk file copy operations. ZIP/RAR/7z archive creation. \
+                    Files staged in unusual locations (Desktop, Temp, USB mount points).",
+                unlocks: &["recycle_bin", "lnk_files"],
+            },
+            InvestigationStep {
+                artifact_id: "lnk_files",
+                rationale: "Windows creates LNK files when files are opened. \
+                    Proves attacker accessed specific sensitive files.",
+                look_for: "LNK files pointing to sensitive documents (PII, financials, source code). \
+                    Unusual file paths: HR shares, exec folders, R&D directories.",
+                unlocks: &["jump_list_auto"],
+            },
+            InvestigationStep {
+                artifact_id: "chrome_login_data",
+                rationale: "Browser credential store is a primary target for credential theft. \
+                    Modification timestamp outside working hours is highly suspicious.",
+                look_for: "SQLite access timestamp outside normal user session. \
+                    Logins.json copies staged elsewhere.",
+                unlocks: &["firefox_logins"],
+            },
+            InvestigationStep {
+                artifact_id: "network_drives",
+                rationale: "Mapped drives reveal staging areas and potential exfil targets. \
+                    External cloud share mappings indicate attacker-controlled endpoints.",
+                look_for: "Drive letters mapped to external or unusual UNC paths. \
+                    New drive mappings created during the attack window.",
+                unlocks: &[],
+            },
+            InvestigationStep {
+                artifact_id: "onedrive_metadata",
+                rationale: "OneDrive sync automatically exfiltrates staged files. \
+                    Metadata database records which files were synced and when.",
+                look_for: "Files synced to OneDrive outside normal business hours. \
+                    Bulk sync of sensitive directories.",
+                unlocks: &["google_drive_fs_metadata"],
+            },
+            InvestigationStep {
+                artifact_id: "evtx_security",
+                rationale: "5140/5145 = network share access events. \
+                    4663 = file access audit (if configured). \
+                    4648 = explicit credential use to access remote shares.",
+                look_for: "5145 with sensitive share names accessed from unfamiliar accounts. \
+                    Bulk file reads from a single process in a short window.",
+                unlocks: &[],
+            },
+            InvestigationStep {
+                artifact_id: "srum_network_usage",
+                rationale: "SRUM tracks bytes sent per process per hour. \
+                    Large outbound bytes from a non-network process = exfiltration.",
+                look_for: "Unusual process with > 100MB sent in a single SRUM interval. \
+                    Process name does not match a known network application.",
+                unlocks: &["srum_db"],
+            },
+        ],
+    },
+    InvestigationPath {
+        id: "bec",
+        trigger: "bec",
+        name: "Business Email Compromise (BEC) Investigation",
+        description: "Account takeover, inbox manipulation, and financial fraud. \
+            Focus: authentication anomalies, mail rules, forwarding, and browser artifacts.",
+        tactics_covered: &["TA0001", "TA0006", "TA0009"],
+        steps: &[
+            InvestigationStep {
+                artifact_id: "evtx_security",
+                rationale: "4624 with LogonType 8 (NetworkCleartext) or Type 10 (RemoteInteractive) \
+                    from anomalous source IPs indicates credential compromise.",
+                look_for: "Failed logins (4625) followed by successful login (4624) from same IP. \
+                    Logons from unexpected geographic locations (requires IP correlation). \
+                    New browser session outside known working hours.",
+                unlocks: &["chrome_login_data"],
+            },
+            InvestigationStep {
+                artifact_id: "chrome_login_data",
+                rationale: "Compromised email accounts often have credentials saved in the browser. \
+                    Credential theft precedes or accompanies email account takeover.",
+                look_for: "SQLite access timestamps during the suspected compromise window. \
+                    Saved credentials for O365, banking portals, or payment systems.",
+                unlocks: &["firefox_logins"],
+            },
+            InvestigationStep {
+                artifact_id: "networklist_profiles",
+                rationale: "Records network names (including mobile hotspot names) the machine \
+                    connected to. Attacker-controlled hotspots leave a distinct profile name.",
+                look_for: "Network names not matching the corporate environment. \
+                    Profile timestamps correlating with the suspect logon window.",
+                unlocks: &[],
+            },
+            InvestigationStep {
+                artifact_id: "psreadline_history",
+                rationale: "PowerShell command history reveals O365/Exchange manipulation. \
+                    BEC actors use PowerShell to set inbox rules and forwarding.",
+                look_for: "Set-InboxRule, New-TransportRule, Set-Mailbox ForwardingSmtpAddress. \
+                    Connect-ExchangeOnline from an unusual host or account.",
+                unlocks: &[],
+            },
+            InvestigationStep {
+                artifact_id: "prefetch_file",
+                rationale: "MFA bypass tools (Evilginx, Modlishka) or email-scraping tools \
+                    leave prefetch entries if run locally.",
+                look_for: "Unknown executables run during the suspect window. \
+                    Credential-dumping tools: mimikatz.exe, procdump.exe, pypykatz.",
+                unlocks: &["amcache_app_file"],
+            },
+            InvestigationStep {
+                artifact_id: "lnk_files",
+                rationale: "LNK files in the user profile reveal which files the actor opened \
+                    after gaining access — financial data, org charts, email templates.",
+                look_for: "LNK files pointing to financial, HR, or executive documents \
+                    opened outside normal hours or from an unusual path.",
+                unlocks: &[],
+            },
+        ],
+    },
+    InvestigationPath {
+        id: "insider",
+        trigger: "insider",
+        name: "Insider Threat Investigation",
+        description: "Unauthorised data access, IP theft, or sabotage by a current or former employee. \
+            Focus: data access patterns, removable media, cloud sync, and communication channels.",
+        tactics_covered: &["TA0010", "TA0009"],
+        steps: &[
+            InvestigationStep {
+                artifact_id: "usb_enum",
+                rationale: "USBSTOR registry key records every USB storage device ever connected. \
+                    Device serial numbers map to specific hardware owned by the insider.",
+                look_for: "USB devices connected outside business hours or during the suspect window. \
+                    Devices not in the approved device list.",
+                unlocks: &["setupapi_dev_log", "mountpoints2"],
+            },
+            InvestigationStep {
+                artifact_id: "lnk_files",
+                rationale: "LNK files prove specific files were opened and provide timestamps. \
+                    Cross-reference with file servers to identify what data was accessed.",
+                look_for: "Sensitive documents (IP, PII, customer data, source code). \
+                    Files accessed shortly before resignation or termination notice.",
+                unlocks: &["jump_list_auto"],
+            },
+            InvestigationStep {
+                artifact_id: "onedrive_metadata",
+                rationale: "OneDrive sync silently uploads staged files. \
+                    Check corporate vs personal account sync paths.",
+                look_for: "Files synced to personal (non-corporate) OneDrive account. \
+                    Bulk sync of directories unrelated to the employee's role.",
+                unlocks: &["google_drive_fs_metadata"],
+            },
+            InvestigationStep {
+                artifact_id: "google_drive_fs_metadata",
+                rationale: "Google Drive File Stream caches metadata about synced files. \
+                    Employees with personal Google accounts may sync corporate data.",
+                look_for: "Files synced to personal Google Drive. \
+                    Sync timestamps correlating with USB or archive events.",
+                unlocks: &["megasync_data"],
+            },
+            InvestigationStep {
+                artifact_id: "megasync_data",
+                rationale: "MEGA is a popular personal cloud storage with end-to-end encryption. \
+                    Frequently used to bypass DLP because traffic is encrypted and hard to inspect.",
+                look_for: "MEGAsync client installation or profile data. \
+                    Sync activity timestamps in the staging window.",
+                unlocks: &[],
+            },
+            InvestigationStep {
+                artifact_id: "usnjrnl",
+                rationale: "USN journal reconstructs file staging activity. \
+                    Archive creation before USB insertion or cloud sync = deliberate staging.",
+                look_for: "ZIP/RAR/7z creation followed by USB device attach within minutes. \
+                    Bulk file copies to Desktop or temp folder.",
+                unlocks: &["recycle_bin"],
+            },
+            InvestigationStep {
+                artifact_id: "evtx_security",
+                rationale: "5145 = network share file access. 4663 = object access (if audited). \
+                    Bulk access to shares outside the employee's normal job function.",
+                look_for: "File server share access for directories unrelated to the employee's role. \
+                    Access during non-working hours (pre-dawn, weekends).",
+                unlocks: &[],
+            },
+            InvestigationStep {
+                artifact_id: "srum_network_usage",
+                rationale: "SRUM tracks bytes sent per process. \
+                    Large outbound bytes correlating with USB events = staging + exfil.",
+                look_for: "Browser or sync agent with abnormally high upload bytes. \
+                    Process correlation: which application was sending data.",
+                unlocks: &["srum_db"],
+            },
+        ],
+    },
+    InvestigationPath {
+        id: "supply_chain",
+        trigger: "supply_chain",
+        name: "Supply Chain Compromise Investigation",
+        description: "Malicious software delivered via a trusted vendor update or build pipeline. \
+            Focus: installation artifacts, software inventory, code signing, and lateral movement after.",
+        tactics_covered: &["TA0001", "TA0003", "TA0008"],
+        steps: &[
+            InvestigationStep {
+                artifact_id: "amcache_app_file",
+                rationale: "AmCache records SHA1 hash of every file that touched the cache. \
+                    The hash identifies the exact malicious binary even if deleted.",
+                look_for: "Hash lookup on VirusTotal for any software installed in the suspect window. \
+                    Version mismatch: same filename as a known good binary but different hash.",
+                unlocks: &["shimcache"],
+            },
+            InvestigationStep {
+                artifact_id: "prefetch_file",
+                rationale: "Prefetch proves the software ran and records DLLs it loaded. \
+                    Malicious updates often side-load a weaponized DLL alongside the installer.",
+                look_for: "Installer executable with unexpected DLL references. \
+                    Execution of the compromised software at the time of the first malicious action.",
+                unlocks: &["evtx_sysmon"],
+            },
+            InvestigationStep {
+                artifact_id: "evtx_sysmon",
+                rationale: "Sysmon 1 = process creation with full command line and parent process. \
+                    Sysmon 7 = image loaded. Sysmon 11 = file created. \
+                    Supply chain payloads spawn unexpected child processes from trusted parents.",
+                look_for: "Trusted parent process (solarwinds.exe, 3cx.exe) spawning cmd.exe, \
+                    powershell.exe, or network tools. DNS queries to unexpected domains from the process.",
+                unlocks: &["networklist_profiles"],
+            },
+            InvestigationStep {
+                artifact_id: "services_imagepath",
+                rationale: "Supply chain implants often register as services for persistence. \
+                    Service ImagePath in a non-standard location is a strong indicator.",
+                look_for: "Services pointing to the compromised vendor software directory. \
+                    Service names matching the vendor product but ImagePath is different.",
+                unlocks: &["scheduled_tasks_dir"],
+            },
+            InvestigationStep {
+                artifact_id: "networklist_profiles",
+                rationale: "Records C2 domains resolved as network names in some environments. \
+                    More importantly: identifies new external connections after software installation.",
+                look_for: "Network connections to unknown external hosts originating from the \
+                    compromised software. DNS-over-HTTPS usage to bypass proxy logs.",
+                unlocks: &[],
+            },
+            InvestigationStep {
+                artifact_id: "run_key_hklm",
+                rationale: "Supply chain implants may add persistence via Run keys alongside \
+                    the legitimate software. The key timestamp reveals the implant installation time.",
+                look_for: "Run key entries added at the same time as the compromised software update. \
+                    Entries with the same vendor name but pointing to a different binary.",
+                unlocks: &["scheduled_tasks_dir"],
+            },
+        ],
+    },
 ];
 
 /// Returns all scenario playbooks (ransomware, data-breach, bec, insider, supply-chain).
@@ -372,8 +731,21 @@ mod tests {
     use crate::catalog::CATALOG;
 
     #[test]
-    fn six_playbooks_defined() {
-        assert_eq!(PLAYBOOKS.len(), 6, "Expected 6 playbooks");
+    fn six_artifact_triggered_playbooks_defined() {
+        let artifact_triggered: Vec<_> = PLAYBOOKS
+            .iter()
+            .filter(|pb| {
+                !matches!(
+                    pb.id,
+                    "ransomware" | "data_breach" | "bec" | "insider" | "supply_chain"
+                )
+            })
+            .collect();
+        assert_eq!(
+            artifact_triggered.len(),
+            6,
+            "Expected 6 artifact-triggered playbooks"
+        );
     }
 
     #[test]

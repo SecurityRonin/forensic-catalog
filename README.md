@@ -12,9 +12,22 @@
 [![rust](https://img.shields.io/badge/rust-1.75+-orange?style=for-the-badge&logo=rust)](https://www.rust-lang.org)
 [![Sponsor](https://img.shields.io/github/sponsors/h4x0r?style=for-the-badge&logo=github&label=Sponsor&color=ea4aaa)](https://github.com/sponsors/h4x0r)
 
-**6,548 forensic artifacts. Every one enriched.**
+**6,551 forensic artifacts. Every one enriched.**
 
-The only zero-dependency Rust crate that unifies all six LOL/LOFL datasets across Windows, Linux, and macOS under a single API — plus a 6,548-artifact DFIR catalog with decoders, ATT&CK mappings, and triage priorities compiled into your binary.
+You're in an active IR. You need to know if a binary is abusable — right now, offline, without opening a browser.
+
+```bash
+# Install
+brew install SecurityRonin/tap/4n6query
+# or: cargo install forensicnomicon-cli
+
+4n6query certutil.exe          # → LOLBAS entry, 3 ATT&CK techniques, use cases
+4n6query userassist            # → 5 artifact variants, decoded field schemas, triage priority
+4n6query T1547.001             # → all artifacts mapped to this technique
+4n6query --triage              # → your 6,551 artifacts ordered Critical → High → Medium → Low
+```
+
+If you're building DFIR tools in Rust, the same data is a zero-dependency library:
 
 ```toml
 [dependencies]
@@ -79,7 +92,7 @@ assert!(is_lolbas_windows_wmi("Win32_Process"));
 
 ### macOS LOFL catalog — first-of-its-kind research
 
-The macOS LOFL section of `LOLBAS_MACOS` (tools installed via Homebrew, pip, npm, cargo, etc.) is the **first published macOS LOFL catalog anywhere**. It covers 78 tools — cloud CLIs, container runtimes, tunneling tools, offensive security tools, and credential managers — with documented abuse techniques mapped to ATT&CK IDs. The raw YAML data lives in `research/macos-lofl-catalog.yaml`.
+The macOS LOFL section of `LOLBAS_MACOS` (tools installed via Homebrew, pip, npm, cargo, etc.) is the **first published macOS LOFL catalog anywhere**. It covers 78 tools — cloud CLIs, container runtimes, tunneling tools, offensive security tools, and credential managers — with documented abuse techniques mapped to ATT&CK IDs. The raw YAML data lives in [`research/macos-lofl-catalog.yaml`](https://github.com/SecurityRonin/forensicnomicon/blob/main/research/macos-lofl-catalog.yaml).
 
 ---
 

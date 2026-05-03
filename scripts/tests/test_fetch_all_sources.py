@@ -453,6 +453,58 @@ class TestXmlUrlFirstStrategy(unittest.TestCase):
         self.assertFalse(ba._should_try_wordpress(entries=[], xml_url=""))
 
 
+class TestDetectIsWordpress(unittest.TestCase):
+    """detect_is_wordpress(xml_text) — True iff RSS feed contains WP generator tag."""
+
+    def test_wordpress_generator_tag_detected(self):
+        rss = textwrap.dedent("""\
+        <?xml version="1.0"?>
+        <rss version="2.0">
+          <channel>
+            <generator>https://wordpress.org/?v=6.5.3</generator>
+            <item><title>T</title><link>https://example.com/</link></item>
+          </channel>
+        </rss>
+        """)
+        self.assertTrue(ba.detect_is_wordpress(rss))
+
+    def test_wordpress_generator_http_also_detected(self):
+        rss = textwrap.dedent("""\
+        <?xml version="1.0"?>
+        <rss version="2.0">
+          <channel>
+            <generator>http://wordpress.org/?v=5.9</generator>
+          </channel>
+        </rss>
+        """)
+        self.assertTrue(ba.detect_is_wordpress(rss))
+
+    def test_ghost_generator_not_wordpress(self):
+        rss = textwrap.dedent("""\
+        <?xml version="1.0"?>
+        <rss version="2.0">
+          <channel>
+            <generator>Ghost 5.79</generator>
+          </channel>
+        </rss>
+        """)
+        self.assertFalse(ba.detect_is_wordpress(rss))
+
+    def test_no_generator_tag_returns_false(self):
+        rss = textwrap.dedent("""\
+        <?xml version="1.0"?>
+        <rss version="2.0"><channel><item><title>T</title></item></channel></rss>
+        """)
+        self.assertFalse(ba.detect_is_wordpress(rss))
+
+    def test_empty_string_returns_false(self):
+        self.assertFalse(ba.detect_is_wordpress(""))
+
+    def test_jekyll_feed_not_wordpress(self):
+        """Jekyll Atom feed — must not be misdetected as WordPress."""
+        self.assertFalse(ba.detect_is_wordpress(BLOGGER_FEED_XML))
+
+
 class TestReadOpmlUsesTextAttribute(unittest.TestCase):
     """read_opml must use `text` (canonical OPML identifier) over `title`.
 

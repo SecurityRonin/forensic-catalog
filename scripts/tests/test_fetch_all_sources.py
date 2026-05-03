@@ -6,8 +6,7 @@ Tests cover the pure-logic functions (no real HTTP):
   - parse_wordpress_posts(json_text)   → list[tuple[str,str,str]]
   - parse_atom_feed(xml_text)          → list[tuple[str,str,str]]
   - parse_github_commits(json_text)    → list[tuple[str,str,str]]
-  - load_seen_urls(feed_state_path, pending_path) → set[str]
-  - dedup_entries(entries, seen_urls)  → list[tuple[str,str,str]]
+  - load_seen_urls(pending_path) → set[str]  (dedup against pending-review.md)
   - classify_blog_source(html_url)     → str  ("blogger"|"wordpress"|"github"|"unknown")
   - rescan_reviewed_entries(path)      → int  (rewrites [x] → [ ])
 """
@@ -94,15 +93,6 @@ PENDING_MD = textwrap.dedent("""\
 - [ ] [Another Post](https://windowsir.blogspot.com/2024/01/shimcache.html) — Windows IR
 - [→] [Third Post](https://dfir.blog/prefetch-analysis/) — dfir.blog
 """)
-
-FEED_STATE_JSON = json.dumps({
-    "https://windowsir.blogspot.com/feeds/posts/default": {
-        "title": "Windows Incident Response",
-        "entries": [
-            {"url": "https://windowsir.blogspot.com/2023/12/userassist.html", "title": "UserAssist"}
-        ],
-    }
-})
 
 
 class TestParseBloggerFeed(unittest.TestCase):
@@ -197,53 +187,35 @@ class TestLoadSeenUrls(unittest.TestCase):
     def setUp(self):
         import tempfile
         self.tmp = tempfile.mkdtemp()
-        self.state = os.path.join(self.tmp, "feed-state.json")
         self.pending = os.path.join(self.tmp, "pending-review.md")
-        with open(self.state, "w") as f:
-            f.write(FEED_STATE_JSON)
         with open(self.pending, "w") as f:
             f.write(PENDING_MD)
 
     def test_returns_set(self):
-        seen = ba.load_seen_urls(self.state, self.pending)
+        seen = ba.load_seen_urls(self.pending)
         self.assertIsInstance(seen, set)
 
-    def test_includes_feed_state_urls(self):
-        seen = ba.load_seen_urls(self.state, self.pending)
+    def test_includes_all_marker_states(self):
+        seen = ba.load_seen_urls(self.pending)
+        # [x], [ ], and [→] entries all count as seen
         self.assertIn("https://windowsir.blogspot.com/2023/12/userassist.html", seen)
-
-    def test_includes_pending_urls(self):
-        seen = ba.load_seen_urls(self.state, self.pending)
         self.assertIn("https://windowsir.blogspot.com/2024/01/shimcache.html", seen)
         self.assertIn("https://dfir.blog/prefetch-analysis/", seen)
 
-    def test_missing_state_file_returns_pending_only(self):
-        seen = ba.load_seen_urls(os.path.join(self.tmp, "nonexistent.json"), self.pending)
-        self.assertIn("https://windowsir.blogspot.com/2024/01/shimcache.html", seen)
+    def test_missing_file_returns_empty_set(self):
+        seen = ba.load_seen_urls(os.path.join(self.tmp, "nonexistent.md"))
+        self.assertEqual(seen, set())
 
-    def test_missing_pending_file_returns_state_only(self):
-        seen = ba.load_seen_urls(self.state, os.path.join(self.tmp, "nonexistent.md"))
-        self.assertIn("https://windowsir.blogspot.com/2023/12/userassist.html", seen)
-
-
-class TestDedupEntries(unittest.TestCase):
-    def test_removes_seen_urls(self):
+    def test_dedup_prevents_duplicate_entries(self):
+        """Re-running fetch must not add URLs already in pending-review.md."""
+        seen = ba.load_seen_urls(self.pending)
         entries = [
             ("ShimCache", "https://windowsir.blogspot.com/2024/01/shimcache.html", "2024-01-15"),
-            ("UserAssist", "https://windowsir.blogspot.com/2023/12/userassist.html", "2023-12-01"),
+            ("New Post", "https://windowsir.blogspot.com/2024/06/new.html", "2024-06-01"),
         ]
-        seen = {"https://windowsir.blogspot.com/2023/12/userassist.html"}
-        result = ba.dedup_entries(entries, seen)
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[0][0], "ShimCache")
-
-    def test_empty_seen_returns_all(self):
-        entries = [("A", "https://a.com/", "2024-01-01")]
-        result = ba.dedup_entries(entries, set())
-        self.assertEqual(result, entries)
-
-    def test_empty_entries_returns_empty(self):
-        self.assertEqual(ba.dedup_entries([], {"https://anything.com"}), [])
+        new = [e for e in entries if e[1] not in seen]
+        self.assertEqual(len(new), 1)
+        self.assertEqual(new[0][0], "New Post")
 
 
 class TestClassifyBlogSource(unittest.TestCase):

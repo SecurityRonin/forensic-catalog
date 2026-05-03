@@ -235,50 +235,23 @@ def _parse_atom_date(entry: ET.Element, ns: str) -> str:
 _PENDING_URL_RE = re.compile(r"^\- \[[^\]]*\] \[[^\]]*\]\(([^)]+)\)")
 
 
-def load_seen_urls(feed_state_path: str, pending_path: str) -> set[str]:
+def load_seen_urls(pending_path: str) -> set[str]:
     """
-    Return union of URLs from feed-state.json and all URLs in pending-review.md.
-
-    feed-state.json format (keyed by feed_url):
-      { "https://feed.url": { "entries": [{"url": "..."}] } }
+    Return all URLs already present in pending-review.md (any marker state).
+    Used to prevent duplicate entries when re-running the fetch.
     """
     seen: set[str] = set()
-
-    # feed-state.json — keyed by feed URL, each value has "entries" list
-    if os.path.exists(feed_state_path):
-        try:
-            with open(feed_state_path) as f:
-                state = json.load(f)
-            if isinstance(state, dict):
-                for feed_data in state.values():
-                    if isinstance(feed_data, dict):
-                        for entry in feed_data.get("entries", []):
-                            url = entry.get("url", "")
-                            if url:
-                                seen.add(url)
-        except (json.JSONDecodeError, OSError):
-            pass
-
-    # pending-review.md
-    if os.path.exists(pending_path):
-        try:
-            with open(pending_path) as f:
-                for line in f:
-                    m = _PENDING_URL_RE.match(line)
-                    if m:
-                        seen.add(m.group(1))
-        except OSError:
-            pass
-
+    if not os.path.exists(pending_path):
+        return seen
+    try:
+        with open(pending_path) as f:
+            for line in f:
+                m = _PENDING_URL_RE.match(line)
+                if m:
+                    seen.add(m.group(1))
+    except OSError:
+        pass
     return seen
-
-
-def dedup_entries(
-    entries: list[tuple[str, str, str]],
-    seen_urls: set[str],
-) -> list[tuple[str, str, str]]:
-    """Remove entries whose URL is already in seen_urls."""
-    return [(t, u, d) for t, u, d in entries if u not in seen_urls]
 
 
 # ─── blog platform classifier ──────────────────────────────────────────────────
@@ -791,7 +764,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     sources = read_opml(args.opml)
-    seen = load_seen_urls(args.state, args.pending)
+    seen = load_seen_urls(args.pending)
 
     total_appended = 0
     total_broken = 0
@@ -841,9 +814,9 @@ def main(argv: list[str] | None = None) -> int:
                 else:
                     entries = []
 
-        new = dedup_entries(entries, seen)
+        new = [e for e in entries if e[1] not in seen]
         # Update seen so we don't re-add within the same run
-        seen.update(u for _, u, _ in new)
+        seen.update(e[1] for e in new)
 
         print(f"{len(entries)} fetched, {len(new)} new")
 

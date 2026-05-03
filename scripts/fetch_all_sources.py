@@ -27,14 +27,11 @@ Platform support:
     squarespace  Blog archive page scraping (mac4n6)
     unknown      Skipped with a warning
 
-Blogs to SKIP for backfill (low artifact signal):
-    SANS ISC        — mostly stormcast podcast summaries
-    BleepingComputer, Krebs, Dark Reading — news aggregators, not DFIR
-    Forensic Focus  — news aggregator
-    HECF            — very high volume, mostly daily link roundups
-    GitHub Atom feeds — use fetch_lolbas.py / fetch_gtfobins.py etc.
-    URLhaus, MalwareBazaar, ThreatFox — IOC feeds, not artifact docs
-    MISP taxonomies — taxonomy commits, not blog posts
+Sources SKIPPED (not blog posts — no artifact documentation content):
+    URLhaus, MalwareBazaar, ThreatFox — IOC feeds, thousands of entries/day
+    MISP taxonomies — taxonomy YAML commits, not investigative content
+    LOL datasets (LOLBAS, GTFOBins, etc.) — use fetch_lolbas.py etc. for structured data
+    YouTube — handled separately via --youtube-api-key flag
 """
 
 import json
@@ -91,7 +88,6 @@ _SKIP_TITLES = frozenset({
     "LOOBins (macOS)",
     "LOLDrivers (BYOVD)",
     "LOFL Project (RMM C2 indicators)",
-    "Blue_Team_Hunting_Field_Notes",
     # YouTube — handled separately via --youtube-api-key flag
     # Without key: first-page Atom only (15 videos); with key: full channel history
 })

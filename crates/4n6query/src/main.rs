@@ -33,7 +33,9 @@ use forensicnomicon::lolbins::{
     lolbas_entry, LolbasEntry, LOLBAS_LINUX, LOLBAS_MACOS, LOLBAS_WINDOWS, LOLBAS_WINDOWS_CMDLETS,
     LOLBAS_WINDOWS_MMC, LOLBAS_WINDOWS_WMI,
 };
-use forensicnomicon::playbooks::{playbook_by_id, InvestigationPath, PLAYBOOKS};
+use forensicnomicon::playbooks::{
+    path_by_id, playbook_by_id, InvestigationPath, INVESTIGATION_PATHS, PLAYBOOKS,
+};
 use std::process;
 
 // ---------------------------------------------------------------------------
@@ -222,12 +224,12 @@ fn run_query(term: &str, platform: Option<Platform>, format: Format) -> i32 {
         vec![]
     };
 
-    // 4. Relevant playbooks: any playbook that mentions a matched artifact in its steps.
-    let playbook_hits: Vec<&InvestigationPath> = if !artifact_hits.is_empty() {
+    // 4. Relevant investigation paths (artifact-triggered chains) for matched artifacts.
+    let path_hits: Vec<&InvestigationPath> = if !artifact_hits.is_empty() {
         let hit_ids: Vec<&str> = artifact_hits.iter().map(|d| d.id).collect();
-        PLAYBOOKS
+        INVESTIGATION_PATHS
             .iter()
-            .filter(|pb| pb.steps.iter().any(|s| hit_ids.contains(&s.artifact_id)))
+            .filter(|p| p.steps.iter().any(|s| hit_ids.contains(&s.artifact_id)))
             .collect()
     } else {
         vec![]
@@ -261,11 +263,8 @@ fn run_query(term: &str, platform: Option<Platform>, format: Format) -> i32 {
                     .collect();
                 obj.insert("artifacts".into(), serde_json::Value::Array(arr));
             }
-            if !playbook_hits.is_empty() {
-                let arr: Vec<_> = playbook_hits
-                    .iter()
-                    .map(|pb| playbook_to_json(pb))
-                    .collect();
+            if !path_hits.is_empty() {
+                let arr: Vec<_> = path_hits.iter().map(|pb| playbook_to_json(pb)).collect();
                 obj.insert("playbooks".into(), serde_json::Value::Array(arr));
             }
             let val = serde_json::Value::Object(obj);
@@ -313,10 +312,10 @@ fn run_query(term: &str, platform: Option<Platform>, format: Format) -> i32 {
                     }
                 }
             }
-            if !playbook_hits.is_empty() {
+            if !path_hits.is_empty() {
                 println!();
                 println!("Playbooks:");
-                for pb in &playbook_hits {
+                for pb in &path_hits {
                     println!("  {}  —  {}", pb.id, pb.name);
                     println!("    Run: 4n6query --playbook {}", pb.id);
                 }
@@ -583,7 +582,7 @@ fn risk_label(r: BlockingRisk) -> &'static str {
 
 fn run_playbook(id_arg: &str, format: Format) -> i32 {
     if id_arg.is_empty() {
-        // List all playbooks
+        // List scenario playbooks only (not investigation paths)
         match format {
             Format::Json => {
                 let arr: Vec<serde_json::Value> = PLAYBOOKS.iter().map(playbook_to_json).collect();
@@ -612,13 +611,22 @@ fn run_playbook(id_arg: &str, format: Format) -> i32 {
                     println!();
                 }
                 println!("Run: 4n6query --playbook <id>  to see full step-by-step path");
+                println!();
+                println!("Investigation Paths ({}):", INVESTIGATION_PATHS.len());
+                println!(
+                    "(ATT&CK-tactic-focused artifact chains — shown when you query an artifact)"
+                );
+                for p in INVESTIGATION_PATHS {
+                    println!("  {:30}  {}", p.id, p.name);
+                }
             }
         }
         return 0;
     }
 
-    // Show specific playbook
-    match playbook_by_id(id_arg) {
+    // Show specific playbook OR investigation path — search both
+    let found = playbook_by_id(id_arg).or_else(|| path_by_id(id_arg));
+    match found {
         None => {
             eprintln!("Not found: playbook '{id_arg}'");
             eprintln!("Run: 4n6query --playbook  to list available playbooks");

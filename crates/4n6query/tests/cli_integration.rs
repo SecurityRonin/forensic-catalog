@@ -492,18 +492,10 @@ fn playbook_list_exits_zero() {
 }
 
 #[test]
-fn playbook_list_shows_all_eleven() {
+fn playbook_list_shows_five_scenarios() {
     let out = run(&["--playbook"]);
-    // All 11 playbook IDs must appear
+    // All 5 scenario IDs must appear
     for id in &[
-        // Artifact-triggered
-        "lateral_movement_rdp",
-        "credential_harvesting",
-        "persistence_hunt",
-        "data_exfiltration",
-        "execution_trace",
-        "defense_evasion",
-        // Scenario-based
         "ransomware",
         "data_breach",
         "bec",
@@ -512,20 +504,34 @@ fn playbook_list_shows_all_eleven() {
     ] {
         assert!(
             out.stdout.contains(id),
-            "--playbook must list playbook id '{id}'"
+            "--playbook must list scenario id '{id}'"
+        );
+    }
+    // All 6 investigation path IDs must also appear (shown in Paths section)
+    for id in &[
+        "lateral_movement",
+        "credential_harvesting",
+        "persistence",
+        "data_exfiltration",
+        "execution_trace",
+        "defense_evasion",
+    ] {
+        assert!(
+            out.stdout.contains(id),
+            "--playbook must list investigation path id '{id}'"
         );
     }
 }
 
 #[test]
 fn playbook_id_lateral_movement_exits_zero() {
-    let out = run(&["--playbook", "lateral_movement_rdp"]);
+    let out = run(&["--playbook", "lateral_movement"]);
     assert_eq!(out.code, 0, "stderr: {}", out.stderr);
 }
 
 #[test]
 fn playbook_id_shows_steps() {
-    let out = run(&["--playbook", "lateral_movement_rdp"]);
+    let out = run(&["--playbook", "lateral_movement"]);
     assert!(
         out.stdout.contains("rdp_client_servers"),
         "playbook steps must include rdp_client_servers"
@@ -558,5 +564,9 @@ fn playbook_list_json_is_valid() {
     let v: serde_json::Value = serde_json::from_str(&out.stdout)
         .expect("--playbook list --format json must produce valid JSON");
     assert!(v.is_array(), "JSON list must be an array");
-    assert_eq!(v.as_array().unwrap().len(), 11);
+    assert_eq!(
+        v.as_array().unwrap().len(),
+        5,
+        "JSON list must have exactly 5 scenario playbooks"
+    );
 }

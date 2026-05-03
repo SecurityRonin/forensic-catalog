@@ -37,9 +37,13 @@ pub struct InvestigationPath {
     pub description: &'static str,
 }
 
-pub static PLAYBOOKS: &[InvestigationPath] = &[
+/// Artifact-triggered investigation paths — one per ATT&CK tactic cluster.
+///
+/// Each path starts from a key artifact and chains through related artifacts
+/// using the `unlocks` field. Use [`path_by_id`] or [`paths_for_trigger`] to query.
+pub static INVESTIGATION_PATHS: &[InvestigationPath] = &[
     InvestigationPath {
-        id: "lateral_movement_rdp",
+        id: "lateral_movement",
         trigger: "rdp_client_servers",
         name: "Lateral Movement via RDP",
         description: "Investigate RDP-based lateral movement: source, destination, credentials used, and post-exploitation activity.",
@@ -129,7 +133,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
         ],
     },
     InvestigationPath {
-        id: "persistence_hunt",
+        id: "persistence",
         trigger: "run_key_hklm",
         name: "Persistence Mechanism Hunt",
         description: "Systematic enumeration of persistence mechanisms: registry autoruns, services, scheduled tasks, and boot persistence.",
@@ -332,6 +336,13 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
         ],
     },
+];
+
+/// Scenario-based investigation checklists — one per incident category.
+///
+/// These are structured collection checklists, not artifact-triggered chains.
+/// Use [`playbook_by_id`] to look up a specific scenario.
+pub static PLAYBOOKS: &[InvestigationPath] = &[
     InvestigationPath {
         id: "ransomware",
         trigger: "ransomware",
@@ -682,34 +693,42 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
     },
 ];
 
-/// Returns all scenario playbooks (ransomware, data-breach, bec, insider, supply-chain).
-/// These are structured collection checklists, not artifact-triggered paths.
-pub fn scenario_playbooks() -> Vec<&'static InvestigationPath> {
-    PLAYBOOKS
-        .iter()
-        .filter(|pb| {
-            matches!(
-                pb.id,
-                "ransomware" | "data_breach" | "bec" | "insider" | "supply_chain"
-            )
-        })
-        .collect()
-}
-
-/// Returns the playbook with the given ID.
+/// Returns the scenario playbook with the given ID, or `None`.
 pub fn playbook_by_id(id: &str) -> Option<&'static InvestigationPath> {
     PLAYBOOKS.iter().find(|p| p.id == id)
 }
 
-/// Returns all playbooks whose trigger matches the given artifact ID or MITRE technique.
-pub fn playbooks_for_trigger(trigger: &str) -> Vec<&'static InvestigationPath> {
-    PLAYBOOKS.iter().filter(|p| p.trigger == trigger).collect()
+/// Returns all scenario playbooks. Alias for iterating `PLAYBOOKS`.
+pub fn scenario_playbooks() -> &'static [InvestigationPath] {
+    PLAYBOOKS
 }
 
-/// Returns all playbooks that reference the given artifact ID in any step.
-pub fn playbooks_for_artifact(artifact_id: &str) -> Vec<&'static InvestigationPath> {
+/// Returns the investigation path with the given ID, or `None`.
+pub fn path_by_id(id: &str) -> Option<&'static InvestigationPath> {
+    INVESTIGATION_PATHS.iter().find(|p| p.id == id)
+}
+
+/// Returns all investigation paths whose trigger matches the given artifact ID or MITRE technique.
+pub fn paths_for_trigger(trigger: &str) -> Vec<&'static InvestigationPath> {
+    INVESTIGATION_PATHS
+        .iter()
+        .filter(|p| p.trigger == trigger)
+        .collect()
+}
+
+/// Returns all investigation paths that reference the given artifact ID in any step.
+pub fn paths_for_artifact(artifact_id: &str) -> Vec<&'static InvestigationPath> {
+    INVESTIGATION_PATHS
+        .iter()
+        .filter(|p| p.steps.iter().any(|s| s.artifact_id == artifact_id))
+        .collect()
+}
+
+/// Returns all playbooks (scenarios + paths) that reference the given artifact ID.
+pub fn all_for_artifact(artifact_id: &str) -> Vec<&'static InvestigationPath> {
     PLAYBOOKS
         .iter()
+        .chain(INVESTIGATION_PATHS.iter())
         .filter(|p| p.steps.iter().any(|s| s.artifact_id == artifact_id))
         .collect()
 }
@@ -721,19 +740,10 @@ mod tests {
 
     #[test]
     fn six_artifact_triggered_playbooks_defined() {
-        let artifact_triggered: Vec<_> = PLAYBOOKS
-            .iter()
-            .filter(|pb| {
-                !matches!(
-                    pb.id,
-                    "ransomware" | "data_breach" | "bec" | "insider" | "supply_chain"
-                )
-            })
-            .collect();
         assert_eq!(
-            artifact_triggered.len(),
+            INVESTIGATION_PATHS.len(),
             6,
-            "Expected 6 artifact-triggered playbooks"
+            "Expected 6 artifact-triggered investigation paths"
         );
     }
 
@@ -754,11 +764,11 @@ mod tests {
     }
 
     #[test]
-    fn playbooks_for_artifact_evtx_security() {
-        let pbs = playbooks_for_artifact("evtx_security");
+    fn all_for_artifact_evtx_security() {
+        let pbs = all_for_artifact("evtx_security");
         assert!(
             pbs.len() >= 2,
-            "evtx_security should appear in multiple playbooks"
+            "evtx_security should appear in multiple playbooks/paths"
         );
     }
 
@@ -900,7 +910,9 @@ mod tests {
     #[test]
     fn lateral_movement_is_investigation_path_not_playbook() {
         assert!(
-            INVESTIGATION_PATHS.iter().any(|p| p.id == "lateral_movement"),
+            INVESTIGATION_PATHS
+                .iter()
+                .any(|p| p.id == "lateral_movement"),
             "lateral_movement must be in INVESTIGATION_PATHS"
         );
         assert!(

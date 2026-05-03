@@ -334,6 +334,20 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
     },
 ];
 
+/// Returns all scenario playbooks (ransomware, data-breach, bec, insider, supply-chain).
+/// These are structured collection checklists, not artifact-triggered paths.
+pub fn scenario_playbooks() -> Vec<&'static InvestigationPath> {
+    PLAYBOOKS
+        .iter()
+        .filter(|pb| {
+            matches!(
+                pb.id,
+                "ransomware" | "data_breach" | "bec" | "insider" | "supply_chain"
+            )
+        })
+        .collect()
+}
+
 /// Returns the playbook with the given ID.
 pub fn playbook_by_id(id: &str) -> Option<&'static InvestigationPath> {
     PLAYBOOKS.iter().find(|p| p.id == id)
@@ -439,5 +453,71 @@ mod tests {
     #[test]
     fn unknown_playbook_returns_none() {
         assert!(playbook_by_id("does_not_exist").is_none());
+    }
+
+    // ── scenario playbooks ────────────────────────────────────────────────────
+
+    #[test]
+    fn five_scenario_playbooks_defined() {
+        let scenarios = scenario_playbooks();
+        assert_eq!(
+            scenarios.len(),
+            5,
+            "Expected 5 scenario playbooks: ransomware, data_breach, bec, insider, supply_chain"
+        );
+    }
+
+    #[test]
+    fn ransomware_playbook_exists_and_has_steps() {
+        let pb = playbook_by_id("ransomware").expect("ransomware playbook must exist");
+        assert!(pb.steps.len() >= 6, "ransomware must have at least 6 steps");
+    }
+
+    #[test]
+    fn data_breach_playbook_exists() {
+        assert!(playbook_by_id("data_breach").is_some());
+    }
+
+    #[test]
+    fn bec_playbook_exists() {
+        assert!(playbook_by_id("bec").is_some());
+    }
+
+    #[test]
+    fn insider_playbook_exists() {
+        assert!(playbook_by_id("insider").is_some());
+    }
+
+    #[test]
+    fn supply_chain_playbook_exists() {
+        assert!(playbook_by_id("supply_chain").is_some());
+    }
+
+    #[test]
+    fn ransomware_playbook_covers_mft_and_usnjrnl() {
+        let pb = playbook_by_id("ransomware").expect("ransomware playbook must exist");
+        let ids: Vec<&str> = pb.steps.iter().map(|s| s.artifact_id).collect();
+        assert!(ids.contains(&"mft"), "ransomware must check $MFT");
+        assert!(ids.contains(&"usnjrnl"), "ransomware must check $UsnJrnl");
+    }
+
+    #[test]
+    fn scenario_playbooks_steps_all_valid_catalog_ids() {
+        for pb in scenario_playbooks() {
+            for step in pb.steps {
+                assert!(
+                    CATALOG.by_id(step.artifact_id).is_some(),
+                    "scenario playbook '{}' step references unknown artifact: {}",
+                    pb.id,
+                    step.artifact_id
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn total_playbooks_is_eleven() {
+        // 6 artifact-triggered + 5 scenario = 11
+        assert_eq!(PLAYBOOKS.len(), 11, "Expected 11 total playbooks");
     }
 }

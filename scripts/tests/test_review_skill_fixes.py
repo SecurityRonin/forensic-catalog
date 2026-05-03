@@ -52,26 +52,40 @@ class TestArtifactPhrasesInSkill(unittest.TestCase):
         phrases = [p for p, _ in _ARTIFACT_PHRASES]
         self.assertIn("prefetch", phrases)
 
-    def test_skill_file_references_artifact_phrases(self):
-        """The review skill must mention the phrase-list so Claude knows to use it."""
+    def test_skill_references_check_related_gaps(self):
+        """The review skill must tell Claude to call check_related_gaps() programmatically."""
         skill_path = os.path.join(
             os.path.dirname(__file__), "..", "..",
             ".claude", "commands", "review-dfir-feeds.md"
         )
         with open(skill_path) as f:
             content = f.read()
-        self.assertIn("_ARTIFACT_PHRASES", content,
-                      "review-dfir-feeds.md must reference _ARTIFACT_PHRASES")
+        self.assertIn("check_related_gaps", content,
+                      "skill must reference check_related_gaps()")
 
-    def test_skill_references_extract_related_artifacts(self):
+    def test_skill_references_fetch_youtube_transcript(self):
         skill_path = os.path.join(
             os.path.dirname(__file__), "..", "..",
             ".claude", "commands", "review-dfir-feeds.md"
         )
         with open(skill_path) as f:
             content = f.read()
-        self.assertIn("extract_related_artifacts", content,
-                      "skill must reference extract_related_artifacts()")
+        self.assertIn("fetch_youtube_transcript", content,
+                      "skill must reference fetch_youtube_transcript()")
+
+    def test_skill_does_not_mandate_keyword_list_for_claude(self):
+        """Claude uses its own comprehension — skill must not say to use _ARTIFACT_PHRASES."""
+        skill_path = os.path.join(
+            os.path.dirname(__file__), "..", "..",
+            ".claude", "commands", "review-dfir-feeds.md"
+        )
+        with open(skill_path) as f:
+            content = f.read()
+        # The phrase list is for scripted automation, not for Claude during review
+        self.assertNotIn(
+            "Pass it to `extract_related_artifacts()`", content,
+            "skill must not tell Claude to run the keyword scanner on fetched content"
+        )
 
 
 class TestRelatedGapDetection(unittest.TestCase):

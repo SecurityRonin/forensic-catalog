@@ -35,38 +35,34 @@ extract artifact findings for the forensicnomicon catalog.
 
 ## Co-occurrence extraction (for `related` field enrichment)
 
-After fetching each post, run `extract_related_artifacts(text)` from
-`scripts/backfill_archives.py` against the fetched content. This function
-uses `_ARTIFACT_PHRASES` — a 50-phrase lookup table mapping natural-language
-terms to catalog IDs:
+**Use your own comprehension — not a keyword list.** You understand DFIR
+artifacts in context. A keyword matcher misses "the journal" (UsnJrnl),
+"the hive" (registry), "shadow copies" (VSS), and any artifact not on a
+predetermined list. You catch all of these.
 
+When reading a post, ask: which artifacts does this investigation use
+*together*? That co-occurrence is what the `related` field should encode.
+
+**For each post:**
+1. Read the content and identify every forensic artifact mentioned —
+   by name, path, registry key, tool output, or implication
+2. Note which artifacts appear *together in the same investigation context*
+   (e.g. "ShimCache and Prefetch both showed calc.exe at the same timestamp")
+3. For each co-occurring pair (A, B): run
+   `python -c "from scripts.backfill_archives import check_related_gaps; print(check_related_gaps('A', ['B']))"`
+   to check if the link already exists in the catalog's `related` array
+4. If missing: flag as a low-priority enrichment task
+
+**For YouTube entries:** the URL is `youtube.com/watch?v=VIDEO_ID`. Run:
 ```
-"shimcache"         → shimcache
-"prefetch"          → prefetch_dir
-"userassist"        → userassist_exe
-"amcache"           → amcache_hve
-"lnk file"          → lnk_file
-"evtx"              → evtx_security
-"srum"              → srudb
-"usnjrnl"           → usnjrnl
-"$mft"              → mft_file
-"lsass"             → lsass_dump
-"rdp"               → evtx_rdp_auth
-"btm"               → fa_file_com_apple_backgroundtaskmanagement_backgrounditems_v
-… (see _ARTIFACT_PHRASES in backfill_archives.py for full list)
+python -c "from scripts.backfill_archives import fetch_youtube_transcript; print(fetch_youtube_transcript('VIDEO_ID')[:500])"
 ```
+This fetches the spoken transcript (via youtube-transcript-api), which
+contains far more artifact signal than the HTML page. Read the transcript
+and apply the same comprehension-based analysis.
 
-For each pair of co-occurring artifact IDs returned, run
-`check_related_gaps(artifact_id, co_occurring_ids)` to find which links are
-missing from the descriptor's `related` array. Flag these as enrichment tasks.
-
-For YouTube entries: `fetch_youtube_transcript(video_id)` returns the spoken
-transcript (via youtube-transcript-api). Pass it to `extract_related_artifacts()`
-instead of the sparse HTML page — transcripts contain far more artifact signal.
-
-The `related` field builds an investigation graph: which artifacts
-corroborate each other for the same TTP. Blog posts and video transcripts
-are the primary real-world source for these relationships.
+The `related` field builds an investigation graph. Real cases are the
+authoritative source — hardcoded lists are a poor substitute.
 
 ## Finding extraction patterns
 

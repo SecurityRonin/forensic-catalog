@@ -69,6 +69,18 @@ struct Cli {
     #[arg(long)]
     triage: bool,
 
+    /// Incident scenario filter (use with --triage).
+    /// Valid values: ransomware, data-breach, bec, insider, supply-chain
+    #[arg(long, value_name = "SCENARIO")]
+    scenario: Option<String>,
+
+    /// ATT&CK tactic filter (use with --triage).
+    /// Valid values: execution, persistence, lateral-movement, credential-access,
+    /// defense-evasion, discovery, collection, exfiltration, command-and-control,
+    /// privilege-escalation
+    #[arg(long = "type", value_name = "TACTIC")]
+    tactic: Option<String>,
+
     #[command(subcommand)]
     command: Option<Commands>,
 }
@@ -135,7 +147,7 @@ fn main() {
             Commands::Dump { format, dataset } => run_dump(format, dataset),
         }
     } else if cli.triage {
-        run_triage(cli.format)
+        run_triage(cli.format, cli.scenario.as_deref(), cli.tactic.as_deref())
     } else if let Some(term) = cli.term {
         run_query(&term, cli.platform, cli.format)
     } else {
@@ -263,11 +275,108 @@ fn run_query(term: &str, platform: Option<Platform>, format: Format) -> i32 {
 }
 
 // ---------------------------------------------------------------------------
+// Scenario / tactic filtering
+// ---------------------------------------------------------------------------
+
+/// Map an incident scenario name to relevant MITRE technique prefixes.
+fn techniques_for_scenario(scenario: &str) -> Option<&'static [&'static str]> {
+    match scenario {
+        "ransomware"    => Some(&["T1486", "T1490", "T1489", "T1059", "T1204", "T1070", "T1562", "T1003"]),
+        "data-breach"   => Some(&["T1048", "T1041", "T1537", "T1567", "T1005", "T1003", "T1555"]),
+        "bec"           => Some(&["T1566", "T1078", "T1534", "T1114", "T1087"]),
+        "insider"       => Some(&["T1005", "T1039", "T1048", "T1083", "T1217"]),
+        "supply-chain"  => Some(&["T1195", "T1199", "T1553", "T1059", "T1027"]),
+        _ => None,
+    }
+}
+
+/// Map an ATT&CK tactic name to relevant MITRE technique prefixes.
+fn techniques_for_tactic(tactic: &str) -> Option<&'static [&'static str]> {
+    match tactic {
+        "execution"           => Some(&["T1059", "T1053", "T1204", "T1047", "T1569", "T1106", "T1129"]),
+        "persistence"         => Some(&["T1053", "T1547", "T1543", "T1546", "T1136", "T1505", "T1197"]),
+        "privilege-escalation"=> Some(&["T1548", "T1134", "T1611", "T1068"]),
+        "defense-evasion"     => Some(&["T1027", "T1036", "T1055", "T1070", "T1218", "T1562", "T1564"]),
+        "credential-access"   => Some(&["T1003", "T1040", "T1555", "T1552", "T1558", "T1110"]),
+        "discovery"           => Some(&["T1012", "T1018", "T1082", "T1083", "T1087", "T1217"]),
+        "lateral-movement"    => Some(&["T1021", "T1080", "T1534", "T1563", "T1570"]),
+        "collection"          => Some(&["T1005", "T1039", "T1056", "T1074", "T1114", "T1113", "T1560"]),
+        "exfiltration"        => Some(&["T1048", "T1041", "T1537", "T1567", "T1011"]),
+        "command-and-control" => Some(&["T1071", "T1090", "T1095", "T1102", "T1105", "T1571"]),
+        _ => None,
+    }
+}
+
+/// Returns true if any of the artifact's MITRE techniques start with any prefix in `prefixes`.
+fn artifact_matches_prefixes(
+    mitre_techniques: &[&'static str],
+    prefixes: &[&'static str],
+) -> bool {
+    mitre_techniques
+        .iter()
+        .any(|t| prefixes.iter().any(|p| t.starts_with(p)))
+}
+
+// ---------------------------------------------------------------------------
 // Triage
 // ---------------------------------------------------------------------------
 
-fn run_triage(format: Format) -> i32 {
-    let hits = CATALOG.for_triage();
+fn run_triage(format: Format, scenario: Option<&str>, tactic: Option<&str>) -> i32 {
+    // Validate scenario if provided
+    let scenario_prefixes: Option<&'static [&'static str]> = if let Some(s) = scenario {
+        match techniques_for_scenario(s) {
+            Some(prefixes) => Some(prefixes),
+            None => {
+                eprintln!(
+                    "error: unknown scenario '{}'. Valid values: ransomware, data-breach, bec, insider, supply-chain",
+                    s
+                );
+                return 1;
+            }
+        }
+    } else {
+        None
+    };
+
+    // Validate tactic if provided
+    let tactic_prefixes: Option<&'static [&'static str]> = if let Some(t) = tactic {
+        match techniques_for_tactic(t) {
+            Some(prefixes) => Some(prefixes),
+            None => {
+                eprintln!(
+                    "error: unknown tactic '{}'. Valid values: execution, persistence, lateral-movement, \
+                     credential-access, defense-evasion, discovery, collection, exfiltration, \
+                     command-and-control, privilege-escalation",
+                    t
+                );
+                return 1;
+            }
+        }
+    } else {
+        None
+    };
+
+    // Start from Critical+High triage list
+    let all_hits = CATALOG.for_triage();
+
+    // Apply filters (AND logic: artifact must match all supplied filters)
+    let hits: Vec<_> = all_hits
+        .into_iter()
+        .filter(|d| {
+            if let Some(sp) = scenario_prefixes {
+                if !artifact_matches_prefixes(d.mitre_techniques, sp) {
+                    return false;
+                }
+            }
+            if let Some(tp) = tactic_prefixes {
+                if !artifact_matches_prefixes(d.mitre_techniques, tp) {
+                    return false;
+                }
+            }
+            true
+        })
+        .collect();
+
     match format {
         Format::Json | Format::Yaml => {
             let arr: Vec<_> = hits.iter().map(|d| descriptor_to_json(d)).collect();

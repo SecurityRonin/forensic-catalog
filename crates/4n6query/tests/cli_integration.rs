@@ -482,3 +482,74 @@ fn triage_scenario_and_type_combined() {
     ]);
     assert_eq!(out.code, 0);
 }
+
+// ── --playbook ───────────────────────────────────────────────────────────────
+
+#[test]
+fn playbook_list_exits_zero() {
+    let out = run(&["--playbook"]);
+    assert_eq!(out.code, 0, "stderr: {}", out.stderr);
+}
+
+#[test]
+fn playbook_list_shows_all_six() {
+    let out = run(&["--playbook"]);
+    // All 6 playbook IDs must appear
+    for id in &[
+        "lateral_movement_rdp",
+        "credential_harvesting",
+        "persistence_hunt",
+        "data_exfiltration",
+        "execution_trace",
+        "defense_evasion",
+    ] {
+        assert!(
+            out.stdout.contains(id),
+            "--playbook must list playbook id '{id}'"
+        );
+    }
+}
+
+#[test]
+fn playbook_id_lateral_movement_exits_zero() {
+    let out = run(&["--playbook", "lateral_movement_rdp"]);
+    assert_eq!(out.code, 0, "stderr: {}", out.stderr);
+}
+
+#[test]
+fn playbook_id_shows_steps() {
+    let out = run(&["--playbook", "lateral_movement_rdp"]);
+    assert!(
+        out.stdout.contains("rdp_client_servers"),
+        "playbook steps must include rdp_client_servers"
+    );
+    assert!(
+        out.stdout.contains("rationale") || out.stdout.contains("Establishes"),
+        "playbook must include step rationale"
+    );
+}
+
+#[test]
+fn playbook_id_unknown_exits_nonzero() {
+    let out = run(&["--playbook", "not_a_real_playbook"]);
+    assert_ne!(out.code, 0, "unknown playbook ID must exit nonzero");
+}
+
+#[test]
+fn playbook_format_json_is_valid() {
+    let out = run(&["--playbook", "execution_trace", "--format", "json"]);
+    assert_eq!(out.code, 0);
+    let v: serde_json::Value = serde_json::from_str(&out.stdout)
+        .expect("--playbook --format json must produce valid JSON");
+    assert!(v["steps"].is_array(), "JSON must have steps array");
+}
+
+#[test]
+fn playbook_list_json_is_valid() {
+    let out = run(&["--playbook", "--format", "json"]);
+    assert_eq!(out.code, 0);
+    let v: serde_json::Value = serde_json::from_str(&out.stdout)
+        .expect("--playbook list --format json must produce valid JSON");
+    assert!(v.is_array(), "JSON list must be an array");
+    assert_eq!(v.as_array().unwrap().len(), 6);
+}

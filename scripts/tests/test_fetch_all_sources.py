@@ -5,9 +5,10 @@ Tests cover the pure-logic functions (no real HTTP):
   - parse_blogger_feed(xml_text)       → list[tuple[str,str,str]]
   - parse_wordpress_posts(json_text)   → list[tuple[str,str,str]]
   - parse_atom_feed(xml_text)          → list[tuple[str,str,str]]
+  - parse_github_commits(json_text)    → list[tuple[str,str,str]]
   - load_seen_urls(feed_state_path, pending_path) → set[str]
   - dedup_entries(entries, seen_urls)  → list[tuple[str,str,str]]
-  - classify_blog_source(html_url)     → str  ("blogger"|"wordpress"|"atom"|"squarespace"|"unknown")
+  - classify_blog_source(html_url)     → str  ("blogger"|"wordpress"|"github"|"unknown")
   - rescan_reviewed_entries(path)      → int  (rewrites [x] → [ ])
 """
 
@@ -62,6 +63,31 @@ GITHUB_ATOM_XML = textwrap.dedent("""\
   </entry>
 </feed>
 """)
+
+GITHUB_COMMITS_JSON = json.dumps([
+    {
+        "html_url": "https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/aaa111",
+        "commit": {
+            "message": "Add lateral movement via WMI\n\nDetailed notes on WMI-based lateral movement.",
+            "author": {"date": "2024-04-01T08:00:00Z"},
+        },
+    },
+    {
+        "html_url": "https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/bbb222",
+        "commit": {
+            "message": "Add persistence via registry run keys",
+            "author": {"date": "2024-03-15T10:30:00Z"},
+        },
+    },
+    {
+        "html_url": "https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/ccc333",
+        "commit": {
+            # Multi-line: only first line is the title
+            "message": "Update README",
+            "author": {"date": "2024-03-01T09:00:00Z"},
+        },
+    },
+])
 
 PENDING_MD = textwrap.dedent("""\
 - [x] [Old Post](https://windowsir.blogspot.com/2023/12/userassist.html) — Windows IR
@@ -137,6 +163,34 @@ class TestParseAtomFeed(unittest.TestCase):
         entries = ba.parse_atom_feed(GITHUB_ATOM_XML)
         _, _, date = entries[0]
         self.assertRegex(date, r"\d{4}-\d{2}-\d{2}")
+
+
+class TestParseGithubCommits(unittest.TestCase):
+    def test_returns_list(self):
+        entries = ba.parse_github_commits(GITHUB_COMMITS_JSON)
+        self.assertIsInstance(entries, list)
+
+    def test_entry_count(self):
+        entries = ba.parse_github_commits(GITHUB_COMMITS_JSON)
+        self.assertEqual(len(entries), 3)
+
+    def test_entry_shape(self):
+        entries = ba.parse_github_commits(GITHUB_COMMITS_JSON)
+        title, url, date = entries[0]
+        self.assertEqual(title, "Add lateral movement via WMI")
+        self.assertIn("commit/aaa111", url)
+        self.assertEqual(date, "2024-04-01")
+
+    def test_multiline_message_uses_first_line_only(self):
+        entries = ba.parse_github_commits(GITHUB_COMMITS_JSON)
+        title, _, _ = entries[0]
+        self.assertNotIn("\n", title)
+
+    def test_empty_json_returns_empty(self):
+        self.assertEqual(ba.parse_github_commits("[]"), [])
+
+    def test_invalid_json_returns_empty(self):
+        self.assertEqual(ba.parse_github_commits("not json"), [])
 
 
 class TestLoadSeenUrls(unittest.TestCase):

@@ -930,7 +930,7 @@ mod tests_new_descriptors {
             .contains("Image File Execution Options"));
     }
 
-    // ── UserAssist folder GUID ────────────────────────────────────────────
+    // ── UserAssist folder/shortcut GUID ──────────────────────────────────
 
     #[test]
     fn userassist_folder_metadata() {
@@ -938,6 +938,73 @@ mod tests_new_descriptors {
         assert_eq!(USERASSIST_FOLDER.hive, Some(HiveTarget::NtUser));
         assert_eq!(USERASSIST_FOLDER.scope, DataScope::User);
         assert!(USERASSIST_FOLDER.key_path.contains("UserAssist"));
+    }
+
+    /// Per Magnet Forensics artifact profile, {F4E57C4B-...} tracks
+    /// shortcut-initiated launches (.lnk), not folder navigation.
+    /// Source: https://www.magnetforensics.com/blog/artifact-profile-userassist/
+    #[test]
+    fn userassist_folder_guid_tracks_shortcut_launches_not_folders() {
+        // The Magnet Forensics article clarifies: {F4E57C4B-...} corresponds
+        // to "launches initiated via shortcuts, which includes clicks on .lnk files"
+        // Our name must not describe it solely as "Folder" navigation.
+        assert!(
+            USERASSIST_FOLDER.name.contains("Shortcut")
+                || USERASSIST_FOLDER.name.contains("LNK")
+                || USERASSIST_FOLDER.meaning.to_lowercase().contains("shortcut"),
+            "USERASSIST_FOLDER should describe shortcut-initiated launches, \
+             not folder navigation. Got name={:?} meaning={:?}",
+            USERASSIST_FOLDER.name,
+            USERASSIST_FOLDER.meaning,
+        );
+    }
+
+    // ── UserAssist XP-era GUIDs (pre-Vista) ──────────────────────────────
+
+    /// {75048700-EF1F-11D0-9888-006097DEACF9} — Applications, files, links,
+    /// and other objects accessed on Windows XP/2000.
+    /// Source: https://www.magnetforensics.com/blog/artifact-profile-userassist/
+    #[test]
+    fn userassist_xp_exe_exists_in_catalog() {
+        let d = CATALOG.by_id("userassist_xp_exe").expect(
+            "userassist_xp_exe must exist — Windows XP application-launch GUID \
+             {75048700-EF1F-11D0-9888-006097DEACF9} documented by Magnet Forensics",
+        );
+        assert!(
+            d.key_path.contains("75048700-EF1F-11D0-9888-006097DEACF9"),
+            "key_path must include the XP EXE GUID"
+        );
+        assert_eq!(d.hive, Some(HiveTarget::NtUser));
+    }
+
+    /// {5E6AB780-7743-11CF-A12B-00AA004AE837} — IE Favorites and IE toolbar
+    /// objects on Windows XP.
+    /// Source: https://www.magnetforensics.com/blog/artifact-profile-userassist/
+    #[test]
+    fn userassist_xp_ie_favorites_exists_in_catalog() {
+        let d = CATALOG.by_id("userassist_xp_ie_favorites").expect(
+            "userassist_xp_ie_favorites must exist — Windows XP IE Favorites GUID \
+             {5E6AB780-7743-11CF-A12B-00AA004AE837} documented by Magnet Forensics",
+        );
+        assert!(
+            d.key_path.contains("5E6AB780-7743-11CF-A12B-00AA004AE837"),
+            "key_path must include the XP IE Favorites GUID"
+        );
+    }
+
+    /// {0D6D4F41-2994-4BA0-8FEF-620E43CD2812} — IE7-specific UserAssist GUID
+    /// on Windows XP with IE7 installed.
+    /// Source: https://www.magnetforensics.com/blog/artifact-profile-userassist/
+    #[test]
+    fn userassist_xp_ie7_exists_in_catalog() {
+        let d = CATALOG.by_id("userassist_xp_ie7").expect(
+            "userassist_xp_ie7 must exist — Windows XP IE7 GUID \
+             {0D6D4F41-2994-4BA0-8FEF-620E43CD2812} documented by Magnet Forensics",
+        );
+        assert!(
+            d.key_path.contains("0D6D4F41-2994-4BA0-8FEF-620E43CD2812"),
+            "key_path must include the XP IE7 GUID"
+        );
     }
 
     // ── Shellbags ────────────────────────────────────────────────────────

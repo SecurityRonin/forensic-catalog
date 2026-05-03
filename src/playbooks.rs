@@ -10,6 +10,8 @@
 pub struct InvestigationStep {
     /// Catalog artifact ID to examine.
     pub artifact_id: &'static str,
+    /// Primary ATT&CK tactic this step addresses (e.g. `"TA0003"`).
+    pub tactic: &'static str,
     /// Why this step matters in context.
     pub rationale: &'static str,
     /// What specific indicators or values to look for.
@@ -51,36 +53,42 @@ pub static INVESTIGATION_PATHS: &[InvestigationPath] = &[
         steps: &[
             InvestigationStep {
                 artifact_id: "rdp_client_servers",
+                tactic: "TA0008",
                 rationale: "Establishes which hosts were connected TO from this machine.",
                 look_for: "Unfamiliar internal IPs, jump hosts, sequential targeting pattern.",
                 unlocks: &["evtx_security", "lnk_files"],
             },
             InvestigationStep {
                 artifact_id: "networklist_profiles",
+                tactic: "TA0007",
                 rationale: "Identifies networks the machine connected to; corroborates RDP destinations.",
                 look_for: "Network names matching target subnets.",
                 unlocks: &[],
             },
             InvestigationStep {
                 artifact_id: "evtx_security",
+                tactic: "TA0008",
                 rationale: "Event 4624 Type 10 = RemoteInteractive logon; 4648 = explicit credential use.",
                 look_for: "4624 with LogonType=10, 4648 with target server matching RDP MRU entries.",
                 unlocks: &["dpapi_masterkey_user", "lsa_secrets"],
             },
             InvestigationStep {
                 artifact_id: "prefetch_file",
+                tactic: "TA0002",
                 rationale: "mstsc.exe prefetch proves local RDP client was run and when.",
                 look_for: "MSTSC.EXE-*.pf with timestamps matching logon events.",
                 unlocks: &["jump_list_auto"],
             },
             InvestigationStep {
                 artifact_id: "jump_list_auto",
+                tactic: "TA0008",
                 rationale: "mstsc.exe jump list may contain target hostnames.",
                 look_for: "Recent items in mstsc jump list; correlate with Security log.",
                 unlocks: &[],
             },
             InvestigationStep {
                 artifact_id: "bam_user",
+                tactic: "TA0002",
                 rationale: "Background Activity Monitor records last execution time for mstsc.exe.",
                 look_for: "mstsc.exe entry with timestamp matching attack window.",
                 unlocks: &[],
@@ -96,36 +104,42 @@ pub static INVESTIGATION_PATHS: &[InvestigationPath] = &[
         steps: &[
             InvestigationStep {
                 artifact_id: "lsa_secrets",
+                tactic: "TA0006",
                 rationale: "Service account passwords and cached domain credentials stored in SYSTEM hive.",
                 look_for: "Unexpected service credentials, recently modified LSA secrets.",
                 unlocks: &["dpapi_masterkey_user", "dcc2_cache"],
             },
             InvestigationStep {
                 artifact_id: "dpapi_masterkey_user",
+                tactic: "TA0006",
                 rationale: "Master keys protect DPAPI-encrypted credentials; attacker may target these.",
                 look_for: "Master key access events, unusual modification timestamps.",
                 unlocks: &["dpapi_cred_user", "chrome_login_data"],
             },
             InvestigationStep {
                 artifact_id: "dpapi_cred_user",
+                tactic: "TA0006",
                 rationale: "Encrypted credential blobs for Windows Credential Manager.",
                 look_for: "Credential blobs accessed/modified outside normal user session.",
                 unlocks: &[],
             },
             InvestigationStep {
                 artifact_id: "dcc2_cache",
+                tactic: "TA0006",
                 rationale: "Cached domain credentials allow offline cracking without DC access.",
                 look_for: "Presence of domain admin account hashes in cache.",
                 unlocks: &["ntds_dit"],
             },
             InvestigationStep {
                 artifact_id: "evtx_security",
+                tactic: "TA0006",
                 rationale: "4672=Special logon, 4768/4769=Kerberos TGT/service ticket requests.",
                 look_for: "4672 for admin accounts, 4768 with RC4 encryption (downgrade attack).",
                 unlocks: &[],
             },
             InvestigationStep {
                 artifact_id: "sam_users",
+                tactic: "TA0006",
                 rationale: "Local account hashes; attacker with SYSTEM can extract all local credentials.",
                 look_for: "Unusual local admin accounts, recently created accounts.",
                 unlocks: &[],
@@ -141,60 +155,70 @@ pub static INVESTIGATION_PATHS: &[InvestigationPath] = &[
         steps: &[
             InvestigationStep {
                 artifact_id: "run_key_hklm",
+                tactic: "TA0003",
                 rationale: "HKLM Run key executes entries for all users at login.",
                 look_for: "Unsigned executables, unusual paths (Temp, AppData, Downloads).",
                 unlocks: &["run_key_hkcu", "prefetch_file"],
             },
             InvestigationStep {
                 artifact_id: "run_key_hkcu",
+                tactic: "TA0003",
                 rationale: "HKCU Run key executes entries for the current user at login.",
                 look_for: "Same suspicious patterns; note which user profile.",
                 unlocks: &["shellbags_user"],
             },
             InvestigationStep {
                 artifact_id: "active_setup_hklm",
+                tactic: "TA0003",
                 rationale: "Active Setup runs per-user first login; abused for persistence after privilege escalation.",
                 look_for: "StubPath values pointing to unusual executables.",
                 unlocks: &[],
             },
             InvestigationStep {
                 artifact_id: "winlogon_shell",
+                tactic: "TA0003",
                 rationale: "Shell value replaces or supplements explorer.exe at login.",
                 look_for: "Any value other than 'explorer.exe' is highly suspicious.",
                 unlocks: &[],
             },
             InvestigationStep {
                 artifact_id: "boot_execute",
+                tactic: "TA0003",
                 rationale: "Runs before Windows subsystem initializes; used by rootkits.",
                 look_for: "Anything other than 'autocheck autochk *' is suspicious.",
                 unlocks: &[],
             },
             InvestigationStep {
                 artifact_id: "appinit_dlls",
+                tactic: "TA0003",
                 rationale: "DLLs injected into every process loading user32.dll.",
                 look_for: "Any non-empty value; verify each DLL is signed.",
                 unlocks: &[],
             },
             InvestigationStep {
                 artifact_id: "ifeo_debugger",
+                tactic: "TA0003",
                 rationale: "IFEO Debugger hijacks process execution at launch.",
                 look_for: "Debugger pointing to malware or cmd.exe for accessibility binary hijack.",
                 unlocks: &[],
             },
             InvestigationStep {
                 artifact_id: "com_hijack_clsid_hkcu",
+                tactic: "TA0003",
                 rationale: "HKCU CLSID overrides load user-controlled DLLs without UAC.",
                 look_for: "CLSIDs in HKCU overriding HKLM entries; unsigned DLL paths.",
                 unlocks: &[],
             },
             InvestigationStep {
                 artifact_id: "scheduled_tasks_dir",
+                tactic: "TA0003",
                 rationale: "Scheduled tasks provide persistence with flexible triggers.",
                 look_for: "Tasks with random/GUID names, tasks running from Temp or AppData.",
                 unlocks: &["evtx_security"],
             },
             InvestigationStep {
                 artifact_id: "services_imagepath",
+                tactic: "TA0003",
                 rationale: "Services run as SYSTEM; malware frequently registers services.",
                 look_for: "Services with ImagePath in non-standard locations, recently created.",
                 unlocks: &[],
@@ -210,36 +234,42 @@ pub static INVESTIGATION_PATHS: &[InvestigationPath] = &[
         steps: &[
             InvestigationStep {
                 artifact_id: "chrome_login_data",
+                tactic: "TA0006",
                 rationale: "Browser credentials stolen first to access additional resources.",
                 look_for: "Access timestamps on login.db outside normal business hours.",
                 unlocks: &["firefox_logins"],
             },
             InvestigationStep {
                 artifact_id: "network_drives",
+                tactic: "TA0009",
                 rationale: "Mapped network shares may be staging areas or exfiltration targets.",
                 look_for: "Unusual drive mappings, external/cloud share paths.",
                 unlocks: &[],
             },
             InvestigationStep {
                 artifact_id: "usn_journal",
+                tactic: "TA0009",
                 rationale: "USN journal records file create/modify/delete; reveals staging activity.",
                 look_for: "Bulk file copy operations, archive creation (zip/rar/7z), large file moves.",
                 unlocks: &["recycle_bin"],
             },
             InvestigationStep {
                 artifact_id: "recycle_bin",
+                tactic: "TA0005",
                 rationale: "Deleted files after exfiltration may still be in Recycle Bin.",
                 look_for: "Deleted archives, bulk deletions after staging window.",
                 unlocks: &[],
             },
             InvestigationStep {
                 artifact_id: "lnk_files",
+                tactic: "TA0009",
                 rationale: "LNK files created when files are opened; proves attacker accessed specific files.",
                 look_for: "LNK files pointing to sensitive documents, unusual file paths.",
                 unlocks: &["jump_list_auto"],
             },
             InvestigationStep {
                 artifact_id: "evtx_security",
+                tactic: "TA0010",
                 rationale: "5140/5145 = network share access events; proves remote file access.",
                 look_for: "5145 with sensitive share names accessed by unfamiliar accounts.",
                 unlocks: &[],
@@ -255,42 +285,49 @@ pub static INVESTIGATION_PATHS: &[InvestigationPath] = &[
         steps: &[
             InvestigationStep {
                 artifact_id: "prefetch_file",
+                tactic: "TA0002",
                 rationale: "Definitive execution proof; records run count, last run time, and loaded DLLs.",
                 look_for: "Unknown executables, tools run from Temp/Downloads, single-run counts.",
                 unlocks: &["shimcache", "amcache_app_file"],
             },
             InvestigationStep {
                 artifact_id: "shimcache",
+                tactic: "TA0002",
                 rationale: "Records all executables that touched shimcache; proves file existed on disk.",
                 look_for: "Files in Prefetch not in Shimcache (deleted after run).",
                 unlocks: &[],
             },
             InvestigationStep {
                 artifact_id: "amcache_app_file",
+                tactic: "TA0002",
                 rationale: "Records SHA1 hash of executed files; enables hash lookup even if file deleted.",
                 look_for: "Hash lookups on VirusTotal for any matches in Prefetch.",
                 unlocks: &[],
             },
             InvestigationStep {
                 artifact_id: "userassist_exe",
+                tactic: "TA0002",
                 rationale: "GUI application launches with run count and timestamp.",
                 look_for: "Unusual GUI tools (network scanners, dumpers) launched by user.",
                 unlocks: &[],
             },
             InvestigationStep {
                 artifact_id: "bam_user",
+                tactic: "TA0002",
                 rationale: "Background Activity Monitor; precise last execution time per binary.",
                 look_for: "Execution times outside business hours, correlation with other timestamps.",
                 unlocks: &[],
             },
             InvestigationStep {
                 artifact_id: "evtx_security",
+                tactic: "TA0002",
                 rationale: "4688 = process creation (if audit policy enabled); 4689 = process exit.",
                 look_for: "4688 events for malware executables; CommandLine field if enabled.",
                 unlocks: &["evtx_sysmon"],
             },
             InvestigationStep {
                 artifact_id: "evtx_sysmon",
+                tactic: "TA0002",
                 rationale: "Sysmon Event 1 = process creation with full command line and hashes.",
                 look_for: "Sysmon 1 for malware hashes; Sysmon 3 for network connections; Sysmon 11 for file drops.",
                 unlocks: &[],
@@ -306,30 +343,35 @@ pub static INVESTIGATION_PATHS: &[InvestigationPath] = &[
         steps: &[
             InvestigationStep {
                 artifact_id: "evtx_system",
+                tactic: "TA0005",
                 rationale: "Event 104 = Security log cleared (or any channel cleared from System).",
                 look_for: "Event 104 or 1102; gap in event timestamps indicates clearing.",
                 unlocks: &["evtx_security"],
             },
             InvestigationStep {
                 artifact_id: "evtx_security",
+                tactic: "TA0005",
                 rationale: "Event 1102 = audit log cleared; compare log size and oldest event timestamp.",
                 look_for: "Event 1102; compare oldest event time against known attack window.",
                 unlocks: &[],
             },
             InvestigationStep {
                 artifact_id: "usn_journal",
+                tactic: "TA0005",
                 rationale: "USN journal deletions may catch tool cleanup (attacker deleting malware).",
                 look_for: "File deletions immediately after execution events; *.exe, *.ps1 in Temp.",
                 unlocks: &["recycle_bin"],
             },
             InvestigationStep {
                 artifact_id: "mft_file",
+                tactic: "TA0005",
                 rationale: "Compare $STANDARD_INFORMATION vs $FILE_NAME timestamps; differences indicate timestomping.",
                 look_for: "$SI Create before $FN Create; $SI earlier than Volume Create = timestomped.",
                 unlocks: &[],
             },
             InvestigationStep {
                 artifact_id: "prefetch_file",
+                tactic: "TA0005",
                 rationale: "Missing Prefetch for known tools may indicate anti-forensics (folder cleared or disabled).",
                 look_for: "Check HKLM\\SYSTEM\\...\\PrefetchParameters\\EnablePrefetcher = 0 (disabled).",
                 unlocks: &[],
@@ -354,6 +396,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
         steps: &[
             InvestigationStep {
                 artifact_id: "mft",
+                tactic: "TA0040",
                 rationale: "$MFT records every file creation, modification, and deletion. \
                     Encrypted files show a mass-modification wave in $SI timestamps. \
                     Compare $SI vs $FN timestamps to detect timestomping before encryption.",
@@ -364,6 +407,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "usnjrnl",
+                tactic: "TA0040",
                 rationale: "$UsnJrnl:$J logs every file-system operation with reason codes. \
                     FILE_CREATE + FILE_DELETE bursts identify the staging and encryption sweep.",
                 look_for: "Bulk RENAME_OLD_NAME entries (attacker renaming original files). \
@@ -373,6 +417,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "evtx_security",
+                tactic: "TA0008",
                 rationale: "Event 4688 = process creation (if audited). \
                     4624/4625 = logon success/failure — establishes attack timeline. \
                     4648 = explicit credential use (attacker moving laterally before encryption).",
@@ -383,6 +428,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "evtx_system",
+                tactic: "TA0005",
                 rationale: "Event 7045 = new service installed. \
                     1102/104 = log clearing (attacker removing evidence after encryption). \
                     6005/6006 = system start/stop (forced reboots to apply encryption).",
@@ -393,6 +439,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "vss_files_not_to_backup",
+                tactic: "TA0040",
                 rationale: "Ransomware frequently adds exclusions to prevent VSS from \
                     backing up files it is about to encrypt, or deletes shadow copies entirely.",
                 look_for: "Additions to FilesNotToBackup or FilesNotToSnapshot registry keys. \
@@ -402,6 +449,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "prefetch_file",
+                tactic: "TA0002",
                 rationale: "Prefetch proves the ransomware binary executed and records \
                     the exact timestamp of first and last run plus all DLLs loaded.",
                 look_for: "Unknown executable with single run count (execute-and-delete). \
@@ -411,6 +459,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "recycle_bin",
+                tactic: "TA0005",
                 rationale: "Ransomware may stage or briefly store files in Recycle Bin. \
                     Attacker tools deleted post-encryption sometimes land here.",
                 look_for: "Deleted executables, scripts, or configuration files. \
@@ -419,6 +468,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "run_key_hklm",
+                tactic: "TA0003",
                 rationale: "Ransomware may establish persistence to resume encryption \
                     after reboots (common in multi-stage ransomware like LockBit).",
                 look_for: "Entries added to HKLM\\Run or RunOnce during the attack window. \
@@ -427,6 +477,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "windows_defender_disabled_av",
+                tactic: "TA0005",
                 rationale: "Most ransomware disables Windows Defender before encrypting. \
                     Registry key changes leave forensic evidence even if logs were cleared.",
                 look_for: "DisableAntiVirus=1 or DisableRealtimeMonitoring=1. \
@@ -435,6 +486,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "srum_db",
+                tactic: "TA0040",
                 rationale: "SRUM records hourly CPU, network, and storage usage per process. \
                     Ransomware encryption produces a spike in disk write activity.",
                 look_for: "Process with massive disk write activity in the attack window. \
@@ -453,6 +505,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
         steps: &[
             InvestigationStep {
                 artifact_id: "usnjrnl",
+                tactic: "TA0009",
                 rationale: "USN journal records bulk file copies and archive creation. \
                     Staging activity shows mass FILE_CREATE events for compressed archives.",
                 look_for: "Bulk file copy operations. ZIP/RAR/7z archive creation. \
@@ -461,6 +514,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "lnk_files",
+                tactic: "TA0009",
                 rationale: "Windows creates LNK files when files are opened. \
                     Proves attacker accessed specific sensitive files.",
                 look_for: "LNK files pointing to sensitive documents (PII, financials, source code). \
@@ -469,6 +523,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "chrome_login_data",
+                tactic: "TA0006",
                 rationale: "Browser credential store is a primary target for credential theft. \
                     Modification timestamp outside working hours is highly suspicious.",
                 look_for: "SQLite access timestamp outside normal user session. \
@@ -477,6 +532,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "network_drives",
+                tactic: "TA0009",
                 rationale: "Mapped drives reveal staging areas and potential exfil targets. \
                     External cloud share mappings indicate attacker-controlled endpoints.",
                 look_for: "Drive letters mapped to external or unusual UNC paths. \
@@ -485,6 +541,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "onedrive_metadata",
+                tactic: "TA0010",
                 rationale: "OneDrive sync automatically exfiltrates staged files. \
                     Metadata database records which files were synced and when.",
                 look_for: "Files synced to OneDrive outside normal business hours. \
@@ -493,6 +550,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "evtx_security",
+                tactic: "TA0010",
                 rationale: "5140/5145 = network share access events. \
                     4663 = file access audit (if configured). \
                     4648 = explicit credential use to access remote shares.",
@@ -502,6 +560,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "srum_network_usage",
+                tactic: "TA0010",
                 rationale: "SRUM tracks bytes sent per process per hour. \
                     Large outbound bytes from a non-network process = exfiltration.",
                 look_for: "Unusual process with > 100MB sent in a single SRUM interval. \
@@ -520,6 +579,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
         steps: &[
             InvestigationStep {
                 artifact_id: "evtx_security",
+                tactic: "TA0001",
                 rationale: "4624 with LogonType 8 (NetworkCleartext) or Type 10 (RemoteInteractive) \
                     from anomalous source IPs indicates credential compromise.",
                 look_for: "Failed logins (4625) followed by successful login (4624) from same IP. \
@@ -529,6 +589,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "chrome_login_data",
+                tactic: "TA0006",
                 rationale: "Compromised email accounts often have credentials saved in the browser. \
                     Credential theft precedes or accompanies email account takeover.",
                 look_for: "SQLite access timestamps during the suspected compromise window. \
@@ -537,6 +598,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "networklist_profiles",
+                tactic: "TA0007",
                 rationale: "Records network names (including mobile hotspot names) the machine \
                     connected to. Attacker-controlled hotspots leave a distinct profile name.",
                 look_for: "Network names not matching the corporate environment. \
@@ -545,6 +607,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "psreadline_history",
+                tactic: "TA0009",
                 rationale: "PowerShell command history reveals O365/Exchange manipulation. \
                     BEC actors use PowerShell to set inbox rules and forwarding.",
                 look_for: "Set-InboxRule, New-TransportRule, Set-Mailbox ForwardingSmtpAddress. \
@@ -553,6 +616,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "prefetch_file",
+                tactic: "TA0002",
                 rationale: "MFA bypass tools (Evilginx, Modlishka) or email-scraping tools \
                     leave prefetch entries if run locally.",
                 look_for: "Unknown executables run during the suspect window. \
@@ -561,6 +625,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "lnk_files",
+                tactic: "TA0009",
                 rationale: "LNK files in the user profile reveal which files the actor opened \
                     after gaining access — financial data, org charts, email templates.",
                 look_for: "LNK files pointing to financial, HR, or executive documents \
@@ -579,6 +644,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
         steps: &[
             InvestigationStep {
                 artifact_id: "usb_enum",
+                tactic: "TA0010",
                 rationale: "USBSTOR registry key records every USB storage device ever connected. \
                     Device serial numbers map to specific hardware owned by the insider.",
                 look_for: "USB devices connected outside business hours or during the suspect window. \
@@ -587,6 +653,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "lnk_files",
+                tactic: "TA0009",
                 rationale: "LNK files prove specific files were opened and provide timestamps. \
                     Cross-reference with file servers to identify what data was accessed.",
                 look_for: "Sensitive documents (IP, PII, customer data, source code). \
@@ -595,6 +662,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "onedrive_metadata",
+                tactic: "TA0010",
                 rationale: "Personal cloud sync (OneDrive personal, Google Drive, MEGA, Dropbox, Box) \
                     is the most common exfiltration path for insiders. Each client leaves \
                     metadata artifacts. Corporate DLP rarely inspects personal sync traffic, \
@@ -608,6 +676,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "usnjrnl",
+                tactic: "TA0009",
                 rationale: "USN journal reconstructs file staging activity. \
                     Archive creation before USB insertion or cloud sync = deliberate staging.",
                 look_for: "ZIP/RAR/7z creation followed by USB device attach within minutes. \
@@ -616,6 +685,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "evtx_security",
+                tactic: "TA0009",
                 rationale: "5145 = network share file access. 4663 = object access (if audited). \
                     Bulk access to shares outside the employee's normal job function.",
                 look_for: "File server share access for directories unrelated to the employee's role. \
@@ -624,6 +694,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "srum_network_usage",
+                tactic: "TA0010",
                 rationale: "SRUM tracks bytes sent per process. \
                     Large outbound bytes correlating with USB events = staging + exfil.",
                 look_for: "Browser or sync agent with abnormally high upload bytes. \
@@ -642,6 +713,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
         steps: &[
             InvestigationStep {
                 artifact_id: "amcache_app_file",
+                tactic: "TA0001",
                 rationale: "AmCache records SHA1 hash of every file that touched the cache. \
                     The hash identifies the exact malicious binary even if deleted.",
                 look_for: "Hash lookup on VirusTotal for any software installed in the suspect window. \
@@ -650,6 +722,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "prefetch_file",
+                tactic: "TA0002",
                 rationale: "Prefetch proves the software ran and records DLLs it loaded. \
                     Malicious updates often side-load a weaponized DLL alongside the installer.",
                 look_for: "Installer executable with unexpected DLL references. \
@@ -658,6 +731,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "evtx_sysmon",
+                tactic: "TA0002",
                 rationale: "Sysmon 1 = process creation with full command line and parent process. \
                     Sysmon 7 = image loaded. Sysmon 11 = file created. \
                     Supply chain payloads spawn unexpected child processes from trusted parents.",
@@ -667,6 +741,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "services_imagepath",
+                tactic: "TA0003",
                 rationale: "Supply chain implants often register as services for persistence. \
                     Service ImagePath in a non-standard location is a strong indicator.",
                 look_for: "Services pointing to the compromised vendor software directory. \
@@ -675,6 +750,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "networklist_profiles",
+                tactic: "TA0011",
                 rationale: "Records C2 domains resolved as network names in some environments. \
                     More importantly: identifies new external connections after software installation.",
                 look_for: "Network connections to unknown external hosts originating from the \
@@ -683,6 +759,7 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "run_key_hklm",
+                tactic: "TA0003",
                 rationale: "Supply chain implants may add persistence via Run keys alongside \
                     the legitimate software. The key timestamp reveals the implant installation time.",
                 look_for: "Run key entries added at the same time as the compromised software update. \

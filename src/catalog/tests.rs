@@ -3847,3 +3847,57 @@ mod phase3_persistence_tests {
         }
     }
 }
+
+#[cfg(test)]
+mod batch_i_tests {
+    use crate::catalog::{TriagePriority, CATALOG};
+
+    #[test]
+    fn batch_i_artifacts_all_present() {
+        let ids = [
+            "linux_dmesg_log",
+            "linux_kern_log",
+            "linux_proc_kallsyms",
+            "linux_proc_net_tcp",
+            "linux_proc_net_tcp6",
+            "linux_proc_net_udp",
+            "linux_proc_net_unix",
+            "linux_lsof_output",
+            "linux_ss_output",
+            "linux_chkrootkit_output",
+            "linux_rkhunter_log",
+            "linux_sysctl_conf",
+            "windows_crash_dump",
+            "windows_minidump",
+            "amcache_driver",
+            "wer_report_queue",
+            "windows_notification_db",
+            "amcache_shortcut",
+            "linux_fail2ban_log",
+        ];
+        for id in &ids {
+            assert!(CATALOG.by_id(id).is_some(), "missing batch-I artifact: {id}");
+        }
+    }
+
+    #[test]
+    fn linux_dmesg_log_is_critical_for_rootkit_detection() {
+        let d = CATALOG.by_id("linux_dmesg_log").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::Critical);
+        assert!(d.mitre_techniques.contains(&"T1014"));
+    }
+
+    #[test]
+    fn linux_proc_net_tcp_enables_rootkit_comparison() {
+        let d = CATALOG.by_id("linux_proc_net_tcp").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::Critical);
+        assert!(d.mitre_techniques.contains(&"T1014"));
+    }
+
+    #[test]
+    fn amcache_driver_is_critical_for_byovd() {
+        let d = CATALOG.by_id("amcache_driver").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::Critical);
+        assert!(d.mitre_techniques.contains(&"T1068"));
+    }
+}

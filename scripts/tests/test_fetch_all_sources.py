@@ -453,5 +453,91 @@ class TestXmlUrlFirstStrategy(unittest.TestCase):
         self.assertFalse(ba._should_try_wordpress(entries=[], xml_url=""))
 
 
+class TestReadOpmlUsesTextAttribute(unittest.TestCase):
+    """read_opml must use `text` (canonical OPML identifier) over `title`.
+
+    The OPML spec defines `text` as the required display attribute.
+    `title` is optional and may contain a verbose description.
+    _SKIP_TITLES matches against short names stored in `text`.
+    """
+
+    _OPML_MIXED_ATTRS = textwrap.dedent("""\
+    <?xml version="1.0" encoding="UTF-8"?>
+    <opml version="2.0">
+      <head><title>Test</title></head>
+      <body>
+        <!-- text == title -->
+        <outline type="rss" text="Windows Incident Response"
+                 title="Windows Incident Response"
+                 xmlUrl="https://windowsir.blogspot.com/feeds/posts/default"
+                 htmlUrl="https://windowsir.blogspot.com/"/>
+        <!-- text != title: IOC feed with verbose title -->
+        <outline type="rss" text="URLhaus"
+                 title="URLhaus — malware distribution URLs"
+                 xmlUrl="https://urlhaus.abuse.ch/rss/"
+                 htmlUrl="https://urlhaus.abuse.ch/"/>
+        <!-- text only (no title attr) -->
+        <outline type="rss" text="MalwareBazaar"
+                 xmlUrl="https://bazaar.abuse.ch/rss/"
+                 htmlUrl="https://bazaar.abuse.ch/"/>
+      </body>
+    </opml>
+    """)
+
+    def test_text_attr_is_used_for_source_name(self):
+        """When text != title, read_opml must return the `text` value as title."""
+        import tempfile, os
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".opml", delete=False) as f:
+            f.write(self._OPML_MIXED_ATTRS)
+            path = f.name
+        try:
+            sources = ba.read_opml(path)
+            titles = [s["title"] for s in sources]
+            # text="URLhaus" must be used, not title="URLhaus — malware distribution URLs"
+            self.assertIn("URLhaus", titles,
+                          "read_opml must use `text` attribute, not the verbose `title`")
+            self.assertNotIn("URLhaus — malware distribution URLs", titles,
+                             "verbose title must not appear — use `text` for the source name")
+        finally:
+            os.unlink(path)
+
+    def test_text_attr_enables_skip_list_matching(self):
+        """_SKIP_TITLES must match when OPML entry has verbose title but short text."""
+        import tempfile, os
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".opml", delete=False) as f:
+            f.write(self._OPML_MIXED_ATTRS)
+            path = f.name
+        try:
+            sources = ba.read_opml(path)
+            non_skipped = [s for s in sources if s["title"] not in ba._SKIP_TITLES]
+            skipped_count = len(sources) - len(non_skipped)
+            # URLhaus + MalwareBazaar are in _SKIP_TITLES; should be skipped
+            self.assertEqual(skipped_count, 2,
+                             f"2 IOC sources should be skipped; non-skipped: {[s['title'] for s in non_skipped]}")
+        finally:
+            os.unlink(path)
+
+    def test_fallback_to_title_when_no_text(self):
+        """If `text` is absent, fall back to `title` attribute."""
+        import tempfile, os
+        opml = textwrap.dedent("""\
+        <?xml version="1.0"?>
+        <opml version="2.0">
+          <body>
+            <outline type="rss" title="OnlyTitle"
+                     xmlUrl="https://example.com/feed/" htmlUrl="https://example.com/"/>
+          </body>
+        </opml>
+        """)
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".opml", delete=False) as f:
+            f.write(opml)
+            path = f.name
+        try:
+            sources = ba.read_opml(path)
+            self.assertEqual(sources[0]["title"], "OnlyTitle")
+        finally:
+            os.unlink(path)
+
+
 if __name__ == "__main__":
     unittest.main()

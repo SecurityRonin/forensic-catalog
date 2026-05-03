@@ -1,25 +1,36 @@
 #!/usr/bin/env python3
-"""Poll subscribed feeds and write a compact snapshot/report.
+"""Poll subscribed feeds and web pages for new DFIR content.
 
-Reads `archive/sources/dfir-feeds.opml`, fetches feed entries for any outline
-that has an `xmlUrl`, and writes:
+Reads `archive/sources/dfir-feeds.opml`, and for every outline with either
+`xmlUrl` (RSS/Atom) or `htmlUrl` + `type="web"` (HTML page monitor), checks
+for new content since the last snapshot.  Writes:
 
 - `archive/sources/feed-state.json`   — full snapshot (machine-readable)
 - `archive/sources/feed-report.md`    — current-run new posts (overwritten each run)
 - `archive/sources/pending-review.md` — accumulated unreviewed posts (append-only)
 
-Designed for scheduled GitHub Actions runs. No third-party dependencies.
+Two monitor types
+-----------------
+RSS/Atom (type="rss"):
+    Standard feed parsing — entries from <item> or <entry> elements.
+
+HTML page monitor (type="web"):
+    Fetches the HTML page, extracts all same-domain blog/article links, and
+    diffs against the previous snapshot.  Use for vendor blogs that have no
+    RSS feed.  The `htmlUrl` attribute is the page to monitor; `xmlUrl` is
+    omitted (or can equal htmlUrl for state-key purposes).
 
 Pending review workflow
 -----------------------
-When new posts are detected they are appended to `pending-review.md` with
-an unchecked checkbox `- [ ]`.  Review them weekly with Claude Code:
+New posts are appended to `pending-review.md` with unchecked checkboxes.
+Review them weekly inside Claude Code:
 
-    make review-feeds          # show pending count
-    /review-dfir-feeds         # Claude Code fetches posts and extracts artifact findings
+    make review-feeds          # show pending count + list
+    /review-dfir-feeds         # Claude Code fetches posts and extracts findings
 
-Mark an item done by changing `- [ ]` to `- [x]` in pending-review.md.
-Items already marked `[x]` or `[→]` are never re-added.
+Mark items done by changing `- [ ]` → `- [x]` (reviewed, no gaps) or
+`- [→]` (reviewed, TDD tasks created).  Already-present URLs are never
+re-added regardless of status.
 """
 
 from __future__ import annotations
@@ -73,14 +84,21 @@ def fetch(url: str) -> bytes:
 def iter_feed_outlines(opml_path: str) -> Iterable[dict[str, str]]:
     root = ET.parse(opml_path).getroot()
     for outline in root.findall(".//outline"):
-        xml_url = outline.attrib.get("xmlUrl")
-        if not xml_url:
-            continue
-        yield {
-            "title": outline.attrib.get("title") or outline.attrib.get("text") or xml_url,
-            "html_url": outline.attrib.get("htmlUrl", ""),
-            "xml_url": xml_url,
-        }
+        kind = outline.attrib.get("type", "rss").lower()
+        xml_url = outline.attrib.get("xmlUrl", "")
+        html_url = outline.attrib.get("htmlUrl", "")
+        title = outline.attrib.get("title") or outline.attrib.get("text") or xml_url or html_url
+
+        if kind == "web":
+            # HTML page monitor — no RSS feed; monitor the page directly
+            if not html_url:
+                continue
+            yield {"title": title, "html_url": html_url, "xml_url": html_url, "kind": "web"}
+        else:
+            # RSS / Atom feed
+            if not xml_url:
+                continue
+            yield {"title": title, "html_url": html_url, "xml_url": xml_url, "kind": "rss"}
 
 
 def parse_isoish(value: str) -> str:
@@ -146,6 +164,48 @@ def parse_feed(payload: bytes) -> list[FeedEntry]:
     if tag.endswith("feed"):
         return parse_atom(root)
     return parse_rss(root)
+
+
+def parse_html_links(payload: bytes, base_url: str) -> list[FeedEntry]:
+    """Extract blog/article links from an HTML page for sites without RSS.
+
+    Finds all ``<a href="...">`` links on the same domain that look like
+    post URLs (not tag/category/author/page pagination URLs).  Returns them
+    as FeedEntry with no publish date (we only know they exist today).
+    """
+    from urllib.parse import urljoin, urlparse
+
+    base = urlparse(base_url)
+    seen: set[str] = set()
+    entries: list[FeedEntry] = []
+
+    # Naive but stdlib-only HTML link extraction
+    for m in re.finditer(r'<a\s[^>]*href=["\']([^"\']+)["\']', payload.decode("utf-8", errors="replace"), re.I):
+        href = m.group(1).strip()
+        if not href or href.startswith("#") or href.startswith("javascript:"):
+            continue
+        full = urljoin(base_url, href).split("#")[0].rstrip("/")
+        p = urlparse(full)
+        if p.netloc != base.netloc:
+            continue
+        # Skip generic pages: tag, category, author, page, search, feed, rss
+        if re.search(r"/(tag|category|author|page|search|feed|rss|wp-|cdn-cgi|#)", p.path, re.I):
+            continue
+        # Must have a non-trivial path (at least one slug segment)
+        segments = [s for s in p.path.split("/") if s]
+        if len(segments) < 1:
+            continue
+        if full in seen:
+            continue
+        seen.add(full)
+        # Title: use the link text if available, otherwise the last path segment
+        text_m = re.search(r'<a\s[^>]*href=["\']' + re.escape(m.group(1)) + r'["\'][^>]*>(.*?)</a>', payload.decode("utf-8", errors="replace"), re.I | re.S)
+        title = re.sub(r"<[^>]+>", "", text_m.group(1)).strip() if text_m else segments[-1].replace("-", " ").replace("_", " ").title()
+        if not title or len(title) > 300:
+            title = segments[-1].replace("-", " ").title()
+        entries.append(FeedEntry(title=title, url=full, published=""))
+
+    return entries
 
 
 def now_iso() -> str:
@@ -262,7 +322,10 @@ def main() -> int:
         entries: list[FeedEntry] = []
         try:
             payload = fetch(outline["xml_url"])
-            entries = parse_feed(payload)[: args.limit]
+            if outline.get("kind") == "web":
+                entries = parse_html_links(payload, outline["html_url"])[: args.limit]
+            else:
+                entries = parse_feed(payload)[: args.limit]
         except Exception as exc:
             error = str(exc)
         snapshots.append(

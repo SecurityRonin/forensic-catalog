@@ -3876,7 +3876,10 @@ mod batch_i_tests {
             "linux_fail2ban_log",
         ];
         for id in &ids {
-            assert!(CATALOG.by_id(id).is_some(), "missing batch-I artifact: {id}");
+            assert!(
+                CATALOG.by_id(id).is_some(),
+                "missing batch-I artifact: {id}"
+            );
         }
     }
 

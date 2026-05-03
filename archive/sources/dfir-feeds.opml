@@ -41,13 +41,15 @@
       <outline type="rss" text="The Sleuth Kit updates" title="The Sleuth Kit updates" xmlUrl="https://www.sleuthkit.org/rss.xml" htmlUrl="https://www.sleuthkit.org/"/>
       <outline type="rss" text="Amped Software blog" title="Amped Software blog" xmlUrl="https://blog.ampedsoftware.com/feed/" htmlUrl="https://blog.ampedsoftware.com/"/>
     </outline>
-    <outline text="Vendor DFIR Blogs (HTML monitor)" title="Vendor DFIR Blogs (HTML monitor)">
-      <!-- No RSS feed available — monitored by fetching the blog index page and diffing links.
-           type="web" tells check_feed_updates.py to use parse_html_links() instead of RSS parsing. -->
-      <outline type="web" text="Binalyze Blog" title="Binalyze Blog" htmlUrl="https://www.binalyze.com/blog"/>
-      <outline type="web" text="Belkasoft Articles" title="Belkasoft Articles" htmlUrl="https://belkasoft.com/articles"/>
-      <outline type="web" text="Forensafe (ArtiFast) Blog" title="Forensafe (ArtiFast) Blog" htmlUrl="https://www.forensafe.com/blog.html"/>
-      <outline type="web" text="Cellebrite Blog" title="Cellebrite Blog" htmlUrl="https://cellebrite.com/en/blog/"/>
+    <outline text="Vendor DFIR Blogs" title="Vendor DFIR Blogs">
+      <!-- RSS feeds confirmed working by probe 2026-05-03 -->
+      <outline type="rss" text="Binalyze Blog" title="Binalyze Blog" xmlUrl="https://www.binalyze.com/blog/rss.xml" htmlUrl="https://www.binalyze.com/blog"/>
+      <!-- Belkasoft's main site (belkasoft.com) has no feed; their WordPress blog does -->
+      <outline type="rss" text="Belkasoft Blog" title="Belkasoft Blog" xmlUrl="https://belkasoft.wordpress.com/feed/" htmlUrl="https://belkasoft.wordpress.com/"/>
+      <outline type="rss" text="Forensafe (ArtiFast) Blog" title="Forensafe (ArtiFast) Blog" xmlUrl="https://www.forensafe.com/rss.xml" htmlUrl="https://www.forensafe.com/"/>
+      <outline type="rss" text="Cellebrite Blog" title="Cellebrite Blog" xmlUrl="https://cellebrite.com/en/feed/" htmlUrl="https://cellebrite.com/en/blog/"/>
+      <!-- DFIR Science — Dr. Joshua James; academic + practitioner content -->
+      <outline type="rss" text="DFIR Science" title="DFIR Science" xmlUrl="https://dfir.science/feed.xml" htmlUrl="https://dfir.science/"/>
     </outline>
     <outline text="Vendor and Intel Blogs" title="Vendor and Intel Blogs">
       <outline type="rss" text="CrowdStrike blog" title="CrowdStrike blog" xmlUrl="https://www.crowdstrike.com/blog/feed/" htmlUrl="https://www.crowdstrike.com/blog/"/>

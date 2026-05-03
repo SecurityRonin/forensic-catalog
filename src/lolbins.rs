@@ -874,6 +874,62 @@ pub const LOLBAS_WINDOWS: &[LolbasEntry] = &[
         use_cases: UC_EXECUTE | UC_DOWNLOAD | UC_BYPASS,
         description: "Windows Package Manager; installs and executes arbitrary packages from attacker-controlled manifests.",
     },
+    // ── Batch 2: LOLBAS Project gaps (feed review 2026-05-03) ─────────────────
+    // Source: https://lolbas-project.github.io/api/lolbas.json
+    LolbasEntry {
+        name: "Devtoolslauncher.exe",
+        mitre_techniques: &["T1127"],
+        use_cases: UC_EXECUTE,
+        description: "Visual Studio DevTools Launcher; executes arbitrary binary as a trusted subprocess of a Microsoft-signed process.",
+    },
+    LolbasEntry {
+        name: "Logger.exe",
+        mitre_techniques: &["T1202"],
+        use_cases: UC_EXECUTE,
+        description: "Windows SDK Logger utility; indirect command execution via RUN/RUNW parameters — spawns command as child process.",
+    },
+    LolbasEntry {
+        name: "Nmcap.exe",
+        mitre_techniques: &["T1040"],
+        use_cases: UC_RECON,
+        description: "Microsoft Network Monitor capture CLI; captures traffic from all adapters to a circular .cap file — living-off-the-land network sniffing.",
+    },
+    LolbasEntry {
+        name: "WorkFolders.exe",
+        mitre_techniques: &["T1218"],
+        use_cases: UC_EXECUTE | UC_BYPASS,
+        description: "Work Folders client binary; executes control.exe from the current working directory via App Paths — proxy execution bypass.",
+    },
+    LolbasEntry {
+        name: "Dxcap.exe",
+        mitre_techniques: &["T1127"],
+        use_cases: UC_EXECUTE,
+        description: "DirectX Diagnostic capture tool; launches xperf.exe or any arbitrary binary placed in the same directory as a trusted subprocess.",
+    },
+    LolbasEntry {
+        name: "write.exe",
+        mitre_techniques: &["T1218"],
+        use_cases: UC_EXECUTE,
+        description: "WordPad launcher stub; executes the binary registered under HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\write.exe.",
+    },
+    LolbasEntry {
+        name: "odbcad32.exe",
+        mitre_techniques: &["T1548.002"],
+        use_cases: UC_BYPASS,
+        description: "ODBC Data Source Administrator GUI; UAC bypass via Tracing tab browse dialog — launches arbitrary executable at elevated integrity.",
+    },
+    LolbasEntry {
+        name: "Sigverif.exe",
+        mitre_techniques: &["T1218"],
+        use_cases: UC_EXECUTE | UC_BYPASS,
+        description: "File Signature Verification utility; GUI Advanced option lets attacker specify arbitrary executable path as the log file — proxy execution.",
+    },
+    LolbasEntry {
+        name: "IntelliTrace.exe",
+        mitre_techniques: &["T1127"],
+        use_cases: UC_EXECUTE,
+        description: "Visual Studio IntelliTrace CLI; launches an executable as a trusted Visual Studio subprocess — proxy execution via developer tooling.",
+    },
 ];
 
 /// Linux LOLBAS — binaries with known GTFOBins escape/bypass techniques.

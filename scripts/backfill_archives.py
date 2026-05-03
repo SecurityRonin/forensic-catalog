@@ -352,6 +352,54 @@ def classify_blog_source(html_url: str) -> str:
 
 # ─── artifact co-occurrence extraction ────────────────────────────────────────
 
+def check_related_gaps(artifact_id: str, co_occurring_ids: list[str]) -> list[str]:
+    """
+    Given an artifact ID and a list of co-occurring artifact IDs (from a blog post),
+    return the subset that are NOT already listed in the artifact's `related` array.
+
+    These are candidates to add to the descriptor's `related` field — they represent
+    investigation-derived correlations that real DFIR cases show are relevant together.
+
+    Returns [] if:
+    - artifact_id is not in the catalog
+    - co_occurring_ids is empty
+    - all co-occurring IDs are already in related[]
+
+    Reads descriptors by running `cargo run -p forensicnomicon-cli -- dump --dataset catalog`
+    so it always reflects the current catalog state without importing Rust.
+    """
+    if not co_occurring_ids:
+        return []
+
+    import subprocess
+
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    try:
+        result = subprocess.run(
+            ["cargo", "run", "-q", "-p", "forensicnomicon-cli", "--",
+             "dump", "--format", "json", "--dataset", "catalog"],
+            capture_output=True, text=True, cwd=repo_root, timeout=60,
+        )
+        if result.returncode != 0:
+            return []
+        data = json.loads(result.stdout)
+        catalog = data.get("catalog", [])
+    except (subprocess.TimeoutExpired, json.JSONDecodeError, OSError):
+        return []
+
+    # Find the target artifact
+    target = next((a for a in catalog if a.get("id") == artifact_id), None)
+    if target is None:
+        return []
+
+    already_related = set(target.get("related", []))
+    gaps = [
+        aid for aid in co_occurring_ids
+        if aid != artifact_id and aid not in already_related
+    ]
+    return gaps
+
+
 def extract_related_artifacts(text: str) -> list[str]:
     """
     Scan blog post text for known artifact names/phrases and return
@@ -484,6 +532,39 @@ def fetch_wordpress_archive(
             break
 
     return all_entries
+
+
+def fetch_youtube_transcript(video_id: str) -> str | None:
+    """
+    Fetch the transcript for a YouTube video using youtube-transcript-api.
+
+    Returns the full transcript as a single string, or None if:
+    - youtube-transcript-api is not installed
+    - the video has no captions
+    - the video ID does not exist
+
+    The returned text feeds directly into extract_related_artifacts() to find
+    artifact co-occurrences from spoken content, not just the sparse HTML page.
+
+    Install: pip install youtube-transcript-api
+    """
+    try:
+        from youtube_transcript_api import YouTubeTranscriptApi
+        from youtube_transcript_api._errors import (
+            NoTranscriptFound,
+            TranscriptsDisabled,
+            VideoUnavailable,
+        )
+    except ImportError:
+        return None
+
+    try:
+        transcript = YouTubeTranscriptApi.get_transcript(video_id)
+        return " ".join(segment["text"] for segment in transcript)
+    except (NoTranscriptFound, TranscriptsDisabled, VideoUnavailable):
+        return None
+    except Exception:
+        return None
 
 
 def fetch_atom_first_page(feed_url: str) -> list[tuple[str, str, str]]:

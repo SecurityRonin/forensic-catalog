@@ -584,27 +584,16 @@ pub static PLAYBOOKS: &[InvestigationPath] = &[
             },
             InvestigationStep {
                 artifact_id: "onedrive_metadata",
-                rationale: "OneDrive sync silently uploads staged files. \
-                    Check corporate vs personal account sync paths.",
-                look_for: "Files synced to personal (non-corporate) OneDrive account. \
-                    Bulk sync of directories unrelated to the employee's role.",
-                unlocks: &["google_drive_fs_metadata"],
-            },
-            InvestigationStep {
-                artifact_id: "google_drive_fs_metadata",
-                rationale: "Google Drive File Stream caches metadata about synced files. \
-                    Employees with personal Google accounts may sync corporate data.",
-                look_for: "Files synced to personal Google Drive. \
-                    Sync timestamps correlating with USB or archive events.",
-                unlocks: &["megasync_data"],
-            },
-            InvestigationStep {
-                artifact_id: "megasync_data",
-                rationale: "MEGA is a popular personal cloud storage with end-to-end encryption. \
-                    Frequently used to bypass DLP because traffic is encrypted and hard to inspect.",
-                look_for: "MEGAsync client installation or profile data. \
-                    Sync activity timestamps in the staging window.",
-                unlocks: &[],
+                rationale: "Personal cloud sync (OneDrive personal, Google Drive, MEGA, Dropbox, Box) \
+                    is the most common exfiltration path for insiders. Each client leaves \
+                    metadata artifacts. Corporate DLP rarely inspects personal sync traffic, \
+                    and MEGA uses end-to-end encryption that proxy inspection cannot see.",
+                look_for: "OneDrive: onedrive_metadata — sync DB, check personal vs corporate account path. \
+                    Google Drive: google_drive_fs_metadata — content_cache.db, metadata_sqlite_db. \
+                    MEGA: megasync_data — MEGAsync profile, sync timestamps. \
+                    Dropbox: %APPDATA%\\Dropbox\\info.json — account type (personal vs business). \
+                    Any bulk sync activity during off-hours or in the weeks before departure.",
+                unlocks: &["google_drive_fs_metadata", "megasync_data"],
             },
             InvestigationStep {
                 artifact_id: "usnjrnl",

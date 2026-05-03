@@ -70,7 +70,12 @@ PENDING_MD = textwrap.dedent("""\
 """)
 
 FEED_STATE_JSON = json.dumps({
-    "seen": ["https://windowsir.blogspot.com/2023/12/userassist.html"]
+    "https://windowsir.blogspot.com/feeds/posts/default": {
+        "title": "Windows Incident Response",
+        "entries": [
+            {"url": "https://windowsir.blogspot.com/2023/12/userassist.html", "title": "UserAssist"}
+        ],
+    }
 })
 
 

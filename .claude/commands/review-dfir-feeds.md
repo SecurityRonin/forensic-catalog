@@ -20,13 +20,32 @@ extract artifact findings for the forensicnomicon catalog.
       - New LOLBins / LOLBAS entries not in `src/lolbins.rs`
       - MITRE ATT&CK technique IDs
       - Forensic artifact names (UserAssist, Prefetch, MFT, etc.)
+      - **Co-occurring artifact pairs** (e.g. post discusses ShimCache + Prefetch
+        together → both are `related` candidates for each other's descriptor)
    d. For each finding: grep `src/catalog/descriptors/` and `src/lolbins.rs`
       to check if already covered
-   e. If gap found: create a TDD task with artifact ID, key_path/file, source URL
-   f. Mark item `[→]` (task created) or `[x]` (reviewed, no gaps)
+   e. For co-occurrences: check whether the `related` field in each descriptor
+      already lists the co-occurring artifact. If not, note it as a `related`
+      enrichment task (lower priority than new artifact gaps).
+   f. If gap found: create a TDD task with artifact ID, key_path/file, source URL
+   g. Mark item `[→]` (task created) or `[x]` (reviewed, no gaps)
 4. Write updated `pending-review.md` back with checkboxes updated
 5. Commit: `chore(feeds): mark N posts reviewed — M gaps found`
 6. Print findings table
+
+## Co-occurrence extraction (for `related` field enrichment)
+
+When a post discusses multiple artifacts in the same investigation context
+(e.g. "ShimCache and Prefetch both showed calc.exe execution"):
+
+1. Note the co-occurring artifact IDs
+2. Check both descriptors' `related` arrays — are they already linked?
+3. If not, add a low-priority enrichment note to the findings table
+4. The `related` field builds an investigation graph: which artifacts
+   corroborate each other for the same TTP
+
+This is the primary real-world source for `ArtifactDescriptor.related`.
+Hardcoded relationships miss investigation-derived correlations.
 
 ## Finding extraction patterns
 

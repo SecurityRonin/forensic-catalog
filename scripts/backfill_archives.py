@@ -56,37 +56,26 @@ USER_AGENT = (
 # Only HTTP 404/410 are "definitively gone" — transient errors do not trigger [!]
 _GONE_CODES = frozenset({404, 410})
 
-# Sources with low artifact signal — skip for backfill
+# Sources to skip for backfill.
+# Rationale for each exclusion is documented — remove from this set
+# if you want complete coverage (at the cost of more noise to review).
 _SKIP_TITLES = frozenset({
-    "SANS Internet Storm Center",
-    "BleepingComputer",
-    "Krebs on Security",
-    "Dark Reading",
-    "Forensic Focus",
-    "HECF / Hacking Exposed Computer Forensics Blog",
+    # Pure IOC/threat-intel feeds — not artifact documentation
     "URLhaus",
     "MalwareBazaar",
     "ThreatFox",
+    # Taxonomy commits — not blog posts
     "MISP taxonomies",
-    "MSAB",
-    "DFIR Training",
-    "Amped Software blog",
-    "The Sleuth Kit updates",
-    "This Week In 4n6",
-    "Forensic 4cast",
-    "Forensic Multimedia Analysis Blog",
-    "13cubed (YouTube)",
-    # LOL datasets — use fetch_*.py scripts instead
+    # LOL datasets — use fetch_*.py scripts for full current state
     "LOLBAS Project (Windows)",
     "GTFOBins (Linux)",
     "LOOBins (macOS)",
     "LOLDrivers (BYOVD)",
     "LOFL Project (RMM C2 indicators)",
     "Blue_Team_Hunting_Field_Notes",
-    # Vendor marketing — low DFIR artifact signal
-    "Cellebrite Blog",
-    "Binalyze Blog",
-    "DFIR Science",
+    # YouTube — Atom feed = last 15 videos only; full history needs YouTube Data API
+    # Remove when YouTube API key is configured (see --youtube-api-key flag TODO)
+    "13cubed (YouTube)",
 })
 
 # Atom XML namespace
@@ -278,18 +267,25 @@ _PENDING_URL_RE = re.compile(r"^\- \[[^\]]*\] \[[^\]]*\]\(([^)]+)\)")
 
 def load_seen_urls(feed_state_path: str, pending_path: str) -> set[str]:
     """
-    Return union of URLs from feed-state.json "seen" list and all URLs in
-    pending-review.md (regardless of checkbox state).
+    Return union of URLs from feed-state.json and all URLs in pending-review.md.
+
+    feed-state.json format (keyed by feed_url):
+      { "https://feed.url": { "entries": [{"url": "..."}] } }
     """
     seen: set[str] = set()
 
-    # feed-state.json
+    # feed-state.json — keyed by feed URL, each value has "entries" list
     if os.path.exists(feed_state_path):
         try:
             with open(feed_state_path) as f:
                 state = json.load(f)
-            if isinstance(state, dict) and "seen" in state:
-                seen.update(state["seen"])
+            if isinstance(state, dict):
+                for feed_data in state.values():
+                    if isinstance(feed_data, dict):
+                        for entry in feed_data.get("entries", []):
+                            url = entry.get("url", "")
+                            if url:
+                                seen.add(url)
         except (json.JSONDecodeError, OSError):
             pass
 

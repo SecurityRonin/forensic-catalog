@@ -1,6 +1,6 @@
 # Feed Update Report
 
-Generated: 2026-05-03T06:13:46Z
+Generated: 2026-05-03T05:36:12Z
 
 ## Windows Incident Response
 
@@ -57,19 +57,7 @@ Generated: 2026-05-03T06:13:46Z
 
 - Site: https://df-stream.com/
 - Feed: https://df-stream.com/feed/
-- Entries checked: 10
-- New since last snapshot: 10
-
-- 2019-10-19T20:23:24+00:00 — [ShellBags & Windows 10 Feature Updates](https://df-stream.com/2019/10/shellbags-windows-10-feature-updates/?utm_source=rss&utm_medium=rss&utm_campaign=shellbags-windows-10-feature-updates)
-- 2018-07-17T12:30:57+00:00 — [USB Device Tracking using the Partition/Diagnostic Event Log – Part 2](https://df-stream.com/2018/07/partition-diagnostic-event-log-and-usb-device-tracking-p2/?utm_source=rss&utm_medium=rss&utm_campaign=partition-diagnostic-event-log-and-usb-device-tracking-p2)
-- 2018-05-01T11:47:34+00:00 — [USB Device Tracking using the Partition/Diagnostic Event Log – Part 1](https://df-stream.com/2018/05/partition-diagnostic-event-log-and-usb-device-tracking-p1/?utm_source=rss&utm_medium=rss&utm_campaign=partition-diagnostic-event-log-and-usb-device-tracking-p1)
-- 2018-03-13T11:00:23+00:00 — [Introducing USB Detective](https://df-stream.com/2018/03/usb-detective/?utm_source=rss&utm_medium=rss&utm_campaign=usb-detective)
-- 2017-10-19T13:50:33+00:00 — [Amcache and USB Device Tracking](https://df-stream.com/2017/10/amcache-and-usb-device-tracking/?utm_source=rss&utm_medium=rss&utm_campaign=amcache-and-usb-device-tracking)
-- 2017-10-07T05:43:15+00:00 — [RecentApps Registry Key](https://df-stream.com/2017/10/recentapps/?utm_source=rss&utm_medium=rss&utm_campaign=recentapps)
-- 2017-08-14T15:18:00+00:00 — [Memory Acquisition and Virtual Secure Mode](https://df-stream.com/2017/08/memory-acquisition-and-virtual-secure/?utm_source=rss&utm_medium=rss&utm_campaign=memory-acquisition-and-virtual-secure)
-- 2016-04-18T04:58:00+00:00 — [Fun with Recycle Bin $I Files & Windows 10](https://df-stream.com/2016/04/fun-with-recycle-bin-i-files-windows-10/?utm_source=rss&utm_medium=rss&utm_campaign=fun-with-recycle-bin-i-files-windows-10)
-- 2015-07-17T03:45:00+00:00 — [Adobe Reader’s Not-So-cRecentFiles](https://df-stream.com/2015/07/adobe-readers-not-so-crecentfiles/?utm_source=rss&utm_medium=rss&utm_campaign=adobe-readers-not-so-crecentfiles)
-- 2015-02-04T05:55:00+00:00 — [Leveraging the DeviceContainers Key](https://df-stream.com/2015/02/leveraging-devicecontainers-key/?utm_source=rss&utm_medium=rss&utm_campaign=leveraging-devicecontainers-key)
+- Status: error: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)
 
 ## mac4n6
 
@@ -189,19 +177,7 @@ Generated: 2026-05-03T06:13:46Z
 
 - Site: https://smarterforensics.com/
 - Feed: https://smarterforensics.com/feed/
-- Entries checked: 10
-- New since last snapshot: 10
-
-- 2024-08-08T02:34:02+00:00 — [iOS 17- The “Forever” Setting That Isn’t… Or Is It?](https://smarterforensics.com/2024/08/ios-17-the-forever-setting-that-isnt-or-is-it/)
-- 2021-12-30T19:00:14+00:00 — [Android and iOS acquisition Recommendations](https://smarterforensics.com/2021/12/android-and-ios-acquisition-recommendations/)
-- 2021-03-17T19:39:09+00:00 — [Forensic 4:Cast Awards – nominations are open](https://smarterforensics.com/2021/03/forensic-4cast-awards-nominations-are-open/)
-- 2020-09-18T15:13:43+00:00 — [Rotten to the Core? Nah, iOS14 is Mostly Sweet](https://smarterforensics.com/2020/09/rotten-to-the-core-nah-ios14-is-mostly-sweet/)
-- 2020-08-25T17:47:27+00:00 — [Using Photos.sqlite to show the relationships between photos and the application they were created with?  By Scott Koenig](https://smarterforensics.com/2020/08/does-photos-sqlite-have-relations-with-cameramessagesapp-by-scott-koenig/)
-- 2020-07-17T18:00:49+00:00 — [DFIRSummit Laugh Track](https://smarterforensics.com/2020/07/dfirsummit-laugh-track/)
-- 2020-04-01T12:23:24+00:00 — [“Life Has no ctrl+Alt+Del” – The New DFIR online Meetup](https://smarterforensics.com/2020/04/life-has-no-ctrlaltdel-the-new-dfir-online-meetup/)
-- 2020-03-19T20:13:25+00:00 — [2020 Forensic 4Cast Nominations are open!](https://smarterforensics.com/2020/03/2020-forensic-4cast-nominations-are-open/)
-- 2019-09-26T20:58:45+00:00 — [iOS 13 – Summary for those of you who enjoy the cliffsnotes](https://smarterforensics.com/2019/09/ios-13-summary-for-those-of-you-who-enjoy-the-cliffsnotes/)
-- 2019-09-26T01:42:10+00:00 — […Won’t you back that thing up: a glimpse of  ios 13 artifacts](https://smarterforensics.com/2019/09/wont-you-back-that-thing-up-a-glimpse-of-ios-13-artifacts/)
+- Status: error: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)
 
 ## Initialization Vectors
 
@@ -330,49 +306,25 @@ Generated: 2026-05-03T06:13:46Z
 
 - Site: https://www.dfir.training/
 - Feed: https://www.dfir.training/dfir-training-categories-k2/itemlist?format=feed
-- Status: error: HTTP 404
+- Status: error: _ssl.c:999: The handshake operation timed out
 
 ## MSAB
 
 - Site: https://www.msab.com/
 - Feed: https://www.msab.com/feed/
-- Entries checked: 10
-- New since last snapshot: 10
-
-- 2026-04-28T05:00:00+00:00 — [MSAB Interim Report – Q1 2026](https://www.msab.com/updates/msab-interim-report-q1-2026/)
-- 2026-04-21T11:00:00+00:00 — [MSAB publishes Annual Report for 2025](https://www.msab.com/updates/msab-publishes-annual-report-for-2025/)
-- 2026-04-14T05:00:00+00:00 — [Invitation to the Presentation of MSAB’s Interim Report January-March 2026](https://www.msab.com/updates/invitation-to-the-presentation-of-msabs-interim-report-january-march-2026/)
-- 2026-04-07T07:00:00+00:00 — [NOTICE OF ANNUAL GENERAL MEETING IN MICRO SYSTEMATION AB (publ)](https://www.msab.com/updates/notice-of-annual-general-meeting-in-micro-systemation-ab-publ-3/)
-- 2026-03-26T12:30:45+00:00 — [Q1 2026 Major Release is now available](https://www.msab.com/updates/q1-2026-major-release-is-now-available/)
-- 2026-03-24T06:00:00+00:00 — [Invitation to MSAB’s Capital Markets Day on May 7th, 2026](https://www.msab.com/updates/invitation-to-msabs-capital-markets-day-on-may-7th-2026/)
-- 2026-02-05T12:30:18+00:00 — [XRY 11.3.1: Market-first GPS device support.](https://www.msab.com/updates/xry-11-3-1-market-first-gps-device-support/)
-- 2026-01-27T06:00:00+00:00 — [Year-end report 2025](https://www.msab.com/updates/year-end-report-2025/)
-- 2026-01-16T07:00:00+00:00 — [MSAB Announces the Appointment of Mårten Blixt as New Chief Revenue Officer (CRO)](https://www.msab.com/updates/msab-announces-the-appointment-of-marten-blixt-as-new-chief-revenue-officer-cro/)
-- 2025-12-19T07:00:00+00:00 — [Nomination Committee appointed for MSAB’s Annual General Meeting 2026](https://www.msab.com/updates/nomination-committee-appointed-for-msabs-annual-general-meeting-2026/)
+- Status: error: mismatched tag: line 93, column 2
 
 ## AboutDFIR
 
 - Site: https://aboutdfir.com/
 - Feed: https://aboutdfir.com/feed/
-- Entries checked: 10
-- New since last snapshot: 10
-
-- 2026-05-01T11:59:32+00:00 — [InfoSec News Nuggets 05/01/2026](https://aboutdfir.com/infosec-news-nuggets-05-01-2026/)
-- 2026-04-30T12:17:25+00:00 — [InfoSec News Nuggets 04/30/2026](https://aboutdfir.com/infosec-news-nuggets-04-30-2026/)
-- 2026-04-29T11:23:11+00:00 — [InfoSec News Nuggets 04/29/2026](https://aboutdfir.com/infosec-news-nuggets-04-29-2026/)
-- 2026-04-28T11:27:14+00:00 — [InfoSec News Nuggets 04/28/2026](https://aboutdfir.com/infosec-news-nuggets-04-28-2026/)
-- 2026-04-27T11:36:33+00:00 — [InfoSec News Nuggets 04/27/2026](https://aboutdfir.com/infosec-news-nuggets-04-27-2026/)
-- 2026-04-24T10:38:50+00:00 — [InfoSec News Nuggets 04/24/2026](https://aboutdfir.com/infosec-news-nuggets-04-24-2026/)
-- 2026-04-23T11:35:43+00:00 — [InfoSec News Nuggets 04/23/2026](https://aboutdfir.com/infosec-news-nuggets-04-23-2026/)
-- 2026-04-22T12:18:10+00:00 — [InfoSec News Nuggets 04/22/2026](https://aboutdfir.com/infosec-news-nuggets-04-22-2026/)
-- 2026-04-21T12:54:27+00:00 — [InfoSec News Nuggets 04/21/2026](https://aboutdfir.com/infosec-news-nuggets-04-21-2026/)
-- 2026-04-20T11:35:03+00:00 — [InfoSec News Nuggets 04/20/2026](https://aboutdfir.com/infosec-news-nuggets-04-20-2026/)
+- Status: error: mismatched tag: line 93, column 2
 
 ## Forensic 4cast
 
 - Site: https://forensic4cast.com/
 - Feed: https://4cast.whitfields.org/?feed=rss2
-- Status: error: [Errno -2] Name or service not known
+- Status: error: [Errno 8] nodename nor servname provided, or not known
 
 ## This Week In 4n6
 
@@ -387,37 +339,13 @@ Generated: 2026-05-03T06:13:46Z
 
 - Site: https://www.sleuthkit.org/
 - Feed: https://www.sleuthkit.org/rss.xml
-- Entries checked: 10
-- New since last snapshot: 10
-
-- 2023-08-29T16:12:32-04:00 — [The Sleuth Kit 4.12.1 is available](https://sleuthkit.org/sleuthkit/download.php)
-- 2023-01-24T18:01:09-05:00 — [The Sleuth Kit 4.12.0 is available](https://sleuthkit.org/sleuthkit/download.php)
-- 2023-08-29T16:12:11-04:00 — [Autopsy 4.21.0 is available](http://www.autopsy.com/download)
-- 2023-01-24T18:00:46-05:00 — [Autopsy 4.20.0 is available](http://www.autopsy.com/download)
-- 2021-12-22T15:00:09-05:00 — [Autopsy 4.19.3 is available](http://sleuthkit.org/autopsy/download.php)
-- 2021-07-31T15:45:54-04:00 — [Autopsy 4.19.0 and The Sleuth Kit 4.11.0 Are Out](http://www.sleuthkit.org/)
-- 2021-03-23T06:47:05-04:00 — [Autopsy 4.18.0 and The Sleuth Kit 4.10.2 Are Out](http://www.sleuthkit.org/)
-- 2020-09-08T17:08:49-04:00 — [Autopsy 4.16.0 was released](http://www.sleuthkit.org/autopsy/history.php)
-- 2020-09-08T17:08:26-04:00 — [The Sleuth Kit 4.10.0 was released](http://www.sleuthkit.org/sleuthkit/history.php)
-- 2020-05-01T06:44:11-04:00 — [The Sleuth Kit 4.9.0 Was Released](http://www.sleuthkit.org/sleuthkit/download.php)
+- Status: error: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)
 
 ## Amped Software blog
 
 - Site: https://blog.ampedsoftware.com/
 - Feed: https://blog.ampedsoftware.com/feed/
-- Entries checked: 10
-- New since last snapshot: 10
-
-- 2026-04-24T13:30:00+00:00 — [Learn from the Experts at Amped Connect U.S. 2026](https://blog.ampedsoftware.com/2026/04/24/learn-from-the-experts-at-amped-connect-u-s-2026)
-- 2026-04-16T13:30:00+00:00 — [Fifty Shades of Fake: Deepfakes, AI Enhancement, and Media Authenticity](https://blog.ampedsoftware.com/2026/04/16/fifty-shades-of-fake)
-- 2026-04-01T13:30:00+00:00 — [Amped DVRConv and Engine Update 40286](https://blog.ampedsoftware.com/2026/04/01/dvrconv-and-engine-update-40286)
-- 2026-03-25T14:30:00+00:00 — [Amped Replay Update 40205: Magnify and Spotlight Improvements, Bookmarks Updates and More!](https://blog.ampedsoftware.com/2026/03/25/amped-replay-update-40205)
-- 2026-03-11T14:30:00+00:00 — [Authenticate Update 40165: Faster and Updated Deepfake Detection, Improved Geometrical Analysis, New Inspector Panel, and more!](https://blog.ampedsoftware.com/2026/03/11/authenticate-update-40165)
-- 2026-02-18T14:30:00+00:00 — [Amped FIVE Update 39780: Playback Control Options, TIME File Improvements, Video Duration Control when Removing Frames, Updates to Resize and Aspect Ratio, and Much More](https://blog.ampedsoftware.com/2026/02/18/amped-five-update-39780)
-- 2026-02-10T14:30:00+00:00 — [2026 Digital Forensics Conference Guide: See Amped’s Video Forensics Tools Live](https://blog.ampedsoftware.com/2026/02/10/2026-digital-forensics-conference-guide)
-- 2026-01-21T14:51:21+00:00 — [Assisted Video Redaction in Amped Replay: Redacting Faces, People, Vehicles, and Plates](https://blog.ampedsoftware.com/2026/01/21/assisted-video-redaction)
-- 2025-12-18T14:30:00+00:00 — [Amped: Software and Much More](https://blog.ampedsoftware.com/2025/12/18/amped-software-and-much-more)
-- 2025-12-16T14:30:00+00:00 — [How to Upgrade Your Video Evidence Skills in 2026: Amped Image and Video Forensics Training Courses](https://blog.ampedsoftware.com/2025/12/16/amped-digital-forensics-training-courses-2026)
+- Status: error: mismatched tag: line 93, column 2
 
 ## Binalyze Blog
 
@@ -539,7 +467,7 @@ Generated: 2026-05-03T06:13:46Z
 
 - Site: https://www.darkreading.com/
 - Feed: https://www.darkreading.com/rss/all.xml
-- Status: error: HTTP 403
+- Status: error: HTTP 404
 
 ## LOLBAS Project (Windows)
 
@@ -630,24 +558,6 @@ Generated: 2026-05-03T06:13:46Z
 - 2024-12-13T22:47:49+00:00 — [Update descriptions](https://github.com/LOFL-Project/LOFL-Project.github.io/commit/579732610849bd794e072afaef4676a5ac0353c9)
 - 2024-12-13T22:34:08+00:00 — [Applying update LOFL-Project/LOFLCAB@b21acf9f074d4e84cc091e819a7375df…](https://github.com/LOFL-Project/LOFL-Project.github.io/commit/3755852482b072f0ef9f28e3c179c57707e0bd33)
 - 2024-04-19T09:56:49+00:00 — [Applying update LOFL-Project/LOFLCAB@343e067d79f88749b84838e7aa4b26eb…](https://github.com/LOFL-Project/LOFL-Project.github.io/commit/1e3724f03fab854e960106607111459f321daeeb)
-
-## Blue Team Hunting Field Notes (bitbug0x55AA)
-
-- Site: https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes
-- Feed: https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commits/main.atom
-- Entries checked: 10
-- New since last snapshot: 10
-
-- 2026-04-22T04:38:23+00:00 — [Update 1.3_Windows_Event_Core.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/8598bdb8d50fe2a68e182933256bc9e21f6a76a5)
-- 2026-04-20T23:49:49+00:00 — [Update !Master_Internals_to_Events_Glossary.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/1633539548835af11f2f28f859593668f6a9330d)
-- 2026-04-20T23:49:11+00:00 — [Update _00_Review_Path.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/f4bddde9ffca0fcf8747a991c9782a4335984e25)
-- 2026-04-20T23:08:35+00:00 — [Merge branch 'main' of https://github.com/bitbug0x55AA/Blue_Team_Hunt…](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/13627bdd7a787b81243b3a6d8af1f9b580449168)
-- 2026-04-20T23:08:33+00:00 — [Script-layer principle file update](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/de15454e587b961734a0a3085d3d3db6bb847942)
-- 2026-04-19T07:02:09+00:00 — [Create 7.6_Malicious_Code_Minor_Analysis_Writeup_Template.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/907393720d8fd4f6578b7fcbbac10d851009f677)
-- 2026-04-19T06:06:50+00:00 — [Script-layer analysis related Underlying principle files update](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/844dda472e32fe283c82d5ea7c053ef68d618424)
-- 2026-04-19T05:56:27+00:00 — [Update README.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/a5613e0cd14be5713b92d1de68d511e0e629d935)
-- 2026-04-19T05:55:03+00:00 — [Update 4.3.03_JScript_VBS_HTA_Analysis.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/38b6d158a0e81d4d942f28d785cf6d6171cbea4e)
-- 2026-04-19T05:45:52+00:00 — [Create 8.1.30_COM_Automation_and_IDispatch_Interface.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/9034714806a5bed6ae1355da7ef5e506175608ec)
 
 ## abuse.ch blog
 

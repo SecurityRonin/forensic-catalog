@@ -11,6 +11,7 @@ mod linux_ext;
 mod macos_ext;
 mod windows_evtx_ext;
 mod windows_files_ext;
+mod windows_logs_ext;
 mod windows_registry_ext;
 mod windows_registry_ext2;
 mod windows_registry_ext3;
@@ -6813,6 +6814,26 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     linux_ext::LINUX_COREDUMP_DIR,
     linux_ext::LINUX_LOGROTATE_D,
     linux_ext::LINUX_SNAP_PACKAGES,
+    // Batch I: Linux kernel / live-system artifacts
+    linux_ext::LINUX_DMESG_LOG,
+    linux_ext::LINUX_KERN_LOG,
+    linux_ext::LINUX_PROC_KALLSYMS,
+    linux_ext::LINUX_PROC_NET_TCP,
+    linux_ext::LINUX_PROC_NET_TCP6,
+    linux_ext::LINUX_PROC_NET_UDP,
+    linux_ext::LINUX_PROC_NET_UNIX,
+    linux_ext::LINUX_LSOF_OUTPUT,
+    linux_ext::LINUX_SS_OUTPUT,
+    linux_ext::LINUX_CHKROOTKIT_OUTPUT,
+    linux_ext::LINUX_RKHUNTER_LOG,
+    linux_ext::LINUX_SYSCTL_CONF,
+    // Batch I: Windows crash dump, WER, and miscellaneous artifacts
+    windows_logs_ext::WINDOWS_CRASH_DUMP,
+    windows_logs_ext::WINDOWS_MINIDUMP,
+    windows_logs_ext::AMCACHE_DRIVER,
+    windows_logs_ext::WER_REPORT_QUEUE,
+    windows_logs_ext::WINDOWS_NOTIFICATION_DB,
+    windows_logs_ext::AMCACHE_SHORTCUT,
     // Phase-2 Windows registry threat-hunting artifacts (windows_registry_ext2)
     windows_registry_ext2::WINLOGON_AUTOADMIN_LOGON,
     windows_registry_ext2::WINLOGON_DEFAULT_PASSWORD,

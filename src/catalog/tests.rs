@@ -4072,3 +4072,160 @@ mod tests_jump_list_enrichment {
         );
     }
 }
+
+// ── Windows Timeline + Windows Search enrichment ──────────────────────────────
+
+#[cfg(test)]
+mod tests_timeline_search_enrichment {
+    use super::*;
+
+    // ── Windows Timeline (ActivitiesCache.db) ─────────────────────────────────
+
+    #[test]
+    fn windows_timeline_does_not_use_srum_fields() {
+        // SRUM_FIELDS is the wrong schema for ActivitiesCache.db.
+        // SRUM is an ESE database (SRUDB.dat) tracking network/CPU/energy by app;
+        // Windows Timeline is a SQLite database tracking app focus and clipboard.
+        // They share nothing in their schema.
+        let srum_field_names: Vec<&str> = SRUM_DB.fields.iter().map(|f| f.name).collect();
+        let timeline_field_names: Vec<&str> =
+            WINDOWS_TIMELINE.fields.iter().map(|f| f.name).collect();
+        assert!(
+            timeline_field_names != srum_field_names,
+            "windows_timeline must not reuse SRUM_FIELDS — different database, different schema; \
+             both currently have: {timeline_field_names:?}"
+        );
+    }
+
+    #[test]
+    fn windows_timeline_has_activity_type_field() {
+        // Activities.Activity_Type (int): 5=AppInFocus, 6=AppLifecycle, 11=UserActivity,
+        // 12=Notification, 16=CopyPaste. The type determines how to decode payload_json.
+        // Source: https://kacos2000.github.io/WindowsTimeline/WindowsTimeline.pdf
+        let field_names: Vec<&str> = WINDOWS_TIMELINE.fields.iter().map(|f| f.name).collect();
+        assert!(
+            field_names.contains(&"activity_type"),
+            "windows_timeline fields must include activity_type (int, distinguishes focus/clipboard/notification); \
+             got: {field_names:?}"
+        );
+    }
+
+    #[test]
+    fn windows_timeline_has_start_time_field() {
+        // Activities.StartTime and EndTime are Unix epoch integers.
+        // Duration = EndTime - StartTime gives app focus duration — critical for
+        // establishing what the user was doing during an incident window.
+        // Source: https://kacos2000.github.io/WindowsTimeline/WindowsTimeline.pdf
+        let field_names: Vec<&str> = WINDOWS_TIMELINE.fields.iter().map(|f| f.name).collect();
+        assert!(
+            field_names.contains(&"start_time"),
+            "windows_timeline fields must include start_time (Unix epoch); \
+             got: {field_names:?}"
+        );
+    }
+
+    #[test]
+    fn windows_timeline_has_payload_json_field() {
+        // Activities.Payload is a JSON blob whose schema depends on activity_type.
+        // For type 16 (CopyPaste), it contains clipboard text — forensically critical
+        // for credential exfiltration and data staging detection.
+        // Source: https://kacos2000.github.io/WindowsTimeline/WindowsTimeline.pdf
+        let field_names: Vec<&str> = WINDOWS_TIMELINE.fields.iter().map(|f| f.name).collect();
+        assert!(
+            field_names.contains(&"payload_json"),
+            "windows_timeline fields must include payload_json (type-specific JSON blob); \
+             got: {field_names:?}"
+        );
+    }
+
+    #[test]
+    fn windows_timeline_has_platform_device_id_field() {
+        // Activities.PlatformDeviceId is a GUID identifying the device that created
+        // the activity. Cross-references DeviceCache registry for human-readable name.
+        // Key for multi-device investigations — was this activity local or synced?
+        // Cloud sync disabled July 2021 for MSA accounts (local db persists).
+        // Source: https://kacos2000.github.io/WindowsTimeline/WindowsTimeline.pdf
+        let field_names: Vec<&str> = WINDOWS_TIMELINE.fields.iter().map(|f| f.name).collect();
+        assert!(
+            field_names.contains(&"platform_device_id"),
+            "windows_timeline fields must include platform_device_id (device GUID); \
+             got: {field_names:?}"
+        );
+    }
+
+    #[test]
+    fn windows_timeline_cites_kacos2000() {
+        // kacos2000/WindowsTimeline is the authoritative source for ActivitiesCache.db
+        // schema (table names, column types, activity_type enum values).
+        assert!(
+            WINDOWS_TIMELINE
+                .sources
+                .iter()
+                .any(|s| s.contains("kacos2000")),
+            "windows_timeline must cite github.com/kacos2000/WindowsTimeline; \
+             got: {:?}",
+            WINDOWS_TIMELINE.sources
+        );
+    }
+
+    #[test]
+    fn windows_timeline_devicecache_registry_exists() {
+        // HKCU\Software\Microsoft\Windows\CurrentVersion\CloudStore\
+        //   Store\Cache\DefaultAccount\*\Current\Data
+        // DeviceCache resolves PlatformDeviceId GUIDs to human-readable device names.
+        // Without this lookup, platform_device_id is an opaque GUID.
+        // Source: https://kacos2000.github.io/WindowsTimeline/WindowsTimeline.pdf
+        assert!(
+            CATALOG.by_id("windows_timeline_devicecache").is_some(),
+            "windows_timeline_devicecache registry artifact must exist in catalog \
+             (resolves PlatformDeviceId GUID to device name)"
+        );
+    }
+
+    // ── Windows Search Index ───────────────────────────────────────────────────
+
+    #[test]
+    fn windows_search_edb_exists() {
+        // Windows.edb: ESE database at
+        //   %PROGRAMDATA%\Microsoft\Windows Search\Data\Applications\Windows\Windows.edb
+        // Contains SystemIndex_0A table: every file/folder indexed by Windows Search.
+        // System_Search_GatherTime = last time Windows indexed the file — forensically
+        // useful because it is independent of $MFT timestamps and can reveal when a
+        // file existed even after deletion.
+        // Source: https://github.com/kacos2000/WinEDB
+        assert!(
+            CATALOG.by_id("windows_search_edb").is_some(),
+            "windows_search_edb artifact must exist in catalog \
+             (Windows Search ESE index, Win7–Win10 21H2)"
+        );
+    }
+
+    #[test]
+    fn windows_search_db_win11_exists() {
+        // Win11 22H2+ migrated Windows Search from ESE to SQLite3:
+        //   C:\ProgramData\Microsoft\Search\Data\Applications\Windows\windows.db
+        // The migration is silently automatic — analysts must check for both files.
+        // Source: https://github.com/kacos2000/WinEDB
+        assert!(
+            CATALOG.by_id("windows_search_db_win11").is_some(),
+            "windows_search_db_win11 artifact must exist in catalog \
+             (Windows Search SQLite, Win11 22H2+)"
+        );
+    }
+
+    #[test]
+    fn windows_search_edb_has_gather_time_field() {
+        // System_Search_GatherTime is the key forensic field in Windows.edb:
+        // it records when Windows Search last indexed the file, independent of
+        // NTFS timestamps — survives timestamp manipulation and file deletion.
+        // Source: https://github.com/kacos2000/WinEDB
+        let desc = CATALOG.by_id("windows_search_edb").unwrap();
+        let field_names: Vec<&str> = desc.fields.iter().map(|f| f.name).collect();
+        assert!(
+            field_names.contains(&"gather_time"),
+            "windows_search_edb fields must include gather_time \
+             (System_Search_GatherTime — timestamp-independent index time); \
+             got: {field_names:?}"
+        );
+    }
+}

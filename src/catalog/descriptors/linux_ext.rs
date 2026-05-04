@@ -33,7 +33,6 @@ pub(crate) static LINUX_AUDITD_LOG: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["linux_auth_log", "linux_syslog"],
     sources: &[
         "https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/security_guide/chap-system_auditing",
-        "https://attack.mitre.org/techniques/T1562/001/",
     ],
 };
 
@@ -141,7 +140,6 @@ pub(crate) static LINUX_APACHE_ACCESS_LOG: ArtifactDescriptor = ArtifactDescript
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["linux_nginx_access_log"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1190/",
         "https://www.sans.org/blog/web-server-log-analysis-for-incident-responders/",
     ],
 };
@@ -162,7 +160,10 @@ pub(crate) static LINUX_APACHE_ERROR_LOG: ArtifactDescriptor = ArtifactDescripto
     retention: Some("Rotated weekly"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["linux_apache_access_log"],
-    sources: &["https://attack.mitre.org/techniques/T1190/"],
+    sources: &[
+        "https://www.sans.org/blog/web-server-log-analysis-for-incident-responders/",
+        "https://httpd.apache.org/docs/current/logs.html",
+    ],
 };
 
 pub(crate) static LINUX_NGINX_ACCESS_LOG: ArtifactDescriptor = ArtifactDescriptor {
@@ -185,7 +186,10 @@ pub(crate) static LINUX_NGINX_ACCESS_LOG: ArtifactDescriptor = ArtifactDescripto
     retention: Some("Rotated; configurable"),
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["linux_apache_access_log"],
-    sources: &["https://attack.mitre.org/techniques/T1190/"],
+    sources: &[
+        "https://www.sans.org/blog/web-server-log-analysis-for-incident-responders/",
+        "https://nginx.org/en/docs/http/ngx_http_log_module.html",
+    ],
 };
 
 pub(crate) static LINUX_FAIL2BAN_LOG: ArtifactDescriptor = ArtifactDescriptor {
@@ -207,7 +211,10 @@ pub(crate) static LINUX_FAIL2BAN_LOG: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("Rotated"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["linux_auth_log", "linux_secure_log"],
-    sources: &["https://attack.mitre.org/techniques/T1110/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-forensics-artifacts/",
+        "https://linux.die.net/man/8/fail2ban",
+    ],
 };
 
 pub(crate) static LINUX_DPKG_LOG: ArtifactDescriptor = ArtifactDescriptor {
@@ -230,7 +237,10 @@ pub(crate) static LINUX_DPKG_LOG: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("Rotated monthly; 12 months typically kept"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["linux_apt_hooks"],
-    sources: &["https://attack.mitre.org/techniques/T1072/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-forensics-artifacts/",
+        "https://linux.die.net/man/1/dpkg",
+    ],
 };
 
 pub(crate) static LINUX_RPM_DB: ArtifactDescriptor = ArtifactDescriptor {
@@ -252,7 +262,10 @@ pub(crate) static LINUX_RPM_DB: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("Updated on install/remove; reflects current state"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["linux_messages_log"],
-    sources: &["https://attack.mitre.org/techniques/T1072/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-forensics-artifacts/",
+        "https://linux.die.net/man/8/rpm",
+    ],
 };
 
 pub(crate) static LINUX_SELINUX_CONFIG: ArtifactDescriptor = ArtifactDescriptor {
@@ -271,7 +284,10 @@ pub(crate) static LINUX_SELINUX_CONFIG: ArtifactDescriptor = ArtifactDescriptor 
     retention: Some("Persistent"),
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["linux_auditd_log"],
-    sources: &["https://attack.mitre.org/techniques/T1562/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://linux.die.net/man/8/selinux",
+    ],
 };
 
 pub(crate) static LINUX_APPARMOR_PROFILES: ArtifactDescriptor = ArtifactDescriptor {
@@ -290,7 +306,10 @@ pub(crate) static LINUX_APPARMOR_PROFILES: ArtifactDescriptor = ArtifactDescript
     retention: Some("Persistent configuration"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["linux_auditd_log"],
-    sources: &["https://attack.mitre.org/techniques/T1562/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://gitlab.com/apparmor/apparmor/-/wikis/Documentation",
+    ],
 };
 
 pub(crate) static LINUX_IPTABLES_RULES: ArtifactDescriptor = ArtifactDescriptor {
@@ -309,7 +328,10 @@ pub(crate) static LINUX_IPTABLES_RULES: ArtifactDescriptor = ArtifactDescriptor 
     retention: Some("Persistent"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["linux_nftables_conf"],
-    sources: &["https://attack.mitre.org/techniques/T1562/004/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://linux.die.net/man/8/iptables",
+    ],
 };
 
 pub(crate) static LINUX_NFTABLES_CONF: ArtifactDescriptor = ArtifactDescriptor {
@@ -328,7 +350,10 @@ pub(crate) static LINUX_NFTABLES_CONF: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("Persistent"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["linux_iptables_rules"],
-    sources: &["https://attack.mitre.org/techniques/T1562/004/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://wiki.nftables.org/wiki-nftables/index.php/Main_Page",
+    ],
 };
 
 pub(crate) static LINUX_HOSTS_FILE: ArtifactDescriptor = ArtifactDescriptor {
@@ -350,7 +375,10 @@ pub(crate) static LINUX_HOSTS_FILE: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("Persistent"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["linux_resolv_conf"],
-    sources: &["https://attack.mitre.org/techniques/T1565/001/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://linux.die.net/man/5/hosts",
+    ],
 };
 
 pub(crate) static LINUX_RESOLV_CONF: ArtifactDescriptor = ArtifactDescriptor {
@@ -369,7 +397,10 @@ pub(crate) static LINUX_RESOLV_CONF: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("Persistent; may be overwritten by NetworkManager/dhclient"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["linux_hosts_file"],
-    sources: &["https://attack.mitre.org/techniques/T1565/001/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://linux.die.net/man/5/resolv.conf",
+    ],
 };
 
 pub(crate) static LINUX_PROC_MODULES: ArtifactDescriptor = ArtifactDescriptor {
@@ -392,8 +423,8 @@ pub(crate) static LINUX_PROC_MODULES: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["linux_modprobe_d", "linux_journal_dir"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1014/",
-        "https://attack.mitre.org/techniques/T1547/006/",
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
     ],
 };
 
@@ -413,7 +444,10 @@ pub(crate) static LINUX_MODPROBE_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("Persistent"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["linux_proc_modules", "linux_modules_load_d"],
-    sources: &["https://attack.mitre.org/techniques/T1574/006/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://linux.die.net/man/5/modprobe.d",
+    ],
 };
 
 pub(crate) static LINUX_DOCKER_CONTAINER_LOGS: ArtifactDescriptor = ArtifactDescriptor {
@@ -436,7 +470,6 @@ pub(crate) static LINUX_DOCKER_CONTAINER_LOGS: ArtifactDescriptor = ArtifactDesc
     triage_priority: TriagePriority::High,
     related_artifacts: &["linux_docker_daemon_json"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1610/",
         "https://www.sans.org/blog/container-forensics/",
     ],
 };
@@ -457,7 +490,10 @@ pub(crate) static LINUX_DOCKER_DAEMON_JSON: ArtifactDescriptor = ArtifactDescrip
     retention: Some("Persistent"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["linux_docker_container_logs"],
-    sources: &["https://attack.mitre.org/techniques/T1610/"],
+    sources: &[
+        "https://www.sans.org/blog/container-forensics/",
+        "https://docs.docker.com/config/daemon/",
+    ],
 };
 
 pub(crate) static LINUX_COREDUMP_DIR: ArtifactDescriptor = ArtifactDescriptor {
@@ -498,7 +534,10 @@ pub(crate) static LINUX_LOGROTATE_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("Persistent configuration"),
     triage_priority: TriagePriority::Medium,
     related_artifacts: &["linux_syslog", "linux_auth_log"],
-    sources: &["https://attack.mitre.org/techniques/T1070/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://linux.die.net/man/8/logrotate",
+    ],
 };
 
 pub(crate) static LINUX_SNAP_PACKAGES: ArtifactDescriptor = ArtifactDescriptor {
@@ -517,7 +556,10 @@ pub(crate) static LINUX_SNAP_PACKAGES: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("Retained until snap is removed"),
     triage_priority: TriagePriority::Medium,
     related_artifacts: &["linux_dpkg_log"],
-    sources: &["https://attack.mitre.org/techniques/T1072/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-forensics-artifacts/",
+        "https://snapcraft.io/docs/snap-format",
+    ],
 };
 
 // ── Batch I: Linux kernel / live-system artifacts ──────────────────────────
@@ -541,7 +583,6 @@ pub(crate) static LINUX_DMESG_LOG: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["linux_kern_log", "linux_proc_modules", "linux_chkrootkit_output"],
     sources: &[
         "https://man7.org/linux/man-pages/man1/dmesg.1.html",
-        "https://attack.mitre.org/techniques/T1014/",
     ],
 };
 
@@ -563,8 +604,8 @@ pub(crate) static LINUX_KERN_LOG: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["linux_dmesg_log", "linux_proc_modules", "linux_syslog"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1014/",
-        "https://attack.mitre.org/techniques/T1547/006/",
+        "https://www.sans.org/blog/linux-forensics-artifacts/",
+        "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
     ],
 };
 
@@ -587,7 +628,6 @@ pub(crate) static LINUX_PROC_KALLSYMS: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["linux_proc_modules", "linux_dmesg_log"],
     sources: &[
         "https://man7.org/linux/man-pages/man5/proc.5.html",
-        "https://attack.mitre.org/techniques/T1014/",
     ],
 };
 
@@ -610,7 +650,6 @@ pub(crate) static LINUX_PROC_NET_TCP: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["linux_ss_output", "linux_proc_net_tcp6", "linux_proc_net_unix"],
     sources: &[
         "https://man7.org/linux/man-pages/man5/proc.5.html",
-        "https://attack.mitre.org/techniques/T1014/",
     ],
 };
 
@@ -633,7 +672,6 @@ pub(crate) static LINUX_PROC_NET_TCP6: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["linux_proc_net_tcp", "linux_ss_output"],
     sources: &[
         "https://man7.org/linux/man-pages/man5/proc.5.html",
-        "https://attack.mitre.org/techniques/T1014/",
     ],
 };
 
@@ -656,7 +694,6 @@ pub(crate) static LINUX_PROC_NET_UDP: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["linux_proc_net_tcp", "linux_ss_output"],
     sources: &[
         "https://man7.org/linux/man-pages/man5/proc.5.html",
-        "https://attack.mitre.org/techniques/T1048/",
     ],
 };
 
@@ -679,7 +716,6 @@ pub(crate) static LINUX_PROC_NET_UNIX: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["linux_proc_net_tcp", "linux_ss_output", "linux_lsof_output"],
     sources: &[
         "https://man7.org/linux/man-pages/man5/proc.5.html",
-        "https://attack.mitre.org/techniques/T1496/",
     ],
 };
 
@@ -702,7 +738,6 @@ pub(crate) static LINUX_LSOF_OUTPUT: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["linux_proc_net_unix", "linux_ss_output"],
     sources: &[
         "https://man7.org/linux/man-pages/man8/lsof.8.html",
-        "https://attack.mitre.org/techniques/T1014/",
     ],
 };
 
@@ -725,7 +760,6 @@ pub(crate) static LINUX_SS_OUTPUT: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["linux_proc_net_tcp", "linux_lsof_output", "linux_proc_net_unix"],
     sources: &[
         "https://man7.org/linux/man-pages/man8/ss.8.html",
-        "https://attack.mitre.org/techniques/T1014/",
     ],
 };
 
@@ -748,7 +782,6 @@ pub(crate) static LINUX_CHKROOTKIT_OUTPUT: ArtifactDescriptor = ArtifactDescript
     related_artifacts: &["linux_lsof_output", "linux_rkhunter_log", "linux_dmesg_log"],
     sources: &[
         "https://www.chkrootkit.org/",
-        "https://attack.mitre.org/techniques/T1014/",
     ],
 };
 
@@ -771,7 +804,6 @@ pub(crate) static LINUX_RKHUNTER_LOG: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["linux_chkrootkit_output", "linux_dmesg_log"],
     sources: &[
         "https://rkhunter.sourceforge.net/",
-        "https://attack.mitre.org/techniques/T1014/",
     ],
 };
 
@@ -794,6 +826,5 @@ pub(crate) static LINUX_SYSCTL_CONF: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["linux_modules_load_d", "linux_udev_rules_d"],
     sources: &[
         "https://man7.org/linux/man-pages/man8/sysctl.8.html",
-        "https://attack.mitre.org/techniques/T1562/006/",
     ],
 };

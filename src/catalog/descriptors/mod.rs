@@ -123,8 +123,6 @@ pub static USERASSIST_EXE: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["prefetch_dir", "shimcache", "srum_app_resource"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1059/",
-        "https://attack.mitre.org/techniques/T1204/002/",
         "https://www.sans.org/blog/computer-forensic-artifacts-windows-7-userassist/",
         "https://windowsir.blogspot.com/2004/02/userassist.html",
         "http://windowsir.blogspot.com/2007/09/more-on-userassist-keys.html",
@@ -164,7 +162,6 @@ pub static RUN_KEY_HKLM_RUN: ArtifactDescriptor = ArtifactDescriptor {
         "scheduled_tasks_dir",
     ],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/001/",
         "https://learn.microsoft.com/en-us/windows/win32/setupapi/run-and-runonce-registry-keys",
         "https://windowsir.blogspot.com/2013/01/run-mru.html",
         "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
@@ -199,7 +196,6 @@ pub static TYPED_URLS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1071/001/",
         "https://www.sans.org/blog/digital-forensics-windows-registry-forensics-part-6-internet-explorer-user-typed-urls/",
         "https://windowsir.blogspot.com/2006/04/typed-urls.html",
         "https://crucialsecurity.wordpress.com/2011/03/14/typedurls-part-1/",
@@ -247,8 +243,6 @@ pub static PCA_APPLAUNCH_DIC: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1059/",
-        "https://attack.mitre.org/techniques/T1204/002/",
         "https://aboutdfir.com/new-windows-11-pro-22h2-evidence-of-execution-artifact/",
         "https://www.sygnia.co/blog/new-windows-11-pca-artifact/",
         "https://github.com/Psmths/windows-forensic-artifacts/blob/main/execution/program-compatibility-assistant.md",
@@ -278,7 +272,6 @@ pub static RUN_KEY_HKCU_RUN: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["run_key_hklm", "startup_folder_user"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/001/",
         "https://learn.microsoft.com/en-us/windows/win32/setupapi/run-and-runonce-registry-keys",
         "https://windowsir.blogspot.com/2013/01/run-mru.html",
         "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
@@ -306,7 +299,6 @@ pub static RUN_KEY_HKCU_RUNONCE: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/001/",
         "https://learn.microsoft.com/en-us/windows/win32/setupapi/run-and-runonce-registry-keys",
     ],
 };
@@ -330,7 +322,6 @@ pub static RUN_KEY_HKLM_RUNONCE: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/001/",
         "https://learn.microsoft.com/en-us/windows/win32/setupapi/run-and-runonce-registry-keys",
     ],
 };
@@ -366,7 +357,6 @@ pub static IFEO_DEBUGGER: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1546/012/",
         "https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/enabling-postmortem-debugging",
         "https://www.sans.org/blog/malware-persistence-without-the-windows-registry/",
     ],
@@ -412,8 +402,6 @@ pub static USERASSIST_FOLDER: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["userassist_exe"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/009/",
-        "https://attack.mitre.org/techniques/T1204/002/",
         "https://www.magnetforensics.com/blog/artifact-profile-userassist/",
         "https://www.sans.org/blog/computer-forensic-artifacts-windows-7-userassist/",
         "https://windowsir.blogspot.com/2004/02/userassist.html",
@@ -503,7 +491,6 @@ pub static USERASSIST_XP_EXE: ArtifactDescriptor = ArtifactDescriptor {
         "https://www.magnetforensics.com/blog/artifact-profile-userassist/",
         "https://windowsir.blogspot.com/2004/02/userassist.html",
         "http://windowsir.blogspot.com/2007/09/more-on-userassist-keys.html",
-        "https://attack.mitre.org/techniques/T1059/",
     ],
 };
 
@@ -536,7 +523,6 @@ pub static USERASSIST_XP_IE_FAVORITES: ArtifactDescriptor = ArtifactDescriptor {
     sources: &[
         "https://www.magnetforensics.com/blog/artifact-profile-userassist/",
         "https://windowsir.blogspot.com/2004/02/userassist.html",
-        "https://attack.mitre.org/techniques/T1071/001/",
     ],
 };
 
@@ -603,8 +589,6 @@ pub static SHELLBAGS_USER: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1083/",
-        "https://attack.mitre.org/techniques/T1005/",
         "https://www.sans.org/blog/shell-bag-forensics/",
         "https://windowsir.blogspot.com/2009/07/shellbag-analysis.html",
         "https://ericzimmerman.github.io/#!index.md",
@@ -652,8 +636,6 @@ pub static AMCACHE_APP_FILE: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["shimcache", "prefetch_dir", "srum_app_resource"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1218/",
-        "https://attack.mitre.org/techniques/T1204/002/",
         "https://www.sans.org/blog/new-amcache-hve-in-windows-8-1-update-1/",
         "https://www.sansforensics.com/blog/amcache-hive-forensics/",
         "https://www.researchgate.net/publication/317258237_Leveraging_the_Windows_Amcachehve_File_in_Forensic_Investigations",
@@ -695,8 +677,6 @@ pub static SHIMCACHE: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["amcache_app_file", "prefetch_dir", "bam_user"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1218/",
-        "https://attack.mitre.org/techniques/T1059/",
         "https://www.sans.org/blog/digital-forensics-shimcache/",
         "https://redcanary.com/blog/threat-detection/appcompatcache/",
         "https://www.sans.org/blog/mass-triage-part-4-processing-returned-files-appcache-shimcache/",
@@ -738,8 +718,6 @@ pub static BAM_USER: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["dam_user", "shimcache", "prefetch_dir"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1059/",
-        "https://attack.mitre.org/techniques/T1204/",
         "https://www.sans.org/blog/background-activity-moderator-bam-forensics/",
         "https://www.13cubed.com/downloads/windows10_forensics_cheat_sheet.pdf",
         "https://forensafe.com/blogs/bam.html",
@@ -774,8 +752,6 @@ pub static DAM_USER: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["bam_user", "shimcache"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1059/",
-        "https://attack.mitre.org/techniques/T1204/",
         "https://www.sans.org/blog/background-activity-moderator-bam-forensics/",
         "https://forensafe.com/blogs/bam.html",
         "https://github.com/Psmths/windows-forensic-artifacts/blob/main/execution/bam-dam.md",
@@ -813,8 +789,6 @@ pub static SAM_USERS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["lsa_secrets", "dcc2_cache"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1003/002/",
-        "https://attack.mitre.org/techniques/T1087/001/",
         "https://www.sans.org/blog/windows-credential-storage-for-penetration-testers/",
         "https://windowsir.blogspot.com/2010/11/recovering-passwords.html",
         "http://windowsir.blogspot.com/2013/07/howto-determine-users-on-system.html",
@@ -848,11 +822,7 @@ pub static LSA_SECRETS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["sam_users", "dpapi_system_masterkey", "dcc2_cache"],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1003/004/",
-        "https://attack.mitre.org/techniques/T1552/002/",
-        "https://www.sans.org/blog/lsa-secrets/",
-    ],
+    sources: &["https://www.sans.org/blog/lsa-secrets/"],
 };
 
 pub(crate) static DCC2_FIELDS: &[FieldSchema] = &[FieldSchema {
@@ -883,10 +853,7 @@ pub static DCC2_CACHE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1003/005/",
-        "https://www.sans.org/blog/windows-credential-storage-for-penetration-testers/",
-    ],
+    sources: &["https://www.sans.org/blog/windows-credential-storage-for-penetration-testers/"],
 };
 
 // ── TypedURLsTime ─────────────────────────────────────────────────────────────
@@ -917,7 +884,6 @@ pub static TYPED_URLS_TIME: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1071/001/",
         "https://www.sans.org/blog/digital-forensics-windows-registry-forensics-part-6-internet-explorer-user-typed-urls/",
     ],
 };
@@ -950,8 +916,6 @@ pub static MRU_RECENT_DOCS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1005/",
-        "https://attack.mitre.org/techniques/T1083/",
         "https://windowsir.blogspot.com/2006/11/recent-docs-mru.html",
         "https://www.sans.org/blog/windows-mru-registry-keys/",
         "https://www.sans.org/blog/opensavemru-and-lastvisitedmru/",
@@ -989,8 +953,6 @@ pub static USB_ENUM: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1200/",
-        "https://attack.mitre.org/techniques/T1052/001/",
         "https://www.sans.org/blog/computer-forensic-artifacts-windows-7-usb-device-tracking/",
         "https://windowsir.blogspot.com/2013/07/usb-device-tracking-in-windows-7.html",
         "https://www.magnetforensics.com/blog/artifact-profile-usb-devices/",
@@ -1028,8 +990,6 @@ pub static MUICACHE: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1059/",
-        "https://attack.mitre.org/techniques/T1204/002/",
         "https://windowsir.blogspot.com/2012/08/no-more-mr-nice-guy.html",
         "https://www.sans.org/blog/digital-forensics-windows-muicache/",
         "http://windowsir.blogspot.com/2005/12/mystery-of-muicachesolved.html",
@@ -1068,7 +1028,6 @@ pub static APPINIT_DLLS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1546/010/",
         "https://learn.microsoft.com/en-us/windows/win32/dlls/registry-keys-for-appinit-dlls",
     ],
 };
@@ -1103,10 +1062,7 @@ pub static WINLOGON_USERINIT: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1547/004/",
-        "https://learn.microsoft.com/en-us/windows/win32/secauthn/winlogon-and-gina",
-    ],
+    sources: &["https://learn.microsoft.com/en-us/windows/win32/secauthn/winlogon-and-gina"],
 };
 
 // ── Screensaver persistence ───────────────────────────────────────────────────
@@ -1139,10 +1095,7 @@ pub static SCREENSAVER_EXE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1546/002/",
-        "https://www.sans.org/blog/screensaver-registry-key-for-persistence/",
-    ],
+    sources: &["https://www.sans.org/blog/screensaver-registry-key-for-persistence/"],
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1429,10 +1382,7 @@ pub static WINLOGON_SHELL: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1547/004/",
-        "https://learn.microsoft.com/en-us/windows/win32/secauthn/winlogon-and-gina",
-    ],
+    sources: &["https://learn.microsoft.com/en-us/windows/win32/secauthn/winlogon-and-gina"],
 };
 
 /// Windows Services — ImagePath value indicates binary launched as a service.
@@ -1457,7 +1407,6 @@ pub static SERVICES_IMAGEPATH: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1543/003/",
         "https://learn.microsoft.com/en-us/windows/win32/services/service-control-manager",
         "https://redcanary.com/threat-detection-report/techniques/t1543/",
         "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
@@ -1494,7 +1443,6 @@ pub static ACTIVE_SETUP_HKLM: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/014/",
         "https://www.sans.org/blog/active-setup-registry-persistence/",
     ],
 };
@@ -1519,7 +1467,7 @@ pub static ACTIVE_SETUP_HKCU: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1547/014/"],
+    sources: &["https://www.sans.org/blog/active-setup-registry-persistence/"],
 };
 
 /// COM Hijacking via HKCU CLSID registration (T1546.015).
@@ -1544,10 +1492,7 @@ pub static COM_HIJACK_CLSID_HKCU: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1546/015/",
-        "https://redcanary.com/threat-detection-report/techniques/t1546/",
-    ],
+    sources: &["https://redcanary.com/threat-detection-report/techniques/t1546/"],
 };
 
 /// AppCert DLLs — DLL injected into every process calling CreateProcess (T1546.009).
@@ -1571,10 +1516,7 @@ pub static APPCERT_DLLS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1546/009/",
-        "https://learn.microsoft.com/en-us/windows/win32/devnotes/appcertdlls",
-    ],
+    sources: &["https://learn.microsoft.com/en-us/windows/win32/devnotes/appcertdlls"],
 };
 
 pub(crate) static BOOT_EXECUTE_FIELDS: &[FieldSchema] = &[FieldSchema {
@@ -1606,7 +1548,6 @@ pub static BOOT_EXECUTE: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/001/",
         "https://learn.microsoft.com/en-us/windows-hardware/drivers/kernel/boot-time-global-flag-settings",
     ],
 };
@@ -1633,7 +1574,6 @@ pub static LSA_SECURITY_PKGS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/005/",
         "https://learn.microsoft.com/en-us/windows/win32/secauthn/lsa-authentication",
     ],
 };
@@ -1656,11 +1596,7 @@ pub static LSA_AUTH_PKGS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1547/002/",
-        "https://attack.mitre.org/techniques/T1547/005/",
-        "https://learn.microsoft.com/en-us/windows/win32/secauthn/lsa-authentication",
-    ],
+    sources: &["https://learn.microsoft.com/en-us/windows/win32/secauthn/lsa-authentication"],
 };
 
 /// Print Monitors — DLL loaded by the spooler service (T1547.010).
@@ -1683,10 +1619,7 @@ pub static PRINT_MONITORS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1547/010/",
-        "https://learn.microsoft.com/en-us/windows-hardware/drivers/print/print-monitor",
-    ],
+    sources: &["https://learn.microsoft.com/en-us/windows-hardware/drivers/print/print-monitor"],
 };
 
 /// Time Provider DLLs — loaded into svchost as part of W32Time (T1547.003).
@@ -1707,10 +1640,7 @@ pub static TIME_PROVIDERS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1547/003/",
-        "https://learn.microsoft.com/en-us/windows/win32/sysinfo/time-provider",
-    ],
+    sources: &["https://learn.microsoft.com/en-us/windows/win32/sysinfo/time-provider"],
 };
 
 /// Netsh Helper DLLs — COM-like DLLs loaded by netsh.exe (T1546.007).
@@ -1732,7 +1662,6 @@ pub static NETSH_HELPER_DLLS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1546/007/",
         "https://learn.microsoft.com/en-us/windows/win32/netmgmt/network-management-functions",
     ],
 };
@@ -1766,7 +1695,6 @@ pub static BROWSER_HELPER_OBJECTS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1176/",
         "https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/platform-apis/aa753582(v=vs.85)",
     ],
 };
@@ -1792,7 +1720,6 @@ pub static STARTUP_FOLDER_USER: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/001/",
         "https://learn.microsoft.com/en-us/windows/win32/shell/csidl",
         "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
     ],
@@ -1816,10 +1743,7 @@ pub static STARTUP_FOLDER_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1547/001/",
-        "https://learn.microsoft.com/en-us/windows/win32/shell/csidl",
-    ],
+    sources: &["https://learn.microsoft.com/en-us/windows/win32/shell/csidl"],
 };
 
 /// Windows Task Scheduler task XML files (T1053.005).
@@ -1844,7 +1768,6 @@ pub static SCHEDULED_TASKS_DIR: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1053/005/",
         "https://learn.microsoft.com/en-us/windows/win32/taskschd/task-scheduler-start-page",
         "https://redcanary.com/threat-detection-report/techniques/t1053/",
         "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
@@ -1874,10 +1797,7 @@ pub static WDIGEST_CACHING: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1003/001/",
-        "https://redcanary.com/threat-detection-report/techniques/t1003/",
-    ],
+    sources: &["https://redcanary.com/threat-detection-report/techniques/t1003/"],
 };
 
 // ── Windows execution evidence ────────────────────────────────────────────
@@ -1902,7 +1822,6 @@ pub static WORDWHEEL_QUERY: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1083/",
         "https://windowsir.blogspot.com/2012/08/wordwheelquery.html",
         "https://github.com/EricZimmerman/RECmd",
         "https://github.com/EricZimmerman/RegistryPlugins",
@@ -1931,7 +1850,6 @@ pub static OPENSAVE_MRU: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1083/",
         "https://windowsir.blogspot.com/2006/11/recent-docs-mru.html",
         "https://www.sans.org/blog/opensavemru-and-lastvisitedmru/",
         "https://forensics.wiki/opensavemru/",
@@ -1959,7 +1877,6 @@ pub static LASTVISITED_MRU: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1083/",
         "https://windowsir.blogspot.com/2006/11/recent-docs-mru.html",
         "https://www.sans.org/blog/opensavemru-and-lastvisitedmru/",
         "https://github.com/EricZimmerman/RECmd",
@@ -2093,7 +2010,6 @@ pub static MFT: ArtifactDescriptor = ArtifactDescriptor {
         // Primary NTFS specification reference
         "https://learn.microsoft.com/en-us/windows/win32/fileio/master-file-table",
         // Timestomping technique + SI vs FN discrepancy
-        "https://attack.mitre.org/techniques/T1070/006/",
         // SANS FOR508 — MFT analysis methodology
         "https://www.sans.org/blog/windows-file-system-forensics-ntfs-master-file-table/",
         // MFTECmd by Eric Zimmerman — primary parsing tool
@@ -2203,7 +2119,6 @@ pub static USNJRNL: ArtifactDescriptor = ArtifactDescriptor {
         // USN_RECORD_V2 structure specification
         "https://learn.microsoft.com/en-us/windows/win32/api/winioctl/ns-winioctl-usn_record_v2",
         // ATT&CK file deletion technique
-        "https://attack.mitre.org/techniques/T1070/004/",
         // SANS FOR508 — USN Journal forensics
         "https://www.sans.org/blog/ntfs-usn-change-journal-forensics/",
         // MFTECmd handles $UsnJrnl parsing
@@ -2260,7 +2175,6 @@ pub static LOGFILE_NTFS: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["mft", "usnjrnl"],
     sources: &[
         "https://learn.microsoft.com/en-us/windows-server/storage/file-server/ntfs-overview",
-        "https://attack.mitre.org/techniques/T1070/006/",
         // NTFS Log Tracker — Eric Zimmerman
         "https://github.com/EricZimmerman/NTFSLogTracker",
         // $LogFile forensics reference
@@ -2290,7 +2204,6 @@ pub static PREFETCH_DIR: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["shimcache", "amcache_app_file", "bam_user"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1204/002/",
         "https://www.sans.org/blog/computer-forensic-artifacts-windows-7-prefetch-files/",
         "https://13cubed.com/downloads/Windows_Forensic_Analysis_Poster.pdf",
         "https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/application-verifier",
@@ -2546,8 +2459,6 @@ pub static POWERSHELL_HISTORY: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1059/001/",
-        "https://attack.mitre.org/techniques/T1552/",
         "https://www.sans.org/blog/powershell-forensics/",
         "https://redcanary.com/threat-detection-report/techniques/t1059.001/",
         "https://community.sophos.com/sophos-labs/b/blog/posts/powershell-command-history-forensics",
@@ -2577,8 +2488,6 @@ pub static RECYCLE_BIN: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1070/004/",
-        "https://attack.mitre.org/techniques/T1083/",
         "https://www.sans.org/blog/digital-forensics-recycle-bin-forensics/",
         "https://windowsir.blogspot.com/2010/02/more-on-recycle-bin.html",
         "https://www.magnetforensics.com/blog/artifact-profile-recycle-bin/",
@@ -2610,7 +2519,6 @@ pub static THUMBCACHE: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1083/",
         "https://www.sans.org/blog/thumbnail-cache-forensics/",
         "https://www.nirsoft.net/utils/thumbcache_viewer.html",
         "https://www.pentestpartners.com/security-blog/thumbnail-forensics-dfir-techniques-for-analysing-windows-thumbcache/",
@@ -2642,7 +2550,6 @@ pub static SEARCH_DB_USER: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1083/",
         "https://www.sans.org/blog/windows-search-index-forensics/",
         "https://learn.microsoft.com/en-us/windows/win32/search/windows-search",
         "https://cyber.aon.com/aon_cyber_labs/windows-search-index-the-forensic-artifact-youve-been-searching-for/",
@@ -2681,7 +2588,6 @@ pub static DPAPI_MASTERKEY_USER: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["dpapi_cred_user", "dpapi_credhist", "chrome_login_data"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1555/004/",
         "https://www.sans.org/blog/dpapi-forensics-credentials-stored-in-windows/",
         "https://posts.specterops.io/operational-guidance-for-offensive-user-dpapi-abuse-1fb7fac8b107",
         "https://www.sygnia.co/blog/the-downfall-of-dpapis-top-secret-weapon/",
@@ -2711,7 +2617,6 @@ pub static DPAPI_CRED_USER: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["dpapi_masterkey_user", "windows_vault_user"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1555/004/",
         "https://www.sans.org/blog/dpapi-forensics-credentials-stored-in-windows/",
         "https://posts.specterops.io/operational-guidance-for-offensive-user-dpapi-abuse-1fb7fac8b107",
         "https://www.sygnia.co/blog/the-downfall-of-dpapis-top-secret-weapon/",
@@ -2738,7 +2643,6 @@ pub static DPAPI_CRED_ROAMING: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1555/004/",
         "https://www.sans.org/blog/dpapi-forensics-credentials-stored-in-windows/",
         "https://posts.specterops.io/operational-guidance-for-offensive-user-dpapi-abuse-1fb7fac8b107",
     ],
@@ -2781,7 +2685,6 @@ pub static WINDOWS_VAULT_USER: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1555/004/",
         "https://learn.microsoft.com/en-us/windows/win32/secauthn/credential-manager",
         "https://blog.digital-forensics.it/2016/01/windows-revaulting.html",
     ],
@@ -2806,7 +2709,6 @@ pub static WINDOWS_VAULT_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1555/004/",
         "https://learn.microsoft.com/en-us/windows/win32/secauthn/credential-manager",
         "https://blog.digital-forensics.it/2016/01/windows-revaulting.html",
     ],
@@ -2842,7 +2744,6 @@ pub static RDP_CLIENT_SERVERS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1021/001/",
         "https://www.sans.org/blog/windows-rdp-forensics/",
         "https://forensafe.com/blogs/rdc.html",
         "https://www.magnetforensics.com/blog/rdp-artifacts-in-incident-response/",
@@ -2876,7 +2777,6 @@ pub static RDP_CLIENT_DEFAULT: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1021/001/",
         "https://www.sans.org/blog/windows-rdp-forensics/",
         "https://forensafe.com/blogs/rdc.html",
         "https://www.magnetforensics.com/blog/rdp-artifacts-in-incident-response/",
@@ -2911,10 +2811,7 @@ pub static NTDS_DIT: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1003/003/",
-        "https://www.sans.org/blog/protecting-ad-from-credential-theft/",
-    ],
+    sources: &["https://www.sans.org/blog/protecting-ad-from-credential-theft/"],
 };
 
 pub(crate) static BROWSER_CRED_FIELDS: &[FieldSchema] = &[
@@ -2951,7 +2848,6 @@ pub static CHROME_LOGIN_DATA: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["chrome_cookies", "dpapi_masterkey_user"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1555/003/",
         "https://redcanary.com/threat-detection-report/techniques/t1555/",
         "https://atropos4n6.com/windows/chrome-login-data-forensics/",
         "https://www.foxtonforensics.com/blog/post/analysing-chrome-login-data",
@@ -2988,7 +2884,6 @@ pub static FIREFOX_LOGINS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1555/003/",
         "https://redcanary.com/threat-detection-report/techniques/t1555/",
         "https://atropos4n6.com/windows/chrome-login-data-forensics/",
     ],
@@ -3031,7 +2926,6 @@ pub static WIFI_PROFILES: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1552/001/",
         "https://www.sans.org/blog/wireless-forensics/",
         "https://forensafe.com/blogs/winwirelessnetworks.html",
     ],
@@ -3107,7 +3001,6 @@ pub static LINUX_CRONTAB_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1053/003/",
         "https://www.sans.org/blog/linux-persistence-mechanisms/",
         "https://linux.die.net/man/5/crontab",
         "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
@@ -3136,7 +3029,6 @@ pub static LINUX_CRON_D: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1053/003/",
         "https://www.sans.org/blog/linux-persistence-mechanisms/",
         "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
     ],
@@ -3163,7 +3055,10 @@ pub static LINUX_CRON_PERIODIC: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1053/003/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
+    ],
 };
 
 /// Per-user crontab spool at `/var/spool/cron/crontabs/{user}` (T1053.003).
@@ -3188,7 +3083,6 @@ pub static LINUX_USER_CRONTAB: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1053/003/",
         "https://www.sans.org/blog/linux-persistence-mechanisms/",
         "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
     ],
@@ -3215,10 +3109,7 @@ pub static LINUX_ANACRONTAB: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1053/003/",
-        "https://linux.die.net/man/8/anacron",
-    ],
+    sources: &["https://linux.die.net/man/8/anacron"],
 };
 
 // ── Linux persistence: systemd ────────────────────────────────────────────
@@ -3247,7 +3138,6 @@ pub static LINUX_SYSTEMD_SYSTEM_UNIT: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1543/002/",
         "https://www.sans.org/blog/linux-persistence-mechanisms/",
         "https://www.freedesktop.org/software/systemd/man/systemd.unit.html",
         "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
@@ -3277,7 +3167,6 @@ pub static LINUX_SYSTEMD_USER_UNIT: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1543/002/",
         "https://www.freedesktop.org/software/systemd/man/systemd.unit.html",
         "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
     ],
@@ -3305,7 +3194,6 @@ pub static LINUX_SYSTEMD_TIMER: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1053/006/",
         "https://www.freedesktop.org/software/systemd/man/systemd.timer.html",
         "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
     ],
@@ -3335,7 +3223,6 @@ pub static LINUX_RC_LOCAL: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1037/004/",
         "https://www.sans.org/blog/linux-persistence-mechanisms/",
         "https://pberba.github.io/security/2022/02/06/linux-threat-hunting-for-persistence-initialization-scripts-and-shell-configuration/",
         "https://www.elastic.co/security-labs/sequel-on-persistence-mechanisms",
@@ -3364,8 +3251,6 @@ pub static LINUX_INIT_D: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1543/002/",
-        "https://attack.mitre.org/techniques/T1037/004/",
         "https://pberba.github.io/security/2022/02/06/linux-threat-hunting-for-persistence-initialization-scripts-and-shell-configuration/",
     ],
 };
@@ -3394,7 +3279,6 @@ pub static LINUX_BASHRC_USER: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1546/004/",
         "https://www.sans.org/blog/linux-persistence-mechanisms/",
         "https://pberba.github.io/security/2022/02/06/linux-threat-hunting-for-persistence-initialization-scripts-and-shell-configuration/",
         "https://www.elastic.co/guide/en/security/current/bash-shell-profile-modification.html",
@@ -3420,7 +3304,6 @@ pub static LINUX_BASH_PROFILE_USER: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1546/004/",
         "https://pberba.github.io/security/2022/02/06/linux-threat-hunting-for-persistence-initialization-scripts-and-shell-configuration/",
     ],
 };
@@ -3444,7 +3327,6 @@ pub static LINUX_PROFILE_USER: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1546/004/",
         "https://pberba.github.io/security/2022/02/06/linux-threat-hunting-for-persistence-initialization-scripts-and-shell-configuration/",
     ],
 };
@@ -3468,7 +3350,6 @@ pub static LINUX_ZSHRC_USER: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1546/004/",
         "https://pberba.github.io/security/2022/02/06/linux-threat-hunting-for-persistence-initialization-scripts-and-shell-configuration/",
     ],
 };
@@ -3492,7 +3373,6 @@ pub static LINUX_PROFILE_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1546/004/",
         "https://www.sans.org/blog/linux-persistence-mechanisms/",
         "https://pberba.github.io/security/2022/02/06/linux-threat-hunting-for-persistence-initialization-scripts-and-shell-configuration/",
     ],
@@ -3517,7 +3397,6 @@ pub static LINUX_PROFILE_D: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1546/004/",
         "https://pberba.github.io/security/2022/02/06/linux-threat-hunting-for-persistence-initialization-scripts-and-shell-configuration/",
     ],
 };
@@ -3548,7 +3427,6 @@ pub static LINUX_LD_SO_PRELOAD: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1574/006/",
         "https://www.sans.org/blog/linux-persistence-mechanisms/",
         "https://www.wiz.io/blog/linux-rootkits-explained-part-1-dynamic-linker-hijacking",
         "https://www.sentinelone.com/labs/leveraging-ld_audit-to-beat-the-traditional-linux-library-preloading-technique/",
@@ -3577,7 +3455,10 @@ pub static LINUX_LD_SO_CONF_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1574/006/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://www.wiz.io/blog/linux-rootkits-explained-part-1-dynamic-linker-hijacking",
+    ],
 };
 
 // ── Linux persistence: SSH ────────────────────────────────────────────────
@@ -3604,7 +3485,6 @@ pub static LINUX_SSH_AUTHORIZED_KEYS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1098/004/",
         "https://www.sans.org/blog/ssh-backdoors/",
         "https://sandflysecurity.com/blog/detecting-unauthorized-ssh-keys-in-linux/",
     ],
@@ -3634,7 +3514,10 @@ pub static LINUX_PAM_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1556/003/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
+    ],
 };
 
 /// `/etc/sudoers.d/` — drop-in sudoers rules (T1548.003).
@@ -3659,7 +3542,10 @@ pub static LINUX_SUDOERS_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1548/003/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
+    ],
 };
 
 /// `/etc/modules-load.d/` — kernel modules loaded at boot (T1547.006).
@@ -3683,7 +3569,10 @@ pub static LINUX_MODULES_LOAD_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1547/006/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
+    ],
 };
 
 /// `/etc/update-motd.d/` — dynamic MOTD scripts executed on login (Debian/Ubuntu).
@@ -3707,7 +3596,10 @@ pub static LINUX_MOTD_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1037/004/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
+    ],
 };
 
 /// `/etc/udev/rules.d/` — udev device event rules (T1546).
@@ -3732,7 +3624,10 @@ pub static LINUX_UDEV_RULES_D: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1546/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
+    ],
 };
 
 // ── Linux execution evidence ──────────────────────────────────────────────
@@ -3761,8 +3656,8 @@ pub static LINUX_BASH_HISTORY: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1059/004/",
-        "https://attack.mitre.org/techniques/T1552/",
+        "https://www.sans.org/blog/linux-forensics-artifacts/",
+        "https://bromiley.medium.com/torvalds-tuesday-bash-history-in-linux-forensics-7cc4c9b4db9f",
     ],
 };
 
@@ -3785,8 +3680,8 @@ pub static LINUX_ZSH_HISTORY: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1059/004/",
-        "https://attack.mitre.org/techniques/T1552/",
+        "https://www.sans.org/blog/linux-forensics-artifacts/",
+        "https://bromiley.medium.com/torvalds-tuesday-bash-history-in-linux-forensics-7cc4c9b4db9f",
     ],
 };
 
@@ -3813,8 +3708,6 @@ pub static LINUX_WTMP: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1078/",
-        "https://attack.mitre.org/techniques/T1021/004/",
         "https://linux.die.net/man/5/wtmp",
         "https://www.sans.org/blog/linux-forensics-artifacts/",
         "https://bromiley.medium.com/torvalds-tuesday-logon-history-in-the-tmp-files-83530b2acc28",
@@ -3843,7 +3736,6 @@ pub static LINUX_BTMP: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1110/",
         "https://linux.die.net/man/5/wtmp",
         "https://bromiley.medium.com/torvalds-tuesday-logon-history-in-the-tmp-files-83530b2acc28",
         "https://sandflysecurity.com/blog/using-linux-utmpdump-for-forensics-and-detecting-log-file-tampering",
@@ -3871,7 +3763,10 @@ pub static LINUX_LASTLOG: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1078/"],
+    sources: &[
+        "https://linux.die.net/man/5/wtmp",
+        "https://bromiley.medium.com/torvalds-tuesday-logon-history-in-the-tmp-files-83530b2acc28",
+    ],
 };
 
 /// `/var/log/auth.log` — authentication and sudo event log (Debian/Ubuntu).
@@ -3896,8 +3791,8 @@ pub static LINUX_AUTH_LOG: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1078/",
-        "https://attack.mitre.org/techniques/T1548/003/",
+        "https://www.sans.org/blog/linux-forensics-artifacts/",
+        "https://sandflysecurity.com/blog/using-linux-utmpdump-for-forensics-and-detecting-log-file-tampering",
     ],
 };
 
@@ -3924,8 +3819,8 @@ pub static LINUX_JOURNAL_DIR: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1078/",
-        "https://attack.mitre.org/techniques/T1059/004/",
+        "https://www.sans.org/blog/linux-forensics-artifacts/",
+        "https://systemd.io/JOURNAL_NATIVE_PROTOCOL/",
     ],
 };
 
@@ -3955,8 +3850,6 @@ pub static LINUX_PASSWD: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1087/001/",
-        "https://attack.mitre.org/techniques/T1136/001/",
         "https://linux.die.net/man/5/passwd",
         "https://bromiley.medium.com/torvalds-tuesday-user-accounts-597b4ca9dcaf",
     ],
@@ -3984,7 +3877,6 @@ pub static LINUX_SHADOW: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1003/008/",
         "https://www.sans.org/blog/linux-password-security/",
         "https://bromiley.medium.com/torvalds-tuesday-user-accounts-597b4ca9dcaf",
     ],
@@ -4012,7 +3904,10 @@ pub static LINUX_SSH_PRIVATE_KEY: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1552/004/"],
+    sources: &[
+        "https://www.sans.org/blog/ssh-backdoors/",
+        "https://sandflysecurity.com/blog/detecting-unauthorized-ssh-keys-in-linux/",
+    ],
 };
 
 /// `~/.ssh/known_hosts` — previously connected SSH server fingerprints (T1021.004).
@@ -4037,8 +3932,8 @@ pub static LINUX_SSH_KNOWN_HOSTS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1021/004/",
-        "https://attack.mitre.org/techniques/T1083/",
+        "https://www.sans.org/blog/ssh-backdoors/",
+        "https://sandflysecurity.com/blog/detecting-unauthorized-ssh-keys-in-linux/",
     ],
 };
 
@@ -4063,7 +3958,10 @@ pub static LINUX_GNUPG_PRIVATE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1552/004/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-forensics-artifacts/",
+        "https://gnupg.org/documentation/manuals/gnupg/GPG-Configuration-Options.html",
+    ],
 };
 
 /// `~/.aws/credentials` — AWS access key material (T1552.001).
@@ -4087,7 +3985,10 @@ pub static LINUX_AWS_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1552/001/"],
+    sources: &[
+        "https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html",
+        "https://www.sans.org/blog/cloud-forensics-and-incident-response/",
+    ],
 };
 
 /// `~/.docker/config.json` — Docker registry auth tokens (T1552.001).
@@ -4111,7 +4012,10 @@ pub static LINUX_DOCKER_CONFIG: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1552/001/"],
+    sources: &[
+        "https://docs.docker.com/engine/reference/commandline/login/",
+        "https://www.sans.org/blog/container-forensics/",
+    ],
 };
 
 // ── Batch E — Windows execution / persistence / credential ───────────────────
@@ -4141,8 +4045,6 @@ pub static LNK_FILES: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["jump_list_auto", "mru_recent_docs"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/009/",
-        "https://attack.mitre.org/techniques/T1070/004/",
         "https://github.com/EricZimmerman/LECmd",
         "https://github.com/EricZimmerman/Lnk",
         "https://github.com/kacos2000/Jumplist-Browser",
@@ -4175,8 +4077,6 @@ pub static JUMP_LIST_AUTO: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["lnk_files", "mru_recent_docs", "jump_list_appid_registry"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/009/",
-        "https://attack.mitre.org/techniques/T1070/004/",
         "https://github.com/EricZimmerman/JLECmd",
         "https://github.com/EricZimmerman/JumpList",
         "https://github.com/kacos2000/Jumplist-Browser",
@@ -4209,8 +4109,6 @@ pub static JUMP_LIST_CUSTOM: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["lnk_files", "jump_list_auto"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/009/",
-        "https://attack.mitre.org/techniques/T1070/004/",
         "https://github.com/EricZimmerman/JLECmd",
         "https://github.com/EricZimmerman/JumpList",
         "https://github.com/kacos2000/Jumplist-Browser",
@@ -4236,11 +4134,7 @@ pub static EVTX_DIR: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("configurable; default ~20MB rolling per channel"),
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1070/001/",
-        "https://attack.mitre.org/techniques/T1059/001/",
-        "https://github.com/EricZimmerman/evtx",
-    ],
+    sources: &["https://github.com/EricZimmerman/evtx"],
 };
 
 pub static MFT_FILE: ArtifactDescriptor = ArtifactDescriptor {
@@ -4261,8 +4155,6 @@ pub static MFT_FILE: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["usn_journal", "recycle_bin", "prefetch_file"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1070/004/",
-        "https://attack.mitre.org/techniques/T1083/",
         "https://github.com/EricZimmerman/MFTECmd",
     ],
 };
@@ -4285,11 +4177,7 @@ pub static USN_JOURNAL: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1070/004/",
-        "https://attack.mitre.org/techniques/T1059/",
-        "https://github.com/EricZimmerman/MFTECmd",
-    ],
+    sources: &["https://github.com/EricZimmerman/MFTECmd"],
 };
 
 // ── Persistence ───────────────────────────────────────────────────────────────
@@ -4313,7 +4201,6 @@ pub static WMI_MOF_DIR: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1546/003/",
         "https://learn.microsoft.com/en-us/windows/win32/wmisdk/receiving-a-wmi-event",
         "https://learn.microsoft.com/en-us/windows/win32/wmisdk/monitoring-and-responding-to-events-with-standard-consumers",
         "https://learn.microsoft.com/en-us/windows/win32/wmisdk/commandlineeventconsumer",
@@ -4340,7 +4227,6 @@ pub static BITS_DB: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1197/",
         "https://learn.microsoft.com/en-us/windows/win32/bits/background-intelligent-transfer-service-portal",
         "https://learn.microsoft.com/en-us/powershell/module/bitstransfer/get-bitstransfer?view=windowsserver2025-ps",
         "https://www.sans.org/white-papers/39195",
@@ -4393,7 +4279,6 @@ pub static WMI_SUBSCRIPTIONS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1546/003/",
         "https://learn.microsoft.com/en-us/windows/win32/wmisdk/receiving-a-wmi-event",
         "https://learn.microsoft.com/en-us/windows/win32/wmisdk/monitoring-and-responding-to-events-with-standard-consumers",
         "https://learn.microsoft.com/en-us/windows/win32/wmisdk/--filtertoconsumerbinding",
@@ -4418,7 +4303,10 @@ pub static LOGON_SCRIPTS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1037/001/"],
+    sources: &[
+        "https://www.sans.org/blog/opensecurity-persistence/",
+        "https://www.hexacorn.com/blog/2013/07/04/beyond-good-ol-run-key-part-15/",
+    ],
 };
 
 pub static WINSOCK_LSP: ArtifactDescriptor = ArtifactDescriptor {
@@ -4439,7 +4327,10 @@ pub static WINSOCK_LSP: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1547/010/"],
+    sources: &[
+        "https://www.sans.org/blog/opensecurity-persistence/",
+        "https://www.hexacorn.com/blog/2013/07/04/beyond-good-ol-run-key-part-15/",
+    ],
 };
 
 pub static APPSHIM_DB: ArtifactDescriptor = ArtifactDescriptor {
@@ -4460,7 +4351,10 @@ pub static APPSHIM_DB: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1546/011/"],
+    sources: &[
+        "https://www.hexacorn.com/blog/2013/07/04/beyond-good-ol-run-key-part-15/",
+        "https://www.sans.org/blog/application-shimming/",
+    ],
 };
 
 pub static PASSWORD_FILTER_DLL: ArtifactDescriptor = ArtifactDescriptor {
@@ -4481,7 +4375,10 @@ pub static PASSWORD_FILTER_DLL: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1556/002/"],
+    sources: &[
+        "https://www.sans.org/blog/opensecurity-persistence/",
+        "https://docs.microsoft.com/en-us/windows/win32/secmgmt/password-filter-programming-considerations",
+    ],
 };
 
 pub static OFFICE_NORMAL_DOTM: ArtifactDescriptor = ArtifactDescriptor {
@@ -4502,7 +4399,10 @@ pub static OFFICE_NORMAL_DOTM: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1137/001/"],
+    sources: &[
+        "https://www.sans.org/blog/opensecurity-persistence/",
+        "https://docs.microsoft.com/en-us/office/vba/word/concepts/customizing-word/using-events-with-the-application-object",
+    ],
 };
 
 pub static POWERSHELL_PROFILE_ALL: ArtifactDescriptor = ArtifactDescriptor {
@@ -4523,7 +4423,10 @@ pub static POWERSHELL_PROFILE_ALL: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1546/013/"],
+    sources: &[
+        "https://www.sans.org/blog/opensecurity-persistence/",
+        "https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_profiles",
+    ],
 };
 
 // ── Credentials ───────────────────────────────────────────────────────────────
@@ -4546,7 +4449,10 @@ pub static DPAPI_SYSTEM_MASTERKEY: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["lsa_secrets", "dpapi_masterkey_user"],
-    sources: &["https://attack.mitre.org/techniques/T1555/004/"],
+    sources: &[
+        "https://github.com/gentilkiwi/mimikatz",
+        "https://blog.gentilkiwi.com/securite/mimikatz/dpapi-domain-backup-keys-theft",
+    ],
 };
 
 pub static DPAPI_CREDHIST: ArtifactDescriptor = ArtifactDescriptor {
@@ -4567,7 +4473,10 @@ pub static DPAPI_CREDHIST: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &["dpapi_masterkey_user"],
-    sources: &["https://attack.mitre.org/techniques/T1555/004/"],
+    sources: &[
+        "https://github.com/gentilkiwi/mimikatz",
+        "https://blog.gentilkiwi.com/securite/mimikatz/dpapi-domain-backup-keys-theft",
+    ],
 };
 
 pub static CHROME_COOKIES: ArtifactDescriptor = ArtifactDescriptor {
@@ -4588,11 +4497,7 @@ pub static CHROME_COOKIES: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &["chrome_login_data"],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1539/",
-        "https://attack.mitre.org/techniques/T1185/",
-        "https://github.com/EricZimmerman/SQLECmd",
-    ],
+    sources: &["https://github.com/EricZimmerman/SQLECmd"],
 };
 
 pub static EDGE_WEBCACHE: ArtifactDescriptor = ArtifactDescriptor {
@@ -4614,8 +4519,8 @@ pub static EDGE_WEBCACHE: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Low,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1539/",
-        "https://attack.mitre.org/techniques/T1217/",
+        "https://github.com/EricZimmerman/SQLECmd",
+        "https://www.sans.org/blog/digital-forensics-windows-browser-artifacts/",
     ],
 };
 
@@ -4637,7 +4542,10 @@ pub static VPN_RAS_PHONEBOOK: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Low,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1552/001/"],
+    sources: &[
+        "https://docs.microsoft.com/en-us/windows/win32/rras/ras-phone-book-files",
+        "https://www.sans.org/blog/digital-forensics-windows-artifact-profiles/",
+    ],
 };
 
 pub static WINDOWS_HELLO_NGC: ArtifactDescriptor = ArtifactDescriptor {
@@ -4658,7 +4566,10 @@ pub static WINDOWS_HELLO_NGC: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1555/"],
+    sources: &[
+        "https://learn.microsoft.com/en-us/windows/security/identity-protection/hello-for-business/",
+        "https://www.sans.org/blog/digital-forensics-windows-artifact-profiles/",
+    ],
 };
 
 pub static USER_CERT_PRIVATE_KEY: ArtifactDescriptor = ArtifactDescriptor {
@@ -4680,7 +4591,8 @@ pub static USER_CERT_PRIVATE_KEY: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1552/004/",
+        "https://learn.microsoft.com/en-us/windows/win32/seccng/key-storage-and-retrieval",
+        "https://github.com/gentilkiwi/mimikatz",
     ],
 };
 
@@ -4702,7 +4614,10 @@ pub static MACHINE_CERT_STORE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1552/004/"],
+    sources: &[
+        "https://learn.microsoft.com/en-us/windows/win32/seccng/key-storage-and-retrieval",
+        "https://github.com/gentilkiwi/mimikatz",
+    ],
 };
 
 // ── Batch F — Linux extended credentials / execution ─────────────────────────
@@ -4725,7 +4640,10 @@ pub static LINUX_AT_QUEUE: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1053/001/"],
+    sources: &[
+        "https://www.sans.org/blog/linux-persistence-mechanisms/",
+        "https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/",
+    ],
 };
 
 pub static LINUX_SSHD_CONFIG: ArtifactDescriptor = ArtifactDescriptor {
@@ -4747,8 +4665,8 @@ pub static LINUX_SSHD_CONFIG: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1098/004/",
-        "https://attack.mitre.org/techniques/T1021/004/",
+        "https://www.sans.org/blog/ssh-backdoors/",
+        "https://linux.die.net/man/5/sshd_config",
     ],
 };
 
@@ -4771,8 +4689,8 @@ pub static LINUX_ETC_GROUP: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1087/001/",
-        "https://attack.mitre.org/techniques/T1078/003/",
+        "https://linux.die.net/man/5/group",
+        "https://bromiley.medium.com/torvalds-tuesday-user-accounts-597b4ca9dcaf",
     ],
 };
 
@@ -4794,7 +4712,10 @@ pub static LINUX_GNOME_KEYRING: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1555/003/"],
+    sources: &[
+        "https://wiki.gnome.org/Projects/GnomeKeyring",
+        "https://www.sans.org/blog/linux-forensics-artifacts/",
+    ],
 };
 
 pub static LINUX_KDE_KWALLET: ArtifactDescriptor = ArtifactDescriptor {
@@ -4815,7 +4736,10 @@ pub static LINUX_KDE_KWALLET: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1555/003/"],
+    sources: &[
+        "https://userbase.kde.org/KWallet",
+        "https://www.sans.org/blog/linux-forensics-artifacts/",
+    ],
 };
 
 pub static LINUX_CHROME_LOGIN_LINUX: ArtifactDescriptor = ArtifactDescriptor {
@@ -4836,7 +4760,10 @@ pub static LINUX_CHROME_LOGIN_LINUX: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1555/003/"],
+    sources: &[
+        "https://github.com/AlessandroZ/LaZagne",
+        "https://www.sans.org/blog/linux-forensics-artifacts/",
+    ],
 };
 
 pub static LINUX_FIREFOX_LOGINS_LINUX: ArtifactDescriptor = ArtifactDescriptor {
@@ -4858,7 +4785,10 @@ pub static LINUX_FIREFOX_LOGINS_LINUX: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1555/003/"],
+    sources: &[
+        "https://github.com/AlessandroZ/LaZagne",
+        "https://www.sans.org/blog/linux-forensics-artifacts/",
+    ],
 };
 
 pub static LINUX_UTMP: ArtifactDescriptor = ArtifactDescriptor {
@@ -4880,7 +4810,6 @@ pub static LINUX_UTMP: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1078/",
         "https://linux.die.net/man/5/utmp",
         "https://www.sans.org/blog/linux-forensics-artifacts/",
         "https://bromiley.medium.com/torvalds-tuesday-logon-history-in-the-tmp-files-83530b2acc28",
@@ -4906,7 +4835,10 @@ pub static LINUX_GCP_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1552/001/"],
+    sources: &[
+        "https://cloud.google.com/sdk/docs/authorizing",
+        "https://www.sans.org/blog/cloud-forensics-and-incident-response/",
+    ],
 };
 
 pub static LINUX_AZURE_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
@@ -4928,7 +4860,8 @@ pub static LINUX_AZURE_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1552/001/",
+        "https://docs.microsoft.com/en-us/cli/azure/authenticate-azure-cli",
+        "https://www.sans.org/blog/cloud-forensics-and-incident-response/",
     ],
 };
 
@@ -4950,7 +4883,10 @@ pub static LINUX_KUBE_CONFIG: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1552/001/"],
+    sources: &[
+        "https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/",
+        "https://www.sans.org/blog/cloud-forensics-and-incident-response/",
+    ],
 };
 
 pub static LINUX_GIT_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
@@ -4971,7 +4907,10 @@ pub static LINUX_GIT_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1552/001/"],
+    sources: &[
+        "https://git-scm.com/docs/git-credential-store",
+        "https://www.sans.org/blog/linux-forensics-artifacts/",
+    ],
 };
 
 pub static LINUX_NETRC: ArtifactDescriptor = ArtifactDescriptor {
@@ -4992,7 +4931,10 @@ pub static LINUX_NETRC: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1552/001/"],
+    sources: &[
+        "https://linux.die.net/man/5/netrc",
+        "https://www.sans.org/blog/linux-forensics-artifacts/",
+    ],
 };
 
 // ── Batch G — LinuxPersist-sourced persistence artifacts ─────────────────────
@@ -5018,10 +4960,7 @@ pub static LINUX_ETC_ENVIRONMENT: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1546/004/",
-        "https://linux.die.net/man/7/environ",
-    ],
+    sources: &["https://linux.die.net/man/7/environ"],
 };
 
 pub static LINUX_XDG_AUTOSTART_USER: ArtifactDescriptor = ArtifactDescriptor {
@@ -5043,10 +4982,7 @@ pub static LINUX_XDG_AUTOSTART_USER: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1547/014/",
-        "https://specifications.freedesktop.org/autostart-spec/autostart-spec-latest.html",
-    ],
+    sources: &["https://specifications.freedesktop.org/autostart-spec/autostart-spec-latest.html"],
 };
 
 pub static LINUX_XDG_AUTOSTART_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
@@ -5068,10 +5004,7 @@ pub static LINUX_XDG_AUTOSTART_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1547/014/",
-        "https://specifications.freedesktop.org/autostart-spec/autostart-spec-latest.html",
-    ],
+    sources: &["https://specifications.freedesktop.org/autostart-spec/autostart-spec-latest.html"],
 };
 
 pub static LINUX_NETWORKMANAGER_DISPATCHER: ArtifactDescriptor = ArtifactDescriptor {
@@ -5094,7 +5027,6 @@ pub static LINUX_NETWORKMANAGER_DISPATCHER: ArtifactDescriptor = ArtifactDescrip
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/013/",
         "https://networkmanager.dev/docs/api/latest/NetworkManager-dispatcher.html",
     ],
 };
@@ -5118,11 +5050,7 @@ pub static LINUX_APT_HOOKS: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &[],
-    sources: &[
-        "https://attack.mitre.org/techniques/T1546/004/",
-        "https://attack.mitre.org/techniques/T1546/016/",
-        "https://wiki.debian.org/DpkgTriggers",
-    ],
+    sources: &["https://wiki.debian.org/DpkgTriggers"],
 };
 
 // ── Batch H — Jump List / LNK / Prefetch / SRUM tables / EVTX channels ──────
@@ -5176,7 +5104,6 @@ pub static JUMP_LIST_APPID_REGISTRY: ArtifactDescriptor = ArtifactDescriptor {
     sources: &[
         "https://github.com/kacos2000/Jumplist-Browser",
         "https://www.hexacorn.com/blog/2013/04/30/jumplists-file-names-and-appid-calculator/",
-        "https://attack.mitre.org/techniques/T1547/009/",
     ],
 };
 
@@ -5223,10 +5150,7 @@ pub static TASKBAND_FAVORITES: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &["jump_list_auto", "lnk_files"],
-    sources: &[
-        "https://github.com/kacos2000/Jumplist-Browser",
-        "https://attack.mitre.org/techniques/T1547/009/",
-    ],
+    sources: &["https://github.com/kacos2000/Jumplist-Browser"],
 };
 
 pub static JUMP_LIST_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
@@ -5249,8 +5173,6 @@ pub static JUMP_LIST_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["jump_list_auto", "jump_list_custom"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/009/",
-        "https://attack.mitre.org/techniques/T1070/004/",
         "https://www.sans.org/blog/computer-forensics-windows-7-jump-lists/",
         "https://windowsir.blogspot.com/2011/05/jump-lists-in-win7.html",
         "https://github.com/EricZimmerman/JLECmd",
@@ -5279,8 +5201,6 @@ pub static LNK_FILES_OFFICE: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["lnk_files", "mru_recent_docs"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/009/",
-        "https://attack.mitre.org/techniques/T1070/004/",
         "https://www.sans.org/blog/lnk-files-analysis-in-windows/",
         "https://windowsir.blogspot.com/2009/01/lnk-files-are-your-friends.html",
         "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-shllink/",
@@ -5362,8 +5282,6 @@ pub static PREFETCH_FILE: ArtifactDescriptor = ArtifactDescriptor {
         "srum_app_resource",
     ],
     sources: &[
-        "https://attack.mitre.org/techniques/T1059/",
-        "https://attack.mitre.org/techniques/T1070/004/",
         "https://www.sans.org/blog/computer-forensic-artifacts-windows-7-prefetch-files/",
         "https://13cubed.com/downloads/Windows_Forensic_Analysis_Poster.pdf",
         "https://isc.sans.edu/diary/Forensic+Value+of+Prefetch/29168",
@@ -5702,9 +5620,6 @@ pub static EVTX_SECURITY: ArtifactDescriptor = ArtifactDescriptor {
         "shimcache",
     ],
     sources: &[
-        "https://attack.mitre.org/techniques/T1070/001/",
-        "https://attack.mitre.org/techniques/T1059/",
-        "https://attack.mitre.org/techniques/T1078/",
         "https://www.sans.org/posters/windows-forensic-analysis/",
         "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/basic-security-audit-policies",
         "https://www.13cubed.com/downloads/windows_event_log_cheat_sheet.pdf",
@@ -5736,8 +5651,6 @@ pub static EVTX_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["evtx_security", "scheduled_tasks_dir", "services_imagepath"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1543/003/",
-        "https://attack.mitre.org/techniques/T1070/001/",
         "https://www.sans.org/posters/windows-forensic-analysis/",
         "https://learn.microsoft.com/en-us/windows/win32/eventlog/event-logging",
         "https://github.com/EricZimmerman/evtx",
@@ -5772,8 +5685,6 @@ pub static EVTX_POWERSHELL: ArtifactDescriptor = ArtifactDescriptor {
         "powershell_profile_all",
     ],
     sources: &[
-        "https://attack.mitre.org/techniques/T1059/001/",
-        "https://attack.mitre.org/techniques/T1027/",
         "https://www.sans.org/blog/detecting-malicious-powershell/",
         "https://redcanary.com/threat-detection-report/techniques/t1059.001/",
         "https://github.com/EricZimmerman/evtx",
@@ -5802,9 +5713,6 @@ pub static EVTX_SYSMON: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["evtx_security", "prefetch_file", "srum_app_resource"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1059/",
-        "https://attack.mitre.org/techniques/T1055/",
-        "https://attack.mitre.org/techniques/T1003/001/",
         "https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon",
         "https://www.sans.org/blog/threat-hunting-using-sysmon/",
         "https://www.thedfirspot.com/post/sysmon-when-visibility-is-key",
@@ -6721,7 +6629,6 @@ pub static MACOS_EMOND: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["macos_launch_daemons"],
     sources: &[
         "https://www.xorrior.com/emond-persistence/",
-        "https://attack.mitre.org/techniques/T1546/014/",
     ],
 };
 
@@ -6794,8 +6701,6 @@ pub static MEM_RUNNING_PROCESSES: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["mem_loaded_modules", "mem_network_connections"],
     sources: &[
         "https://volatilityfoundation.org/",
-        "https://attack.mitre.org/techniques/T1057/",
-        "https://attack.mitre.org/techniques/T1055/",
     ],
 };
 
@@ -6845,7 +6750,6 @@ pub static MEM_NETWORK_CONNECTIONS: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["mem_running_processes"],
     sources: &[
         "https://volatilityfoundation.org/",
-        "https://attack.mitre.org/techniques/T1049/",
     ],
 };
 
@@ -6889,7 +6793,6 @@ pub static MEM_LOADED_MODULES: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["mem_running_processes"],
     sources: &[
         "https://volatilityfoundation.org/",
-        "https://attack.mitre.org/techniques/T1055/",
     ],
 };
 
@@ -6927,7 +6830,6 @@ pub static MEM_REGISTRY_HIVES: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["mem_running_processes"],
     sources: &[
         "https://volatilityfoundation.org/",
-        "https://attack.mitre.org/techniques/T1012/",
     ],
 };
 
@@ -6965,7 +6867,6 @@ pub static MEM_USER_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["mem_running_processes"],
     sources: &[
         "https://volatilityfoundation.org/",
-        "https://attack.mitre.org/techniques/T1003/001/",
         "https://www.sans.org/blog/protecting-privileged-domain-accounts-lsa-secrets-good-times/",
     ],
 };

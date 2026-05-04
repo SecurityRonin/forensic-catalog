@@ -29,7 +29,6 @@ pub(crate) static SAFEBOOT_MINIMAL: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["services_imagepath", "boot_execute"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/001/",
         "https://www.microsoftpressstore.com/articles/article.aspx?p=2762082",
     ],
 };
@@ -50,7 +49,10 @@ pub(crate) static SAFEBOOT_NETWORK: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("Persistent until registry modification"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["safeboot_minimal", "services_imagepath"],
-    sources: &["https://attack.mitre.org/techniques/T1547/001/"],
+    sources: &[
+        "https://www.microsoftpressstore.com/articles/article.aspx?p=2762082",
+        "https://www.hexacorn.com/blog/2013/07/04/beyond-good-ol-run-key-part-15/",
+    ],
 };
 
 pub(crate) static KNOWN_DLLS: ArtifactDescriptor = ArtifactDescriptor {
@@ -70,7 +72,6 @@ pub(crate) static KNOWN_DLLS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["services_imagepath"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1574/001/",
         "https://docs.microsoft.com/en-us/windows/win32/dlls/dynamic-link-library-search-order",
     ],
 };
@@ -91,7 +92,10 @@ pub(crate) static CMD_AUTORUN_HKLM: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("Persistent until registry modification"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["cmd_autorun_hkcu", "run_key_hklm"],
-    sources: &["https://attack.mitre.org/techniques/T1059/003/"],
+    sources: &[
+        "https://www.sans.org/blog/opensecurity-persistence/",
+        "https://www.hexacorn.com/blog/2013/07/04/beyond-good-ol-run-key-part-15/",
+    ],
 };
 
 pub(crate) static CMD_AUTORUN_HKCU: ArtifactDescriptor = ArtifactDescriptor {
@@ -110,7 +114,10 @@ pub(crate) static CMD_AUTORUN_HKCU: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("Persistent until registry modification"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["cmd_autorun_hklm", "run_key_hkcu"],
-    sources: &["https://attack.mitre.org/techniques/T1059/003/"],
+    sources: &[
+        "https://www.sans.org/blog/opensecurity-persistence/",
+        "https://www.hexacorn.com/blog/2013/07/04/beyond-good-ol-run-key-part-15/",
+    ],
 };
 
 pub(crate) static CREDENTIAL_PROVIDERS: ArtifactDescriptor = ArtifactDescriptor {
@@ -130,7 +137,6 @@ pub(crate) static CREDENTIAL_PROVIDERS: ArtifactDescriptor = ArtifactDescriptor 
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["lsa_auth_pkgs", "lsa_security_pkgs"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1556/001/",
         "https://docs.microsoft.com/en-us/windows/win32/secauthn/credential-providers-in-windows",
     ],
 };
@@ -151,7 +157,10 @@ pub(crate) static NETWORK_PROVIDER_ORDER: ArtifactDescriptor = ArtifactDescripto
     retention: Some("Persistent"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["credential_providers", "lsa_auth_pkgs"],
-    sources: &["https://attack.mitre.org/techniques/T1556/"],
+    sources: &[
+        "https://www.sans.org/blog/opensecurity-persistence/",
+        "https://www.hexacorn.com/blog/2013/07/04/beyond-good-ol-run-key-part-15/",
+    ],
 };
 
 pub(crate) static SHELL_EXECUTE_HOOKS: ArtifactDescriptor = ArtifactDescriptor {
@@ -170,7 +179,10 @@ pub(crate) static SHELL_EXECUTE_HOOKS: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("Persistent"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["com_hijack_clsid_hkcu", "browser_helper_objects"],
-    sources: &["https://attack.mitre.org/techniques/T1546/013/"],
+    sources: &[
+        "https://www.sans.org/blog/opensecurity-persistence/",
+        "https://www.hexacorn.com/blog/2013/07/04/beyond-good-ol-run-key-part-15/",
+    ],
 };
 
 pub(crate) static WER_RUNTIME_EXCEPTION_HELPER: ArtifactDescriptor = ArtifactDescriptor {
@@ -190,7 +202,6 @@ pub(crate) static WER_RUNTIME_EXCEPTION_HELPER: ArtifactDescriptor = ArtifactDes
     triage_priority: TriagePriority::High,
     related_artifacts: &["ifeo_debugger"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1574/002/",
         "https://www.hexacorn.com/blog/2019/09/20/beyond-good-ol-run-key-part-116/",
     ],
 };
@@ -212,7 +223,6 @@ pub(crate) static IFEO_GLOBAL_FLAG: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["ifeo_debugger"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1546/012/",
         "https://blog.xpnsec.com/hiding-your-dotnet-etw/",
     ],
 };
@@ -234,7 +244,6 @@ pub(crate) static SCHEDULED_TASK_REGISTRY_CACHE: ArtifactDescriptor = ArtifactDe
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["scheduled_tasks_dir"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1053/005/",
         "https://blog.jpcert.or.jp/2023/06/task-scheduler.html",
     ],
 };
@@ -255,7 +264,10 @@ pub(crate) static GROUP_POLICY_STARTUP_SCRIPTS: ArtifactDescriptor = ArtifactDes
     retention: Some("Persistent until GPO removal"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["logon_scripts", "run_key_hklm"],
-    sources: &["https://attack.mitre.org/techniques/T1037/001/"],
+    sources: &[
+        "https://www.sans.org/blog/opensecurity-persistence/",
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/dn789189(v=ws.11)",
+    ],
 };
 
 pub(crate) static GROUP_POLICY_LOGON_SCRIPTS: ArtifactDescriptor = ArtifactDescriptor {
@@ -274,7 +286,10 @@ pub(crate) static GROUP_POLICY_LOGON_SCRIPTS: ArtifactDescriptor = ArtifactDescr
     retention: Some("Persistent until GPO removal"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["group_policy_startup_scripts", "logon_scripts"],
-    sources: &["https://attack.mitre.org/techniques/T1037/001/"],
+    sources: &[
+        "https://www.sans.org/blog/opensecurity-persistence/",
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/dn789189(v=ws.11)",
+    ],
 };
 
 pub(crate) static WINLOGON_NOTIFY: ArtifactDescriptor = ArtifactDescriptor {
@@ -293,7 +308,10 @@ pub(crate) static WINLOGON_NOTIFY: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("Persistent"),
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["winlogon_shell", "winlogon_userinit", "lsa_auth_pkgs"],
-    sources: &["https://attack.mitre.org/techniques/T1547/004/"],
+    sources: &[
+        "https://www.sans.org/blog/opensecurity-persistence/",
+        "https://www.hexacorn.com/blog/2013/07/04/beyond-good-ol-run-key-part-15/",
+    ],
 };
 
 pub(crate) static COM_SERVER_HKLM: ArtifactDescriptor = ArtifactDescriptor {
@@ -312,7 +330,10 @@ pub(crate) static COM_SERVER_HKLM: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("Persistent"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["com_hijack_clsid_hkcu"],
-    sources: &["https://attack.mitre.org/techniques/T1546/015/"],
+    sources: &[
+        "https://www.sans.org/blog/opensecurity-persistence/",
+        "https://www.hexacorn.com/blog/2013/07/04/beyond-good-ol-run-key-part-15/",
+    ],
 };
 
 pub(crate) static OFFICE_ADDINS: ArtifactDescriptor = ArtifactDescriptor {
@@ -331,7 +352,10 @@ pub(crate) static OFFICE_ADDINS: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("Persistent until uninstall"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["office_normal_dotm", "com_server_hklm"],
-    sources: &["https://attack.mitre.org/techniques/T1137/001/"],
+    sources: &[
+        "https://www.sans.org/blog/opensecurity-persistence/",
+        "https://learn.microsoft.com/en-us/office/dev/add-ins/concepts/add-in-development-best-practices",
+    ],
 };
 
 pub(crate) static TERMINAL_SERVER_INITIAL_PROGRAM: ArtifactDescriptor = ArtifactDescriptor {
@@ -350,7 +374,10 @@ pub(crate) static TERMINAL_SERVER_INITIAL_PROGRAM: ArtifactDescriptor = Artifact
     retention: Some("Persistent"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["rdp_client_default", "rdp_client_servers"],
-    sources: &["https://attack.mitre.org/techniques/T1021/001/"],
+    sources: &[
+        "https://www.sans.org/blog/opensecurity-persistence/",
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/clients/remote-desktop-allow-access",
+    ],
 };
 
 // ── RECmd batch: user activity & execution evidence ──────────────────────────
@@ -442,7 +469,6 @@ pub(crate) static PROXY_SETTINGS: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["wifi_profiles", "networklist_profiles"],
     sources: &[
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
-        "https://attack.mitre.org/techniques/T1090/",
     ],
 };
 
@@ -622,7 +648,6 @@ pub(crate) static TERMINAL_SERVER_CLIENT_SERVERS: ArtifactDescriptor = ArtifactD
     related_artifacts: &["rdp_client_servers", "rdp_client_default", "rdp_bitmap_cache"],
     sources: &[
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
-        "https://attack.mitre.org/techniques/T1021/001/",
     ],
 };
 

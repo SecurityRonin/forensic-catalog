@@ -34,7 +34,6 @@ pub(crate) static CHROME_HISTORY: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["chrome_login_data", "chrome_web_data"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1217/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/Chrome.tkape",
         "https://www.sans.org/blog/google-chrome-forensics/",
         "https://13cubed.com/downloads/Windows_Forensic_Analysis_Poster.pdf",
@@ -62,7 +61,6 @@ pub(crate) static CHROME_WEB_DATA: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["chrome_history", "chrome_login_data"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1555/003/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/Chrome.tkape",
         "https://www.sans.org/blog/google-chrome-forensics/",
     ],
@@ -89,7 +87,6 @@ pub(crate) static EDGE_CHROMIUM_HISTORY: ArtifactDescriptor = ArtifactDescriptor
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["edge_chromium_login_data", "chrome_history"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1217/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/MicrosoftEdge.tkape",
         "https://www.sans.org/blog/microsoft-edge-forensics/",
     ],
@@ -116,7 +113,6 @@ pub(crate) static EDGE_CHROMIUM_LOGIN_DATA: ArtifactDescriptor = ArtifactDescrip
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["edge_chromium_history", "dpapi_masterkey_user"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1555/003/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/MicrosoftEdge.tkape",
     ],
 };
@@ -143,7 +139,6 @@ pub(crate) static FIREFOX_PLACES: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["firefox_form_history", "firefox_session_restore", "firefox_logins"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1217/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/Firefox.tkape",
         "https://www.sans.org/blog/firefox-history-and-what-it-tells-you/",
         "https://nicoleibrahim.com/mozilla-firefox-forensics/",
@@ -171,7 +166,6 @@ pub(crate) static FIREFOX_FORM_HISTORY: ArtifactDescriptor = ArtifactDescriptor 
     triage_priority: TriagePriority::High,
     related_artifacts: &["firefox_places", "firefox_logins"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1217/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/Firefox.tkape",
         "https://nicoleibrahim.com/mozilla-firefox-forensics/",
     ],
@@ -198,7 +192,6 @@ pub(crate) static FIREFOX_SESSION_RESTORE: ArtifactDescriptor = ArtifactDescript
     triage_priority: TriagePriority::High,
     related_artifacts: &["firefox_places", "firefox_form_history"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1217/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/Firefox.tkape",
         "https://nicoleibrahim.com/mozilla-firefox-forensics/",
     ],
@@ -226,7 +219,6 @@ pub(crate) static PSREADLINE_HISTORY: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["psreadline_history_system", "powershell_history", "evtx_powershell"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1059/001/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/PowerShellConsole.tkape",
         "https://www.sans.org/blog/powershell-forensics-auditing/",
         "https://13cubed.com/downloads/Windows_Forensic_Analysis_Poster.pdf",
@@ -253,7 +245,6 @@ pub(crate) static PSREADLINE_HISTORY_SYSTEM: ArtifactDescriptor = ArtifactDescri
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["psreadline_history", "evtx_powershell", "evtx_task_scheduler"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1059/001/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/PowerShellConsole.tkape",
         "https://www.sans.org/blog/powershell-forensics-auditing/",
     ],
@@ -280,7 +271,6 @@ pub(crate) static POWERSHELL_TRANSCRIPTS: ArtifactDescriptor = ArtifactDescripto
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["psreadline_history", "evtx_powershell"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1059/001/",
         "https://www.sans.org/blog/powershell-forensics-auditing/",
         "https://devblogs.microsoft.com/powershell/powershell-the-blue-team/",
     ],
@@ -310,7 +300,6 @@ pub(crate) static TEAMVIEWER_CONNECTION_LOG: ArtifactDescriptor = ArtifactDescri
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["teamviewer_app_log"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1219/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/TeamViewer.tkape",
         "https://www.kroll.com/en/insights/publications/cyber/teamviewer-forensics",
         "https://dfir.blog/teamviewer-forensics/",
@@ -337,7 +326,6 @@ pub(crate) static TEAMVIEWER_APP_LOG: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["teamviewer_connection_log"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1219/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/TeamViewer.tkape",
         "https://dfir.blog/teamviewer-forensics/",
     ],
@@ -364,7 +352,6 @@ pub(crate) static ANYDESK_TRACE_USER: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["anydesk_trace_system", "anydesk_connection_trace"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1219/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/AnyDesk.tkape",
         "https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-025a",
         "https://dfir.blog/anydesk-forensics/",
@@ -392,7 +379,6 @@ pub(crate) static ANYDESK_TRACE_SYSTEM: ArtifactDescriptor = ArtifactDescriptor 
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["anydesk_trace_user", "anydesk_connection_trace"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1219/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/AnyDesk.tkape",
         "https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-025a",
         "https://dfir.blog/anydesk-forensics/",
@@ -421,7 +407,6 @@ pub(crate) static ANYDESK_CONNECTION_TRACE: ArtifactDescriptor = ArtifactDescrip
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["anydesk_trace_user", "anydesk_file_transfer_log"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1219/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/AnyDesk.tkape",
         "https://dfir.blog/anydesk-forensics/",
     ],
@@ -449,7 +434,6 @@ pub(crate) static ANYDESK_FILE_TRANSFER_LOG: ArtifactDescriptor = ArtifactDescri
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["anydesk_connection_trace", "anydesk_trace_user"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1219/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/AnyDesk.tkape",
         "https://dfir.blog/anydesk-forensics/",
     ],
@@ -477,7 +461,6 @@ pub(crate) static SCREENCONNECT_SESSION_DB: ArtifactDescriptor = ArtifactDescrip
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["teamviewer_connection_log", "anydesk_trace_system"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1219/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/ScreenConnect.tkape",
         "https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-241a",
     ],
@@ -503,7 +486,6 @@ pub(crate) static RUSTDESK_LOGS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["anydesk_trace_user", "teamviewer_connection_log"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1219/",
         "https://thedfirreport.com/2024/08/12/threat-actors-toolkit-leveraging-sliver-poshc2-and-batch-scripts/",
         "https://github.com/rustdesk/rustdesk",
     ],
@@ -532,7 +514,6 @@ pub(crate) static DROPBOX_INSTANCE_DB: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["onedrive_metadata", "google_drive_fs_metadata"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1567/002/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/Dropbox.tkape",
         "https://www.sans.org/blog/cloud-storage-forensics-dropbox-google-drive-and-onedrive/",
         "https://dfir.blog/dropbox-forensics/",
@@ -560,7 +541,6 @@ pub(crate) static ONEDRIVE_METADATA: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["dropbox_instance_db", "google_drive_fs_metadata"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1567/002/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/OneDrive.tkape",
         "https://www.sans.org/blog/cloud-storage-forensics-dropbox-google-drive-and-onedrive/",
         "https://github.com/barnettjw/ODL-Parser",
@@ -589,7 +569,6 @@ pub(crate) static GOOGLE_DRIVE_FS_METADATA: ArtifactDescriptor = ArtifactDescrip
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["dropbox_instance_db", "onedrive_metadata"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1567/002/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/GoogleDrive.tkape",
         "https://www.sans.org/blog/cloud-storage-forensics-dropbox-google-drive-and-onedrive/",
     ],
@@ -615,7 +594,6 @@ pub(crate) static MEGASYNC_DATA: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["dropbox_instance_db", "onedrive_metadata"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1567/002/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/MEGAsync.tkape",
         "https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-165a",
     ],
@@ -696,7 +674,6 @@ pub(crate) static DISCORD_LOCAL_STORAGE: ArtifactDescriptor = ArtifactDescriptor
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["slack_indexed_db", "chrome_login_data"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1539/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/Discord.tkape",
         "https://www.bleepingcomputer.com/news/security/discord-token-stealers-on-the-rise-heres-what-you-can-do/",
     ],
@@ -749,7 +726,6 @@ pub(crate) static SIGNAL_CONFIG_JSON: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["signal_database"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1552/001/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/Signal.tkape",
         "https://www.magnetforensics.com/blog/forensic-analysis-of-signal-desktop/",
         "https://www.bleepingcomputer.com/news/security/signal-desktop-app-stores-messages-in-plaintext-unencrypted-folder/",
@@ -870,7 +846,6 @@ pub(crate) static CERTUTIL_CACHE: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["evtx_powershell", "psreadline_history"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1105/",
         "https://lolbas-project.github.io/lolbas/Binaries/Certutil/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/CertUtil.tkape",
         "https://www.sans.org/blog/certutil-is-a-lolbin/",
@@ -897,7 +872,6 @@ pub(crate) static SDB_CUSTOM_FILES: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["appshim_db"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1546/011/",
         "https://www.fireeye.com/blog/threat-research/2017/05/fin7-shim-databases-persistence.html",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/AppCompatSDBFiles.tkape",
         "https://www.hexacorn.com/blog/2015/07/17/beyond-good-ol-run-key-part-38/",
@@ -926,7 +900,6 @@ pub(crate) static WER_REPORTS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["evtx_system", "prefetch_dir"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1055/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WindowsErrorReporting.tkape",
         "https://www.sans.org/blog/windows-error-reporting-forensics/",
     ],
@@ -955,7 +928,6 @@ pub(crate) static IIS_W3SVC_LOGS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["iis_config_applicationhost", "evtx_system"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1190/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Logs/IISLogFiles.tkape",
         "https://www.sans.org/blog/iis-log-forensics/",
         "https://docs.microsoft.com/en-us/iis/manage/provisioning-and-managing-iis/configure-logging-in-iis",
@@ -983,7 +955,6 @@ pub(crate) static IIS_CONFIG_APPLICATIONHOST: ArtifactDescriptor = ArtifactDescr
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["iis_w3svc_logs"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1505/004/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Logs/IISLogFiles.tkape",
         "https://www.sans.org/blog/iis-log-forensics/",
     ],
@@ -1011,7 +982,6 @@ pub(crate) static DNS_DEBUG_LOG: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["dhcp_server_log", "evtx_system"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1071/004/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Logs/DNSServerLog.tkape",
         "https://www.sans.org/blog/dns-logging-in-windows-server/",
         "https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/dn800669(v=ws.11)",
@@ -1041,7 +1011,6 @@ pub(crate) static DHCP_SERVER_LOG: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["dns_debug_log", "evtx_system"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1016/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Logs/DHCPServerLog.tkape",
         "https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/active-directory-enumeration-with-ad-module-without-rsat",
     ],
@@ -1070,7 +1039,6 @@ pub(crate) static SUM_DB: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["evtx_security", "dns_debug_log", "dhcp_server_log"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1021/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/UserAccessLogging.tkape",
         "https://www.sans.org/blog/windows-user-access-logging-sum/",
         "https://advisory.kpmg.us/blog/2021/digital-forensics-incident-response.html",
@@ -1099,7 +1067,6 @@ pub(crate) static COPILOT_RECALL_UKG: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["windows_timeline", "srum_db"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1113/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WindowsRecall.tkape",
         "https://doublepulsar.com/recall-stealing-everything-youve-ever-typed-or-viewed-on-your-own-windows-pc-is-now-possible-da3e12e9465e",
         "https://www.bleepingcomputer.com/news/microsoft/microsoft-recall-now-available-to-all-windows-insiders/",
@@ -1126,7 +1093,6 @@ pub(crate) static NTUSER_DAT_FILE: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["usrclass_dat_file", "shellbags_user", "run_key_hkcu"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1012/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/RegistryHivesUser.tkape",
         "https://13cubed.com/downloads/Windows_Forensic_Analysis_Poster.pdf",
         "https://www.sans.org/blog/digital-forensics-artifacts-in-windows-registry/",
@@ -1153,7 +1119,6 @@ pub(crate) static USRCLASS_DAT_FILE: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["ntuser_dat_file", "shellbags_user"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1083/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/RegistryHivesUser.tkape",
         "https://www.sans.org/blog/windows-shellbag-forensics-in-depth/",
     ],

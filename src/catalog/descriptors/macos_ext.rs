@@ -102,7 +102,6 @@ pub(crate) static MACOS_LOGIN_ITEMS_PLIST: ArtifactDescriptor = ArtifactDescript
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["macos_launch_agents_user", "macos_launch_daemons"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/015/",
         "https://www.sentinelone.com/blog/how-malware-persists-on-macos/",
     ],
 };
@@ -215,7 +214,6 @@ pub(crate) static MACOS_TCC_SYSTEM_DB: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["macos_tcc_db"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1548/",
         "https://www.rainforestqa.com/blog/macos-tcc-db-deep-dive",
     ],
 };

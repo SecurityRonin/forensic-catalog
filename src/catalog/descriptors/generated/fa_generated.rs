@@ -44544,7 +44544,10 @@ processes, or avoid detection by disabling anti-virus software.
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1138/", "https://countercept.com/blog/hunting-for-application-shim-databases/", "http://files.brucon.org/2015/Tomczak_and_Ballenthin_Shims_for_the_Win.pdf", "https://www.blackhat.com/docs/eu-15/materials/eu-15-Pierce-Defending-Against-Malicious-Application-Compatibility-Shims-wp.pdf"],
+    sources: &[
+        "https://countercept.com/blog/hunting-for-application-shim-databases/",
+        "https://www.blackhat.com/docs/eu-15/materials/eu-15-Pierce-Defending-Against-Malicious-Application-Compatibility-Shims-wp.pdf",
+    ],
 };
 
 pub(crate) static FA_FILE_APPPATCH_FRXMAIN_SDB: ArtifactDescriptor = ArtifactDescriptor {
@@ -44583,7 +44586,10 @@ processes, or avoid detection by disabling anti-virus software.
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1138/", "https://countercept.com/blog/hunting-for-application-shim-databases/", "http://files.brucon.org/2015/Tomczak_and_Ballenthin_Shims_for_the_Win.pdf", "https://www.blackhat.com/docs/eu-15/materials/eu-15-Pierce-Defending-Against-Malicious-Application-Compatibility-Shims-wp.pdf"],
+    sources: &[
+        "https://countercept.com/blog/hunting-for-application-shim-databases/",
+        "https://www.blackhat.com/docs/eu-15/materials/eu-15-Pierce-Defending-Against-Malicious-Application-Compatibility-Shims-wp.pdf",
+    ],
 };
 
 pub(crate) static FA_FILE_APPPATCH_MSIMAIN_SDB: ArtifactDescriptor = ArtifactDescriptor {
@@ -44622,7 +44628,10 @@ processes, or avoid detection by disabling anti-virus software.
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1138/", "https://countercept.com/blog/hunting-for-application-shim-databases/", "http://files.brucon.org/2015/Tomczak_and_Ballenthin_Shims_for_the_Win.pdf", "https://www.blackhat.com/docs/eu-15/materials/eu-15-Pierce-Defending-Against-Malicious-Application-Compatibility-Shims-wp.pdf"],
+    sources: &[
+        "https://countercept.com/blog/hunting-for-application-shim-databases/",
+        "https://www.blackhat.com/docs/eu-15/materials/eu-15-Pierce-Defending-Against-Malicious-Application-Compatibility-Shims-wp.pdf",
+    ],
 };
 
 pub(crate) static FA_FILE_APPPATCH_PCAMAIN_SDB: ArtifactDescriptor = ArtifactDescriptor {
@@ -44661,7 +44670,10 @@ processes, or avoid detection by disabling anti-virus software.
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1138/", "https://countercept.com/blog/hunting-for-application-shim-databases/", "http://files.brucon.org/2015/Tomczak_and_Ballenthin_Shims_for_the_Win.pdf", "https://www.blackhat.com/docs/eu-15/materials/eu-15-Pierce-Defending-Against-Malicious-Application-Compatibility-Shims-wp.pdf"],
+    sources: &[
+        "https://countercept.com/blog/hunting-for-application-shim-databases/",
+        "https://www.blackhat.com/docs/eu-15/materials/eu-15-Pierce-Defending-Against-Malicious-Application-Compatibility-Shims-wp.pdf",
+    ],
 };
 
 pub(crate) static FA_FILE_APPPATCH_SYSMAIN_SDB: ArtifactDescriptor = ArtifactDescriptor {
@@ -44700,7 +44712,10 @@ processes, or avoid detection by disabling anti-virus software.
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1138/", "https://countercept.com/blog/hunting-for-application-shim-databases/", "http://files.brucon.org/2015/Tomczak_and_Ballenthin_Shims_for_the_Win.pdf", "https://www.blackhat.com/docs/eu-15/materials/eu-15-Pierce-Defending-Against-Malicious-Application-Compatibility-Shims-wp.pdf"],
+    sources: &[
+        "https://countercept.com/blog/hunting-for-application-shim-databases/",
+        "https://www.blackhat.com/docs/eu-15/materials/eu-15-Pierce-Defending-Against-Malicious-Application-Compatibility-Shims-wp.pdf",
+    ],
 };
 
 pub(crate) static FA_FILE_CUSTOM: ArtifactDescriptor = ArtifactDescriptor {
@@ -44739,7 +44754,10 @@ processes, or avoid detection by disabling anti-virus software.
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1138/", "https://countercept.com/blog/hunting-for-application-shim-databases/", "http://files.brucon.org/2015/Tomczak_and_Ballenthin_Shims_for_the_Win.pdf", "https://www.blackhat.com/docs/eu-15/materials/eu-15-Pierce-Defending-Against-Malicious-Application-Compatibility-Shims-wp.pdf"],
+    sources: &[
+        "https://countercept.com/blog/hunting-for-application-shim-databases/",
+        "https://www.blackhat.com/docs/eu-15/materials/eu-15-Pierce-Defending-Against-Malicious-Application-Compatibility-Shims-wp.pdf",
+    ],
 };
 
 pub(crate) static FA_FILE_CUSTOM_2: ArtifactDescriptor = ArtifactDescriptor {
@@ -44778,7 +44796,10 @@ processes, or avoid detection by disabling anti-virus software.
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1138/", "https://countercept.com/blog/hunting-for-application-shim-databases/", "http://files.brucon.org/2015/Tomczak_and_Ballenthin_Shims_for_the_Win.pdf", "https://www.blackhat.com/docs/eu-15/materials/eu-15-Pierce-Defending-Against-Malicious-Application-Compatibility-Shims-wp.pdf"],
+    sources: &[
+        "https://countercept.com/blog/hunting-for-application-shim-databases/",
+        "https://www.blackhat.com/docs/eu-15/materials/eu-15-Pierce-Defending-Against-Malicious-Application-Compatibility-Shims-wp.pdf",
+    ],
 };
 
 pub(crate) static FA_FILE_CUSTOM64: ArtifactDescriptor = ArtifactDescriptor {
@@ -44817,7 +44838,10 @@ processes, or avoid detection by disabling anti-virus software.
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1138/", "https://countercept.com/blog/hunting-for-application-shim-databases/", "http://files.brucon.org/2015/Tomczak_and_Ballenthin_Shims_for_the_Win.pdf", "https://www.blackhat.com/docs/eu-15/materials/eu-15-Pierce-Defending-Against-Malicious-Application-Compatibility-Shims-wp.pdf"],
+    sources: &[
+        "https://countercept.com/blog/hunting-for-application-shim-databases/",
+        "https://www.blackhat.com/docs/eu-15/materials/eu-15-Pierce-Defending-Against-Malicious-Application-Compatibility-Shims-wp.pdf",
+    ],
 };
 
 pub(crate) static FA_FILE_CUSTOMSDB: ArtifactDescriptor = ArtifactDescriptor {
@@ -44856,7 +44880,10 @@ processes, or avoid detection by disabling anti-virus software.
     retention: None,
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
-    sources: &["https://attack.mitre.org/techniques/T1138/", "https://countercept.com/blog/hunting-for-application-shim-databases/", "http://files.brucon.org/2015/Tomczak_and_Ballenthin_Shims_for_the_Win.pdf", "https://www.blackhat.com/docs/eu-15/materials/eu-15-Pierce-Defending-Against-Malicious-Application-Compatibility-Shims-wp.pdf"],
+    sources: &[
+        "https://countercept.com/blog/hunting-for-application-shim-databases/",
+        "https://www.blackhat.com/docs/eu-15/materials/eu-15-Pierce-Defending-Against-Malicious-Application-Compatibility-Shims-wp.pdf",
+    ],
 };
 
 pub(crate) static FA_FILE_SYSTEM32_WINAPPXRT_DLL: ArtifactDescriptor = ArtifactDescriptor {

@@ -35,7 +35,6 @@ pub(crate) static WINLOGON_AUTOADMIN_LOGON: ArtifactDescriptor = ArtifactDescrip
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["winlogon_default_password", "winlogon_default_username"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/001/",
         "https://learn.microsoft.com/en-us/troubleshoot/windows-server/user-profiles-and-logon/turn-on-automatic-logon",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
@@ -64,7 +63,6 @@ pub(crate) static WINLOGON_DEFAULT_PASSWORD: ArtifactDescriptor = ArtifactDescri
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["winlogon_autoadmin_logon", "winlogon_default_username"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1552/002/",
         "https://learn.microsoft.com/en-us/troubleshoot/windows-server/user-profiles-and-logon/turn-on-automatic-logon",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
@@ -93,7 +91,6 @@ pub(crate) static WINLOGON_DEFAULT_USERNAME: ArtifactDescriptor = ArtifactDescri
     triage_priority: TriagePriority::High,
     related_artifacts: &["winlogon_autoadmin_logon", "winlogon_default_password"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1552/002/",
         "https://learn.microsoft.com/en-us/troubleshoot/windows-server/user-profiles-and-logon/turn-on-automatic-logon",
     ],
 };
@@ -123,7 +120,6 @@ pub(crate) static LOGONUI_LAST_LOGGEDON_USER: ArtifactDescriptor = ArtifactDescr
     triage_priority: TriagePriority::Medium,
     related_artifacts: &["winlogon_default_username", "profile_list_users"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1078/",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
 };
@@ -153,7 +149,6 @@ pub(crate) static PORTPROXY_CONFIG: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["network_shares_server", "rdp_shadow_sessions"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1572/",
         "https://www.fireeye.com/blog/threat-research/2019/01/bypassing-network-restrictions-through-rdp-tunneling.html",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
@@ -184,7 +179,6 @@ pub(crate) static WINDOWS_DEFENDER_EXCLUSIONS_LOCAL: ArtifactDescriptor = Artifa
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["windows_defender_disabled_av", "windows_defender_realtime"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1562/001/",
         "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/registry/registry_set/registry_set_windows_defender_exclusion_added.yml",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
@@ -213,7 +207,6 @@ pub(crate) static WINDOWS_DEFENDER_DISABLED_AV: ArtifactDescriptor = ArtifactDes
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["windows_defender_exclusions_local", "windows_defender_realtime"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1562/001/",
         "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/registry/registry_set/registry_set_windows_defender_disabled.yml",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
@@ -242,7 +235,6 @@ pub(crate) static WINDOWS_DEFENDER_REALTIME: ArtifactDescriptor = ArtifactDescri
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["windows_defender_disabled_av", "windows_defender_exclusions_local"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1562/001/",
         "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/registry/registry_set/registry_set_windows_defender_realtime_protection_disabled.yml",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
@@ -273,7 +265,6 @@ pub(crate) static MS_OFFICE_TRUSTED_DOCS: ArtifactDescriptor = ArtifactDescripto
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["ms_office_server_cache"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1566/001/",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
         "https://docs.microsoft.com/en-us/deployoffice/security/trusted-documents",
     ],
@@ -304,7 +295,6 @@ pub(crate) static VSS_FILES_NOT_TO_SNAPSHOT: ArtifactDescriptor = ArtifactDescri
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["vss_files_not_to_backup"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1490/",
         "https://www.bleepingcomputer.com/news/security/revil-ransomware-has-a-secret-backdoor-and-its-been-used/",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
@@ -333,7 +323,6 @@ pub(crate) static VSS_FILES_NOT_TO_BACKUP: ArtifactDescriptor = ArtifactDescript
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["vss_files_not_to_snapshot"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1490/",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
 };
@@ -363,7 +352,6 @@ pub(crate) static IFEO_SILENT_EXIT: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["taskcache_tasks_path", "startup_approved_run_system"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1546/012/",
         "https://www.deepinstinct.com/blog/ifeo-injections",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
@@ -394,7 +382,6 @@ pub(crate) static EXEFILE_SHELL_OPEN_SOFTWARE: ArtifactDescriptor = ArtifactDesc
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["exefile_shell_open_usrclass"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1546/001/",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
 };
@@ -422,7 +409,6 @@ pub(crate) static EXEFILE_SHELL_OPEN_USRCLASS: ArtifactDescriptor = ArtifactDesc
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["exefile_shell_open_software"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1546/001/",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
 };
@@ -452,8 +438,6 @@ pub(crate) static RDP_SHADOW_SESSIONS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["portproxy_config", "restricted_admin_rdp"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1021/001/",
-        "https://attack.mitre.org/techniques/T1563/002/",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
 };
@@ -481,7 +465,6 @@ pub(crate) static RESTRICTED_ADMIN_RDP: ArtifactDescriptor = ArtifactDescriptor 
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["rdp_shadow_sessions"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1550/002/",
         "https://docs.microsoft.com/en-us/windows-server/remote/remote-desktop-services/clients/remote-desktop-allow-access",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
@@ -512,7 +495,6 @@ pub(crate) static NETWORK_SHARES_SERVER: ArtifactDescriptor = ArtifactDescriptor
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["portproxy_config"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1021/002/",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
 };
@@ -542,7 +524,6 @@ pub(crate) static SYSINTERNALS_EULA: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["registrar_favorites"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1012/",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
         "https://learn.microsoft.com/en-us/sysinternals/",
     ],
@@ -573,7 +554,6 @@ pub(crate) static MS_OFFICE_SERVER_CACHE: ArtifactDescriptor = ArtifactDescripto
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["ms_office_trusted_docs"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1566/001/",
         "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2022-30190",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
@@ -604,7 +584,6 @@ pub(crate) static POWERSHELL_COBALT_INFO: ArtifactDescriptor = ArtifactDescripto
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["ifeo_silent_exit", "taskcache_tasks_path"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1059/001/",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/RECmd_Batch_MC.reb",
         "https://www.crowdstrike.com/blog/registry-analysis-with-crowdresponse/",
     ],
@@ -635,7 +614,6 @@ pub(crate) static STARTUP_APPROVED_RUN_SYSTEM: ArtifactDescriptor = ArtifactDesc
     triage_priority: TriagePriority::High,
     related_artifacts: &["startup_approved_run_user"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/001/",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
 };
@@ -663,7 +641,6 @@ pub(crate) static STARTUP_APPROVED_RUN_USER: ArtifactDescriptor = ArtifactDescri
     triage_priority: TriagePriority::High,
     related_artifacts: &["startup_approved_run_system"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/001/",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
 };
@@ -693,7 +670,6 @@ pub(crate) static TASKCACHE_TASKS_PATH: ArtifactDescriptor = ArtifactDescriptor 
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["ifeo_silent_exit", "startup_approved_run_system"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1053/005/",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
         "https://nasbench.medium.com/a-deep-dive-into-windows-scheduled-tasks-and-the-processes-running-them-218d1eed4cce",
     ],
@@ -724,7 +700,6 @@ pub(crate) static PROFILE_LIST_USERS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["logonui_last_loggedon_user", "winlogon_default_username"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1087/001/",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
         "https://learn.microsoft.com/en-us/windows/win32/sysinfo/profilelist",
     ],
@@ -755,7 +730,6 @@ pub(crate) static REGISTRAR_FAVORITES: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["sysinternals_eula"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1012/",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
 };
@@ -785,7 +759,6 @@ pub(crate) static DHCP_IPV4_INTERFACE: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["portproxy_config", "firewall_rules"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1016/",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
 };
@@ -815,7 +788,6 @@ pub(crate) static NTFS_LAST_ACCESS_STATUS: ArtifactDescriptor = ArtifactDescript
     triage_priority: TriagePriority::High,
     related_artifacts: &["prefetch_status"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1070/006/",
         "https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/fsutil-behavior",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
@@ -846,7 +818,6 @@ pub(crate) static PREFETCH_STATUS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["ntfs_last_access_status"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1070/",
         "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/dn452747(v=ws.11)",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],
@@ -877,7 +848,6 @@ pub(crate) static FIREWALL_RULES: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["portproxy_config", "network_shares_server"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1562/004/",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
         "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/registry/registry_set/registry_set_firewall_rule_added.yml",
     ],
@@ -908,7 +878,6 @@ pub(crate) static EVENT_LOG_CHANNEL_STATUS: ArtifactDescriptor = ArtifactDescrip
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["windows_defender_disabled_av"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1562/002/",
         "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/registry/registry_set/registry_set_disable_event_logging.yml",
         "https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb",
     ],

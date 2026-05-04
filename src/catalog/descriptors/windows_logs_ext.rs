@@ -29,7 +29,6 @@ pub(crate) static WINDOWS_CRASH_DUMP: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["windows_minidump"],
     sources: &[
         "https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/complete-memory-dump",
-        "https://attack.mitre.org/techniques/T1529/",
     ],
 };
 
@@ -52,7 +51,6 @@ pub(crate) static WINDOWS_MINIDUMP: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["windows_crash_dump", "evtx_system"],
     sources: &[
         "https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/minidump-files",
-        "https://attack.mitre.org/techniques/T1068/",
     ],
 };
 
@@ -79,7 +77,6 @@ pub(crate) static AMCACHE_DRIVER: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["amcache_app_file", "shimcache", "evtx_code_integrity"],
     sources: &[
         "https://learn.microsoft.com/en-us/windows/security/threat-protection/intelligence/criteria",
-        "https://attack.mitre.org/techniques/T1068/",
     ],
 };
 
@@ -105,7 +102,6 @@ pub(crate) static WER_REPORT_QUEUE: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["windows_minidump", "evtx_system"],
     sources: &[
         "https://learn.microsoft.com/en-us/windows/win32/wer/windows-error-reporting",
-        "https://attack.mitre.org/techniques/T1562/001/",
     ],
 };
 
@@ -131,7 +127,6 @@ pub(crate) static WINDOWS_NOTIFICATION_DB: ArtifactDescriptor = ArtifactDescript
     related_artifacts: &["srum_push_notification"],
     sources: &[
         "https://learn.microsoft.com/en-us/windows/apps/design/shell/tiles-and-notifications/windows-push-notification-services--wns--overview",
-        "https://attack.mitre.org/techniques/T1016/",
     ],
 };
 
@@ -157,6 +152,5 @@ pub(crate) static AMCACHE_SHORTCUT: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["amcache_app_file", "lnk_files", "jump_list_auto"],
     sources: &[
         "https://learn.microsoft.com/en-us/windows/compatibility/application-compatibility-toolkit-documentation",
-        "https://attack.mitre.org/techniques/T1547/009/",
     ],
 };

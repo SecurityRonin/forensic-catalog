@@ -62,7 +62,6 @@ pub(crate) static ACTIVE_SETUP: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["active_setup_hklm", "run_key_hklm", "scheduled_task_registry_cache"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/014/",
         "https://learn.microsoft.com/en-us/archive/blogs/arunjoshi_iis/what-is-active-setup",
         "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1547.014/T1547.014.md",
         "https://learn.microsoft.com/en-us/sysinternals/downloads/autoruns",
@@ -102,7 +101,6 @@ pub(crate) static LSA_AUTH_PACKAGES: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["lsa_security_packages", "lsa_notification_packages", "lsa_secrets"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/002/",
         "https://learn.microsoft.com/en-us/windows/win32/secauthn/authentication-packages",
         "https://www.hexacorn.com/blog/2013/09/17/beyond-good-ol-run-key-part-8/",
         "https://learn.microsoft.com/en-us/sysinternals/downloads/autoruns",
@@ -140,7 +138,6 @@ pub(crate) static LSA_SECURITY_PACKAGES: ArtifactDescriptor = ArtifactDescriptor
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["lsa_auth_packages", "lsa_notification_packages", "lsa_secrets"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/005/",
         "https://learn.microsoft.com/en-us/windows/win32/secauthn/ssp-packages-provided-by-microsoft",
         "https://www.hexacorn.com/blog/2013/09/17/beyond-good-ol-run-key-part-8/",
         "https://learn.microsoft.com/en-us/sysinternals/downloads/autoruns",
@@ -175,7 +172,6 @@ pub(crate) static LSA_NOTIFICATION_PACKAGES: ArtifactDescriptor = ArtifactDescri
     triage_priority: TriagePriority::High,
     related_artifacts: &["lsa_auth_packages", "lsa_security_packages", "lsa_secrets"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/008/",
         "https://learn.microsoft.com/en-us/windows/win32/secauthn/password-filter-programming-considerations",
         "https://www.hexacorn.com/blog/2013/09/17/beyond-good-ol-run-key-part-8/",
         "https://learn.microsoft.com/en-us/sysinternals/downloads/autoruns",
@@ -215,7 +211,6 @@ pub(crate) static SCREENSAVER_PERSISTENCE: ArtifactDescriptor = ArtifactDescript
     triage_priority: TriagePriority::Medium,
     related_artifacts: &["screensaver_exe", "run_key_hkcu", "winlogon_shell"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1546/002/",
         "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1546.002/T1546.002.md",
         "https://learn.microsoft.com/en-us/sysinternals/downloads/autoruns",
     ],
@@ -254,7 +249,6 @@ pub(crate) static PRINT_MONITOR_DLLS: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["print_monitors", "lsa_auth_packages", "services_hklm"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1547/010/",
         "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2021-1675",
         "https://www.hexacorn.com/blog/2013/10/20/beyond-good-ol-run-key-part-7/",
         "https://learn.microsoft.com/en-us/sysinternals/downloads/autoruns",
@@ -306,7 +300,6 @@ pub(crate) static SERVICES_HKLM: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["boot_execute", "lsa_auth_packages", "scheduled_task_registry_cache"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1543/003/",
         "https://learn.microsoft.com/en-us/windows/win32/services/services",
         "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1543.003/T1543.003.md",
         "https://learn.microsoft.com/en-us/sysinternals/downloads/autoruns",

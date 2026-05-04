@@ -30,7 +30,6 @@ pub(crate) static EVTX_TASK_SCHEDULER: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["scheduled_tasks_dir", "scheduled_task_registry_cache"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1053/005/",
         "https://github.com/Yamato-Security/hayabusa-rules",
     ],
 };
@@ -55,7 +54,6 @@ pub(crate) static EVTX_RDP_CLIENT: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["rdp_client_servers", "evtx_rdp_inbound", "rdp_bitmap_cache"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1021/001/",
         "https://ponderthebits.com/2018/02/windows-rdp-related-event-logs-identification-tracking-and-investigation/",
     ],
 };
@@ -81,7 +79,6 @@ pub(crate) static EVTX_RDP_INBOUND: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["evtx_rdp_client", "evtx_rdp_session", "evtx_security"],
     sources: &[
         "https://ponderthebits.com/2018/02/windows-rdp-related-event-logs-identification-tracking-and-investigation/",
-        "https://attack.mitre.org/techniques/T1021/001/",
     ],
 };
 
@@ -107,7 +104,6 @@ pub(crate) static EVTX_RDP_SESSION: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["evtx_rdp_inbound", "evtx_security"],
     sources: &[
         "https://ponderthebits.com/2018/02/windows-rdp-related-event-logs-identification-tracking-and-investigation/",
-        "https://attack.mitre.org/techniques/T1021/001/",
     ],
 };
 
@@ -131,7 +127,6 @@ pub(crate) static EVTX_WINRM: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["evtx_security", "powershell_history"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1021/006/",
         "https://github.com/Yamato-Security/hayabusa-rules",
     ],
 };
@@ -156,7 +151,6 @@ pub(crate) static EVTX_WMI_ACTIVITY: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["wmi_subscriptions", "wmi_mof_dir", "evtx_security"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1047/",
         "https://www.fireeye.com/blog/threat-research/2019/03/windows-management-instrumentation-wmi-offense-defense-and-forensics.html",
     ],
 };
@@ -182,7 +176,6 @@ pub(crate) static EVTX_BITS_CLIENT: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["bits_db"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1197/",
         "https://isc.sans.edu/forums/diary/Investigating+Windows+BITS+Activity/23281/",
     ],
 };
@@ -207,7 +200,6 @@ pub(crate) static EVTX_APPLOCKER: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["evtx_security"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1562/001/",
         "https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-defender-application-control/applocker/what-is-applocker",
     ],
 };
@@ -230,7 +222,10 @@ pub(crate) static EVTX_APPLOCKER_SCRIPT: ArtifactDescriptor = ArtifactDescriptor
     retention: Some("Default 1 MB"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["evtx_applocker", "evtx_powershell"],
-    sources: &["https://attack.mitre.org/techniques/T1562/001/"],
+    sources: &[
+        "https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-defender-application-control/applocker/what-is-applocker",
+        "https://github.com/Yamato-Security/hayabusa-rules",
+    ],
 };
 
 pub(crate) static EVTX_DEFENDER: ArtifactDescriptor = ArtifactDescriptor {
@@ -254,7 +249,6 @@ pub(crate) static EVTX_DEFENDER: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["evtx_security", "evtx_system"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1562/001/",
         "https://github.com/Yamato-Security/hayabusa-rules",
     ],
 };
@@ -279,7 +273,6 @@ pub(crate) static EVTX_FIREWALL: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["evtx_security", "evtx_system"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1562/004/",
         "https://github.com/Yamato-Security/hayabusa-rules",
     ],
 };
@@ -303,7 +296,6 @@ pub(crate) static EVTX_CODE_INTEGRITY: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["evtx_system"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1014/",
         "https://github.com/Yamato-Security/hayabusa-rules",
     ],
 };
@@ -328,7 +320,6 @@ pub(crate) static EVTX_NTLM: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &["evtx_security", "dcc2_cache"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1550/002/",
         "https://github.com/Yamato-Security/hayabusa-rules",
     ],
 };
@@ -376,7 +367,6 @@ pub(crate) static EVTX_NETLOGON: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["evtx_security", "ntds_dit"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1210/",
         "https://www.secura.com/blog/zero-logon",
     ],
 };
@@ -399,7 +389,10 @@ pub(crate) static EVTX_SMB_CLIENT: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("Default 1 MB"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["evtx_security", "network_drives"],
-    sources: &["https://attack.mitre.org/techniques/T1021/002/"],
+    sources: &[
+        "https://github.com/Yamato-Security/hayabusa-rules",
+        "https://learn.microsoft.com/en-us/windows-server/storage/file-server/troubleshoot/detect-enable-and-disable-smbv1-v2-v3",
+    ],
 };
 
 pub(crate) static EVTX_NETWORK_PROFILE: ArtifactDescriptor = ArtifactDescriptor {
@@ -487,7 +480,6 @@ pub(crate) static EVTX_LSA_PROTECTION: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["evtx_security", "lsa_secrets"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1003/001/",
         "https://docs.microsoft.com/en-us/windows-server/security/credentials-protection-and-management/configuring-additional-lsa-protection",
     ],
 };
@@ -510,7 +502,10 @@ pub(crate) static EVTX_CAPI2: ArtifactDescriptor = ArtifactDescriptor {
     retention: Some("Default 1 MB"),
     triage_priority: TriagePriority::Medium,
     related_artifacts: &["machine_cert_store", "user_cert_private_key"],
-    sources: &["https://attack.mitre.org/techniques/T1553/004/"],
+    sources: &[
+        "https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/enable-debug-logging-capi2",
+        "https://github.com/Yamato-Security/hayabusa-rules",
+    ],
 };
 
 pub(crate) static EVTX_POWERSHELL_CLASSIC: ArtifactDescriptor = ArtifactDescriptor {
@@ -531,5 +526,8 @@ pub(crate) static EVTX_POWERSHELL_CLASSIC: ArtifactDescriptor = ArtifactDescript
     retention: Some("Default 15 MB"),
     triage_priority: TriagePriority::High,
     related_artifacts: &["evtx_powershell", "powershell_history"],
-    sources: &["https://attack.mitre.org/techniques/T1059/001/"],
+    sources: &[
+        "https://www.sans.org/blog/powershell-logging-for-the-blue-team/",
+        "https://github.com/Yamato-Security/hayabusa-rules",
+    ],
 };

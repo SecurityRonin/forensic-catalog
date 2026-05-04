@@ -2373,6 +2373,62 @@ mod tests_batch_d {
         assert!(SRUM_PUSH_NOTIFICATION.mitre_techniques.contains(&"T1059"));
     }
 
+    // ── SRUM DRY: no MITRE URLs in sources[] ─────────────────────────────
+    //
+    // mitre_techniques[] already carries the ATT&CK IDs.
+    // sources[] is for researcher docs, specs, and tool repos — not MITRE pages.
+    // See CLAUDE.md accuracy standard #7.
+
+    #[test]
+    fn srum_db_sources_no_mitre_urls() {
+        for url in SRUM_DB.sources {
+            assert!(
+                !url.contains("attack.mitre.org"),
+                "srum_db.sources[] must not contain MITRE URLs (DRY — use mitre_techniques[]): {url}"
+            );
+        }
+    }
+
+    #[test]
+    fn srum_network_usage_sources_no_mitre_urls() {
+        for url in SRUM_NETWORK_USAGE.sources {
+            assert!(
+                !url.contains("attack.mitre.org"),
+                "srum_network_usage.sources[] must not contain MITRE URLs: {url}"
+            );
+        }
+    }
+
+    #[test]
+    fn srum_app_resource_sources_no_mitre_urls() {
+        for url in SRUM_APP_RESOURCE.sources {
+            assert!(
+                !url.contains("attack.mitre.org"),
+                "srum_app_resource.sources[] must not contain MITRE URLs: {url}"
+            );
+        }
+    }
+
+    #[test]
+    fn srum_energy_usage_sources_no_mitre_urls() {
+        for url in SRUM_ENERGY_USAGE.sources {
+            assert!(
+                !url.contains("attack.mitre.org"),
+                "srum_energy_usage.sources[] must not contain MITRE URLs: {url}"
+            );
+        }
+    }
+
+    #[test]
+    fn srum_push_notification_sources_no_mitre_urls() {
+        for url in SRUM_PUSH_NOTIFICATION.sources {
+            assert!(
+                !url.contains("attack.mitre.org"),
+                "srum_push_notification.sources[] must not contain MITRE URLs: {url}"
+            );
+        }
+    }
+
     // ── EVTX channels ─────────────────────────────────────────────────────
 
     #[test]

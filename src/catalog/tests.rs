@@ -103,6 +103,32 @@ mod catalog_integrity {
             }
         }
     }
+
+    #[test]
+    fn no_mitre_urls_in_sources() {
+        // mitre_techniques[] already expresses the ATT&CK relationship.
+        // sources[] is for documents that informed the artifact model.
+        // See CLAUDE.md accuracy standard #7.
+        let mut violations: Vec<(&str, &str)> = Vec::new();
+        for d in CATALOG.list() {
+            for src in d.sources {
+                if src.contains("attack.mitre.org") {
+                    violations.push((d.id, src));
+                }
+            }
+        }
+        assert!(
+            violations.is_empty(),
+            "sources[] must not contain MITRE URLs ({} violation{}):\n{}",
+            violations.len(),
+            if violations.len() == 1 { "" } else { "s" },
+            violations
+                .iter()
+                .map(|(id, url)| format!("  {id}: {url}"))
+                .collect::<Vec<_>>()
+                .join("\n")
+        );
+    }
 }
 
 #[cfg(test)]

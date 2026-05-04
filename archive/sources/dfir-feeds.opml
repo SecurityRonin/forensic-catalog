@@ -153,6 +153,10 @@
     <outline text="Blue Team Field Notes" title="Blue Team Field Notes">
       <!-- GitHub commit atom — one entry per new TTP entry added to the notebook -->
       <outline type="rss" text="Blue_Team_Hunting_Field_Notes" title="Blue Team Hunting Field Notes (bitbug0x55AA)" xmlUrl="https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commits/main.atom" htmlUrl="https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes"/>
+      <!-- kacos2000/Win10 — Costas Katsavounidis: per-OS-version artifact/registry notes,
+           raw field offsets, GUI tool internals (Prefetch, MFT, JumpList, Timeline, WinEDB);
+           each commit adds new Windows 10/11 forensic field details -->
+      <outline type="rss" text="kacos2000_Win10" title="kacos2000/Win10 (Windows forensic field notes)" xmlUrl="https://github.com/kacos2000/Win10/commits/master.atom" htmlUrl="https://github.com/kacos2000/Win10"/>
     </outline>
     <outline text="Threat Intelligence Feeds" title="Threat Intelligence Feeds">
       <!-- abuse.ch suite — actively maintained, machine-readable threat intel -->

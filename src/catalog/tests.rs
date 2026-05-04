@@ -4456,3 +4456,196 @@ mod tests_timeline_search_enrichment {
         );
     }
 }
+
+mod tests_prefetch_mft_enrichment {
+    use super::*;
+
+    // ── Prefetch-Browser enrichment ─────────────────────────────────────────
+
+    #[test]
+    fn prefetch_has_volume_creation_time_field() {
+        // Volumes information block stores VolumeCreationTime (FILETIME UTC) per
+        // volume accessed during execution. Pivot: matches $MFT volume birth time.
+        // Source: https://github.com/kacos2000/Prefetch-Browser
+        let desc = CATALOG.by_id("prefetch_file").unwrap();
+        let names: Vec<&str> = desc.fields.iter().map(|f| f.name).collect();
+        assert!(
+            names.contains(&"volume_creation_time"),
+            "prefetch_file fields must include volume_creation_time \
+             (FILETIME per volume in the Volumes Information block); got: {names:?}"
+        );
+    }
+
+    #[test]
+    fn prefetch_has_volume_serial_number_field() {
+        // Volume serial number from the Volumes Information block.
+        // Correlates with $VOLUME_INFORMATION in $MFT for origin-volume identification.
+        // Source: https://github.com/kacos2000/Prefetch-Browser
+        let desc = CATALOG.by_id("prefetch_file").unwrap();
+        let names: Vec<&str> = desc.fields.iter().map(|f| f.name).collect();
+        assert!(
+            names.contains(&"volume_serial_number"),
+            "prefetch_file fields must include volume_serial_number \
+             (u32 from Volumes Information; pivot to $MFT $VOLUME_INFORMATION); got: {names:?}"
+        );
+    }
+
+    #[test]
+    fn prefetch_has_mft_record_number_field() {
+        // File metrics entries with flag bit 0x100 set include the 48-bit MFT
+        // record number of each referenced file. Pivot to $MFT for timestomping.
+        // Source: https://github.com/kacos2000/Prefetch-Browser
+        let desc = CATALOG.by_id("prefetch_file").unwrap();
+        let names: Vec<&str> = desc.fields.iter().map(|f| f.name).collect();
+        assert!(
+            names.contains(&"mft_record_number"),
+            "prefetch_file fields must include mft_record_number \
+             (48-bit MFT ref from File Metrics entry flag 0x100); got: {names:?}"
+        );
+    }
+
+    #[test]
+    fn prefetch_has_format_version_field() {
+        // SCCA header offset 0x0000: u32 version. Used to select correct
+        // timestamp-array and run-count offsets:
+        //   17 (XP), 23 (Vista/7), 26 (Win8), 30/31 (Win10/11)
+        // Source: https://github.com/kacos2000/Prefetch-Browser
+        let desc = CATALOG.by_id("prefetch_file").unwrap();
+        let names: Vec<&str> = desc.fields.iter().map(|f| f.name).collect();
+        assert!(
+            names.contains(&"format_version"),
+            "prefetch_file fields must include format_version \
+             (SCCA u32 at offset 0: 17=XP, 23=Vista/7, 26=Win8, 30/31=Win10/11); got: {names:?}"
+        );
+    }
+
+    #[test]
+    fn prefetch_cites_kacos2000() {
+        // kacos2000/Prefetch-Browser documents the MAM compressed wrapper,
+        // Volumes Information block, and File Metrics MFT reference flag 0x100.
+        let desc = CATALOG.by_id("prefetch_file").unwrap();
+        let cites_kacos = desc
+            .sources
+            .iter()
+            .any(|s| s.contains("kacos2000") && s.contains("Prefetch"));
+        assert!(
+            cites_kacos,
+            "prefetch_file sources must cite kacos2000/Prefetch-Browser; got: {:?}",
+            desc.sources
+        );
+    }
+
+    #[test]
+    fn prefetch_cites_libscca() {
+        // libscca is the authoritative format spec for all SCCA versions.
+        // Source: https://github.com/libyal/libscca
+        let desc = CATALOG.by_id("prefetch_file").unwrap();
+        let cites_libscca = desc
+            .sources
+            .iter()
+            .any(|s| s.contains("libscca") || s.contains("libyal"));
+        assert!(
+            cites_libscca,
+            "prefetch_file sources must cite libscca (authoritative SCCA format spec); got: {:?}",
+            desc.sources
+        );
+    }
+
+    // ── MFT-Browser enrichment ───────────────────────────────────────────────
+
+    #[test]
+    fn mft_has_lsn_field() {
+        // $LogFile Sequence Number at MFT record header offset 0x08 (uint64).
+        // Increments on every modification — chronological ordering without
+        // relying on timestamps. Key for detecting out-of-order $LogFile entries.
+        // Source: https://github.com/kacos2000/MFT_Browser
+        let desc = CATALOG.by_id("mft_file").unwrap();
+        let names: Vec<&str> = desc.fields.iter().map(|f| f.name).collect();
+        assert!(
+            names.contains(&"lsn"),
+            "mft_file fields must include lsn \
+             ($LogFile Sequence Number at header 0x08, uint64; chronological anchor); got: {names:?}"
+        );
+    }
+
+    #[test]
+    fn mft_has_fn_changed_and_accessed_fields() {
+        // MFT_Browser exposes all 8 MACE timestamps: 4 from $STANDARD_INFORMATION
+        // and 4 from $FILE_NAME. fn_changed and fn_accessed complete the FN set —
+        // these are kernel-maintained and harder to forge than SI equivalents.
+        // Source: https://github.com/kacos2000/MFT_Browser
+        let desc = CATALOG.by_id("mft_file").unwrap();
+        let names: Vec<&str> = desc.fields.iter().map(|f| f.name).collect();
+        assert!(
+            names.contains(&"fn_changed"),
+            "mft_file fields must include fn_changed \
+             ($FILE_NAME MFT-record-changed time, kernel-maintained); got: {names:?}"
+        );
+        assert!(
+            names.contains(&"fn_accessed"),
+            "mft_file fields must include fn_accessed \
+             ($FILE_NAME last-accessed time, kernel-maintained); got: {names:?}"
+        );
+    }
+
+    #[test]
+    fn mft_has_hard_link_count_field() {
+        // Hard link count at MFT record header offset 0x12 (uint16).
+        // Count > 1 = multiple directory entries point to this record.
+        // Anti-forensic use: hard links to executables in innocuous locations.
+        // Source: https://github.com/kacos2000/MFT_Browser
+        let desc = CATALOG.by_id("mft_file").unwrap();
+        let names: Vec<&str> = desc.fields.iter().map(|f| f.name).collect();
+        assert!(
+            names.contains(&"hard_link_count"),
+            "mft_file fields must include hard_link_count \
+             (uint16 at header 0x12; > 1 indicates multiple directory entries); got: {names:?}"
+        );
+    }
+
+    #[test]
+    fn mft_has_record_slack_field() {
+        // Record slack = PhysicalSize - LogicalSize.
+        // Carved from residual bytes at end of a 1024- or 4096-byte record.
+        // May contain prior attribute remnants after file metadata shrinks.
+        // Source: https://github.com/kacos2000/MFT_Browser
+        let desc = CATALOG.by_id("mft_file").unwrap();
+        let names: Vec<&str> = desc.fields.iter().map(|f| f.name).collect();
+        assert!(
+            names.contains(&"record_slack"),
+            "mft_file fields must include record_slack \
+             (PhysicalSize - LogicalSize; may contain prior attribute remnants); got: {names:?}"
+        );
+    }
+
+    #[test]
+    fn mft_has_usn_field() {
+        // USN value from $STANDARD_INFORMATION at SI offset +64 (8 bytes).
+        // Links this MFT record to its entry in $UsnJrnl:$J.
+        // Source: https://github.com/kacos2000/MFT_Browser
+        let desc = CATALOG.by_id("mft_file").unwrap();
+        let names: Vec<&str> = desc.fields.iter().map(|f| f.name).collect();
+        assert!(
+            names.contains(&"usn"),
+            "mft_file fields must include usn \
+             ($SI offset +64, links record to $UsnJrnl:$J entry); got: {names:?}"
+        );
+    }
+
+    #[test]
+    fn mft_cites_kacos2000() {
+        // kacos2000/MFT_Browser is the authoritative source for:
+        // all NTFS attribute offsets, record slack, LSN, 8-timestamp dual set,
+        // hard link count, USN in $SI, and $Object_ID UUID creation time.
+        let desc = CATALOG.by_id("mft_file").unwrap();
+        let cites_kacos = desc
+            .sources
+            .iter()
+            .any(|s| s.contains("kacos2000") && s.contains("MFT"));
+        assert!(
+            cites_kacos,
+            "mft_file sources must cite kacos2000/MFT_Browser; got: {:?}",
+            desc.sources
+        );
+    }
+}

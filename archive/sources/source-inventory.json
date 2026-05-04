@@ -4,7 +4,7 @@
     "directories": "archive/sources/catalog-directories.json",
     "manual": "archive/sources/manual-sources.json"
   },
-  "total_sources": 99,
+  "total_sources": 114,
   "sources": [
     {
       "id": "aboutdfir-blogs",
@@ -59,6 +59,19 @@
       ]
     },
     {
+      "id": "4n6k",
+      "title": "4n6k",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.4n6k.com/",
+      "feed_url": "https://www.4n6k.com/feeds/posts/default",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
       "id": "aboutdfir",
       "title": "AboutDFIR",
       "category": "feed",
@@ -91,6 +104,19 @@
       "kind": "rss-feed",
       "html_url": "https://blog.ampedsoftware.com/",
       "feed_url": "https://blog.ampedsoftware.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "andrea-fortuna-dfir-malware-analysis",
+      "title": "Andrea Fortuna — DFIR & Malware Analysis",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://andreafortuna.org/",
+      "feed_url": "https://andreafortuna.org/feed.xml",
       "update_strategy": "rss",
       "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
       "sources": [
@@ -202,6 +228,19 @@
       ]
     },
     {
+      "id": "cisco-talos-blog",
+      "title": "Cisco Talos Blog",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://blog.talosintelligence.com/",
+      "feed_url": "https://blog.talosintelligence.com/rss/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
       "id": "crowdstrike-blog",
       "title": "CrowdStrike blog",
       "category": "feed",
@@ -220,7 +259,7 @@
       "category": "feed",
       "kind": "rss-feed",
       "html_url": "https://www.darkreading.com/",
-      "feed_url": "https://www.darkreading.com/rss/all.xml",
+      "feed_url": "https://www.darkreading.com/rss.xml",
       "update_strategy": "rss",
       "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
       "sources": [
@@ -234,6 +273,19 @@
       "kind": "rss-feed",
       "html_url": "https://dfirdiva.com/",
       "feed_url": "https://dfirdiva.com/feed",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "dfir-review",
+      "title": "DFIR Review",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://dfir.pubpub.org/",
+      "feed_url": "https://dfir.pubpub.org/rss.xml",
       "update_strategy": "rss",
       "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
       "sources": [
@@ -280,12 +332,25 @@
       ]
     },
     {
-      "id": "digital-forensics-stream",
-      "title": "Digital Forensics Stream",
+      "id": "didier-stevens-blog",
+      "title": "Didier Stevens Blog",
       "category": "feed",
       "kind": "rss-feed",
-      "html_url": "https://df-stream.com/",
-      "feed_url": "https://df-stream.com/feed/",
+      "html_url": "https://blog.didierstevens.com/",
+      "feed_url": "https://blog.didierstevens.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "digital-forensics-tips",
+      "title": "Digital Forensics Tips",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.digitalforensicstips.com/",
+      "feed_url": "https://www.digitalforensicstips.com/feeds/posts/default",
       "update_strategy": "rss",
       "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
       "sources": [
@@ -299,6 +364,32 @@
       "kind": "rss-feed",
       "html_url": "https://www.doubleblak.com/",
       "feed_url": "https://www.doubleblak.com/blogRSS.xml",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "elcomsoft-blog",
+      "title": "Elcomsoft Blog",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://blog.elcomsoft.com/",
+      "feed_url": "https://blog.elcomsoft.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "embee-research",
+      "title": "Embee Research",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://embee-research.ghost.io/",
+      "feed_url": "https://embee-research.ghost.io/rss/",
       "update_strategy": "rss",
       "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
       "sources": [
@@ -358,19 +449,6 @@
       ]
     },
     {
-      "id": "forensicmike1",
-      "title": "forensicmike1",
-      "category": "feed",
-      "kind": "rss-feed",
-      "html_url": "https://forensicmike1.com/",
-      "feed_url": "https://forensicmike1.com/feed/",
-      "update_strategy": "rss",
-      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
-      "sources": [
-        "opml"
-      ]
-    },
-    {
       "id": "hecf-hacking-exposed-computer-forensics-blog",
       "title": "HECF / Hacking Exposed Computer Forensics Blog",
       "category": "feed",
@@ -384,12 +462,64 @@
       ]
     },
     {
+      "id": "hexacorn",
+      "title": "Hexacorn",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.hexacorn.com/blog/",
+      "feed_url": "https://www.hexacorn.com/blog/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "hexordia",
+      "title": "Hexordia",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.hexordia.com/blog/",
+      "feed_url": "https://www.hexordia.com/blog?format=rss",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "huntress-blog",
+      "title": "Huntress Blog",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.huntress.com/blog",
+      "feed_url": "https://www.huntress.com/blog/rss.xml",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
       "id": "initialization-vectors",
       "title": "Initialization Vectors",
       "category": "feed",
       "kind": "rss-feed",
       "html_url": "https://abrignoni.blogspot.com/",
       "feed_url": "https://abrignoni.blogspot.com/feeds/posts/default",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "jpcert-cc-english-blog",
+      "title": "JPCERT/CC English Blog",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://blogs.jpcert.or.jp/en/",
+      "feed_url": "https://blogs.jpcert.or.jp/en/atom.xml",
       "update_strategy": "rss",
       "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
       "sources": [
@@ -501,6 +631,19 @@
       ]
     },
     {
+      "id": "mandiant-threat-intelligence",
+      "title": "Mandiant Threat Intelligence",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://cloud.google.com/blog/topics/threat-intelligence",
+      "feed_url": "https://feeds.feedburner.com/threatintelligence/pvexyqv7v0v",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
       "id": "misp-taxonomies",
       "title": "MISP taxonomies",
       "category": "feed",
@@ -520,6 +663,45 @@
       "kind": "rss-feed",
       "html_url": "https://www.msab.com/",
       "feed_url": "https://www.msab.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "objective-see",
+      "title": "Objective-See",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://objective-see.org/blog.html",
+      "feed_url": "https://objective-see.org/rss.xml",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "palo-alto-unit-42",
+      "title": "Palo Alto Unit 42",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://unit42.paloaltonetworks.com/",
+      "feed_url": "https://unit42.paloaltonetworks.com/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "red-canary-blog",
+      "title": "Red Canary Blog",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://redcanary.com/blog/",
+      "feed_url": "https://redcanary.com/blog/feed/",
       "update_strategy": "rss",
       "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
       "sources": [
@@ -572,6 +754,32 @@
       "kind": "rss-feed",
       "html_url": "https://thebinaryhick.blog/",
       "feed_url": "https://thebinaryhick.blog/feed/",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "the-dfir-spot",
+      "title": "The DFIR Spot",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://www.thedfirspot.com/",
+      "feed_url": "https://www.thedfirspot.com/blog-feed.xml",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "the-eclectic-light-company",
+      "title": "The Eclectic Light Company",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://eclecticlight.co/",
+      "feed_url": "https://eclecticlight.co/feed/",
       "update_strategy": "rss",
       "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
       "sources": [
@@ -650,19 +858,6 @@
       "kind": "rss-feed",
       "html_url": "https://urlhaus.abuse.ch/",
       "feed_url": "https://urlhaus.abuse.ch/rss/",
-      "update_strategy": "rss",
-      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
-      "sources": [
-        "opml"
-      ]
-    },
-    {
-      "id": "vmware-carbon-black",
-      "title": "VMware Carbon Black",
-      "category": "feed",
-      "kind": "rss-feed",
-      "html_url": "https://www.carbonblack.com/",
-      "feed_url": "https://www.carbonblack.com/feed/",
       "update_strategy": "rss",
       "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
       "sources": [

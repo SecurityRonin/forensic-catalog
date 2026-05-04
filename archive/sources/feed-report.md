@@ -1,24 +1,15 @@
 # Feed Update Report
 
-Generated: 2026-05-03T05:36:12Z
+Generated: 2026-05-04T06:24:10Z
 
 ## Windows Incident Response
 
 - Site: https://windowsir.blogspot.com/
 - Feed: https://windowsir.blogspot.com/feeds/posts/default
 - Entries checked: 10
-- New since last snapshot: 10
+- New since last snapshot: 0
 
-- 2026-03-10T06:23:32-05:00 — [LNK Files](https://windowsir.blogspot.com/2026/03/lnk-files.html)
-- 2026-03-10T06:23:21-05:00 — [Links](https://windowsir.blogspot.com/2026/03/links.html)
-- 2026-03-02T13:42:34-05:00 — [Devices](https://windowsir.blogspot.com/2026/02/devices.html)
-- 2026-01-20T08:26:21-05:00 — [Views on AI & the Anthropic Report](https://windowsir.blogspot.com/2026/01/views-on-ai-anthropic-report.html)
-- 2026-01-10T16:13:59-05:00 — [What's on your clipboard?](https://windowsir.blogspot.com/2026/01/whats-on-your-clipboard.html)
-- 2026-01-05T12:21:06-05:00 — [Questions I've Been Asked](https://windowsir.blogspot.com/2026/01/questions-ive-been-asked.html)
-- 2026-01-01T19:20:47-05:00 — [Windows Defender Support Logs](https://windowsir.blogspot.com/2026/01/windows-defender-support-logs.html)
-- 2026-01-01T19:20:38-05:00 — [Grab Bag](https://windowsir.blogspot.com/2026/01/grab-bag.html)
-- 2025-12-29T13:16:17-05:00 — [Question on Open Source Tools](https://windowsir.blogspot.com/2025/12/question-on-open-source-tools.html)
-- 2025-12-11T17:10:19-05:00 — [Perspectives on Cybersecurity](https://windowsir.blogspot.com/2025/12/perspectives-on-cybersecurity.html)
+- No new entries detected
 
 ## dfir.blog
 
@@ -31,18 +22,9 @@ Generated: 2026-05-03T05:36:12Z
 - Site: https://az4n6.blogspot.com/
 - Feed: https://az4n6.blogspot.com/feeds/posts/default
 - Entries checked: 10
-- New since last snapshot: 10
+- New since last snapshot: 0
 
-- 2020-02-28T17:32:13-07:00 — [Detecting Lateral Movement with WinSCP](https://az4n6.blogspot.com/2020/02/detecting-laterial-movment-with-winscp.html)
-- 2019-08-27T14:06:43-07:00 — [Triage Collection and Timeline Generation with KAPE](https://az4n6.blogspot.com/2019/08/triage-collection-and-timeline.html)
-- 2018-06-13T07:09:57-07:00 — [Malicious PowerShell in the Registry: Persistence](https://az4n6.blogspot.com/2018/06/malicious-powershell-in-registry.html)
-- 2018-02-01T15:01:02-07:00 — [Mounting an APFS image in Linux](https://az4n6.blogspot.com/2018/01/mounting-apfs-image-in-linux.html)
-- 2018-01-01T13:32:41-07:00 — [How to mount Mac APFS images in Windows](https://az4n6.blogspot.com/2018/01/how-to-mount-mac-apfs-images-in-windows.html)
-- 2017-10-16T07:03:18-07:00 — [Finding and Decoding Malicious PowerShell Scripts](https://az4n6.blogspot.com/2017/10/finding-and-decoding-malicious.html)
-- 2017-02-24T08:20:50-07:00 — [Onion Peeler: Batch Tor Lookup Program](https://az4n6.blogspot.com/2017/02/onion-peeler-batch-tor-lookup-program.html)
-- 2017-02-20T14:48:25-07:00 — [When Windows Lies](https://az4n6.blogspot.com/2017/02/when-windows-lies.html)
-- 2016-10-05T08:22:32-07:00 — [Quicklook thumbnails.data parser](https://az4n6.blogspot.com/2016/10/quicklook-thumbnailsdata-parser.html)
-- 2016-09-22T07:34:11-07:00 — [Mac Live Imaging: Functionality Versus Speed](https://az4n6.blogspot.com/2016/09/mac-live-imaging-functionality-versus.html)
+- No new entries detected
 
 ## DFIR Diva
 
@@ -52,12 +34,6 @@ Generated: 2026-05-03T05:36:12Z
 - New since last snapshot: 0
 
 - No new entries detected
-
-## Digital Forensics Stream
-
-- Site: https://df-stream.com/
-- Feed: https://df-stream.com/feed/
-- Status: error: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)
 
 ## mac4n6
 
@@ -73,18 +49,27 @@ Generated: 2026-05-03T05:36:12Z
 - Site: https://binaryforay.blogspot.com/
 - Feed: https://binaryforay.blogspot.com/feeds/posts/default
 - Entries checked: 10
+- New since last snapshot: 0
+
+- No new entries detected
+
+## Andrea Fortuna
+
+- Site: https://andreafortuna.org/
+- Feed: https://andreafortuna.org/feed.xml
+- Entries checked: 10
 - New since last snapshot: 10
 
-- 2020-05-28T12:41:35-04:00 — [KAPE 0.9.2.0 released!](https://binaryforay.blogspot.com/2020/05/kape-0920-released.html)
-- 2019-08-26T15:39:26-04:00 — [KAPE 0.8.7.0 released!](https://binaryforay.blogspot.com/2019/08/kape-0870-released.html)
-- 2019-08-09T09:44:12-04:00 — [KAPE 0.8.6.1 released](https://binaryforay.blogspot.com/2019/08/kape-0861-released.html)
-- 2019-04-26T13:56:50-04:00 — [Introducing EvtxECmd!!](https://binaryforay.blogspot.com/2019/04/introducing-evtxecmd.html)
-- 2019-03-15T13:39:13-04:00 — [KAPE 0.8.3.0 released](https://binaryforay.blogspot.com/2019/03/kape-0830-released.html)
-- 2019-03-05T18:57:36-05:00 — [KAPE v0.8.2.0 released!](https://binaryforay.blogspot.com/2019/03/kape-v0820-released.html)
-- 2019-02-16T12:56:05-05:00 — [KAPE v0.8.1.0 released!](https://binaryforay.blogspot.com/2019/02/kape-v0810-released.html)
-- 2019-02-14T14:01:31-05:00 — [Introducing KAPE!](https://binaryforay.blogspot.com/2019/02/introducing-kape.html)
-- 2019-01-17T14:52:33-05:00 — [Locked file support added to AmcacheParser, AppCompatCacheParser, MFTECmd, ShellBags Explorer (and SBECmd), and Registry Explorer (and RECmd)](https://binaryforay.blogspot.com/2019/01/locked-file-support-added-to.html)
-- 2019-01-12T21:22:04-05:00 — [Registry Explorer and RECmd 1.2.0.0 released!](https://binaryforay.blogspot.com/2019/01/registry-explorer-and-recmd-1200.html)
+- 2026-05-03T00:00:00+00:00 — [When the firefighter starts the fire: IR professionals who joined BlackCat](https://andreafortuna.org/2026/05/03/ir-professionals-blackcat-insider-threat/)
+- 2026-05-02T00:00:00+00:00 — [Copy Fail and the forensic blind spot hiding in Linux memory](https://andreafortuna.org/2026/05/02/copy-fail-cve-2026-31431/)
+- 2026-05-01T00:00:00+00:00 — [Beyond backup: operational resilience, cyber recovery and what DORA really demands](https://andreafortuna.org/2026/05/01/beyond-backup-operational-resilience-dora/)
+- 2026-04-29T00:00:00+00:00 — [Living off the orchard: understanding LOOBins and native macOS attack techniques](https://andreafortuna.org/2026/04/29/living-off-the-orchard-understanding-loobins-macos-attack-techniques/)
+- 2026-04-26T22:00:00+00:00 — [When identity becomes the perimeter: breaking in without malware](https://andreafortuna.org/2026/04/26/identity-new-perimeter/)
+- 2026-04-23T00:00:00+00:00 — [Android pattern of life: hidden artifacts that reconstruct a user’s daily routine](https://andreafortuna.org/2026/04/23/android-pattern-of-life-hidden-artifacts-reconstruct-daily-routine/)
+- 2026-04-22T00:00:00+00:00 — [Threat hunting with YARA-X: a practical guide to the new standard](https://andreafortuna.org/2026/04/22/threat-hunting-yara-x/)
+- 2026-04-21T00:00:00+00:00 — [Apple Watch forensics: acquisition techniques and evidentiary artifacts](https://andreafortuna.org/2026/04/21/apple-watch-forensics/)
+- 2026-04-20T00:00:00+00:00 — [Is tapping your watch really safe? A deep dive into contactless payment security](https://andreafortuna.org/2026/04/20/contactless-payment-security/)
+- 2026-04-17T00:00:00+00:00 — [Claude Mythos found what 27 years of human review missed. Now what?](https://andreafortuna.org/2026/04/17/claude-mythos-for-ciso/)
 
 ## Salt Forensics
 
@@ -100,18 +85,9 @@ Generated: 2026-05-03T05:36:12Z
 - Site: https://cheeky4n6monkey.blogspot.com/
 - Feed: https://cheeky4n6monkey.blogspot.com/feeds/posts/default
 - Entries checked: 10
-- New since last snapshot: 10
+- New since last snapshot: 0
 
-- 2022-02-28T17:57:44+11:00 — [Monkey Attempts To Digest Some Google Takeout (DetectedActivitys)](https://cheeky4n6monkey.blogspot.com/2022/02/monkey-attempts-to-digest-some-google.html)
-- 2022-01-07T19:53:21+11:00 — [Mike & the Monkey Dumpster Dive Into Samsung Gallery3d App Trash](https://cheeky4n6monkey.blogspot.com/2022/01/mike-monkey-dumpster-dive-into-samsung.html)
-- 2021-03-29T17:40:48+11:00 — [Monkey Test Drives a Honda Accord](https://cheeky4n6monkey.blogspot.com/2021/03/monkey-test-drives-honda-accord.html)
-- 2020-11-28T01:39:13+11:00 — [iOS14 Maps History BLOB Script](https://cheeky4n6monkey.blogspot.com/2020/11/ios14-maps-history-blob-script.html)
-- 2020-05-25T00:27:09+10:00 — [Recovering and Replaying Garmin Voice Instructions](https://cheeky4n6monkey.blogspot.com/2020/05/recovering-and-replaying-garmin-voice.html)
-- 2020-03-10T14:11:29+11:00 — [A Monkey Forays Into USB Flashdrives](https://cheeky4n6monkey.blogspot.com/2020/03/a-monkey-forays-into-usb-flashdrives.html)
-- 2017-10-15T13:06:58+11:00 — [Monkey takes a .heic](https://cheeky4n6monkey.blogspot.com/2017/10/monkey-takes-heic.html)
-- 2017-08-21T18:57:55+10:00 — [Monkey Unpacks Some Python](https://cheeky4n6monkey.blogspot.com/2017/08/monkey-unpacks-some-python.html)
-- 2017-01-04T23:53:39+11:00 — [Monkey Plays (LAN) Turtle](https://cheeky4n6monkey.blogspot.com/2017/01/monkey-plays-lan-turtle.html)
-- 2016-08-13T01:35:48+10:00 — [Google S2 Mapping Scripts](https://cheeky4n6monkey.blogspot.com/2016/08/google-s2-mapping-scripts.html)
+- No new entries detected
 
 ## ThinkDFIR
 
@@ -143,26 +119,29 @@ Generated: 2026-05-03T05:36:12Z
 ## forensicmike1
 
 - Site: https://forensicmike1.com/
-- Feed: https://forensicmike1.com/feed/
-- Status: error: HTTP 404
+- Feed: https://forensicmike1.com/
+- Entries checked: 10
+- New since last snapshot: 10
+
+- unknown date — [Welcome to the New Site](https://forensicmike1.com/post/welcome-to-the-new-site)
+- unknown date — [Taking A Look At Ios Apps On An M1 Mac](https://forensicmike1.com/post/taking-a-look-at-ios-apps-on-an-m1-mac)
+- unknown date — [Analysis Of The Abtracetogether App Ios](https://forensicmike1.com/post/analysis-of-the-abtracetogether-app-ios)
+- unknown date — [Examiner Coder Types Learningit Can Make You A Better Developer](https://forensicmike1.com/post/examiner-coder-types-learningit-can-make-you-a-better-developer)
+- unknown date — [Spice Up Your Forensic Web Reports With Ui Frameworks](https://forensicmike1.com/post/spice-up-your-forensic-web-reports-with-ui-frameworks)
+- unknown date — [Knowledgec Now Playing Entries](https://forensicmike1.com/post/knowledgec-now-playing-entries)
+- unknown date — [Ios Photo Vault App Still Pwnable In 2019](https://forensicmike1.com/post/ios-photo-vault-app-still-pwnable-in-2019)
+- unknown date — [A Lesson In Home Network Security](https://forensicmike1.com/post/a-lesson-in-home-network-security)
+- unknown date — [Obtain Logical Signal Android](https://forensicmike1.com/post/obtain-logical-signal-android)
+- unknown date — [forensicBlend: Designing a scalable community plugin API](https://forensicmike1.com/post/forensicblend-designing-a-scalable-community-plugin-api)
 
 ## HECF / Hacking Exposed Computer Forensics Blog
 
 - Site: https://www.hecfblog.com/
 - Feed: https://www.hecfblog.com/feeds/posts/default
 - Entries checked: 10
-- New since last snapshot: 10
+- New since last snapshot: 0
 
-- 2025-04-22T22:06:17-05:00 — [Daily Blog #815: I missed a day](https://www.hecfblog.com/2025/04/daily-blog-815-i-missed-day.html)
-- 2025-04-20T22:28:18-05:00 — [Daily Blog #814: Sunday Funday 4/20/25](https://www.hecfblog.com/2025/04/daily-blog-814-sunday-funday-42025.html)
-- 2025-04-19T22:43:28-05:00 — [Daily Blog #813: Solution Saturday 4/19/25](https://www.hecfblog.com/2025/04/daily-blog-813-solution-saturday-41925.html)
-- 2025-04-18T22:37:43-05:00 — [Daily Blog #812: Testing AWS Log latency - Removing Users from Groups](https://www.hecfblog.com/2025/04/daily-blog-812-testing-aws-log-latency.html)
-- 2025-04-17T21:36:06-05:00 — [Daily Blog #811: Testing AWS Log latency - Modifying User Permissions](https://www.hecfblog.com/2025/04/daily-blog-811-testing-aws-log-latency.html)
-- 2025-04-16T22:57:40-05:00 — [Daily Blog #810: Testing AWS Log latency - CreateUser](https://www.hecfblog.com/2025/04/daily-blog-810-testing-aws-log-latency.html)
-- 2025-04-15T22:26:48-05:00 — [Daily Blog #809: Testing AWS Log latency - CreateAccessKey](https://www.hecfblog.com/2025/04/daily-blog-809-testing-aws-log-latency.html)
-- 2025-04-14T22:17:14-05:00 — [Daily Blog #808: Testing AWS Log latency - ConsoleLogin](https://www.hecfblog.com/2025/04/daily-blog-808-testing-aws-log-latency.html)
-- 2025-04-13T15:36:36-05:00 — [Daily Blog #807: Sunday Funday 4/13/25](https://www.hecfblog.com/2025/04/daily-blog-807-sunday-funday-41325.html)
-- 2025-04-12T17:40:50-05:00 — [Daily Blog #806: Solution Saturday 4/12/25](https://www.hecfblog.com/2025/04/daily-blog-806-solution-saturday-41225.html)
+- No new entries detected
 
 ## tisiphone.net
 
@@ -177,25 +156,28 @@ Generated: 2026-05-03T05:36:12Z
 
 - Site: https://smarterforensics.com/
 - Feed: https://smarterforensics.com/feed/
-- Status: error: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2024-08-08T02:34:02+00:00 — [iOS 17- The “Forever” Setting That Isn’t… Or Is It?](https://smarterforensics.com/2024/08/ios-17-the-forever-setting-that-isnt-or-is-it/)
+- 2021-12-30T19:00:14+00:00 — [Android and iOS acquisition Recommendations](https://smarterforensics.com/2021/12/android-and-ios-acquisition-recommendations/)
+- 2021-03-17T19:39:09+00:00 — [Forensic 4:Cast Awards – nominations are open](https://smarterforensics.com/2021/03/forensic-4cast-awards-nominations-are-open/)
+- 2020-09-18T15:13:43+00:00 — [Rotten to the Core? Nah, iOS14 is Mostly Sweet](https://smarterforensics.com/2020/09/rotten-to-the-core-nah-ios14-is-mostly-sweet/)
+- 2020-08-25T17:47:27+00:00 — [Using Photos.sqlite to show the relationships between photos and the application they were created with?  By Scott Koenig](https://smarterforensics.com/2020/08/does-photos-sqlite-have-relations-with-cameramessagesapp-by-scott-koenig/)
+- 2020-07-17T18:00:49+00:00 — [DFIRSummit Laugh Track](https://smarterforensics.com/2020/07/dfirsummit-laugh-track/)
+- 2020-04-01T12:23:24+00:00 — [“Life Has no ctrl+Alt+Del” – The New DFIR online Meetup](https://smarterforensics.com/2020/04/life-has-no-ctrlaltdel-the-new-dfir-online-meetup/)
+- 2020-03-19T20:13:25+00:00 — [2020 Forensic 4Cast Nominations are open!](https://smarterforensics.com/2020/03/2020-forensic-4cast-nominations-are-open/)
+- 2019-09-26T20:58:45+00:00 — [iOS 13 – Summary for those of you who enjoy the cliffsnotes](https://smarterforensics.com/2019/09/ios-13-summary-for-those-of-you-who-enjoy-the-cliffsnotes/)
+- 2019-09-26T01:42:10+00:00 — […Won’t you back that thing up: a glimpse of  ios 13 artifacts](https://smarterforensics.com/2019/09/wont-you-back-that-thing-up-a-glimpse-of-ios-13-artifacts/)
 
 ## Initialization Vectors
 
 - Site: https://abrignoni.blogspot.com/
 - Feed: https://abrignoni.blogspot.com/feeds/posts/default
 - Entries checked: 10
-- New since last snapshot: 10
+- New since last snapshot: 0
 
-- 2025-05-19T05:05:20-04:00 — [Extraction, Processing, & Querying Apple Unified Logs from an iOS Device](https://abrignoni.blogspot.com/2025/05/extraction-processing-querying-apple.html)
-- 2024-05-25T09:50:04-04:00 — [Full File System extractions in Zip - MAC times](https://abrignoni.blogspot.com/2024/05/full-file-system-extractions-in-zip-mac.html)
-- 2024-04-09T20:00:52-04:00 — [New parser for Uber app geo-locatios in iOS using iLEAPP](https://abrignoni.blogspot.com/2024/04/new-parser-for-uber-app-geo-locatios-in.html)
-- 2024-04-07T08:59:35-04:00 — [New VLEAPP parser](https://abrignoni.blogspot.com/2024/04/new-vleapp-parser.html)
-- 2024-02-07T11:53:42-05:00 — [What is cacheV0.db and why are there only images in it?](https://abrignoni.blogspot.com/2024/02/what-is-cachev0db-and-why-are-there.html)
-- 2024-01-16T21:14:01-05:00 — [SQLite 3.45 introducing binary JSON](https://abrignoni.blogspot.com/2024/01/sqlite-345-introducion-binary-json.html)
-- 2022-07-07T15:55:11-04:00 — [4Cast Awards 2022 voting in progress...](https://abrignoni.blogspot.com/2022/07/4cast-awards-2022-voting-in-progress.html)
-- 2021-12-24T14:16:43-05:00 — [Android Tor Browser Thumbnails. What?](https://abrignoni.blogspot.com/2021/12/tor-thumbnails-what.html)
-- 2021-07-21T15:38:17-04:00 — [vLEAPP - Vehicle Logs Events And Properties Parser](https://abrignoni.blogspot.com/2021/07/vleapp-vehicle-logs-events-and.html)
-- 2021-05-10T10:56:18-04:00 — [CLEAPP it! - ChromeOS Logs Events And Protobuf Parser](https://abrignoni.blogspot.com/2021/05/cleapp-it-chromeos-logs-events-and.html)
+- No new entries detected
 
 ## Brett Shavers
 
@@ -211,18 +193,9 @@ Generated: 2026-05-03T05:36:12Z
 - Site: https://www.swiftforensics.com/
 - Feed: https://www.swiftforensics.com/feeds/posts/default
 - Entries checked: 10
-- New since last snapshot: 10
+- New since last snapshot: 0
 
-- 2025-01-23T01:42:10-05:00 — [New Wifi database from Apple intelligence](http://www.swiftforensics.com/2025/01/new-wifi-database-from-apple.html)
-- 2025-01-12T18:18:30-05:00 — [mac_apt update to BTM processing](http://www.swiftforensics.com/2025/01/macapt-update-to-btm-processing.html)
-- 2024-08-04T10:42:02-04:00 — [NSKeyedArchive Deserializer update](http://www.swiftforensics.com/2024/08/nskeyedarchive-deserializer-update.html)
-- 2022-11-04T11:18:27-04:00 — [Reading OneDrive Logs Part 2](http://www.swiftforensics.com/2022/11/reading-onedrive-logs-part-2.html)
-- 2022-02-13T07:34:51-05:00 — [Reading OneDrive Logs](http://www.swiftforensics.com/2022/02/reading-onedrive-logs.html)
-- 2021-01-09T15:27:46-05:00 — [Gboard has some interesting data..](http://www.swiftforensics.com/2021/01/gboard-has-some-interesting-data.html)
-- 2021-01-03T12:05:51-05:00 — [iOS Application Groups & Shared data](http://www.swiftforensics.com/2021/01/ios-application-groups-shared-data.html)
-- 2020-12-28T22:07:21-05:00 — [Introducing ios_apt - iOS Artifact Parsing Tool](http://www.swiftforensics.com/2020/12/introducing-iosapt-ios-artifact-parsing.html)
-- 2020-07-19T22:29:26-04:00 — [KTX to PNG in Python for iOS snapshots](http://www.swiftforensics.com/2020/07/ktx-to-png-in-python-for-ios-snapshots.html)
-- 2020-06-09T23:05:27-04:00 — [Screentime Notifications in Catalina (10.15)](http://www.swiftforensics.com/2020/06/screentime-notifications-in-catalina.html)
+- No new entries detected
 
 ## Forensic Focus
 
@@ -238,18 +211,9 @@ Generated: 2026-05-03T05:36:12Z
 - Site: https://forensicphotoshop.blogspot.com/
 - Feed: https://forensicphotoshop.blogspot.com/feeds/posts/default
 - Entries checked: 10
-- New since last snapshot: 10
+- New since last snapshot: 0
 
-- 2025-07-12T11:08:46-07:00 — [Coming Out of Retirement for This One: On AI, Authorship, and the Erosion of Ground Truth](http://forensicphotoshop.blogspot.com/2025/07/coming-out-of-retirement-for-this-one.html)
-- 2025-01-03T16:43:24-08:00 — [](http://forensicphotoshop.blogspot.com/2025/01/2025-update-i-received-very-odd-notice.html)
-- 2020-09-22T07:40:47-07:00 — [So long, and thanks for all the fish](http://forensicphotoshop.blogspot.com/2020/09/so-long-and-thanks-for-all-fish.html)
-- 2020-03-27T07:50:00-07:00 — [A cultural shift in training delivery is happening](http://forensicphotoshop.blogspot.com/2020/03/a-cultural-shift-in-training-delivery.html)
-- 2020-03-25T10:09:29-07:00 — [Working from home? Remember, Alexa hears everything.](http://forensicphotoshop.blogspot.com/2020/03/working-from-home-remember-alexa-hears.html)
-- 2020-03-11T07:48:48-07:00 — [Definitions](http://forensicphotoshop.blogspot.com/2020/03/definitions.html)
-- 2020-03-10T09:01:01-07:00 — [Considering forensic science: individual differences, opposing expert testimony and juror decision making](http://forensicphotoshop.blogspot.com/2020/03/considering-forensic-science-individual.html)
-- 2020-03-09T15:47:44-07:00 — [COVID-19 and the cancellation of everything](http://forensicphotoshop.blogspot.com/2020/03/covid-19-and-cancellation-of-everything.html)
-- 2020-03-03T12:44:39-08:00 — [How accurate are satellite images?](http://forensicphotoshop.blogspot.com/2020/03/how-accurate-are-satellite-images.html)
-- 2020-02-29T17:09:09-08:00 — [A D.C. judge issues a much-needed opinion on ‘junk science'](http://forensicphotoshop.blogspot.com/2020/02/a-dc-judge-issues-much-needed-opinion.html)
+- No new entries detected
 
 ## Magnet Forensics
 
@@ -265,123 +229,455 @@ Generated: 2026-05-03T05:36:12Z
 - Site: https://thedfirreport.com/
 - Feed: https://thedfirreport.com/feed/
 - Entries checked: 10
-- New since last snapshot: 10
+- New since last snapshot: 0
 
-- 2026-04-22T14:51:21+00:00 — [Bissa Scanner Exposed: AI-Assisted Mass Exploitation and Credential Harvesting](https://thedfirreport.com/2026/04/22/bissa-scanner-exposed-ai-assisted-mass-exploitation-and-credential-harvesting/)
-- 2026-02-23T14:09:43+00:00 — [Apache ActiveMQ Exploit Leads to LockBit Ransomware](https://thedfirreport.com/2026/02/23/apache-activemq-exploit-leads-to-lockbit-ransomware/)
-- 2025-12-17T19:07:07+00:00 — [Cat’s Got Your Files: Lynx Ransomware](https://thedfirreport.com/2025/12/17/cats-got-your-files-lynx-ransomware/)
-- 2025-11-04T21:30:27+00:00 — [From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira](https://thedfirreport.com/2025/11/04/from-bing-search-to-ransomware-bumblebee-and-adaptixc2-deliver-akira-2/)
-- 2025-09-29T14:30:06+00:00 — [From a Single Click: How Lunar Spider Enabled a Near Two-Month Intrusion](https://thedfirreport.com/2025/09/29/from-a-single-click-how-lunar-spider-enabled-a-near-two-month-intrusion/)
-- 2025-09-08T14:20:31+00:00 — [Blurring the Lines: Intrusion Shows Connection With Three Major Ransomware Gangs](https://thedfirreport.com/2025/09/08/blurring-the-lines-intrusion-shows-connection-with-three-major-ransomware-gangs/)
-- 2025-07-14T00:50:41+00:00 — [KongTuke FileFix Leads to New Interlock RAT Variant](https://thedfirreport.com/2025/07/14/kongtuke-filefix-leads-to-new-interlock-rat-variant/)
-- 2025-06-30T00:20:06+00:00 — [Hide Your RDP: Password Spray Leads to RansomHub Deployment](https://thedfirreport.com/2025/06/30/hide-your-rdp-password-spray-leads-to-ransomhub-deployment/)
-- 2025-05-19T00:05:39+00:00 — [Another Confluence Bites the Dust: Falling to ELPACO-team Ransomware](https://thedfirreport.com/2025/05/19/another-confluence-bites-the-dust-falling-to-elpaco-team-ransomware/)
-- 2025-04-28T00:03:02+00:00 — [Navigating Through The Fog](https://thedfirreport.com/2025/04/28/navigating-through-the-fog/)
+- No new entries detected
 
 ## 13cubed (YouTube)
 
 - Site: https://www.youtube.com/@13cubed
 - Feed: https://www.youtube.com/feeds/videos.xml?channel_id=UCy8ntxFEudOCRZYT1f7ya9Q
-- Status: error: HTTP 500
+- Status: error: HTTP 404
 
 ## SANS Internet Storm Center
 
 - Site: https://isc.sans.edu/
 - Feed: https://isc.sans.edu/rssfeed_full.xml
 - Entries checked: 10
-- New since last snapshot: 10
+- New since last snapshot: 2
 
-- 2026-05-01T19:01:21+00:00 — [Malicious Ad for Homebrew Leads to MacSync Stealer, (Fri, May 1st)](https://isc.sans.edu/diary/rss/32942)
-- 2026-05-01T02:00:03+00:00 — [ISC Stormcast For Friday, May 1st, 2026 https://isc.sans.edu/podcastdetail/9914, (Fri, May 1st)](https://isc.sans.edu/diary/rss/32940)
-- 2026-04-30T02:00:02+00:00 — [ISC Stormcast For Thursday, April 30th, 2026 https://isc.sans.edu/podcastdetail/9912, (Thu, Apr 30th)](https://isc.sans.edu/diary/rss/32938)
-- 2026-04-30T00:07:03+00:00 — [Danger of Libredtail &#x5b;Guest Diary&#x5d;, (Wed, Apr 29th)](https://isc.sans.edu/diary/rss/32936)
-- 2026-04-29T13:11:41+00:00 — [Today's Odd Web Requests, (Wed, Apr 29th)](https://isc.sans.edu/diary/rss/32934)
-- 2026-04-29T02:00:02+00:00 — [ISC Stormcast For Wednesday, April 29th, 2026 https://isc.sans.edu/podcastdetail/9910, (Wed, Apr 29th)](https://isc.sans.edu/diary/rss/32932)
-- 2026-04-28T13:28:45+00:00 — [HTTP Requests with X-Vercel-Set-Bypass-Cookie Header, (Tue, Apr 28th)](https://isc.sans.edu/diary/rss/32930)
-- 2026-04-28T02:00:03+00:00 — [ISC Stormcast For Tuesday, April 28th, 2026 https://isc.sans.edu/podcastdetail/9908, (Tue, Apr 28th)](https://isc.sans.edu/diary/rss/32928)
-- 2026-04-27T14:01:17+00:00 — [TeamPCP Supply Chain Campaign: Update 008 - 26-Day Pause Ends with Three Concurrent Compromises (Checkmarx KICS, Bitwarden CLI Cascade, xinference PyPI), CanisterSprawl npm Worm Identified, and Tier 1 Coverage Returns, (Mon, Apr 27th)](https://isc.sans.edu/diary/rss/32926)
-- 2026-04-24T02:00:02+00:00 — [ISC Stormcast For Friday, April 24th, 2026 https://isc.sans.edu/podcastdetail/9906, (Fri, Apr 24th)](https://isc.sans.edu/diary/rss/32924)
+- 2026-05-04T02:00:03+00:00 — [ISC Stormcast For Monday, May 4th, 2026 https://isc.sans.edu/podcastdetail/9916, (Mon, May 4th)](https://isc.sans.edu/diary/rss/32946)
+- 2026-05-03T16:49:04+00:00 — [Wireshark 4.6.5 Released, (Sun, May 3rd)](https://isc.sans.edu/diary/rss/32944)
 
 ## DFIR Training
 
 - Site: https://www.dfir.training/
 - Feed: https://www.dfir.training/dfir-training-categories-k2/itemlist?format=feed
-- Status: error: _ssl.c:999: The handshake operation timed out
+- Status: error: HTTP 404
 
 ## MSAB
 
 - Site: https://www.msab.com/
 - Feed: https://www.msab.com/feed/
-- Status: error: mismatched tag: line 93, column 2
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2026-04-28T05:00:00+00:00 — [MSAB Interim Report – Q1 2026](https://www.msab.com/updates/msab-interim-report-q1-2026/)
+- 2026-04-21T11:00:00+00:00 — [MSAB publishes Annual Report for 2025](https://www.msab.com/updates/msab-publishes-annual-report-for-2025/)
+- 2026-04-14T05:00:00+00:00 — [Invitation to the Presentation of MSAB’s Interim Report January-March 2026](https://www.msab.com/updates/invitation-to-the-presentation-of-msabs-interim-report-january-march-2026/)
+- 2026-04-07T07:00:00+00:00 — [NOTICE OF ANNUAL GENERAL MEETING IN MICRO SYSTEMATION AB (publ)](https://www.msab.com/updates/notice-of-annual-general-meeting-in-micro-systemation-ab-publ-3/)
+- 2026-03-26T12:30:45+00:00 — [Q1 2026 Major Release is now available](https://www.msab.com/updates/q1-2026-major-release-is-now-available/)
+- 2026-03-24T06:00:00+00:00 — [Invitation to MSAB’s Capital Markets Day on May 7th, 2026](https://www.msab.com/updates/invitation-to-msabs-capital-markets-day-on-may-7th-2026/)
+- 2026-02-05T12:30:18+00:00 — [XRY 11.3.1: Market-first GPS device support.](https://www.msab.com/updates/xry-11-3-1-market-first-gps-device-support/)
+- 2026-01-27T06:00:00+00:00 — [Year-end report 2025](https://www.msab.com/updates/year-end-report-2025/)
+- 2026-01-16T07:00:00+00:00 — [MSAB Announces the Appointment of Mårten Blixt as New Chief Revenue Officer (CRO)](https://www.msab.com/updates/msab-announces-the-appointment-of-marten-blixt-as-new-chief-revenue-officer-cro/)
+- 2025-12-19T07:00:00+00:00 — [Nomination Committee appointed for MSAB’s Annual General Meeting 2026](https://www.msab.com/updates/nomination-committee-appointed-for-msabs-annual-general-meeting-2026/)
 
 ## AboutDFIR
 
 - Site: https://aboutdfir.com/
 - Feed: https://aboutdfir.com/feed/
-- Status: error: mismatched tag: line 93, column 2
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2026-05-01T11:59:32+00:00 — [InfoSec News Nuggets 05/01/2026](https://aboutdfir.com/infosec-news-nuggets-05-01-2026/)
+- 2026-04-30T12:17:25+00:00 — [InfoSec News Nuggets 04/30/2026](https://aboutdfir.com/infosec-news-nuggets-04-30-2026/)
+- 2026-04-29T11:23:11+00:00 — [InfoSec News Nuggets 04/29/2026](https://aboutdfir.com/infosec-news-nuggets-04-29-2026/)
+- 2026-04-28T11:27:14+00:00 — [InfoSec News Nuggets 04/28/2026](https://aboutdfir.com/infosec-news-nuggets-04-28-2026/)
+- 2026-04-27T11:36:33+00:00 — [InfoSec News Nuggets 04/27/2026](https://aboutdfir.com/infosec-news-nuggets-04-27-2026/)
+- 2026-04-24T10:38:50+00:00 — [InfoSec News Nuggets 04/24/2026](https://aboutdfir.com/infosec-news-nuggets-04-24-2026/)
+- 2026-04-23T11:35:43+00:00 — [InfoSec News Nuggets 04/23/2026](https://aboutdfir.com/infosec-news-nuggets-04-23-2026/)
+- 2026-04-22T12:18:10+00:00 — [InfoSec News Nuggets 04/22/2026](https://aboutdfir.com/infosec-news-nuggets-04-22-2026/)
+- 2026-04-21T12:54:27+00:00 — [InfoSec News Nuggets 04/21/2026](https://aboutdfir.com/infosec-news-nuggets-04-21-2026/)
+- 2026-04-20T11:35:03+00:00 — [InfoSec News Nuggets 04/20/2026](https://aboutdfir.com/infosec-news-nuggets-04-20-2026/)
 
 ## Forensic 4cast
 
 - Site: https://forensic4cast.com/
 - Feed: https://4cast.whitfields.org/?feed=rss2
-- Status: error: [Errno 8] nodename nor servname provided, or not known
+- Status: error: [Errno -2] Name or service not known
 
 ## This Week In 4n6
 
 - Site: https://thisweekin4n6.com/
 - Feed: https://thisweekin4n6.wordpress.com/feed/
 - Entries checked: 10
-- New since last snapshot: 0
+- New since last snapshot: 1
 
-- No new entries detected
+- 2026-05-03T12:54:35+00:00 — [Week 18 – 2026](https://thisweekin4n6.com/2026/05/03/week-18-2026/)
 
 ## The Sleuth Kit updates
 
 - Site: https://www.sleuthkit.org/
 - Feed: https://www.sleuthkit.org/rss.xml
-- Status: error: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2023-08-29T16:12:32-04:00 — [The Sleuth Kit 4.12.1 is available](https://sleuthkit.org/sleuthkit/download.php)
+- 2023-01-24T18:01:09-05:00 — [The Sleuth Kit 4.12.0 is available](https://sleuthkit.org/sleuthkit/download.php)
+- 2023-08-29T16:12:11-04:00 — [Autopsy 4.21.0 is available](http://www.autopsy.com/download)
+- 2023-01-24T18:00:46-05:00 — [Autopsy 4.20.0 is available](http://www.autopsy.com/download)
+- 2021-12-22T15:00:09-05:00 — [Autopsy 4.19.3 is available](http://sleuthkit.org/autopsy/download.php)
+- 2021-07-31T15:45:54-04:00 — [Autopsy 4.19.0 and The Sleuth Kit 4.11.0 Are Out](http://www.sleuthkit.org/)
+- 2021-03-23T06:47:05-04:00 — [Autopsy 4.18.0 and The Sleuth Kit 4.10.2 Are Out](http://www.sleuthkit.org/)
+- 2020-09-08T17:08:49-04:00 — [Autopsy 4.16.0 was released](http://www.sleuthkit.org/autopsy/history.php)
+- 2020-09-08T17:08:26-04:00 — [The Sleuth Kit 4.10.0 was released](http://www.sleuthkit.org/sleuthkit/history.php)
+- 2020-05-01T06:44:11-04:00 — [The Sleuth Kit 4.9.0 Was Released](http://www.sleuthkit.org/sleuthkit/download.php)
 
 ## Amped Software blog
 
 - Site: https://blog.ampedsoftware.com/
 - Feed: https://blog.ampedsoftware.com/feed/
-- Status: error: mismatched tag: line 93, column 2
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2026-04-24T13:30:00+00:00 — [Learn from the Experts at Amped Connect U.S. 2026](https://blog.ampedsoftware.com/2026/04/24/learn-from-the-experts-at-amped-connect-u-s-2026)
+- 2026-04-16T13:30:00+00:00 — [Fifty Shades of Fake: Deepfakes, AI Enhancement, and Media Authenticity](https://blog.ampedsoftware.com/2026/04/16/fifty-shades-of-fake)
+- 2026-04-01T13:30:00+00:00 — [Amped DVRConv and Engine Update 40286](https://blog.ampedsoftware.com/2026/04/01/dvrconv-and-engine-update-40286)
+- 2026-03-25T14:30:00+00:00 — [Amped Replay Update 40205: Magnify and Spotlight Improvements, Bookmarks Updates and More!](https://blog.ampedsoftware.com/2026/03/25/amped-replay-update-40205)
+- 2026-03-11T14:30:00+00:00 — [Authenticate Update 40165: Faster and Updated Deepfake Detection, Improved Geometrical Analysis, New Inspector Panel, and more!](https://blog.ampedsoftware.com/2026/03/11/authenticate-update-40165)
+- 2026-02-18T14:30:00+00:00 — [Amped FIVE Update 39780: Playback Control Options, TIME File Improvements, Video Duration Control when Removing Frames, Updates to Resize and Aspect Ratio, and Much More](https://blog.ampedsoftware.com/2026/02/18/amped-five-update-39780)
+- 2026-02-10T14:30:00+00:00 — [2026 Digital Forensics Conference Guide: See Amped’s Video Forensics Tools Live](https://blog.ampedsoftware.com/2026/02/10/2026-digital-forensics-conference-guide)
+- 2026-01-21T14:51:21+00:00 — [Assisted Video Redaction in Amped Replay: Redacting Faces, People, Vehicles, and Plates](https://blog.ampedsoftware.com/2026/01/21/assisted-video-redaction)
+- 2025-12-18T14:30:00+00:00 — [Amped: Software and Much More](https://blog.ampedsoftware.com/2025/12/18/amped-software-and-much-more)
+- 2025-12-16T14:30:00+00:00 — [How to Upgrade Your Video Evidence Skills in 2026: Amped Image and Video Forensics Training Courses](https://blog.ampedsoftware.com/2025/12/16/amped-digital-forensics-training-courses-2026)
+
+## Didier Stevens Blog
+
+- Site: https://blog.didierstevens.com/
+- Feed: https://blog.didierstevens.com/feed/
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2026-05-01T09:28:46+00:00 — [Overview of Content Published in April](https://blog.didierstevens.com/2026/05/01/overview-of-content-published-in-april-10/)
+- 2026-04-19T09:18:21+00:00 — [Update: cut-bytes.py Version 0.0.18](https://blog.didierstevens.com/2026/04/19/update-cut-bytes-py-version-0-0-18/)
+- 2026-04-02T00:00:00+00:00 — [Overview of Content Published in March](https://blog.didierstevens.com/2026/04/02/overview-of-content-published-in-march-11/)
+- 2026-03-17T00:00:00+00:00 — [Update: oledump.py Version 0.0.85](https://blog.didierstevens.com/2026/03/17/update-oledump-py-version-0-0-85/)
+- 2026-03-14T00:00:00+00:00 — [Update: oledump.py Version 0.0.84](https://blog.didierstevens.com/2026/03/14/update-oledump-py-version-0-0-84/)
+- 2026-03-13T00:00:00+00:00 — [Update: pdf-parser.py Version 0.7.14](https://blog.didierstevens.com/2026/03/13/update-pdf-parser-py-version-0-7-14/)
+- 2026-03-12T00:00:00+00:00 — [Update: zipdump.py Version 0.0.34](https://blog.didierstevens.com/2026/03/12/update-zipdump-py-version-0-0-34-2/)
+- 2026-03-11T09:22:41+00:00 — [Update: zipdump.py Version 0.0.34](https://blog.didierstevens.com/2026/03/11/update-zipdump-py-version-0-0-34/)
+- 2026-03-11T00:00:00+00:00 — [Update: pecheck.py Version 0.7.20](https://blog.didierstevens.com/2026/03/11/update-pecheck-py-version-0-7-20/)
+- 2026-03-10T00:00:00+00:00 — [Update: search-for-compression.py 0.0.6](https://blog.didierstevens.com/2026/03/10/update-search-for-compression-py-0-0-6/)
+
+## Hexordia
+
+- Site: https://www.hexordia.com/blog/
+- Feed: https://www.hexordia.com/blog?format=rss
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2026-04-21T22:22:48+00:00 — [New Lumyx Essentials Course at Hexordia](https://www.hexordia.com/blog/t9ffbl1rex92o9dqm0yfhi3emxrnix)
+- 2026-04-07T17:56:46+00:00 — [The Android Googlfication Spectrum](https://www.hexordia.com/blog/the-android-googlfication-spectrum)
+- 2026-03-31T22:04:03+00:00 — [Digital Forensics On-Scene Triage: A Best Practice Discussion](https://www.hexordia.com/blog/digital-forensics-on-scene-triage-a-best-practice-discussion)
+- 2026-03-18T11:15:01+00:00 — [2026 MSAB CTF: iOS Questions](https://www.hexordia.com/blog/2026-msab-ctf-ios-questions)
+- 2026-03-17T11:15:25+00:00 — [2026 MSAB CTF: Android Questions](https://www.hexordia.com/blog/2026-msab-ctf-android-questions)
+- 2026-03-06T21:00:29+00:00 — [Magnet Virtual Summit 2026 CTF - Cipher Questions](https://www.hexordia.com/blog/magnet-virtual-summit-2026-ctf-cipher-questions)
+- 2026-03-05T20:28:58+00:00 — [Magnet Virtual Summit 2026 CTF - Mac Questions](https://www.hexordia.com/blog/magnet-virtual-summit-2026-ctf-mac-questions)
+- 2026-03-04T20:00:32+00:00 — [Magnet Virtual Summit 2026 CTF - Android Questions](https://www.hexordia.com/blog/magnet-virtual-summit-2026-ctf-android-questions)
+- 2026-03-03T22:30:51+00:00 — [Magnet Virtual Summit 2026 CTF - iOS Questions](https://www.hexordia.com/blog/magnet-virtual-summit-2026-ctf-ios-questions)
+- 2026-02-17T12:30:30+00:00 — [Reopening the Digital Files: Solving Cold Cases with Digital Forensics](https://www.hexordia.com/blog/reopening-the-digital-files-solving-cold-cases-with-digital-forensics)
+
+## Hexacorn
+
+- Site: https://www.hexacorn.com/blog/
+- Feed: https://www.hexacorn.com/blog/feed/
+- Entries checked: 5
+- New since last snapshot: 5
+
+- 2026-04-22T00:44:33+00:00 — [Some unintelligent fun with ms-notepad protocol](https://www.hexacorn.com/blog/2026/04/22/some-unintelligent-fun-with-ms-notepad-protocol/)
+- 2026-04-18T00:09:41+00:00 — [A few more protocol handlers :), Part 2](https://www.hexacorn.com/blog/2026/04/18/a-few-more-protocol-handlers-part-2/)
+- 2026-04-16T23:19:05+00:00 — [WerReportCreate API](https://www.hexacorn.com/blog/2026/04/16/werreportcreate-api/)
+- 2026-02-26T01:16:00+00:00 — [ShimBad the Sailor, Part 3](https://www.hexacorn.com/blog/2026/02/26/shimbad-the-sailor-part-3/)
+- 2026-02-21T20:23:40+00:00 — [1 little known secret of sti_ci.dll](https://www.hexacorn.com/blog/2026/02/21/1-little-known-secret-of-sti_ci-dll/)
+
+## The DFIR Spot
+
+- Site: https://www.thedfirspot.com/
+- Feed: https://www.thedfirspot.com/blog-feed.xml
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2026-03-09T13:30:17+00:00 — [From Chaos to Chronology: The Power of Forensic Timelines](https://www.thedfirspot.com/post/from-chaos-to-chronology-the-power-of-forensic-timelines)
+- 2025-10-31T13:30:12+00:00 — [Utilizing QELP for Rapid ESXi Analysis](https://www.thedfirspot.com/post/utilizing-qelp-for-rapid-esxi-analysis)
+- 2025-08-18T13:00:25+00:00 — [Evil on Schedule: Investigating Malicious Windows Scheduled Tasks](https://www.thedfirspot.com/post/evil-on-schedule-investigating-malicious-windows-tasks)
+- 2025-03-12T13:00:17+00:00 — [AnyDesk - Investigating Threat Actors Favorite Tool](https://www.thedfirspot.com/post/anydesk-investigating-threat-actors-favorite-tool)
+- 2025-01-07T15:00:16+00:00 — [A BITS of a Problem - Investigating BITS Jobs](https://www.thedfirspot.com/post/a-bits-of-a-problem-investigating-bits-jobs)
+- 2024-11-18T16:00:20+00:00 — [Lateral Movement - Remote Desktop Protocol (RDP) Artifacts](https://www.thedfirspot.com/post/lateral-movement-remote-desktop-protocol-rdp-artifacts)
+- 2024-10-01T14:00:16+00:00 — [Lateral Movement - Remote Desktop Protocol (RDP) Event Logs](https://www.thedfirspot.com/post/lateral-movement-remote-desktop-protocol-rdp-event-logs)
+- 2024-07-28T14:00:21+00:00 — [RDP Bitmap Cache - Piece(s) of the Puzzle](https://www.thedfirspot.com/post/rdp-bitmap-cache-piece-s-of-the-puzzle)
+- 2024-06-19T14:00:30+00:00 — [Windows Defender MP Logs - A Story of Artifacts](https://www.thedfirspot.com/post/windows-defender-mp-logs-a-story-of-artifacts)
+- 2024-05-08T16:00:21+00:00 — [SUM UAL - Investigating Server Access with User Access Logging](https://www.thedfirspot.com/post/sum-ual-investigating-server-access-with-user-access-logging)
+
+## 4n6k
+
+- Site: https://www.4n6k.com/
+- Feed: https://www.4n6k.com/feeds/posts/default
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2018-08-26T18:28:17-05:00 — [Forensics Quickie: Identifying an Unknown GUID with Shellbags Explorer, Detailing Shell Item Extension Block 0xbeef0026, & Creative Cloud GUID Behavior](https://www.4n6k.com/2018/07/forensics-quickie-detailing-shell-item-guid-behavior-creative-cloud.html)
+- 2018-08-27T00:22:45-05:00 — [Forensics Quickie: Methodology for Identifying Linux ext4 Timestamp Values in debugfs `stat` Command](https://www.4n6k.com/2018/01/forensics-quickie-methodology-for.html)
+- 2018-09-07T21:58:19-05:00 — [Forensics Quickie: Methodology for Identifying "Clear Recent History" Settings for an Old Version of Firefox](https://www.4n6k.com/2017/11/forensics-quickie-identifying-clear.html)
+- 2018-08-26T19:14:22-05:00 — [Forensics Quickie: Accessing & Copying Volume Shadow Copy Contents From Live Remote Systems](https://www.4n6k.com/2017/02/forensics-quickie-accessing-copying.html)
+- 2018-08-26T19:18:57-05:00 — [Forensics Quickie: PowerShell Versions and the Registry](https://www.4n6k.com/2016/08/forensics-quickie-powershell-versions.html)
+- 2021-07-19T23:11:54-05:00 — [Jump List Forensics: AppID Master List (400+ AppIDs)](https://www.4n6k.com/2016/03/jump-list-forensics-appid-master-list.html)
+- 2018-08-26T19:27:38-05:00 — [Forensics Quickie: NTUSER.DAT Analysis (SANS CEIC 2015 Challenge #1 Write-Up)](https://www.4n6k.com/2015/05/forensics-quickie-ntuserdat-analysis.html)
+- 2020-10-11T23:36:54-05:00 — [Forensic FOSS: 4n6k_volatility_installer.sh - Install Volatility For Linux Automatically](https://www.4n6k.com/2014/08/forensic-foss-4n6kvolatilityinstallersh.html)
+- 2018-08-26T19:31:22-05:00 — [Forensics Quickie: Merging VMDKs & Delta/Snapshot Files (2 Solutions)](https://www.4n6k.com/2014/04/forensics-quickie-merging-vmdks.html)
+- 2018-08-26T19:38:13-05:00 — [Forensics Quickie: Verifying Program Behavior Using Source Code](https://www.4n6k.com/2014/03/forensics-quickie-verifying-program.html)
+
+## Embee Research
+
+- Site: https://embee-research.ghost.io/
+- Feed: https://embee-research.ghost.io/rss/
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2024-10-16T15:36:31+00:00 — [Practical Examples of URL Hunting Queries - Part 1](https://www.embeeresearch.io/practical-examples-of-url-hunting-queries-part-1/)
+- 2024-09-03T07:44:52+00:00 — [Advanced Cyberchef Techniques - Defeating Nanocore Obfuscation With Math and Flow Control](https://www.embeeresearch.io/advanced-cyberchef-techniques-defeating-nanocore-obfuscation-with-math-and-flow-control/)
+- 2024-08-04T08:54:54+00:00 — [Decoding a Cobalt Strike Downloader Script With CyberChef](https://www.embeeresearch.io/decoding-a-cobalt-strike-downloader-script-with-cyberchef/)
+- 2024-05-23T11:17:07+00:00 — [Tracking APT SideWinder Domains By Combining Regex Patterns, Whois Records and Domain Registrars](https://www.embeeresearch.io/advanced-guide-to-infrastructure-analysis-tracking-apt-sidewinder-domains/)
+- 2024-04-11T09:46:32+00:00 — [How To Track Malicious Infrastructure With DNS Records - Vultur Banking Trojan](https://www.embeeresearch.io/infrastructure-tracking-locating-vultur-domains-with-passive-dns/)
+- 2024-04-04T08:36:04+00:00 — [How To Track Malware Infrastructure - Identifying MatanBuchus Domains Through Hardcoded Certificate Values](https://www.embeeresearch.io/tls-certificates-for-threat-intel-dns/)
+- 2024-04-01T06:22:12+00:00 — [Tracking Malware Infrastructure With Passive DNS and 302 Redirects](https://www.embeeresearch.io/phishing-domain-analysis-with-passive-dns-latrodectus/)
+- 2024-03-30T09:16:47+00:00 — [Tracking Gamaredon Infrastructure With Passive DNS Records and Subdomain Analysis](https://www.embeeresearch.io/uncovering-apt-infrastructure-with-passive-dns-pivoting/)
+- 2024-03-27T14:15:04+00:00 — [Introduction To Malware Infrastructure Analysis With Passive DNS](https://www.embeeresearch.io/infrastructure-analysis-with-dns-pivoting/)
+- 2024-03-25T13:48:10+00:00 — [Latrodectus Malware Analysis - Decoding Obfuscated Malware By Removing Junk Comments](https://www.embeeresearch.io/latrodectus-script-deobfuscation/)
+
+## Digital Forensics Tips
+
+- Site: https://www.digitalforensicstips.com/
+- Feed: https://www.digitalforensicstips.com/feeds/posts/default
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2024-05-01T07:34:19-07:00 — [Leveling Up Your OSINT Game: Creating a Professional Email on a Budget](https://www.digitalforensicstips.com/2024/05/leveling-up-your-osint-game-creating.html)
+- 2024-03-18T09:51:20-07:00 — [Navigating Internet Censorship: An In-Depth Look at Tor, VPNs, and Circumvention Strategies](https://www.digitalforensicstips.com/2024/03/navigating-internet-censorship-in-depth.html)
+- 2023-12-28T14:28:07-08:00 — [Introducing FaviconLocator: The Eazy Button to Searching by Favicon](https://www.digitalforensicstips.com/2023/12/introducing-faviconlocator-eazy-button.html)
+- 2023-08-31T12:08:23-07:00 — [Automating Domain Squatting Detection with DNSTwist and Python](https://www.digitalforensicstips.com/2023/08/automating-domain-squatting-detection.html)
+- 2023-06-22T08:12:24-07:00 — [Why Rainbow Tables Aren't the Pot of Gold They Once Were](https://www.digitalforensicstips.com/2023/06/why-rainbow-tables-arent-pot-of-gold.html)
+- 2023-05-18T10:52:17-07:00 — [Expanding the Boundaries of ChatGPT with LangChain - Part Two](https://www.digitalforensicstips.com/2023/05/expanding-boundaries-of-chatgpt-with_18.html)
+- 2023-05-11T09:55:37-07:00 — [Expanding the Boundaries of ChatGPT with LangChain - Part One](https://www.digitalforensicstips.com/2023/05/expanding-boundaries-of-chatgpt-with.html)
+- 2023-05-04T10:09:27-07:00 — [Beyond the Tor Browser: Proxying Applications for Enhanced Privacy and Capabilities](https://www.digitalforensicstips.com/2023/05/beyond-tor-browser-proxying.html)
+- 2023-04-22T12:04:21-07:00 — [Lowering the Cost of Education with SANS: A Guide to Affordable Programs for Prospective Students](https://www.digitalforensicstips.com/2023/04/lowering-cost-of-education-with-sans.html)
+- 2023-04-18T07:19:31-07:00 — [Cutting the Cord: Harnessing OpenAI's Whisper in an Offline Environment](https://www.digitalforensicstips.com/2023/04/cutting-cord-harnessing-openais-whisper.html)
+
+## Objective-See
+
+- Site: https://objective-see.org/blog.html
+- Feed: https://objective-see.org/rss.xml
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2026-04-01T00:00:00+00:00 — [Catching macOS Stealers in the Wild](https://objective-see.org/blog/blog_0x88.html)
+- 2026-03-31T00:00:00-05:00 — [No Paste for You!](https://objective-see.org/blog/blog_0x87.html)
+- 2026-03-27T00:00:00-05:00 — [Building a Firewall ...via Endpoint Security!?](https://objective-see.org/blog/blog_0x86.html)
+- 2026-02-15T00:00:00-05:00 — [ClickFix: Stopped at ⌘+V](https://objective-see.org/blog/blog_0x85.html)
+- 2026-01-01T00:00:00-05:00 — [The Mac Malware of 2025](https://objective-see.org/blog/blog_0x84.html)
+- 2025-12-08T00:00:00-05:00 — [A Remote Pre-Authentication Overflow in LLDB's debugserver](https://objective-see.org/blog/blog_0x83.html)
+- 2025-11-24T00:00:00-05:00 — [Restoring Reflective Code Loading on macOS (Part II)](https://objective-see.org/blog/blog_0x82.html)
+- 2025-09-15T00:00:00-05:00 — [[0day] From Spotlight to Apple Intelligence](https://objective-see.org/blog/blog_0x81.html)
+- 2025-03-27T00:00:00-05:00 — [TCCing is Believing: Apple finally adds TCC events to Endpoint Security!](https://objective-see.org/blog/blog_0x7F.html)
+- 2025-03-20T00:00:00-05:00 — [Leaking Passwords (and more!) on macOS](https://objective-see.org/blog/blog_0x7E.html)
+
+## The Eclectic Light Company
+
+- Site: https://eclecticlight.co/
+- Feed: https://eclecticlight.co/feed/
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2026-05-03T11:30:00+00:00 — [A walk in the parks of Rome, Vienna, Manhattan and Brooklyn](https://eclecticlight.co/2026/05/03/a-walk-in-the-parks-of-rome-vienna-manhattan-and-brooklyn/)
+- 2026-05-03T07:00:00+00:00 — [Last Week on My Mac: Where’s the fire escape?](https://eclecticlight.co/2026/05/03/last-week-on-my-mac-wheres-the-fire-escape/)
+- 2026-05-02T11:30:00+00:00 — [A walk in the parks of London and Paris](https://eclecticlight.co/2026/05/02/a-walk-in-the-parks-of-london-and-paris/)
+- 2026-05-02T08:00:00+00:00 — [Saturday Mac riddles 358](https://eclecticlight.co/2026/05/02/saturday-mac-riddles-358/)
+- 2026-05-02T07:00:00+00:00 — [How fast is a macOS VM, and how small could it be?](https://eclecticlight.co/2026/05/02/how-fast-is-a-macos-vm-and-how-small-could-it-be/)
+- 2026-05-01T11:30:00+00:00 — [Naturalists: Photography](https://eclecticlight.co/2026/05/01/naturalists-photography/)
+- 2026-05-01T06:30:00+00:00 — [Use Finder tags for categories](https://eclecticlight.co/2026/05/01/use-finder-tags-for-categories/)
+- 2026-04-30T11:30:00+00:00 — [On Reflection: The Venus Effect](https://eclecticlight.co/2026/04/30/on-reflection-the-venus-effect/)
+- 2026-04-30T06:30:00+00:00 — [Control what gets written to the log](https://eclecticlight.co/2026/04/30/control-what-gets-written-to-the-log/)
+- 2026-04-29T11:30:00+00:00 — [Medium and message: Tapestry](https://eclecticlight.co/2026/04/29/medium-and-message-tapestry/)
+
+## JPCERT/CC
+
+- Site: https://blogs.jpcert.or.jp/en/
+- Feed: https://blogs.jpcert.or.jp/en/atom.xml
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2026-04-14T06:00:09+00:00 — [ICS Security Conference 2026](https://blogs.jpcert.or.jp/en/2026/04/ics-conference2026.html)
+- 2026-03-30T05:00:13+00:00 — [TSUBAME Report Overflow (Jul-Sep 2025)](https://blogs.jpcert.or.jp/en/2026/03/tsubame_overflow_2025-07-09.html)
+- 2026-03-25T06:00:20+00:00 — [CSIRTs Around the World – Azerbaijan](https://blogs.jpcert.or.jp/en/2026/03/csirts-around-the-world-azerbaijan.html)
+- 2026-04-01T05:24:47+00:00 — [Study of Binaries Created with Rust through Reverse Engineering](https://blogs.jpcert.or.jp/en/2026/03/rust_research_en.html)
+- 2026-03-06T02:00:14+00:00 — [JSAC2026 -Workshop/Lightning Talk Session/Panel Discussion-](https://blogs.jpcert.or.jp/en/2026/03/jsac2026-ws-lt-pd.html)
+- 2026-02-27T02:06:29+00:00 — [JSAC2026 -Day 2-](https://blogs.jpcert.or.jp/en/2026/02/jsac2026day2.html)
+- 2026-04-01T05:25:32+00:00 — [JSAC2026 -Day 1-](https://blogs.jpcert.or.jp/en/2026/02/jsac2026day1.html)
+- 2026-02-13T02:00:01+00:00 — [Multiple Threat Actors Rapidly Exploit React2Shell: A Case Study of Active Compromise](https://blogs.jpcert.or.jp/en/2026/02/multiple-threat-actors-rapidly-exploit-react2shell-a-case-study-of-active-compromise.html)
+- 2025-11-18T03:00:51+00:00 — [YAMAGoya: A Real-time Client Monitoring Tool Using Sigma and YARA Rules](https://blogs.jpcert.or.jp/en/2025/11/YAMAGoya.html)
+- 2025-11-05T04:31:53+00:00 — [Update on Attacks by Threat Group APT-C-60](https://blogs.jpcert.or.jp/en/2025/11/APT-C-60_update.html)
+
+## DFIR Review
+
+- Site: https://dfir.pubpub.org/
+- Feed: https://dfir.pubpub.org/rss.xml
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2026-01-01T20:56:21+00:00 — [Word Documents – What Changed?](https://dfir.pubpub.org/pub/mdm3270g)
+- 2025-12-21T21:33:25+00:00 — [Is that Windows Notepad window really empty?](https://dfir.pubpub.org/pub/wmhy8t6v)
+- 2024-08-29T01:40:00+00:00 — [Location, Location, Location](https://dfir.pubpub.org/pub/4fkeiv34)
+- 2024-04-04T12:43:06+00:00 — [How Did That Photo Get On That iPhone](https://dfir.pubpub.org/pub/5d08cdxl)
+- 2023-08-03T10:38:21+00:00 — [Peeking at User Notification Events in iOS 15](https://dfir.pubpub.org/pub/6amsr72k)
+- 2023-01-05T20:28:33+00:00 — [Enriching Investigations with Apple Watch Data Through the healthdb_secure.sqlite Database](https://dfir.pubpub.org/pub/xqvcn3hj)
+- 2022-11-03T11:55:30+00:00 — [Wipeout! Detecting Android Factory Resets](https://dfir.pubpub.org/pub/xmjxofpd)
+- 2022-11-03T11:44:23+00:00 — [An Alternate Location for Deleted SMS/iMessage Data in Apple Devices](https://dfir.pubpub.org/pub/yp6efc8q)
+- 2022-11-03T11:43:49+00:00 — [iOS KnowledgeC.db Notifications](https://dfir.pubpub.org/pub/g2v1z97i)
+- 2022-09-28T12:26:34+00:00 — [Turbo Speed: Parsing Device Health Services from Google](https://dfir.pubpub.org/pub/4can3p40)
+
+## Elcomsoft Blog
+
+- Site: https://blog.elcomsoft.com/
+- Feed: https://blog.elcomsoft.com/feed/
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2026-04-30T08:00:30+00:00 — [Elcomsoft Phone Breaker 11 Restores iCloud Access](https://blog.elcomsoft.com/2026/04/elcomsoft-phone-breaker-11-restores-icloud-access/)
+- 2026-04-29T08:00:29+00:00 — [New Security Features and Low-Level Extraction of iOS 26](https://blog.elcomsoft.com/2026/04/new-and-updated-security-features-in-ios-26-and-their-forensic-implications/)
+- 2026-04-28T08:00:17+00:00 — [Digital Triage Masterclass](https://blog.elcomsoft.com/2026/04/digital-triage-masterclass/)
+- 2026-04-23T08:00:34+00:00 — [Recovering Windows Credentials with Elcomsoft System Recovery](https://blog.elcomsoft.com/2026/04/recovering-windows-credentials-with-elcomsoft-system-recovery/)
+- 2026-04-21T08:00:37+00:00 — [Low-Level Extraction for M-Series iPads](https://blog.elcomsoft.com/2026/04/low-level-extraction-for-m-series-ipads/)
+- 2026-04-14T14:00:53+00:00 — [Low-Level Extraction for iOS 17 and 18](https://blog.elcomsoft.com/2026/04/low-level-extraction-for-ios-17-and-18/)
+- 2026-04-03T12:00:54+00:00 — [Compelled Decryption: The East Asian Region](https://blog.elcomsoft.com/2026/04/compelled-decryption-the-east-asian-region/)
+- 2026-04-01T14:21:30+00:00 — [Digital Rights vs. State Power – The Protectors](https://blog.elcomsoft.com/2026/04/digital-rights-vs-state-power-the-protectors/)
+- 2026-03-31T06:16:25+00:00 — [The Geography of Coercion: a Study of Compelled Decryption Laws](https://blog.elcomsoft.com/2026/03/the-geography-of-coercion-a-study-of-compelled-decryption-laws/)
+- 2026-03-27T12:32:10+00:00 — [Arrested by AI](https://blog.elcomsoft.com/2026/03/arrested-by-an-algorithm/)
+
+## Huntress Blog
+
+- Site: https://www.huntress.com/blog
+- Feed: https://www.huntress.com/blog/rss.xml
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2026-05-01T17:00:00+00:00 — [Social Engineering Leveled Up. Has Your Security Program?](https://www.huntress.com/blog/device-code-phishing-cyber-resilience-strategy)
+- 2026-04-30T13:00:00+00:00 — [ClickFix Removes Your Background but Leaves the Malware](https://www.huntress.com/blog/clickfix-castleloader-backgroundfix)
+- 2026-04-30T00:00:00+00:00 — [Komari Red: The Monitoring Tool with a Built-in Reverse Shell](https://www.huntress.com/blog/komari-c2-agent-abuse)
+- 2026-04-27T13:00:00+00:00 — [Unified EDR + ITDR: Closing the Identity Gap Before Attacks Spread](https://www.huntress.com/blog/edr-itdr-correlations)
+- 2026-04-23T04:00:00+00:00 — [What Is Multi-Factor Authentication (MFA)? | How MFA Secures Businesses | Huntress](https://www.huntress.com/blog/what-is-multi-factor-authentication)
+- 2026-04-23T04:00:00+00:00 — [Cyber Hygiene Best Practices: Essential Security Checklist](https://www.huntress.com/blog/huntress-top-cyber-hygiene-tips)
+- 2026-04-22T20:00:00+00:00 — [What Cybersecurity Leaders Must Prioritize in 2026](https://www.huntress.com/blog/what-does-the-future-hold-for-todays-cybersecurity-leaders)
+- 2026-04-22T14:00:00+00:00 — [Attackers Didn’t Wait for AI. They Built Workflows Around It.](https://www.huntress.com/blog/ai-powered-attack-workflows)
+- 2026-04-22T13:00:00+00:00 — [Untangling a Linux Incident With an OpenAI Twist (Part 2)](https://www.huntress.com/blog/codex-part-two)
+- 2026-04-21T13:00:00+00:00 — [Tradecraft Tuesday Recap: axios npm Supply Chain Compromise](https://www.huntress.com/blog/axios-npm-compromise)
+
+## Red Canary Blog
+
+- Site: https://redcanary.com/blog/
+- Feed: https://redcanary.com/blog/feed/
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2026-04-29T13:33:45+00:00 — [How AI can streamline your security testing](https://redcanary.com/blog/testing-and-validation/ai-security-testing/)
+- 2026-04-23T16:03:33+00:00 — [Intelligence Insights: April 2026](https://redcanary.com/blog/threat-intelligence/intelligence-insights-april-2026/)
+- 2026-04-15T13:42:56+00:00 — [Identity, browsers, and node.js: Everything you missed in the Threat Detection Report miniseries](https://redcanary.com/blog/security-operations/tdr-secops-recap/)
+- 2026-04-14T12:55:58+00:00 — [New: Use response actions to update Zscaler policies and block threats](https://redcanary.com/blog/product-updates/zia-response-actions/)
+- 2026-04-08T13:43:10+00:00 — [AI in cybersecurity: The good, the bad, and the FUD](https://redcanary.com/blog/security-operations/ai-in-cybersecurity/)
+- 2026-04-01T15:36:46+00:00 — [Red Canary CFP tracker: April 2026](https://redcanary.com/blog/news-events/red-canary-cfp-tracker-april-2026/)
+- 2026-03-26T16:18:49+00:00 — [Scarlet Goldfinch’s year in ClickFix](https://redcanary.com/blog/threat-intelligence/scarlet-goldfinch-clickfix/)
+- 2026-03-19T18:34:19+00:00 — [Intelligence Insights: March 2026](https://redcanary.com/blog/threat-intelligence/intelligence-insights-march-2026/)
+- 2026-03-18T15:05:27+00:00 — [AI and browser threats stand out in the 2026 Threat Detection Report](https://redcanary.com/blog/threat-detection/2026-threat-detection-report/)
+- 2026-03-12T13:00:59+00:00 — [Moving up the Assemblyline: Exposing malicious code in browser extensions](https://redcanary.com/blog/threat-detection/assemblyline-browser-extensions/)
+
+## Palo Alto Unit 42
+
+- Site: https://unit42.paloaltonetworks.com/
+- Feed: https://unit42.paloaltonetworks.com/feed/
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2026-05-02T00:10:33+00:00 — [The npm Threat Landscape: Attack Surface and Mitigations (Updated May 1)](https://unit42.paloaltonetworks.com/monitoring-npm-supply-chain-attacks/)
+- 2026-05-01T23:00:13+00:00 — [Essential Data Sources for Detection Beyond the Endpoint](https://unit42.paloaltonetworks.com/detection-beyond-the-endpoint/)
+- 2026-04-30T22:00:57+00:00 — [That AI Extension Helping You Write Emails? It’s Reading Them First](https://unit42.paloaltonetworks.com/high-risk-gen-ai-browser-extensions/)
+- 2026-04-24T20:30:19+00:00 — [TGR-STA-1030: New Activity in Central and South America](https://unit42.paloaltonetworks.com/new-activity-central-south-america/)
+- 2026-04-23T20:45:50+00:00 — [Frontier AI and the Future of Defense: Your Top Questions Answered](https://unit42.paloaltonetworks.com/frontier-ai-top-questions-answered/)
+- 2026-04-23T10:00:31+00:00 — [Can AI Attack the Cloud? Lessons From Building an Autonomous Cloud Offensive Multi-Agent System](https://unit42.paloaltonetworks.com/autonomous-ai-cloud-attacks/)
+- 2026-04-22T10:00:22+00:00 — [When Wi-Fi Encryption Fails: Protecting Your Enterprise from AirSnitch Attacks](https://unit42.paloaltonetworks.com/air-snitch-enterprise-wireless-attacks/)
+- 2026-04-20T10:00:14+00:00 — [Fracturing Software Security With Frontier AI Models](https://unit42.paloaltonetworks.com/ai-software-security-risks/)
+- 2026-04-17T22:35:07+00:00 — [Threat Brief: Escalation of Cyber Risk Related to Iran (Updated April 17)](https://unit42.paloaltonetworks.com/iranian-cyberattacks-2026/)
+- 2026-04-16T22:00:13+00:00 — [A Deep Dive Into Attempted Exploitation of CVE-2023-33538](https://unit42.paloaltonetworks.com/exploitation-of-cve-2023-33538/)
+
+## Mandiant Threat Intelligence
+
+- Site: https://cloud.google.com/blog/topics/threat-intelligence
+- Feed: https://feeds.feedburner.com/threatintelligence/pvexyqv7v0v
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2026-04-23T14:00:00+00:00 — [Snow Flurries: How UNC6692 Employed Social Engineering to Deploy a Custom Malware Suite](https://cloud.google.com/blog/topics/threat-intelligence/unc6692-social-engineering-custom-malware/)
+- 2026-04-16T14:00:00+00:00 — [Defending Your Enterprise When AI Models Can Find Vulnerabilities Faster Than Ever](https://cloud.google.com/blog/topics/threat-intelligence/defending-enterprise-ai-vulnerabilities/)
+- 2026-04-15T14:00:00+00:00 — [The German Cyber Criminal Überfall: Shifts in Europe's Data Leak Landscape](https://cloud.google.com/blog/topics/threat-intelligence/europe-data-leak-landscape/)
+- 2026-04-02T14:00:00+00:00 — [vSphere and BRICKSTORM Malware: A Defender's Guide](https://cloud.google.com/blog/topics/threat-intelligence/vsphere-brickstorm-defender-guide/)
+- 2026-03-31T14:00:00+00:00 — [North Korea-Nexus Threat Actor Compromises Widely Used Axios NPM Package in Supply Chain Attack](https://cloud.google.com/blog/topics/threat-intelligence/north-korea-threat-actor-targets-axios-npm-package/)
+- 2026-03-23T14:00:00+00:00 — [M-Trends 2026: Data, Insights, and Strategies From the Frontlines](https://cloud.google.com/blog/topics/threat-intelligence/m-trends-2026/)
+- 2026-03-18T14:00:00+00:00 — [The Proliferation of DarkSword: iOS Exploit Chain Adopted by Multiple Threat Actors](https://cloud.google.com/blog/topics/threat-intelligence/darksword-ios-exploit-chain/)
+- 2026-03-16T14:00:00+00:00 — [Ransomware Under Pressure: Tactics, Techniques, and Procedures in a Shifting Threat Landscape](https://cloud.google.com/blog/topics/threat-intelligence/ransomware-ttps-shifting-threat-landscape/)
+- 2026-03-06T14:00:00+00:00 — [Proactive Preparation and Hardening Against Destructive Attacks: 2026 Edition](https://cloud.google.com/blog/topics/threat-intelligence/preparation-hardening-destructive-attacks/)
+- 2026-03-05T14:00:00+00:00 — [Look What You Made Us Patch: 2025 Zero-Days in Review](https://cloud.google.com/blog/topics/threat-intelligence/2025-zero-day-review/)
+
+## Cisco Talos Blog
+
+- Site: https://blog.talosintelligence.com/
+- Feed: https://blog.talosintelligence.com/rss/
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2026-04-30T18:00:07+00:00 — [Great responsibility, without great power](https://blog.talosintelligence.com/great-responsibility-without-great-power/)
+- 2026-04-29T10:00:42+00:00 — [AI-powered honeypots: Turning the tables on malicious AI agents](https://blog.talosintelligence.com/ai-powered-honeypots-turning-the-tables-on-malicious-ai-agents/)
+- 2026-04-28T13:23:20+00:00 — [Five defender priorities from the Talos Year in Review](https://blog.talosintelligence.com/five-defender-priorities-from-the-talos-year-in-review/)
+- 2026-04-23T18:00:22+00:00 — [It pays to be a forever student](https://blog.talosintelligence.com/it-pays-to-be-a-forever-student/)
+- 2026-04-23T15:10:57+00:00 — [UAT-4356's Targeting of Cisco Firepower Devices](https://blog.talosintelligence.com/uat-4356-firestarter/)
+- 2026-04-22T10:00:34+00:00 — [IR Trends Q1 2026: Phishing reemerges as top initial access vector, as attacks targeting public administration persist](https://blog.talosintelligence.com/ir-trends-q1-2026/)
+- 2026-04-21T12:29:49+00:00 — [[Podcast] It's not you, it's your printer: State-sponsored and phishing threats in 2025](https://blog.talosintelligence.com/podcast-its-not-you-its-your-printer-state-sponsored-and-phishing-threats-in-2025/)
+- 2026-04-21T12:00:08+00:00 — [Phishing and MFA exploitation: Targeting the keys to the kingdom](https://blog.talosintelligence.com/phishing-and-mfa-exploitation-targeting-the-keys-to-the-kingdom/)
+- 2026-04-21T10:00:29+00:00 — [Bad Apples: Weaponizing native macOS primitives for movement and execution](https://blog.talosintelligence.com/bad-apples-weaponizing-native-macos-primitives-for-movement-and-execution/)
+- 2026-04-16T19:00:24+00:00 — [Foxit, LibRaw vulnerabilities](https://blog.talosintelligence.com/foxit-libraw-vulnerabilities/)
+
+## SANS Blog
+
+- Site: https://www.sans.org/blog
+- Feed: https://www.sans.org/blog
+- Entries checked: 10
+- New since last snapshot: 10
+
+- unknown date — [Log In](https://www.sans.org/account/login)
+- unknown date — [Join - It&#x27;s Free](https://www.sans.org/account/create)
+- unknown date — [Training](https://www.sans.org/cyber-security-training-overview)
+- unknown date — [CoursesBuild cyber prowess with training from renowned experts](https://www.sans.org/cybersecurity-courses)
+- unknown date — [Ways to TrainMultiple training options to best fit your schedule and preferred learning style](https://www.sans.org/cyber-security-training-formats)
+- unknown date — [Cyber RangesHands-on training to keep you at the top of your game](https://www.sans.org/cyber-ranges)
+- unknown date — [Training Events &amp; SummitsExpert-led training at locations around the world](https://www.sans.org/cyber-security-training-events)
+- unknown date — [CertificationsDemonstrate cybersecurity expertise with GIAC certifications](https://www.sans.org/cyber-security-certifications)
+- unknown date — [Free Training EventsUpcoming workshops, webinars and local events](https://www.sans.org/free-cybersecurity-events)
+- unknown date — [Workforce Security and Risk Training Harden enterprise security with end-user and role-based training](https://www.sans.org/for-organizations/workforce)
 
 ## Binalyze Blog
 
 - Site: https://www.binalyze.com/blog
 - Feed: https://www.binalyze.com/blog/rss.xml
 - Entries checked: 10
-- New since last snapshot: 10
+- New since last snapshot: 0
 
-- 2026-03-16T07:59:59+00:00 — [Inside the 2025 Gartner® DFIR Retainer Services Market Guide: A Service Provider’s Perspective](https://www.binalyze.com/blog/inside-the-2025-gartner-dfir-retainer-services-market-guide-a-service-providers-perspective)
-- 2026-03-09T08:00:00+00:00 — [Our Takeaways for Enterprises from the 2025 Gartner Market Guide for DFIR Retainer Services](https://www.binalyze.com/blog/key-takeaways-for-enterprises-from-the-2025-gartner-dfir-retainer-services-market-guide)
-- 2026-03-04T20:21:45+00:00 — [Most Security Investigations Never Look Inside the Data](https://www.binalyze.com/blog/why-soc-investigations-stall)
-- 2026-03-04T17:28:30+00:00 — [Next-Gen SOC: How to Build a Culture That Investigates First](https://www.binalyze.com/blog/next-gen-soc-how-to-build-a-culture-that-investigates-first)
-- 2026-02-05T09:00:00+00:00 — [Less Guesswork, More Accountability: The 2026 Investigation Benchmark](https://www.binalyze.com/blog/the-state-of-cybersecurity-investigations-2026)
-- 2025-10-02T11:03:50+00:00 — [Why Detecting Browser-Stored Passwords Strengthens Cyber Resilience](https://www.binalyze.com/blog/why-detecting-browser-stored-passwords-strengthens-cyber-resilience)
-- 2025-09-29T12:25:04+00:00 — [Revolutionizing Incident Response and Building True Cyber Resilience](https://www.binalyze.com/blog/revolutionizing-incident-response-and-building-true-cyber-resilience)
-- 2025-09-15T13:52:40+00:00 — [Incident Readiness vs. Incident Response](https://www.binalyze.com/blog/incident-readiness-vs.-incident-response)
-- 2025-09-03T08:27:29+00:00 — [How Binalyze is Engineering AI to Enhance Cyber Incident Response Investigations](https://www.binalyze.com/blog/how-binalyze-is-engineering-ai-to-enhance-cyber-incident-response-investigations)
-- 2025-08-28T14:19:29+00:00 — [The Next Era of Investigations: Why Speed Without Depth Isn’t Enough](https://www.binalyze.com/blog/the-next-era-of-investigations-why-speed-without-depth-isnt-enough)
+- No new entries detected
 
 ## Belkasoft Blog
 
 - Site: https://belkasoft.wordpress.com/
 - Feed: https://belkasoft.wordpress.com/feed/
 - Entries checked: 10
-- New since last snapshot: 10
+- New since last snapshot: 0
 
-- 2016-12-23T23:27:57+00:00 — [Comprehensive Skype chat analysis with Belkasoft Evidence Center](https://belkasoft.wordpress.com/2016/12/23/comprehensive-skype-chat-analysis-with-belkasoft-evidence-center/)
-- 2016-10-26T15:12:37+00:00 — [Fighting “I have been hacked” defense](https://belkasoft.wordpress.com/2016/10/26/fighting-i-have-been-hacked-defense/)
-- 2016-07-11T10:43:25+00:00 — [Working with Encrypted iTunes Backups](https://belkasoft.wordpress.com/2016/07/11/working-with-encrypted-itunes-backups/)
-- 2016-06-22T15:09:02+00:00 — [New Update: Evidence Center v.7.5](https://belkasoft.wordpress.com/2016/06/22/new-update-evidence-center-v-7-5/)
-- 2016-06-07T14:22:20+00:00 — [SSD 2016: Part 3 now out!](https://belkasoft.wordpress.com/2016/06/07/ssd-2016-part-3-now-out/)
-- 2016-05-18T15:02:16+00:00 — [Belkasoft Helping Security of Olympics in Rio](https://belkasoft.wordpress.com/2016/05/18/belkasoft-helping-security-of-olympics-in-rio/)
-- 2016-05-02T13:17:30+00:00 — [SSD Forensics Article – Part 2 published!](https://belkasoft.wordpress.com/2016/05/02/ssd-forensics-article-part-2-published/)
-- 2016-04-21T13:02:25+00:00 — [New Article on SSD and eMMC Forensics](https://belkasoft.wordpress.com/2016/04/21/new-article-on-ssd-and-emmc-forensics/)
-- 2016-03-08T13:02:19+00:00 — [Webinar: Investigating Computer And Mobile Artifacts With New Belkasoft Evidence Center](https://belkasoft.wordpress.com/2016/03/08/webinar-investigating-computer-and-mobile-artifacts-with-new-belkasoft-evidence-center/)
-- 2015-11-24T10:25:07+00:00 — [BelkaScript: How to Get Most out of Digital Forensic Software](https://belkasoft.wordpress.com/2015/11/24/belkascript-how-to-get-most-out-of-digital-forensic-software/)
+- No new entries detected
 
 ## Forensafe (ArtiFast) Blog
 
@@ -394,55 +690,36 @@ Generated: 2026-05-03T05:36:12Z
 - Site: https://cellebrite.com/en/blog/
 - Feed: https://cellebrite.com/en/feed/
 - Entries checked: 5
-- New since last snapshot: 5
+- New since last snapshot: 0
 
-- 2026-04-30T12:59:35+00:00 — [Former Okta President of Auth0, Shiven Ramji, to Join Cellebrite as President, Products and Technology](https://cellebrite.com/en/resources/press-releases/former-okta-president-of-auth0-shiven-ramji-to-join-cellebrite-as-president-products-and-technology/)
-- 2026-04-29T15:46:00+00:00 — [5 Best Practices for Investigating Contraband Phones and Drones in Jail](https://cellebrite.com/en/resources/whitepapers/5-best-practices-for-investigating-contraband-phones-and-drones-in-jail/)
-- 2026-04-28T16:04:48+00:00 — [7 Data Collection Mistakes That Compromise Corporate Investigations and How to Avoid Them](https://cellebrite.com/en/blog/7-data-collection-mistakes-that-compromise-corporate-investigations-and-how-to-avoid-them/)
-- 2026-04-27T16:43:55+00:00 — [Digital Evidence is Now Central to VAWG Investigations. Are Your Investigators Equipped?](https://cellebrite.com/en/resources/webinars/digital-evidence-is-now-central-to-vawg-investigations-are-your-investigators-equipped/)
-- 2026-04-27T15:34:50+00:00 — [AI-Generated CSAM: Staying Ahead of the Threat](https://cellebrite.com/en/blog/ai-generated-csam-stay-ahead-of-the-threat/)
+- No new entries detected
 
 ## DFIR Science
 
 - Site: https://dfir.science/
 - Feed: https://dfir.science/feed.xml
 - Entries checked: 10
-- New since last snapshot: 10
+- New since last snapshot: 0
 
-- 2022-08-18T06:11:22+09:00 — [iLEAPP and RLEAPP updates and dev thoughts](https://dfir.science/2022/08/iLEAPP-and-RLEAPP-updates)
-- 2022-08-17T00:46:18+09:00 — [What data can you find in RAM?](https://dfir.science/2022/08/What-data-can-you-find-in-RAM)
-- 2022-08-13T06:58:28+09:00 — [Modular artifact scripts coming to iLEAPP](https://dfir.science/2022/08/Modular-artifact-scripts-coming-to-iLEAPP)
-- 2022-08-12T06:53:40+09:00 — [Forensic 4:Cast Awards - The real award is DFriends we made along the way](https://dfir.science/2022/08/Forensic-4-Cast-Awards-The-real-award-is-DFriends-we-made-along-the-way)
-- 2022-08-11T06:51:17+09:00 — [Digital Forensics and the Military - Interview with Andrew Lister](https://dfir.science/2022/08/Digital-Forensics-and-the-Military-Interview-with-Andrew-Lister)
-- 2022-07-28T05:04:57+09:00 — [Acquire and Analyze Random Access Memory](https://dfir.science/2022/07/Acquire-and-Analyze-Random-Access-Memory)
-- 2022-07-26T23:00:15+09:00 — [What is Random Access Memory?](https://dfir.science/2022/07/What-is-Random-Access-Memory)
-- 2022-07-16T01:12:00+09:00 — [DFIR Science nominated for Forensic 4:cast Award](https://dfir.science/2022/07/DFIR-Science-nominated-for-Forensic-4Cast-Award)
-- 2022-07-06T03:33:17+09:00 — [🇺🇳 Africa DFIR CTF 2022 Award Ceremony 🎉](https://dfir.science/2022/07/Africa-DFIR-CTF-2022-Award-Ceremony)
-- 2022-06-15T22:53:04+09:00 — [Fast password cracking - Hashcat wordlists from RAM](https://dfir.science/2022/06/Fast-password-cracking-Hashcat-wordlists-from-RAM)
+- No new entries detected
 
 ## CrowdStrike blog
 
 - Site: https://www.crowdstrike.com/blog/
 - Feed: https://www.crowdstrike.com/blog/feed/
 - Entries checked: 10
-- New since last snapshot: 1
+- New since last snapshot: 0
 
-- 2026-05-01T00:00:00-05:00 — [Tune In: The Future of AI-Powered Vulnerability Discovery](https://www.crowdstrike.com/en-us/blog/tune-in-future-of-ai-powered-vulnerability-discovery/)
-
-## VMware Carbon Black
-
-- Site: https://www.carbonblack.com/
-- Feed: https://www.carbonblack.com/feed/
-- Status: error: syntax error: line 1, column 0
+- No new entries detected
 
 ## Malwarebytes Labs
 
 - Site: https://blog.malwarebytes.com/
 - Feed: https://blog.malwarebytes.com/feed/
 - Entries checked: 10
-- New since last snapshot: 0
+- New since last snapshot: 1
 
-- No new entries detected
+- 2026-05-03T10:33:26+00:00 — [3 easy-to-miss cybersecurity risks for small businesses](https://www.malwarebytes.com/blog/how-to/2026/05/3-easy-to-miss-cybersecurity-risks-for-small-businesses)
 
 ## Krebs on Security
 
@@ -458,106 +735,92 @@ Generated: 2026-05-03T05:36:12Z
 - Site: https://www.bleepingcomputer.com/
 - Feed: https://www.bleepingcomputer.com/feed/
 - Entries checked: 10
-- New since last snapshot: 2
+- New since last snapshot: 3
 
-- 2026-05-02T17:54:00-04:00 — [Critrical cPanel flaw mass-exploited in "Sorry" ransomware attacks](https://www.bleepingcomputer.com/news/security/critrical-cpanel-flaw-mass-exploited-in-sorry-ransomware-attacks/)
-- 2026-05-02T10:32:25-04:00 — [ConsentFix v3 attacks target Azure with automated OAuth abuse](https://www.bleepingcomputer.com/news/security/consentfix-v3-attacks-target-azure-with-automated-oauth-abuse/)
+- 2026-05-03T18:16:27-04:00 — [Instructure confirms data breach, ShinyHunters claims attack](https://www.bleepingcomputer.com/news/security/instructure-confirms-data-breach-shinyhunters-claims-attack/)
+- 2026-05-03T14:11:25-04:00 — [Microsoft Defender wrongly flags DigiCert certs as Trojan:Win32/Cerdigent.A!dha](https://www.bleepingcomputer.com/news/security/microsoft-defender-wrongly-flags-digicert-certs-as-trojan-win32-cerdigentadha/)
+- 2026-05-03T10:11:21-04:00 — [Telegram Mini Apps abused for crypto scams, Android malware delivery](https://www.bleepingcomputer.com/news/security/telegram-mini-apps-abused-for-crypto-scams-android-malware-delivery/)
 
 ## Dark Reading
 
 - Site: https://www.darkreading.com/
-- Feed: https://www.darkreading.com/rss/all.xml
-- Status: error: HTTP 404
+- Feed: https://www.darkreading.com/rss.xml
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2026-05-01T20:34:27+00:00 — [76% of All Crypto Stolen in 2026 Is Now in North Korea](https://www.darkreading.com/cybersecurity-analytics/crypto-stolen-2026-north-korea)
+- 2026-05-01T14:39:55+00:00 — [If AI's So Smart, Why Does It Keep Deleting Production Databases?](https://www.darkreading.com/cloud-security/ais-so-smart-keep-deleting-production-databases)
+- 2026-05-01T12:00:55+00:00 — [Name That Toon: Mark of (Security) Progress](https://www.darkreading.com/cybersecurity-operations/name-that-toon-mark-security-progress)
+- 2026-05-01T12:00:00+00:00 — [20 Years in Cyber: Dark Reading Marks Milestone With Month of Special Coverage](https://www.darkreading.com/cybersecurity-operations/20-years-cyber-dark-reading-milestone-special-coverage)
+- 2026-04-30T21:01:18+00:00 — [TeamPCP Hits SAP Packages With 'Mini Shai-Hulud' Attack](https://www.darkreading.com/cloud-security/teampcp-sap-packages-mini-shai-hulud)
+- 2026-04-30T20:41:18+00:00 — [Another AI-Assisted Software Scan Yields 9-Year-Old Linux Bug](https://www.darkreading.com/vulnerabilities-threats/ai-assisted-software-scan-linux-bug)
+- 2026-04-30T19:09:21+00:00 — [Anthropic's Mythos Has Landed: Here's What Comes Next for Cyber](https://www.darkreading.com/cybersecurity-operations/anthropic-mythos-cyber-what-comes-next)
+- 2026-04-30T13:45:58+00:00 — [Oracle Red Bull Racing Team Revs Up Automation to Boost Security](https://www.darkreading.com/identity-access-management-security/oracle-red-bull-racing-team-revs-up-automation-to-boost-security)
+- 2026-04-30T00:00:00+00:00 — [Claude Mythos Fears Startle Japan's Financial Services Sector](https://www.darkreading.com/cyber-risk/claude-mythos-startle-japans-financial-sector)
+- 2026-04-29T20:08:17+00:00 — [Reverse Engineering With AI Unearths High-Severity GitHub Bug](https://www.darkreading.com/application-security/reverse-engineering-ai-unearths-high-severity-github-bug)
 
 ## LOLBAS Project (Windows)
 
 - Site: https://lolbas-project.github.io/
 - Feed: https://github.com/LOLBAS-Project/LOLBAS/commits/master.atom
 - Entries checked: 10
-- New since last snapshot: 10
+- New since last snapshot: 0
 
-- 2026-03-16T14:12:08+00:00 — [Adding VirusTotal link to DevToolsLauncher.yml, closes #155](https://github.com/LOLBAS-Project/LOLBAS/commit/db6da5b0308bce011616beb9d818359d8f5ffa2b)
-- 2026-03-16T14:00:01+00:00 — [Create Logger.yml (#448)](https://github.com/LOLBAS-Project/LOLBAS/commit/2a21e4a4b4e256b562416412ffcc0ed39768be27)
-- 2026-03-16T13:51:21+00:00 — [Create Nmcap.yml (#462)](https://github.com/LOLBAS-Project/LOLBAS/commit/6a6364085becb5edaa6147eb10b573d0d81a094a)
-- 2026-03-16T13:43:24+00:00 — [Add App Paths Hijacking (Proxy Execution) to WorkFolders.exe (#490)](https://github.com/LOLBAS-Project/LOLBAS/commit/41458bdce05a062a7fd11dadd412573068ad036a)
-- 2026-03-16T13:33:27+00:00 — [Add new Proxy Execution techniques for dxcap.exe and cmstp.exe (#489)](https://github.com/LOLBAS-Project/LOLBAS/commit/fb87ee5f080acb8c865337767f21e71add08ef6e)
-- 2026-03-16T13:19:47+00:00 — [Create write.yml (#440)](https://github.com/LOLBAS-Project/LOLBAS/commit/c39a24f3ce946d4535ddbbadbc83ec5d2114e94c)
-- 2026-03-16T12:30:32+00:00 — [Adding cipher.exe entry (#274)](https://github.com/LOLBAS-Project/LOLBAS/commit/cea80b95eeafe6eb9ad50837d18330e2236ab6db)
-- 2026-03-14T11:59:51+00:00 — [UAC bypass via odbcad32.exe GUI (#460)](https://github.com/LOLBAS-Project/LOLBAS/commit/42a5add3c7d662f86ac24d95dd616cc239cdc944)
-- 2026-03-14T11:48:31+00:00 — [Added Sigverif.yml (#469)](https://github.com/LOLBAS-Project/LOLBAS/commit/0c3b8d778607ed338ab8a0a847e0b48c727e74ae)
-- 2025-12-06T22:05:02+00:00 — [Create IntelliTrace.yml (#464)](https://github.com/LOLBAS-Project/LOLBAS/commit/b463e865f3ecfb3b17441c798aa5bce381accc67)
+- No new entries detected
 
 ## GTFOBins (Linux)
 
 - Site: https://gtfobins.github.io/
 - Feed: https://github.com/GTFOBins/GTFOBins.github.io/commits/master.atom
 - Entries checked: 10
-- New since last snapshot: 10
+- New since last snapshot: 0
 
-- 2026-04-20T13:51:04+00:00 — [Add version constraint for xdg-user-dir](https://github.com/GTFOBins/GTFOBins.github.io/commit/7382261ef936e35896ba70e7a6b833352ffb9a22)
-- 2026-04-07T08:08:53+00:00 — [Fix cpulimit invocation](https://github.com/GTFOBins/GTFOBins.github.io/commit/dacbcc4cfa34fbe5dd8b2f481e8ad3f593505682)
-- 2026-03-30T06:53:24+00:00 — [Fix command syntax in tcpdump instructions](https://github.com/GTFOBins/GTFOBins.github.io/commit/c922862e18dc55edfb272ef1f296530f5f335c33)
-- 2026-03-03T22:08:20+00:00 — [Add back sqlite3 inherit](https://github.com/GTFOBins/GTFOBins.github.io/commit/869f965b285f5d42182ca48769892413cf833caa)
-- 2026-03-03T22:04:54+00:00 — [Fix sqlite3 quotes](https://github.com/GTFOBins/GTFOBins.github.io/commit/32283c756e6acb350ef567b09359aa6c1367c743)
-- 2026-03-02T16:22:25+00:00 — [Merge #568](https://github.com/GTFOBins/GTFOBins.github.io/commit/890af27684e3c9a768f34178308aaf896980a08a)
-- 2026-03-02T16:22:00+00:00 — [Convert and simplify bbot](https://github.com/GTFOBins/GTFOBins.github.io/commit/5f6782139dd8a2412319fb2067ff03b3955790bb)
-- 2026-03-02T16:20:58+00:00 — [Sync with master](https://github.com/GTFOBins/GTFOBins.github.io/commit/4e26b0b72ce4968e1c3da8318cb1adb1d8c72313)
-- 2026-02-27T21:08:08+00:00 — [Merge #567](https://github.com/GTFOBins/GTFOBins.github.io/commit/24c6ef53cf2c5885006e9681e771b350b7fd0947)
-- 2026-02-27T21:07:54+00:00 — [Fix codex](https://github.com/GTFOBins/GTFOBins.github.io/commit/da68f4cc293273a2e9724ad3befaa12fe6a368ea)
+- No new entries detected
 
 ## LOOBins (macOS)
 
 - Site: https://loobins.io/
 - Feed: https://github.com/infosecB/LOOBins/commits/main.atom
 - Entries checked: 10
-- New since last snapshot: 10
+- New since last snapshot: 0
 
-- 2026-04-30T22:26:56+00:00 — [Add SEO improvements to Astro web UI (#253)](https://github.com/infosecB/LOOBins/commit/b1de45c5f6317876aa0036c2c25fb8c2b29291e1)
-- 2026-04-30T20:33:26+00:00 — [chore: bump version to 2.0.14 [skip ci]](https://github.com/infosecB/LOOBins/commit/5c132925f31ba0a0a9b7d87a96f10c086a852120)
-- 2026-04-30T20:32:20+00:00 — [Standardize LOOBin tags and add tag taxonomy (#252)](https://github.com/infosecB/LOOBins/commit/11847f49900733de2bbe4746b090272e9e573e78)
-- 2026-04-30T16:10:30+00:00 — [Fix search: proper dropdown styling and script loading (#250)](https://github.com/infosecB/LOOBins/commit/e716f2e84801946a1f2248049413557f1f0a8b3a)
-- 2026-04-30T16:10:02+00:00 — [Scope auto-release to only trigger on LOOBin/SDK changes (#251)](https://github.com/infosecB/LOOBins/commit/86f24085c63b045a5740a8238201bb7c88f9b4ea)
-- 2026-04-30T15:17:19+00:00 — [chore: bump version to 2.0.13 [skip ci]](https://github.com/infosecB/LOOBins/commit/14bfdb9d8b52af9d09af788b96a5abc1b37fba2c)
-- 2026-04-30T15:15:52+00:00 — [Add Astro web UI with GitHub Pages deployment (#249)](https://github.com/infosecB/LOOBins/commit/a6227aba28f92b83ae294d874c6361db36dd5ca0)
-- 2026-04-30T15:12:46+00:00 — [chore: bump version to 2.0.12 [skip ci]](https://github.com/infosecB/LOOBins/commit/a6a4cbb4353c3fd33e326de83a7e2591f04dc8f0)
-- 2026-04-30T15:11:38+00:00 — [Fix web UI: set GitHub Pages base path (#248)](https://github.com/infosecB/LOOBins/commit/dbd653a440533c637bbc39230a952bc6e114e7e5)
-- 2026-04-30T15:04:15+00:00 — [chore: bump version to 2.0.11 [skip ci]](https://github.com/infosecB/LOOBins/commit/7ec375441ddb6993b32801318fafe47ae097ef93)
+- No new entries detected
 
 ## LOLDrivers (BYOVD)
 
 - Site: https://www.loldrivers.io/
 - Feed: https://github.com/magicsword-io/LOLDrivers/commits/main.atom
 - Entries checked: 10
-- New since last snapshot: 10
+- New since last snapshot: 0
 
-- 2026-04-28T19:11:53+00:00 — [New site and hashes generated by GitHub Actions [ci skip]](https://github.com/magicsword-io/LOLDrivers/commit/1746cc6486b247e898cf025d255130ea8ca44bbc)
-- 2026-04-28T19:04:49+00:00 — [updating drivers count in README.md [ci skip]](https://github.com/magicsword-io/LOLDrivers/commit/10e1dd5ba73c7246f14f6655a79d598a353bf5de)
-- 2026-04-28T19:03:52+00:00 — [Merge pull request #338 from marius-benthin/fix-typo](https://github.com/magicsword-io/LOLDrivers/commit/b0c714f05c6c1acfdbc1b5981cf72740308e701c)
-- 2026-04-28T17:32:12+00:00 — [fix: typos](https://github.com/magicsword-io/LOLDrivers/commit/a25b03bea2562e063b1fdd5fbb749eb8a00ee3ff)
-- 2026-04-23T17:33:43+00:00 — [New site and hashes generated by GitHub Actions [ci skip]](https://github.com/magicsword-io/LOLDrivers/commit/3cc87fcd963c720da4bb317283480ce75609e4a7)
-- 2026-04-23T17:23:39+00:00 — [updating drivers count in README.md [ci skip]](https://github.com/magicsword-io/LOLDrivers/commit/f05359fe767df8a172c88e790d524cf58ba4cfeb)
-- 2026-04-23T17:22:29+00:00 — [Merge pull request #336 from magicsword-io/MHaggis/add-gofly64-299](https://github.com/magicsword-io/LOLDrivers/commit/a9e8f74d1bbb01f15cac83e8b7c18d60bd6558d6)
-- 2026-04-23T15:55:36+00:00 — [New site and hashes generated by GitHub Actions [ci skip]](https://github.com/magicsword-io/LOLDrivers/commit/260aa5bd1780ca0a6eb1eb65c3d20c51e428c35c)
-- 2026-04-23T15:46:52+00:00 — [updating drivers count in README.md [ci skip]](https://github.com/magicsword-io/LOLDrivers/commit/afc47209b44428498a88523d5491eb5feb89e2e1)
-- 2026-04-23T15:45:49+00:00 — [Merge pull request #333 from magicsword-io/MHaggis/add-devhost-malicious](https://github.com/magicsword-io/LOLDrivers/commit/e00b2e1728565ed2794fac2979a665ecb339655b)
+- No new entries detected
 
 ## LOFL Project (RMM C2 indicators)
 
 - Site: https://lofl-project.github.io/
 - Feed: https://github.com/LOFL-Project/LOFL-Project.github.io/commits/main.atom
 - Entries checked: 10
+- New since last snapshot: 0
+
+- No new entries detected
+
+## Blue_Team_Hunting_Field_Notes
+
+- Site: https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes
+- Feed: https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commits/main.atom
+- Entries checked: 10
 - New since last snapshot: 10
 
-- 2026-04-14T20:13:07+00:00 — [Migrate away from excessively expensive Azure Front Door](https://github.com/LOFL-Project/LOFL-Project.github.io/commit/6f4c65cef3c881eef3119dace33455546fcadc22)
-- 2026-03-28T18:48:58+00:00 — [Applying update LOFL-Project/LOFLCAB@75b0aec1a3a2062bbc4647c90bb6837c…](https://github.com/LOFL-Project/LOFL-Project.github.io/commit/25c82a0393a7a751b3d9e2c4c2e2b3feed82a8c3)
-- 2026-03-28T12:09:02+00:00 — [Applying update LOFL-Project/LOFLCAB@c9ecf2612d3a981de3f1445320716e40…](https://github.com/LOFL-Project/LOFL-Project.github.io/commit/35b20386e348b9d936302ea51dc2a0e727f46762)
-- 2026-03-28T11:33:33+00:00 — [Applying update LOFL-Project/LOFLCAB@c9f7063e9733acb8d55931f1f37e63fe…](https://github.com/LOFL-Project/LOFL-Project.github.io/commit/db6836d2089b296057158bfbfebaed20812584bb)
-- 2026-03-28T10:37:31+00:00 — [Applying update LOFL-Project/LOFLCAB@0ed7791b6ba7dd084c1b9bbc6b19f0da…](https://github.com/LOFL-Project/LOFL-Project.github.io/commit/1a282d9b39f186b11cf90594f59d132024dd850f)
-- 2026-03-28T10:31:58+00:00 — [Applying update LOFL-Project/LOFLCAB@b871fa77e916ec17285ece195fda67a5…](https://github.com/LOFL-Project/LOFL-Project.github.io/commit/9e07515f4b6f1b9b68eae84a042df4d6896760a9)
-- 2026-03-28T10:24:01+00:00 — [Applying update LOFL-Project/LOFLCAB@3bf50506f5fe87356e09a0072731e950…](https://github.com/LOFL-Project/LOFL-Project.github.io/commit/757db3903a0dcd99d78f1f4885bf51dec44a1f83)
-- 2024-12-13T22:47:49+00:00 — [Update descriptions](https://github.com/LOFL-Project/LOFL-Project.github.io/commit/579732610849bd794e072afaef4676a5ac0353c9)
-- 2024-12-13T22:34:08+00:00 — [Applying update LOFL-Project/LOFLCAB@b21acf9f074d4e84cc091e819a7375df…](https://github.com/LOFL-Project/LOFL-Project.github.io/commit/3755852482b072f0ef9f28e3c179c57707e0bd33)
-- 2024-04-19T09:56:49+00:00 — [Applying update LOFL-Project/LOFLCAB@343e067d79f88749b84838e7aa4b26eb…](https://github.com/LOFL-Project/LOFL-Project.github.io/commit/1e3724f03fab854e960106607111459f321daeeb)
+- 2026-04-22T04:38:23+00:00 — [Update 1.3_Windows_Event_Core.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/8598bdb8d50fe2a68e182933256bc9e21f6a76a5)
+- 2026-04-20T23:49:49+00:00 — [Update !Master_Internals_to_Events_Glossary.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/1633539548835af11f2f28f859593668f6a9330d)
+- 2026-04-20T23:49:11+00:00 — [Update _00_Review_Path.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/f4bddde9ffca0fcf8747a991c9782a4335984e25)
+- 2026-04-20T23:08:35+00:00 — [Merge branch 'main' of https://github.com/bitbug0x55AA/Blue_Team_Hunt…](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/13627bdd7a787b81243b3a6d8af1f9b580449168)
+- 2026-04-20T23:08:33+00:00 — [Script-layer principle file update](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/de15454e587b961734a0a3085d3d3db6bb847942)
+- 2026-04-19T07:02:09+00:00 — [Create 7.6_Malicious_Code_Minor_Analysis_Writeup_Template.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/907393720d8fd4f6578b7fcbbac10d851009f677)
+- 2026-04-19T06:06:50+00:00 — [Script-layer analysis related Underlying principle files update](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/844dda472e32fe283c82d5ea7c053ef68d618424)
+- 2026-04-19T05:56:27+00:00 — [Update README.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/a5613e0cd14be5713b92d1de68d511e0e629d935)
+- 2026-04-19T05:55:03+00:00 — [Update 4.3.03_JScript_VBS_HTA_Analysis.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/38b6d158a0e81d4d942f28d785cf6d6171cbea4e)
+- 2026-04-19T05:45:52+00:00 — [Create 8.1.30_COM_Automation_and_IDispatch_Interface.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/9034714806a5bed6ae1355da7ef5e506175608ec)
 
 ## abuse.ch blog
 
@@ -565,19 +828,19 @@ Generated: 2026-05-03T05:36:12Z
 - Feed: https://abuse.ch/blog/feed/
 - Status: error: HTTP 404
 
-## URLhaus — malware distribution URLs
+## URLhaus
 
 - Site: https://urlhaus.abuse.ch/
 - Feed: https://urlhaus.abuse.ch/rss/
 - Status: error: HTTP 404
 
-## MalwareBazaar — malware samples
+## MalwareBazaar
 
 - Site: https://bazaar.abuse.ch/
 - Feed: https://bazaar.abuse.ch/rss/
 - Status: error: HTTP 404
 
-## ThreatFox — IOC sharing
+## ThreatFox
 
 - Site: https://threatfox.abuse.ch/
 - Feed: https://threatfox.abuse.ch/rss/
@@ -588,15 +851,6 @@ Generated: 2026-05-03T05:36:12Z
 - Site: https://www.misp-project.org/
 - Feed: https://github.com/MISP/misp-taxonomies/commits/main.atom
 - Entries checked: 10
-- New since last snapshot: 10
+- New since last snapshot: 0
 
-- 2026-04-27T19:58:43+00:00 — [chg: [manifest] updated](https://github.com/MISP/misp-taxonomies/commit/36162561c74fcb992dce4455fd0ff8b6f9e1d1b3)
-- 2026-04-27T19:57:48+00:00 — [Merge pull request #322 from MISP/codex/add-misp-taxonomy-cloud-sover…](https://github.com/MISP/misp-taxonomies/commit/eb8803d1acb6306fa807018833b6ce1cbdc4d843)
-- 2026-04-27T19:56:22+00:00 — [add SoV cloud sovereignty taxonomy](https://github.com/MISP/misp-taxonomies/commit/90cf8b587e03cedd5ca7424a69299c3fb564db54)
-- 2026-03-23T15:06:46+00:00 — [new: [cloud-sovereignty] new cloud-sovereignty taxonomy added](https://github.com/MISP/misp-taxonomies/commit/a21d5570203503833fd72ccb1f87d6dc84c9217c)
-- 2026-03-19T08:14:33+00:00 — [new: [ai-computer-assisted] Taxonomy describing the level of AI assis…](https://github.com/MISP/misp-taxonomies/commit/8bb21dfb450ae9dde693e907b9b44152ac36c177)
-- 2026-03-18T13:29:36+00:00 — [chg: [MANIFEST] updated](https://github.com/MISP/misp-taxonomies/commit/68600a0b8f3743ad3cb9f57b552a3ccf9528f274)
-- 2026-03-18T10:38:48+00:00 — [chg: [gen] updated](https://github.com/MISP/misp-taxonomies/commit/9f967c9a7f6ec581f2d694704bdc1bf51b23c9a7)
-- 2026-03-06T00:28:56+00:00 — [chg: [MANIFEST] updated](https://github.com/MISP/misp-taxonomies/commit/ae62540852db8c906a49414545999600e4dc76da)
-- 2026-03-06T00:27:32+00:00 — [Merge branch 'nassima17-feature/eu-ai-act-taxonomy'](https://github.com/MISP/misp-taxonomies/commit/6e11d7140fa4bf73e77390037a7dd8e1274616a6)
-- 2026-03-06T00:25:02+00:00 — [fix: [eu-ai-act] updated](https://github.com/MISP/misp-taxonomies/commit/6b47e44770843e788b1dd8bb04596ca1e260121e)
+- No new entries detected

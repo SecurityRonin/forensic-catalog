@@ -12464,3 +12464,159 @@ Mark `[x]` when reviewed, `[→]` when artifact tasks were created.
 - [ ] [Coast Guard's New Cybersecurity Rules Offer Lessons for CISOs](https://www.darkreading.com/cybersecurity-operations/coast-guards-cybersecurity-rules-lessons-cisos) — Dark Reading
 - [ ] [NIST Revamps CVE Framework to Focus on High-Impact Vulnerabilities](https://www.darkreading.com/vulnerabilities-threats/nist-revamps-cve-framework-to-focus-on-high-impact-vulnerabilities) — Dark Reading
 - [ ] [North Korea Uses ClickFix to Target macOS Users' Data](https://www.darkreading.com/application-security/north-korea-clickfix-target-macos-users-data) — Dark Reading
+
+## 2026-05-04
+
+- [ ] [Welcome to the New Site](https://forensicmike1.com/post/welcome-to-the-new-site) — forensicmike1
+- [ ] [Taking A Look At Ios Apps On An M1 Mac](https://forensicmike1.com/post/taking-a-look-at-ios-apps-on-an-m1-mac) — forensicmike1
+- [ ] [Analysis Of The Abtracetogether App Ios](https://forensicmike1.com/post/analysis-of-the-abtracetogether-app-ios) — forensicmike1
+- [ ] [Examiner Coder Types Learningit Can Make You A Better Developer](https://forensicmike1.com/post/examiner-coder-types-learningit-can-make-you-a-better-developer) — forensicmike1
+- [ ] [Spice Up Your Forensic Web Reports With Ui Frameworks](https://forensicmike1.com/post/spice-up-your-forensic-web-reports-with-ui-frameworks) — forensicmike1
+- [ ] [Knowledgec Now Playing Entries](https://forensicmike1.com/post/knowledgec-now-playing-entries) — forensicmike1
+- [ ] [Ios Photo Vault App Still Pwnable In 2019](https://forensicmike1.com/post/ios-photo-vault-app-still-pwnable-in-2019) — forensicmike1
+- [ ] [A Lesson In Home Network Security](https://forensicmike1.com/post/a-lesson-in-home-network-security) — forensicmike1
+- [ ] [Obtain Logical Signal Android](https://forensicmike1.com/post/obtain-logical-signal-android) — forensicmike1
+- [ ] [forensicBlend: Designing a scalable community plugin API](https://forensicmike1.com/post/forensicblend-designing-a-scalable-community-plugin-api) — forensicmike1
+- [ ] [ISC Stormcast For Monday, May 4th, 2026 https://isc.sans.edu/podcastdetail/9916, (Mon, May 4th)](https://isc.sans.edu/diary/rss/32946) — SANS Internet Storm Center
+- [ ] [Forensics Quickie: Identifying an Unknown GUID with Shellbags Explorer, Detailing Shell Item Extension Block 0xbeef0026, & Creative Cloud GUID Behavior](https://www.4n6k.com/2018/07/forensics-quickie-detailing-shell-item-guid-behavior-creative-cloud.html) — 4n6k
+- [ ] [Forensics Quickie: Methodology for Identifying Linux ext4 Timestamp Values in debugfs `stat` Command](https://www.4n6k.com/2018/01/forensics-quickie-methodology-for.html) — 4n6k
+- [ ] [Forensics Quickie: Methodology for Identifying "Clear Recent History" Settings for an Old Version of Firefox](https://www.4n6k.com/2017/11/forensics-quickie-identifying-clear.html) — 4n6k
+- [ ] [Forensics Quickie: Accessing & Copying Volume Shadow Copy Contents From Live Remote Systems](https://www.4n6k.com/2017/02/forensics-quickie-accessing-copying.html) — 4n6k
+- [ ] [Forensics Quickie: PowerShell Versions and the Registry](https://www.4n6k.com/2016/08/forensics-quickie-powershell-versions.html) — 4n6k
+- [ ] [Jump List Forensics: AppID Master List (400+ AppIDs)](https://www.4n6k.com/2016/03/jump-list-forensics-appid-master-list.html) — 4n6k
+- [ ] [Forensics Quickie: NTUSER.DAT Analysis (SANS CEIC 2015 Challenge #1 Write-Up)](https://www.4n6k.com/2015/05/forensics-quickie-ntuserdat-analysis.html) — 4n6k
+- [ ] [Forensic FOSS: 4n6k_volatility_installer.sh - Install Volatility For Linux Automatically](https://www.4n6k.com/2014/08/forensic-foss-4n6kvolatilityinstallersh.html) — 4n6k
+- [ ] [Forensics Quickie: Merging VMDKs & Delta/Snapshot Files (2 Solutions)](https://www.4n6k.com/2014/04/forensics-quickie-merging-vmdks.html) — 4n6k
+- [ ] [Forensics Quickie: Verifying Program Behavior Using Source Code](https://www.4n6k.com/2014/03/forensics-quickie-verifying-program.html) — 4n6k
+- [ ] [Leveling Up Your OSINT Game: Creating a Professional Email on a Budget](https://www.digitalforensicstips.com/2024/05/leveling-up-your-osint-game-creating.html) — Digital Forensics Tips
+- [ ] [Navigating Internet Censorship: An In-Depth Look at Tor, VPNs, and Circumvention Strategies](https://www.digitalforensicstips.com/2024/03/navigating-internet-censorship-in-depth.html) — Digital Forensics Tips
+- [ ] [Introducing FaviconLocator: The Eazy Button to Searching by Favicon](https://www.digitalforensicstips.com/2023/12/introducing-faviconlocator-eazy-button.html) — Digital Forensics Tips
+- [ ] [Automating Domain Squatting Detection with DNSTwist and Python](https://www.digitalforensicstips.com/2023/08/automating-domain-squatting-detection.html) — Digital Forensics Tips
+- [ ] [Why Rainbow Tables Aren't the Pot of Gold They Once Were](https://www.digitalforensicstips.com/2023/06/why-rainbow-tables-arent-pot-of-gold.html) — Digital Forensics Tips
+- [ ] [Expanding the Boundaries of ChatGPT with LangChain - Part Two](https://www.digitalforensicstips.com/2023/05/expanding-boundaries-of-chatgpt-with_18.html) — Digital Forensics Tips
+- [ ] [Expanding the Boundaries of ChatGPT with LangChain - Part One](https://www.digitalforensicstips.com/2023/05/expanding-boundaries-of-chatgpt-with.html) — Digital Forensics Tips
+- [ ] [Beyond the Tor Browser: Proxying Applications for Enhanced Privacy and Capabilities](https://www.digitalforensicstips.com/2023/05/beyond-tor-browser-proxying.html) — Digital Forensics Tips
+- [ ] [Lowering the Cost of Education with SANS: A Guide to Affordable Programs for Prospective Students](https://www.digitalforensicstips.com/2023/04/lowering-cost-of-education-with-sans.html) — Digital Forensics Tips
+- [ ] [Cutting the Cord: Harnessing OpenAI's Whisper in an Offline Environment](https://www.digitalforensicstips.com/2023/04/cutting-cord-harnessing-openais-whisper.html) — Digital Forensics Tips
+- [ ] [Catching macOS Stealers in the Wild](https://objective-see.org/blog/blog_0x88.html) — Objective-See
+- [ ] [No Paste for You!](https://objective-see.org/blog/blog_0x87.html) — Objective-See
+- [ ] [Building a Firewall ...via Endpoint Security!?](https://objective-see.org/blog/blog_0x86.html) — Objective-See
+- [ ] [ClickFix: Stopped at ⌘+V](https://objective-see.org/blog/blog_0x85.html) — Objective-See
+- [ ] [The Mac Malware of 2025](https://objective-see.org/blog/blog_0x84.html) — Objective-See
+- [ ] [A Remote Pre-Authentication Overflow in LLDB's debugserver](https://objective-see.org/blog/blog_0x83.html) — Objective-See
+- [ ] [Restoring Reflective Code Loading on macOS (Part II)](https://objective-see.org/blog/blog_0x82.html) — Objective-See
+- [ ] [[0day] From Spotlight to Apple Intelligence](https://objective-see.org/blog/blog_0x81.html) — Objective-See
+- [ ] [TCCing is Believing: Apple finally adds TCC events to Endpoint Security!](https://objective-see.org/blog/blog_0x7F.html) — Objective-See
+- [ ] [Leaking Passwords (and more!) on macOS](https://objective-see.org/blog/blog_0x7E.html) — Objective-See
+- [ ] [A walk in the parks of Rome, Vienna, Manhattan and Brooklyn](https://eclecticlight.co/2026/05/03/a-walk-in-the-parks-of-rome-vienna-manhattan-and-brooklyn/) — The Eclectic Light Company
+- [ ] [Last Week on My Mac: Where’s the fire escape?](https://eclecticlight.co/2026/05/03/last-week-on-my-mac-wheres-the-fire-escape/) — The Eclectic Light Company
+- [ ] [A walk in the parks of London and Paris](https://eclecticlight.co/2026/05/02/a-walk-in-the-parks-of-london-and-paris/) — The Eclectic Light Company
+- [ ] [Saturday Mac riddles 358](https://eclecticlight.co/2026/05/02/saturday-mac-riddles-358/) — The Eclectic Light Company
+- [ ] [How fast is a macOS VM, and how small could it be?](https://eclecticlight.co/2026/05/02/how-fast-is-a-macos-vm-and-how-small-could-it-be/) — The Eclectic Light Company
+- [ ] [Naturalists: Photography](https://eclecticlight.co/2026/05/01/naturalists-photography/) — The Eclectic Light Company
+- [ ] [Use Finder tags for categories](https://eclecticlight.co/2026/05/01/use-finder-tags-for-categories/) — The Eclectic Light Company
+- [ ] [On Reflection: The Venus Effect](https://eclecticlight.co/2026/04/30/on-reflection-the-venus-effect/) — The Eclectic Light Company
+- [ ] [Control what gets written to the log](https://eclecticlight.co/2026/04/30/control-what-gets-written-to-the-log/) — The Eclectic Light Company
+- [ ] [Medium and message: Tapestry](https://eclecticlight.co/2026/04/29/medium-and-message-tapestry/) — The Eclectic Light Company
+- [ ] [ICS Security Conference 2026](https://blogs.jpcert.or.jp/en/2026/04/ics-conference2026.html) — JPCERT/CC
+- [ ] [TSUBAME Report Overflow (Jul-Sep 2025)](https://blogs.jpcert.or.jp/en/2026/03/tsubame_overflow_2025-07-09.html) — JPCERT/CC
+- [ ] [CSIRTs Around the World – Azerbaijan](https://blogs.jpcert.or.jp/en/2026/03/csirts-around-the-world-azerbaijan.html) — JPCERT/CC
+- [ ] [Study of Binaries Created with Rust through Reverse Engineering](https://blogs.jpcert.or.jp/en/2026/03/rust_research_en.html) — JPCERT/CC
+- [ ] [JSAC2026 -Workshop/Lightning Talk Session/Panel Discussion-](https://blogs.jpcert.or.jp/en/2026/03/jsac2026-ws-lt-pd.html) — JPCERT/CC
+- [ ] [JSAC2026 -Day 2-](https://blogs.jpcert.or.jp/en/2026/02/jsac2026day2.html) — JPCERT/CC
+- [ ] [JSAC2026 -Day 1-](https://blogs.jpcert.or.jp/en/2026/02/jsac2026day1.html) — JPCERT/CC
+- [ ] [Multiple Threat Actors Rapidly Exploit React2Shell: A Case Study of Active Compromise](https://blogs.jpcert.or.jp/en/2026/02/multiple-threat-actors-rapidly-exploit-react2shell-a-case-study-of-active-compromise.html) — JPCERT/CC
+- [ ] [YAMAGoya: A Real-time Client Monitoring Tool Using Sigma and YARA Rules](https://blogs.jpcert.or.jp/en/2025/11/YAMAGoya.html) — JPCERT/CC
+- [ ] [Update on Attacks by Threat Group APT-C-60](https://blogs.jpcert.or.jp/en/2025/11/APT-C-60_update.html) — JPCERT/CC
+- [ ] [Word Documents – What Changed?](https://dfir.pubpub.org/pub/mdm3270g) — DFIR Review
+- [ ] [Is that Windows Notepad window really empty?](https://dfir.pubpub.org/pub/wmhy8t6v) — DFIR Review
+- [ ] [Location, Location, Location](https://dfir.pubpub.org/pub/4fkeiv34) — DFIR Review
+- [ ] [How Did That Photo Get On That iPhone](https://dfir.pubpub.org/pub/5d08cdxl) — DFIR Review
+- [ ] [Peeking at User Notification Events in iOS 15](https://dfir.pubpub.org/pub/6amsr72k) — DFIR Review
+- [ ] [Enriching Investigations with Apple Watch Data Through the healthdb_secure.sqlite Database](https://dfir.pubpub.org/pub/xqvcn3hj) — DFIR Review
+- [ ] [Wipeout! Detecting Android Factory Resets](https://dfir.pubpub.org/pub/xmjxofpd) — DFIR Review
+- [ ] [An Alternate Location for Deleted SMS/iMessage Data in Apple Devices](https://dfir.pubpub.org/pub/yp6efc8q) — DFIR Review
+- [ ] [iOS KnowledgeC.db Notifications](https://dfir.pubpub.org/pub/g2v1z97i) — DFIR Review
+- [ ] [Turbo Speed: Parsing Device Health Services from Google](https://dfir.pubpub.org/pub/4can3p40) — DFIR Review
+- [ ] [Elcomsoft Phone Breaker 11 Restores iCloud Access](https://blog.elcomsoft.com/2026/04/elcomsoft-phone-breaker-11-restores-icloud-access/) — Elcomsoft Blog
+- [ ] [New Security Features and Low-Level Extraction of iOS 26](https://blog.elcomsoft.com/2026/04/new-and-updated-security-features-in-ios-26-and-their-forensic-implications/) — Elcomsoft Blog
+- [ ] [Digital Triage Masterclass](https://blog.elcomsoft.com/2026/04/digital-triage-masterclass/) — Elcomsoft Blog
+- [ ] [Recovering Windows Credentials with Elcomsoft System Recovery](https://blog.elcomsoft.com/2026/04/recovering-windows-credentials-with-elcomsoft-system-recovery/) — Elcomsoft Blog
+- [ ] [Low-Level Extraction for M-Series iPads](https://blog.elcomsoft.com/2026/04/low-level-extraction-for-m-series-ipads/) — Elcomsoft Blog
+- [ ] [Low-Level Extraction for iOS 17 and 18](https://blog.elcomsoft.com/2026/04/low-level-extraction-for-ios-17-and-18/) — Elcomsoft Blog
+- [ ] [Compelled Decryption: The East Asian Region](https://blog.elcomsoft.com/2026/04/compelled-decryption-the-east-asian-region/) — Elcomsoft Blog
+- [ ] [Digital Rights vs. State Power – The Protectors](https://blog.elcomsoft.com/2026/04/digital-rights-vs-state-power-the-protectors/) — Elcomsoft Blog
+- [ ] [The Geography of Coercion: a Study of Compelled Decryption Laws](https://blog.elcomsoft.com/2026/03/the-geography-of-coercion-a-study-of-compelled-decryption-laws/) — Elcomsoft Blog
+- [ ] [Arrested by AI](https://blog.elcomsoft.com/2026/03/arrested-by-an-algorithm/) — Elcomsoft Blog
+- [ ] [Social Engineering Leveled Up. Has Your Security Program?](https://www.huntress.com/blog/device-code-phishing-cyber-resilience-strategy) — Huntress Blog
+- [ ] [ClickFix Removes Your Background but Leaves the Malware](https://www.huntress.com/blog/clickfix-castleloader-backgroundfix) — Huntress Blog
+- [ ] [Komari Red: The Monitoring Tool with a Built-in Reverse Shell](https://www.huntress.com/blog/komari-c2-agent-abuse) — Huntress Blog
+- [ ] [Unified EDR + ITDR: Closing the Identity Gap Before Attacks Spread](https://www.huntress.com/blog/edr-itdr-correlations) — Huntress Blog
+- [ ] [What Is Multi-Factor Authentication (MFA)? | How MFA Secures Businesses | Huntress](https://www.huntress.com/blog/what-is-multi-factor-authentication) — Huntress Blog
+- [ ] [Cyber Hygiene Best Practices: Essential Security Checklist](https://www.huntress.com/blog/huntress-top-cyber-hygiene-tips) — Huntress Blog
+- [ ] [What Cybersecurity Leaders Must Prioritize in 2026](https://www.huntress.com/blog/what-does-the-future-hold-for-todays-cybersecurity-leaders) — Huntress Blog
+- [ ] [Attackers Didn’t Wait for AI. They Built Workflows Around It.](https://www.huntress.com/blog/ai-powered-attack-workflows) — Huntress Blog
+- [ ] [Untangling a Linux Incident With an OpenAI Twist (Part 2)](https://www.huntress.com/blog/codex-part-two) — Huntress Blog
+- [ ] [Tradecraft Tuesday Recap: axios npm Supply Chain Compromise](https://www.huntress.com/blog/axios-npm-compromise) — Huntress Blog
+- [ ] [How AI can streamline your security testing](https://redcanary.com/blog/testing-and-validation/ai-security-testing/) — Red Canary Blog
+- [ ] [Intelligence Insights: April 2026](https://redcanary.com/blog/threat-intelligence/intelligence-insights-april-2026/) — Red Canary Blog
+- [ ] [Identity, browsers, and node.js: Everything you missed in the Threat Detection Report miniseries](https://redcanary.com/blog/security-operations/tdr-secops-recap/) — Red Canary Blog
+- [ ] [New: Use response actions to update Zscaler policies and block threats](https://redcanary.com/blog/product-updates/zia-response-actions/) — Red Canary Blog
+- [ ] [AI in cybersecurity: The good, the bad, and the FUD](https://redcanary.com/blog/security-operations/ai-in-cybersecurity/) — Red Canary Blog
+- [ ] [Red Canary CFP tracker: April 2026](https://redcanary.com/blog/news-events/red-canary-cfp-tracker-april-2026/) — Red Canary Blog
+- [ ] [Scarlet Goldfinch’s year in ClickFix](https://redcanary.com/blog/threat-intelligence/scarlet-goldfinch-clickfix/) — Red Canary Blog
+- [ ] [Intelligence Insights: March 2026](https://redcanary.com/blog/threat-intelligence/intelligence-insights-march-2026/) — Red Canary Blog
+- [ ] [AI and browser threats stand out in the 2026 Threat Detection Report](https://redcanary.com/blog/threat-detection/2026-threat-detection-report/) — Red Canary Blog
+- [ ] [Moving up the Assemblyline: Exposing malicious code in browser extensions](https://redcanary.com/blog/threat-detection/assemblyline-browser-extensions/) — Red Canary Blog
+- [ ] [The npm Threat Landscape: Attack Surface and Mitigations (Updated May 1)](https://unit42.paloaltonetworks.com/monitoring-npm-supply-chain-attacks/) — Palo Alto Unit 42
+- [ ] [Essential Data Sources for Detection Beyond the Endpoint](https://unit42.paloaltonetworks.com/detection-beyond-the-endpoint/) — Palo Alto Unit 42
+- [ ] [That AI Extension Helping You Write Emails? It’s Reading Them First](https://unit42.paloaltonetworks.com/high-risk-gen-ai-browser-extensions/) — Palo Alto Unit 42
+- [ ] [TGR-STA-1030: New Activity in Central and South America](https://unit42.paloaltonetworks.com/new-activity-central-south-america/) — Palo Alto Unit 42
+- [ ] [Frontier AI and the Future of Defense: Your Top Questions Answered](https://unit42.paloaltonetworks.com/frontier-ai-top-questions-answered/) — Palo Alto Unit 42
+- [ ] [Can AI Attack the Cloud? Lessons From Building an Autonomous Cloud Offensive Multi-Agent System](https://unit42.paloaltonetworks.com/autonomous-ai-cloud-attacks/) — Palo Alto Unit 42
+- [ ] [When Wi-Fi Encryption Fails: Protecting Your Enterprise from AirSnitch Attacks](https://unit42.paloaltonetworks.com/air-snitch-enterprise-wireless-attacks/) — Palo Alto Unit 42
+- [ ] [Fracturing Software Security With Frontier AI Models](https://unit42.paloaltonetworks.com/ai-software-security-risks/) — Palo Alto Unit 42
+- [ ] [Threat Brief: Escalation of Cyber Risk Related to Iran (Updated April 17)](https://unit42.paloaltonetworks.com/iranian-cyberattacks-2026/) — Palo Alto Unit 42
+- [ ] [A Deep Dive Into Attempted Exploitation of CVE-2023-33538](https://unit42.paloaltonetworks.com/exploitation-of-cve-2023-33538/) — Palo Alto Unit 42
+- [ ] [Snow Flurries: How UNC6692 Employed Social Engineering to Deploy a Custom Malware Suite](https://cloud.google.com/blog/topics/threat-intelligence/unc6692-social-engineering-custom-malware/) — Mandiant Threat Intelligence
+- [ ] [Defending Your Enterprise When AI Models Can Find Vulnerabilities Faster Than Ever](https://cloud.google.com/blog/topics/threat-intelligence/defending-enterprise-ai-vulnerabilities/) — Mandiant Threat Intelligence
+- [ ] [The German Cyber Criminal Überfall: Shifts in Europe's Data Leak Landscape](https://cloud.google.com/blog/topics/threat-intelligence/europe-data-leak-landscape/) — Mandiant Threat Intelligence
+- [ ] [vSphere and BRICKSTORM Malware: A Defender's Guide](https://cloud.google.com/blog/topics/threat-intelligence/vsphere-brickstorm-defender-guide/) — Mandiant Threat Intelligence
+- [ ] [North Korea-Nexus Threat Actor Compromises Widely Used Axios NPM Package in Supply Chain Attack](https://cloud.google.com/blog/topics/threat-intelligence/north-korea-threat-actor-targets-axios-npm-package/) — Mandiant Threat Intelligence
+- [ ] [M-Trends 2026: Data, Insights, and Strategies From the Frontlines](https://cloud.google.com/blog/topics/threat-intelligence/m-trends-2026/) — Mandiant Threat Intelligence
+- [ ] [The Proliferation of DarkSword: iOS Exploit Chain Adopted by Multiple Threat Actors](https://cloud.google.com/blog/topics/threat-intelligence/darksword-ios-exploit-chain/) — Mandiant Threat Intelligence
+- [ ] [Ransomware Under Pressure: Tactics, Techniques, and Procedures in a Shifting Threat Landscape](https://cloud.google.com/blog/topics/threat-intelligence/ransomware-ttps-shifting-threat-landscape/) — Mandiant Threat Intelligence
+- [ ] [Proactive Preparation and Hardening Against Destructive Attacks: 2026 Edition](https://cloud.google.com/blog/topics/threat-intelligence/preparation-hardening-destructive-attacks/) — Mandiant Threat Intelligence
+- [ ] [Look What You Made Us Patch: 2025 Zero-Days in Review](https://cloud.google.com/blog/topics/threat-intelligence/2025-zero-day-review/) — Mandiant Threat Intelligence
+- [ ] [Great responsibility, without great power](https://blog.talosintelligence.com/great-responsibility-without-great-power/) — Cisco Talos Blog
+- [ ] [AI-powered honeypots: Turning the tables on malicious AI agents](https://blog.talosintelligence.com/ai-powered-honeypots-turning-the-tables-on-malicious-ai-agents/) — Cisco Talos Blog
+- [ ] [Five defender priorities from the Talos Year in Review](https://blog.talosintelligence.com/five-defender-priorities-from-the-talos-year-in-review/) — Cisco Talos Blog
+- [ ] [It pays to be a forever student](https://blog.talosintelligence.com/it-pays-to-be-a-forever-student/) — Cisco Talos Blog
+- [ ] [UAT-4356's Targeting of Cisco Firepower Devices](https://blog.talosintelligence.com/uat-4356-firestarter/) — Cisco Talos Blog
+- [ ] [IR Trends Q1 2026: Phishing reemerges as top initial access vector, as attacks targeting public administration persist](https://blog.talosintelligence.com/ir-trends-q1-2026/) — Cisco Talos Blog
+- [ ] [[Podcast] It's not you, it's your printer: State-sponsored and phishing threats in 2025](https://blog.talosintelligence.com/podcast-its-not-you-its-your-printer-state-sponsored-and-phishing-threats-in-2025/) — Cisco Talos Blog
+- [ ] [Phishing and MFA exploitation: Targeting the keys to the kingdom](https://blog.talosintelligence.com/phishing-and-mfa-exploitation-targeting-the-keys-to-the-kingdom/) — Cisco Talos Blog
+- [ ] [Bad Apples: Weaponizing native macOS primitives for movement and execution](https://blog.talosintelligence.com/bad-apples-weaponizing-native-macos-primitives-for-movement-and-execution/) — Cisco Talos Blog
+- [ ] [Foxit, LibRaw vulnerabilities](https://blog.talosintelligence.com/foxit-libraw-vulnerabilities/) — Cisco Talos Blog
+- [ ] [Log In](https://www.sans.org/account/login) — SANS Blog
+- [ ] [Join - It&#x27;s Free](https://www.sans.org/account/create) — SANS Blog
+- [ ] [Training](https://www.sans.org/cyber-security-training-overview) — SANS Blog
+- [ ] [CoursesBuild cyber prowess with training from renowned experts](https://www.sans.org/cybersecurity-courses) — SANS Blog
+- [ ] [Ways to TrainMultiple training options to best fit your schedule and preferred learning style](https://www.sans.org/cyber-security-training-formats) — SANS Blog
+- [ ] [Cyber RangesHands-on training to keep you at the top of your game](https://www.sans.org/cyber-ranges) — SANS Blog
+- [ ] [Training Events &amp; SummitsExpert-led training at locations around the world](https://www.sans.org/cyber-security-training-events) — SANS Blog
+- [ ] [CertificationsDemonstrate cybersecurity expertise with GIAC certifications](https://www.sans.org/cyber-security-certifications) — SANS Blog
+- [ ] [Free Training EventsUpcoming workshops, webinars and local events](https://www.sans.org/free-cybersecurity-events) — SANS Blog
+- [ ] [Workforce Security and Risk Training Harden enterprise security with end-user and role-based training](https://www.sans.org/for-organizations/workforce) — SANS Blog
+- [ ] [Instructure confirms data breach, ShinyHunters claims attack](https://www.bleepingcomputer.com/news/security/instructure-confirms-data-breach-shinyhunters-claims-attack/) — BleepingComputer
+- [ ] [Microsoft Defender wrongly flags DigiCert certs as Trojan:Win32/Cerdigent.A!dha](https://www.bleepingcomputer.com/news/security/microsoft-defender-wrongly-flags-digicert-certs-as-trojan-win32-cerdigentadha/) — BleepingComputer
+- [ ] [Update 1.3_Windows_Event_Core.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/8598bdb8d50fe2a68e182933256bc9e21f6a76a5) — Blue_Team_Hunting_Field_Notes
+- [ ] [Update !Master_Internals_to_Events_Glossary.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/1633539548835af11f2f28f859593668f6a9330d) — Blue_Team_Hunting_Field_Notes
+- [ ] [Update _00_Review_Path.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/f4bddde9ffca0fcf8747a991c9782a4335984e25) — Blue_Team_Hunting_Field_Notes
+- [ ] [Merge branch 'main' of https://github.com/bitbug0x55AA/Blue_Team_Hunt…](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/13627bdd7a787b81243b3a6d8af1f9b580449168) — Blue_Team_Hunting_Field_Notes
+- [ ] [Script-layer principle file update](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/de15454e587b961734a0a3085d3d3db6bb847942) — Blue_Team_Hunting_Field_Notes
+- [ ] [Create 7.6_Malicious_Code_Minor_Analysis_Writeup_Template.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/907393720d8fd4f6578b7fcbbac10d851009f677) — Blue_Team_Hunting_Field_Notes
+- [ ] [Script-layer analysis related Underlying principle files update](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/844dda472e32fe283c82d5ea7c053ef68d618424) — Blue_Team_Hunting_Field_Notes
+- [ ] [Update README.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/a5613e0cd14be5713b92d1de68d511e0e629d935) — Blue_Team_Hunting_Field_Notes
+- [ ] [Update 4.3.03_JScript_VBS_HTA_Analysis.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/38b6d158a0e81d4d942f28d785cf6d6171cbea4e) — Blue_Team_Hunting_Field_Notes
+- [ ] [Create 8.1.30_COM_Automation_and_IDispatch_Interface.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/9034714806a5bed6ae1355da7ef5e506175608ec) — Blue_Team_Hunting_Field_Notes

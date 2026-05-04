@@ -7,7 +7,7 @@ Generated from:
 
 Category counts:
 - directory: 3
-- feed: 50
+- feed: 65
 - knowledge-base: 36
 - practitioner-blog: 1
 - primary-reference: 9
@@ -25,11 +25,15 @@ Category counts:
 
 - 13cubed (YouTube): https://www.youtube.com/@13cubed
   update: `rss`; kind: `rss-feed`; sources: `opml`
+- 4n6k: https://www.4n6k.com/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
 - AboutDFIR: https://aboutdfir.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - abuse.ch blog: https://abuse.ch/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Amped Software blog: https://blog.ampedsoftware.com/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- Andrea Fortuna — DFIR & Malware Analysis: https://andreafortuna.org/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Another Forensics Blog: https://az4n6.blogspot.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
@@ -47,11 +51,15 @@ Category counts:
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Cheeky4n6Monkey: https://cheeky4n6monkey.blogspot.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
+- Cisco Talos Blog: https://blog.talosintelligence.com/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
 - CrowdStrike blog: https://www.crowdstrike.com/blog/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Dark Reading: https://www.darkreading.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - DFIR Diva: https://dfirdiva.com/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- DFIR Review: https://dfir.pubpub.org/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - DFIR Science: https://dfir.science/
   update: `rss`; kind: `rss-feed`; sources: `opml`
@@ -59,9 +67,15 @@ Category counts:
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - dfir.blog: https://dfir.blog/
   update: `rss`; kind: `rss-feed`; sources: `opml`
-- Digital Forensics Stream: https://df-stream.com/
+- Didier Stevens Blog: https://blog.didierstevens.com/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- Digital Forensics Tips: https://www.digitalforensicstips.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - DoubleBlak: https://www.doubleblak.com/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- Elcomsoft Blog: https://blog.elcomsoft.com/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- Embee Research: https://embee-research.ghost.io/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Forensafe (ArtiFast) Blog: https://www.forensafe.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
@@ -71,11 +85,17 @@ Category counts:
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Forensic Multimedia Analysis Blog: https://forensicphotoshop.blogspot.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
-- forensicmike1: https://forensicmike1.com/
-  update: `rss`; kind: `rss-feed`; sources: `opml`
 - HECF / Hacking Exposed Computer Forensics Blog: https://www.hecfblog.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
+- Hexacorn: https://www.hexacorn.com/blog/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- Hexordia: https://www.hexordia.com/blog/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- Huntress Blog: https://www.huntress.com/blog
+  update: `rss`; kind: `rss-feed`; sources: `opml`
 - Initialization Vectors: https://abrignoni.blogspot.com/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- JPCERT/CC English Blog: https://blogs.jpcert.or.jp/en/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Krebs on Security: https://krebsonsecurity.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
@@ -93,9 +113,17 @@ Category counts:
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Malwarebytes Labs: https://blog.malwarebytes.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
+- Mandiant Threat Intelligence: https://cloud.google.com/blog/topics/threat-intelligence
+  update: `rss`; kind: `rss-feed`; sources: `opml`
 - MISP taxonomies: https://www.misp-project.org/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - MSAB: https://www.msab.com/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- Objective-See: https://objective-see.org/blog.html
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- Palo Alto Unit 42: https://unit42.paloaltonetworks.com/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- Red Canary Blog: https://redcanary.com/blog/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Salt Forensics: https://salt4n6.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
@@ -104,6 +132,10 @@ Category counts:
 - Smarter Forensics: https://smarterforensics.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - The Binary Hick: https://thebinaryhick.blog/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- The DFIR Spot: https://www.thedfirspot.com/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- The Eclectic Light Company: https://eclecticlight.co/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - The Sleuth Kit updates: https://www.sleuthkit.org/
   update: `rss`; kind: `rss-feed`; sources: `opml`
@@ -116,8 +148,6 @@ Category counts:
 - tisiphone.net: https://tisiphone.net/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - URLhaus — malware distribution URLs: https://urlhaus.abuse.ch/
-  update: `rss`; kind: `rss-feed`; sources: `opml`
-- VMware Carbon Black: https://www.carbonblack.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Windows Incident Response: https://windowsir.blogspot.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`

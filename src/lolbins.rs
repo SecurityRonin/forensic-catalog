@@ -872,9 +872,22 @@ pub const LOLBAS_WINDOWS: &[LolbasEntry] = &[
     },
     LolbasEntry {
         name: "winget.exe",
-        mitre_techniques: &["T1072", "T1218"],
+        mitre_techniques: &["T1072", "T1218", "T1559.001"],
         use_cases: UC_EXECUTE | UC_DOWNLOAD | UC_BYPASS,
-        description: "Windows Package Manager; installs and executes arbitrary packages from attacker-controlled manifests.",
+        description: "Windows Package Manager; installs and executes arbitrary packages from attacker-controlled manifests. COM API (IWinGetConfigurationStatics / DSC engine) can be activated directly via DSCourier without invoking winget.exe, bypassing AppLocker rules that block the binary.",
+    },
+    // Source: https://github.com/DylanDavis1/DSCourier — WinGet COM API proxy technique
+    LolbasEntry {
+        name: "ConfigurationRemotingServer.exe",
+        mitre_techniques: &["T1559.001", "T1218"],
+        use_cases: UC_EXECUTE | UC_BYPASS,
+        description: "WinGet Desired State Configuration COM server (Microsoft-signed); DSCourier activates it directly via IWinGetConfigurationStatics COM interface to install and execute arbitrary packages without winget.exe on the process tree — bypasses AppLocker/WDAC rules targeting winget.exe.",
+    },
+    LolbasEntry {
+        name: "WindowsPackageManagerServer.exe",
+        mitre_techniques: &["T1218", "T1559.001"],
+        use_cases: UC_EXECUTE | UC_BYPASS,
+        description: "WinGet DCOM out-of-process broker (Microsoft-signed); spawned by ConfigurationRemotingServer.exe during DSCourier COM activation — provides the full WinGet package install surface under a Microsoft-signed process tree (svchost → WindowsPackageManagerServer) with no winget.exe parent.",
     },
     // ── Batch 2: LOLBAS Project gaps (feed review 2026-05-03) ─────────────────
     // Source: https://lolbas-project.github.io/api/lolbas.json
@@ -8012,7 +8025,10 @@ mod tests {
     #[test]
     fn winget_entry_mentions_com_api() {
         // DSCourier technique — COM API bypass note must be on the winget entry
-        let entry = LOLBAS_WINDOWS.iter().find(|e| e.name == "winget.exe").unwrap();
+        let entry = LOLBAS_WINDOWS
+            .iter()
+            .find(|e| e.name == "winget.exe")
+            .unwrap();
         assert!(
             entry.description.contains("COM") || entry.description.contains("DSC"),
             "winget.exe description should mention COM API / DSC bypass (DSCourier technique)"

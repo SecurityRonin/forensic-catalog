@@ -2426,9 +2426,6 @@ pub static WINDOWS_TIMELINE: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Medium,
     related_artifacts: &["windows_timeline_devicecache"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1059/",
-        "https://attack.mitre.org/techniques/T1204/002/",
-        "https://attack.mitre.org/techniques/T1115/",
         "https://kacos2000.github.io/WindowsTimeline/WindowsTimeline.pdf",
         "https://github.com/kacos2000/WindowsTimeline",
         "https://www.sans.org/blog/windows-10-timeline-forensic-artifacts/",
@@ -2523,11 +2520,7 @@ pub static WINDOWS_SEARCH_DB_WIN11: ArtifactDescriptor = ArtifactDescriptor {
     retention: None,
     triage_priority: TriagePriority::Medium,
     related_artifacts: &["windows_search_edb", "mft", "usnjrnl"],
-    sources: &[
-        "https://github.com/kacos2000/WinEDB",
-        "https://attack.mitre.org/techniques/T1070/004/",
-        "https://attack.mitre.org/techniques/T1070/006/",
-    ],
+    sources: &["https://github.com/kacos2000/WinEDB"],
 };
 
 /// PowerShell PSReadLine command history (T1059.001).

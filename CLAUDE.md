@@ -64,6 +64,7 @@ Catalog errors like the UserAssist "Folder GUID" misnomer (the `{F4E57C4B-...}` 
 4. **Count all GUIDs a source enumerates** — for artifacts with multiple GUIDs (UserAssist, Shellbags), verify you've captured every variant documented by each cited source
 5. **Source field-level attribution**: where a specific field value (name, GUID, offset) comes from a specific source distinct from the others, add a `// Source: [url]` comment on that field
 6. **`// Source:` comments must be URLs** — `// Source: Magnet Forensics` is a stub, not a citation. Every `// Source:` comment must contain at least one `https://` URL so readers can independently verify without guessing which page to look at. "Confirmed by X" without a URL is rejected.
+7. **`sources[]` is for documents, not MITRE URLs** — `mitre_techniques: &["T1070.004"]` already expresses the MITRE relationship. Adding `"https://attack.mitre.org/techniques/T1070/004/"` to `sources[]` is redundant (DRY violation). `sources[]` is for researcher blogs, spec documents, tool repositories, and vendor artifact profiles — external documents that informed the artifact model, not the techniques themselves.
 
 ---
 

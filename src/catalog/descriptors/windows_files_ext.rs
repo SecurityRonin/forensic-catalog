@@ -816,9 +816,6 @@ pub(crate) static WINDOWS_SEARCH_EDB: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["mft", "usnjrnl", "windows_search_db_win11"],
     sources: &[
         "https://github.com/kacos2000/WinEDB",
-        "https://attack.mitre.org/techniques/T1083/",
-        "https://attack.mitre.org/techniques/T1070/004/",
-        "https://attack.mitre.org/techniques/T1070/006/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WindowsIndexSearch.tkape",
         "https://www.foxtonforensics.com/blog/post/analysing-the-windows-search-database",
     ],

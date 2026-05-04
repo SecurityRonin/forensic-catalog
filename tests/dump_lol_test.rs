@@ -1,8 +1,11 @@
 /// Integration tests for the `dump_lol` example.
 ///
-/// These tests run `cargo run --example dump_lol --features serde` and then
-/// verify the generated JSON snapshot files in `data/`.
+/// These tests run `cargo run --example dump_lol --features serde` exactly
+/// once (via `OnceLock`) and then verify the generated JSON snapshot files
+/// in `data/`. Without the lock, parallel test threads all invoke the example
+/// concurrently and corrupt each other's output files on Windows.
 use std::process::Command;
+use std::sync::OnceLock;
 
 /// Builds the manifest dir path for this crate (workspace root).
 fn workspace_root() -> std::path::PathBuf {
@@ -21,20 +24,29 @@ fn run_dump_lol() -> std::process::Output {
         .expect("failed to spawn cargo")
 }
 
+/// Ensure the dump_lol example has been run exactly once, regardless of how
+/// many test threads call this concurrently. Panics if the example fails.
+fn ensure_dump_lol_ran() {
+    static ONCE: OnceLock<()> = OnceLock::new();
+    ONCE.get_or_init(|| {
+        let out = run_dump_lol();
+        assert!(
+            out.status.success(),
+            "dump_lol exited non-zero.\nstdout: {}\nstderr: {}",
+            String::from_utf8_lossy(&out.stdout),
+            String::from_utf8_lossy(&out.stderr),
+        );
+    });
+}
+
 #[test]
 fn dump_lol_exits_zero() {
-    let out = run_dump_lol();
-    assert!(
-        out.status.success(),
-        "dump_lol exited non-zero.\nstdout: {}\nstderr: {}",
-        String::from_utf8_lossy(&out.stdout),
-        String::from_utf8_lossy(&out.stderr),
-    );
+    ensure_dump_lol_ran();
 }
 
 #[test]
 fn dump_lol_all_json_exists_and_is_valid_object() {
-    let _ = run_dump_lol();
+    ensure_dump_lol_ran();
     let path = workspace_root().join("data/all.json");
     assert!(path.exists(), "data/all.json does not exist");
 
@@ -46,7 +58,7 @@ fn dump_lol_all_json_exists_and_is_valid_object() {
 
 #[test]
 fn dump_lol_all_json_has_required_keys() {
-    let _ = run_dump_lol();
+    ensure_dump_lol_ran();
     let path = workspace_root().join("data/all.json");
     let content = std::fs::read_to_string(&path).expect("cannot read data/all.json");
     let value: serde_json::Value = serde_json::from_str(&content).unwrap();
@@ -68,7 +80,7 @@ fn dump_lol_all_json_has_required_keys() {
 
 #[test]
 fn dump_lol_lolbas_windows_json_is_nonempty_array() {
-    let _ = run_dump_lol();
+    ensure_dump_lol_ran();
     let path = workspace_root().join("data/lolbas_windows.json");
     assert!(path.exists(), "data/lolbas_windows.json does not exist");
 
@@ -85,7 +97,7 @@ fn dump_lol_lolbas_windows_json_is_nonempty_array() {
 
 #[test]
 fn dump_lol_lolbas_windows_entries_have_required_fields() {
-    let _ = run_dump_lol();
+    ensure_dump_lol_ran();
     let path = workspace_root().join("data/lolbas_windows.json");
     let content = std::fs::read_to_string(&path).unwrap();
     let value: serde_json::Value = serde_json::from_str(&content).unwrap();

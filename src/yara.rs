@@ -94,7 +94,10 @@ pub fn yara_rule_template(artifact_id: &str) -> Option<String> {
                 format!("    strings:\n        $evtx_file = \"{filename}\" nocase wide ascii");
             (block, "$evtx_file")
         }
-        ArtifactType::MemoryRegion | ArtifactType::LiveResponse | ArtifactType::DatabaseEntry => {
+        ArtifactType::MemoryRegion
+        | ArtifactType::LiveResponse
+        | ArtifactType::DatabaseEntry
+        | ArtifactType::EseDatabase => {
             let block = format!(
                 "    strings:\n        $artifact = \"{}\" nocase wide ascii",
                 artifact.name

@@ -2348,10 +2348,62 @@ pub static SRUM_DB: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
+/// ActivitiesCache.db field schema — derived from kacos2000/WindowsTimeline analysis.
+///
+/// `payload_json` is a type-specific JSON blob:
+/// - Activity_Type 5 (AppInFocus): `{"appDisplayName": "...", "displayText": "..."}`
+/// - Activity_Type 16 (CopyPaste): clipboard text — credential exfiltration indicator
+/// - Activity_Type 6 (AppLifecycle): launch/exit events
+pub(crate) static WINDOWS_TIMELINE_FIELDS: &[FieldSchema] = &[
+    FieldSchema {
+        name: "activity_type",
+        value_type: ValueType::Integer,
+        description: "5=AppInFocus, 6=AppLifecycle, 11=UserActivity, 12=Notification, 16=CopyPaste",
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "start_time",
+        value_type: ValueType::Timestamp,
+        description: "Unix epoch start time of the activity",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "end_time",
+        value_type: ValueType::Timestamp,
+        description: "Unix epoch end time; duration = end_time - start_time gives focus duration",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "payload_json",
+        value_type: ValueType::Json,
+        description: "Type-specific JSON payload; type 16 contains clipboard text",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "platform_device_id",
+        value_type: ValueType::Guid,
+        description: "Device GUID; resolve to name via DeviceCache registry",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "is_local_only",
+        value_type: ValueType::Integer,
+        description:
+            "1 = not synced to cloud; 0 = was eligible for cross-device sync (pre-July 2021)",
+        is_uid_component: false,
+    },
+];
+
 /// Windows Timeline / Activities Cache — cross-device activity history (Win10+).
 ///
-/// SQLite database; `Activity` table records application focus events,
-/// file opens, and clipboard content with timestamps.
+/// SQLite database per user+device at:
+/// `C:\Users\*\AppData\Local\ConnectedDevicesPlatform\*\ActivitiesCache.db`.
+/// Three tables: Activities (focus/clipboard events), ActivityOperation (pending sync),
+/// Activity_PackageID (app identity). Cloud sync disabled July 2021 for MSA accounts;
+/// local database persists. db-wal carving recovers deleted clipboard entries.
+///
+/// `platform_device_id` is a GUID — resolve to human name via DeviceCache registry:
+/// `HKCU\Software\Microsoft\Windows\CurrentVersion\CloudStore\Store\Cache\DefaultAccount\*\Current\Data`
 pub static WINDOWS_TIMELINE: ArtifactDescriptor = ArtifactDescriptor {
     id: "windows_timeline",
     name: "Windows Timeline (ActivitiesCache.db)",
@@ -2363,21 +2415,118 @@ pub static WINDOWS_TIMELINE: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::User,
     os_scope: OsScope::Win10Plus,
     decoder: Decoder::Identity,
-    meaning:
-        "Application activity timeline including focus time, file access, and clipboard events",
-    mitre_techniques: &["T1059", "T1204.002"],
-    fields: SRUM_FIELDS,
+    meaning: "App focus, lifecycle, and clipboard events with per-device attribution. \
+              Activity_Type 16 (CopyPaste) entries capture clipboard text — primary indicator \
+              for credential staging and data exfiltration. platform_device_id GUID resolves \
+              to device name via DeviceCache registry. Cloud sync disabled July 2021; \
+              db-wal carving recovers deleted clipboard entries.",
+    mitre_techniques: &["T1059", "T1204.002", "T1115"],
+    fields: WINDOWS_TIMELINE_FIELDS,
     retention: Some("~30 days"),
     triage_priority: TriagePriority::Medium,
-    related_artifacts: &[],
+    related_artifacts: &["windows_timeline_devicecache"],
     sources: &[
         "https://attack.mitre.org/techniques/T1059/",
         "https://attack.mitre.org/techniques/T1204/002/",
+        "https://attack.mitre.org/techniques/T1115/",
+        "https://kacos2000.github.io/WindowsTimeline/WindowsTimeline.pdf",
+        "https://github.com/kacos2000/WindowsTimeline",
         "https://www.sans.org/blog/windows-10-timeline-forensic-artifacts/",
         "https://aboutdfir.com/windows-10-timeline/",
         "http://windowsir.blogspot.com/2019/11/activitescachedb-vs-ntuserdat.html",
-        "https://kacos2000.github.io/WindowsTimeline/",
         "https://github.com/EricZimmerman/WxTCmd",
+    ],
+};
+
+/// Windows Timeline DeviceCache registry — resolves PlatformDeviceId GUIDs to names.
+///
+/// Registry path:
+/// `HKCU\Software\Microsoft\Windows\CurrentVersion\CloudStore\Store\Cache\DefaultAccount\*\Current\Data`
+/// Each subkey GUID corresponds to a device that contributed Timeline activities.
+/// Without this key, `platform_device_id` in ActivitiesCache.db is an opaque GUID.
+pub static WINDOWS_TIMELINE_DEVICECACHE: ArtifactDescriptor = ArtifactDescriptor {
+    id: "windows_timeline_devicecache",
+    name: "Windows Timeline DeviceCache Registry",
+    artifact_type: ArtifactType::RegistryKey,
+    hive: Some(HiveTarget::NtUser),
+    key_path: r"Software\Microsoft\Windows\CurrentVersion\CloudStore\Store\Cache\DefaultAccount\*\Current",
+    value_name: Some("Data"),
+    file_path: None,
+    scope: DataScope::User,
+    os_scope: OsScope::Win10Plus,
+    decoder: Decoder::Identity,
+    meaning: "Maps platform_device_id GUIDs (ActivitiesCache.db Activities.PlatformDeviceId) \
+              to human-readable device names. Required to determine whether timeline activities \
+              originated on the examined device or were synced from another.",
+    mitre_techniques: &["T1059"],
+    fields: &[
+        FieldSchema {
+            name: "device_guid",
+            value_type: ValueType::Guid,
+            description: "Device GUID matching Activities.PlatformDeviceId",
+            is_uid_component: true,
+        },
+        FieldSchema {
+            name: "device_name",
+            value_type: ValueType::Text,
+            description: "Human-readable device display name",
+            is_uid_component: false,
+        },
+    ],
+    retention: None,
+    triage_priority: TriagePriority::Low,
+    related_artifacts: &["windows_timeline"],
+    sources: &[
+        "https://kacos2000.github.io/WindowsTimeline/WindowsTimeline.pdf",
+        "https://github.com/kacos2000/WindowsTimeline",
+    ],
+};
+
+/// Windows Search index (SQLite) — Win11 22H2+ migration from Windows.edb.
+///
+/// SQLite3 at:
+/// `C:\ProgramData\Microsoft\Search\Data\Applications\Windows\windows.db`
+///
+/// Note the path change: `Windows Search` → `Search`, `Windows.edb` → `windows.db`.
+/// The migration is silent and automatic on Win11 22H2+. Analysts must check
+/// for both files on Windows 11 systems.
+pub static WINDOWS_SEARCH_DB_WIN11: ArtifactDescriptor = ArtifactDescriptor {
+    id: "windows_search_db_win11",
+    name: "Windows Search Index SQLite (windows.db, Win11 22H2+)",
+    artifact_type: ArtifactType::DatabaseEntry,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"C:\ProgramData\Microsoft\Search\Data\Applications\Windows\windows.db"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win11_22H2,
+    decoder: Decoder::Identity,
+    meaning: "Win11 22H2+ replacement for Windows.edb. Same forensic value — \
+              gather_time independent of NTFS timestamps — but SQLite3 format. \
+              Different path: note 'Search' (not 'Windows Search') and 'windows.db' (lowercase). \
+              Check for both files on Win11 systems.",
+    mitre_techniques: &["T1070.004", "T1070.006"],
+    fields: &[
+        FieldSchema {
+            name: "file_path",
+            value_type: ValueType::Text,
+            description: "Indexed file or folder path",
+            is_uid_component: true,
+        },
+        FieldSchema {
+            name: "gather_time",
+            value_type: ValueType::Timestamp,
+            description: "Last indexed time — independent of NTFS timestamps",
+            is_uid_component: false,
+        },
+    ],
+    retention: None,
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["windows_search_edb", "mft", "usnjrnl"],
+    sources: &[
+        "https://github.com/kacos2000/WinEDB",
+        "https://attack.mitre.org/techniques/T1070/004/",
+        "https://attack.mitre.org/techniques/T1070/006/",
     ],
 };
 
@@ -6900,6 +7049,8 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     PREFETCH_DIR,
     SRUM_DB,
     WINDOWS_TIMELINE,
+    WINDOWS_TIMELINE_DEVICECACHE,
+    WINDOWS_SEARCH_DB_WIN11,
     POWERSHELL_HISTORY,
     RECYCLE_BIN,
     THUMBCACHE,

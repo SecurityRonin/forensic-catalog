@@ -22,6 +22,8 @@ pub enum ArtifactType {
     LiveResponse,
     /// A structured database file (ESE/SQLite/etc.).
     DatabaseEntry,
+    /// An Extensible Storage Engine (ESE/JET Blue) database file.
+    EseDatabase,
 }
 
 /// Which Windows registry hive an artifact lives in.
@@ -162,6 +164,10 @@ pub enum ValueType {
     Bytes,
     Bool,
     List,
+    /// JSON-encoded blob — schema varies by context (e.g. Windows Timeline payload_json)
+    Json,
+    /// UUID/GUID stored as text or binary
+    Guid,
 }
 
 /// Describes one field in a decoded artifact record -- purely metadata, no data.

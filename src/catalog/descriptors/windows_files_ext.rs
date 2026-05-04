@@ -758,28 +758,67 @@ pub(crate) static SIGNAL_CONFIG_JSON: ArtifactDescriptor = ArtifactDescriptor {
 
 // ── Windows Forensic Files ────────────────────────────────────────────────────
 
+/// Windows Search index (ESE) — every indexed file with timestamp-independent gather time (Win7–10 21H2).
+///
+/// ESE database at:
+/// `%PROGRAMDATA%\Microsoft\Windows Search\Data\Applications\Windows\Windows.edb`
+///
+/// Key table: `SystemIndex_0A` — one row per indexed file/folder.
+/// `System_Search_GatherTime` is independent of NTFS timestamps — survives timestomping.
+/// Win11 22H2+ silently migrates to SQLite3 at a different path — see `windows_search_db_win11`.
 pub(crate) static WINDOWS_SEARCH_EDB: ArtifactDescriptor = ArtifactDescriptor {
     id: "windows_search_edb",
-    name: "Windows Search Index Database (Windows.edb)",
-    artifact_type: ArtifactType::File,
+    name: "Windows Search Index (Windows.edb)",
+    artifact_type: ArtifactType::EseDatabase,
     hive: None,
     key_path: "",
     value_name: None,
-    file_path: Some(r"C:\ProgramData\Microsoft\Search\Data\Applications\Windows\Windows.edb"),
+    file_path: Some(
+        r"C:\ProgramData\Microsoft\Windows Search\Data\Applications\Windows\Windows.edb",
+    ),
     scope: DataScope::System,
-    os_scope: OsScope::Win10Plus,
-    decoder: Decoder::Identity,
-    meaning: "Extensible Storage Engine (ESE) database containing Windows Search index. Stores content extracted from indexed files including email bodies, document text, and metadata. Contains evidence of file content even after files have been deleted, and indexes network shares visited by the user.",
-    mitre_techniques: &["T1083"],
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::EseDatabase,
+    meaning: "Indexes every file and folder on the system. SystemIndex_0A table contains \
+              System_Search_GatherTime — when Search last indexed each file. \
+              This timestamp is independent of NTFS $MFT timestamps and can reveal \
+              file existence after deletion or timestamp manipulation. Also indexes \
+              email, IE history, and Office document metadata depending on Search scope.",
+    mitre_techniques: &["T1083", "T1070.004", "T1070.006"],
     fields: &[
-        FieldSchema { name: "file_path", value_type: ValueType::Text, description: "Indexed file path", is_uid_component: true },
-        FieldSchema { name: "last_modified", value_type: ValueType::Timestamp, description: "File last modification time as indexed", is_uid_component: false },
+        FieldSchema {
+            name: "file_path",
+            value_type: ValueType::Text,
+            description: "Indexed file or folder path",
+            is_uid_component: true,
+        },
+        FieldSchema {
+            name: "gather_time",
+            value_type: ValueType::Timestamp,
+            description: "System_Search_GatherTime — when Search last indexed this file; independent of NTFS timestamps",
+            is_uid_component: false,
+        },
+        FieldSchema {
+            name: "last_modified",
+            value_type: ValueType::Timestamp,
+            description: "System_DateModified as reported to Search",
+            is_uid_component: false,
+        },
+        FieldSchema {
+            name: "size",
+            value_type: ValueType::Integer,
+            description: "File size in bytes at last index time",
+            is_uid_component: false,
+        },
     ],
     retention: Some("Rebuilt on corruption; grows until disk pressure forces cleanup"),
-    triage_priority: TriagePriority::High,
-    related_artifacts: &["mft_file", "ntuser_dat_file"],
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["mft", "usnjrnl", "windows_search_db_win11"],
     sources: &[
+        "https://github.com/kacos2000/WinEDB",
         "https://attack.mitre.org/techniques/T1083/",
+        "https://attack.mitre.org/techniques/T1070/004/",
+        "https://attack.mitre.org/techniques/T1070/006/",
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WindowsIndexSearch.tkape",
         "https://www.foxtonforensics.com/blog/post/analysing-the-windows-search-database",
     ],

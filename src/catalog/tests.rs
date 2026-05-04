@@ -194,7 +194,7 @@ mod decode_tests {
     #[test]
     fn catalog_has_entries() {
         assert!(!CATALOG.list().is_empty());
-        assert_eq!(CATALOG.list().len(), 6576);
+        assert_eq!(CATALOG.list().len(), 6577);
     }
 
     #[test]
@@ -2455,6 +2455,81 @@ mod tests_batch_d {
         }
     }
 
+    // ── SRUM enrichment: ssid + network_connections ───────────────────────
+
+    #[test]
+    fn srum_network_usage_has_ssid_field() {
+        // Network Usage records the wireless SSID (L2ProfileId ESE column)
+        // when the interface is wireless. Essential for correlating exfil
+        // with specific WiFi networks (e.g. airport, hotel, home).
+        // Source: https://github.com/MarkBaggett/srum-dump
+        assert!(
+            SRUM_NETWORK_USAGE
+                .fields
+                .iter()
+                .any(|f| f.name == "l2_profile_id"),
+            "srum_network_usage must have 'l2_profile_id' field (wireless SSID)"
+        );
+    }
+
+    #[test]
+    fn srum_network_connections_exists() {
+        // Separate SRUM table {DD6636C4-8929-4683-974E-22C046A43763}.
+        // Tracks connection-level metadata: start time, interface type,
+        // connected duration. Distinct from Network Data Usage (bytes).
+        // Source: https://github.com/MarkBaggett/srum-dump
+        assert!(
+            CATALOG.by_id("srum_network_connections").is_some(),
+            "srum_network_connections artifact must exist in catalog"
+        );
+    }
+
+    #[test]
+    fn srum_network_connections_has_correct_guid() {
+        let d = CATALOG.by_id("srum_network_connections").unwrap();
+        assert!(
+            d.file_path
+                .unwrap_or("")
+                .contains("DD6636C4-8929-4683-974E-22C046A43763"),
+            "srum_network_connections file_path must embed ESE table GUID"
+        );
+    }
+
+    #[test]
+    fn srum_network_connections_has_interface_type_field() {
+        let d = CATALOG.by_id("srum_network_connections").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "interface_type"),
+            "srum_network_connections must have 'interface_type' field (6=ethernet, 71=wireless)"
+        );
+    }
+
+    #[test]
+    fn srum_network_connections_has_connected_time_field() {
+        let d = CATALOG.by_id("srum_network_connections").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "connected_time"),
+            "srum_network_connections must have 'connected_time' field (duration in seconds)"
+        );
+    }
+
+    #[test]
+    fn srum_network_connections_cites_srum_dump() {
+        let d = CATALOG.by_id("srum_network_connections").unwrap();
+        assert!(
+            d.sources
+                .iter()
+                .any(|s| s.contains("github.com/MarkBaggett/srum-dump")),
+            "srum_network_connections must cite srum-dump as authoritative schema source"
+        );
+    }
+
+    #[test]
+    fn catalog_count_after_srum_network_connections() {
+        // +1 from srum_network_connections
+        assert_eq!(CATALOG.list().len(), 6577);
+    }
+
     // ── EVTX channels ─────────────────────────────────────────────────────
 
     #[test]
@@ -3353,7 +3428,7 @@ mod phase2_registry_tests {
     #[test]
     fn catalog_count_includes_phase2() {
         // Updated to 354 after phase-2b file artifact additions
-        assert_eq!(CATALOG.list().len(), 6576);
+        assert_eq!(CATALOG.list().len(), 6577);
     }
 
     #[test]
@@ -3498,7 +3573,7 @@ mod phase2b_files_tests {
     fn catalog_count_includes_phase2b() {
         // phase2a adds 30 registry artifacts (284→314), phase2b adds 40 file artifacts (314→354)
         // Note: chrome_login_data was already present from Phase 1; not duplicated here.
-        assert_eq!(CATALOG.list().len(), 6576);
+        assert_eq!(CATALOG.list().len(), 6577);
     }
 
     #[test]
@@ -3801,7 +3876,7 @@ mod phase3_persistence_tests {
         // phase3 adds 7 net-new artifacts not already in catalog (354 → 361)
         // Note: winlogon_shell, winlogon_userinit, appinit_dlls, boot_execute,
         //       ifeo_debugger, netsh_helper_dlls, mountpoints2 were already present.
-        assert_eq!(CATALOG.list().len(), 6576);
+        assert_eq!(CATALOG.list().len(), 6577);
     }
 
     // ── Pre-existing artifacts verified present ───────────────────────────────

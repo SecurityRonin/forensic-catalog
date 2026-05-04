@@ -5326,8 +5326,17 @@ pub(crate) static SRUM_NET_FIELDS: &[FieldSchema] = &[
     },
     FieldSchema {
         name: "interface_luid",
-        description: "Network interface LUID",
+        description: "Network interface LUID (resolve to adapter name via registry)",
         value_type: ValueType::UnsignedInt,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        // ESE column: L2ProfileId. Present only when interface is wireless.
+        // Null/zero for wired (ethernet) sessions.
+        // Source: https://github.com/MarkBaggett/srum-dump
+        name: "l2_profile_id",
+        description: "Wireless SSID (L2ProfileId) when network is WiFi; null for ethernet",
+        value_type: ValueType::Text,
         is_uid_component: false,
     },
 ];
@@ -5358,6 +5367,98 @@ pub static SRUM_NETWORK_USAGE: ArtifactDescriptor = ArtifactDescriptor {
         "https://www.magnetforensics.com/blog/srum-forensic-analysis-of-windows-system-resource-utilization-monitor/",
         "https://github.com/EricZimmerman/Srum",
         "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
+    ],
+};
+
+/// SRUM Network Connections table field schema.
+///
+/// ESE column names from srum-dump (github.com/MarkBaggett/srum-dump).
+/// `interface_type` values: 6 = ethernet, 71 = 802.11 wireless.
+pub(crate) static SRUM_NET_CONN_FIELDS: &[FieldSchema] = &[
+    FieldSchema {
+        name: "app_id",
+        description: "Application identifier (path or service name)",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "user_id",
+        description: "SID of the user account",
+        value_type: ValueType::Text,
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "timestamp",
+        description: "Connection start time (UTC)",
+        value_type: ValueType::Timestamp,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        // InterfaceType ESE column. 6 = IF_TYPE_ETHERNET_CSMACD, 71 = IF_TYPE_IEEE80211.
+        // Source: https://github.com/MarkBaggett/srum-dump
+        name: "interface_type",
+        description: "Network interface type: 6=ethernet, 71=wireless (802.11)",
+        value_type: ValueType::UnsignedInt,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        // ConnectedTime ESE column. Duration of the network session in seconds.
+        // Source: https://github.com/MarkBaggett/srum-dump
+        name: "connected_time",
+        description: "Duration of the network connection in seconds",
+        value_type: ValueType::UnsignedInt,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "l2_profile_id",
+        description: "Wireless SSID when interface is WiFi; null for ethernet",
+        value_type: ValueType::Text,
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "l2_profile_flags",
+        description: "Wireless profile flags (0 = managed/infrastructure, 1 = ad-hoc)",
+        value_type: ValueType::UnsignedInt,
+        is_uid_component: false,
+    },
+];
+
+/// SRUM Network Connections table — per-app connection-level timeline (Win8+).
+///
+/// ESE table `{DD6636C4-8929-4683-974E-22C046A43763}` records one row per
+/// network connection attempt by each application. Distinct from Network Data
+/// Usage (`{973F5D5C-...}`) which records bytes; this table records *when*
+/// connections happened and *which type* of network (ethernet vs WiFi).
+///
+/// Key forensic pivot: interface_type=71 (wireless) rows with a specific
+/// `l2_profile_id` SSID reveal which WiFi network was in use during malicious
+/// activity — correlates with location (home, hotel, airport, VPN-bypass).
+pub static SRUM_NETWORK_CONNECTIONS: ArtifactDescriptor = ArtifactDescriptor {
+    id: "srum_network_connections",
+    name: "SRUM Network Connections Table",
+    artifact_type: ArtifactType::EseDatabase,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(
+        r"C:\Windows\System32\sru\SRUDB.dat:{DD6636C4-8929-4683-974E-22C046A43763}",
+    ),
+    scope: DataScope::System,
+    os_scope: OsScope::Win8Plus,
+    decoder: Decoder::Identity,
+    meaning: "ESE table {DD6636C4-8929-4683-974E-22C046A43763} records per-app \
+              connection start time, interface type (ethernet/WiFi), duration, and SSID. \
+              Proves which WiFi network was in use during execution — geo-context \
+              for lateral movement and exfil timeline.",
+    mitre_techniques: &["T1049", "T1048"],
+    fields: SRUM_NET_CONN_FIELDS,
+    retention: Some("~30 days"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["srum_network_usage", "srum_app_resource", "networklist_profiles"],
+    sources: &[
+        "https://github.com/MarkBaggett/srum-dump",
+        "https://www.sans.org/white-papers/36660/",
+        "https://www.magnetforensics.com/blog/srum-forensic-analysis-of-windows-system-resource-utilization-monitor/",
     ],
 };
 
@@ -7071,6 +7172,7 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     LNK_FILES_OFFICE,
     PREFETCH_FILE,
     SRUM_NETWORK_USAGE,
+    SRUM_NETWORK_CONNECTIONS,
     SRUM_APP_RESOURCE,
     SRUM_ENERGY_USAGE,
     SRUM_PUSH_NOTIFICATION,

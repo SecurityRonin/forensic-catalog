@@ -2340,7 +2340,6 @@ pub static SRUM_DB: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1204/002/",
         "https://www.sans.org/white-papers/36660/",
         "https://www.sans.org/blog/srum-forensics/",
         "https://www.magnetforensics.com/blog/srum-forensic-analysis-of-windows-system-resource-utilization-monitor/",
@@ -5436,8 +5435,6 @@ pub static SRUM_NETWORK_USAGE: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["evtx_security", "srum_app_resource", "prefetch_file"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1049/",
-        "https://attack.mitre.org/techniques/T1048/",
         "https://www.sans.org/white-papers/36660/",
         "https://www.sans.org/blog/srum-forensics/",
         "https://www.magnetforensics.com/blog/srum-forensic-analysis-of-windows-system-resource-utilization-monitor/",
@@ -5511,8 +5508,6 @@ pub static SRUM_APP_RESOURCE: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::Critical,
     related_artifacts: &["srum_network_usage", "prefetch_file", "evtx_security"],
     sources: &[
-        "https://attack.mitre.org/techniques/T1059/",
-        "https://attack.mitre.org/techniques/T1070/004/",
         "https://www.sans.org/white-papers/36660/",
         "https://www.sans.org/blog/srum-forensics/",
         "https://www.magnetforensics.com/blog/srum-forensic-analysis-of-windows-system-resource-utilization-monitor/",
@@ -5579,7 +5574,6 @@ pub static SRUM_ENERGY_USAGE: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1059/",
         "https://www.sans.org/white-papers/36660/",
         "https://github.com/EricZimmerman/Srum",
     ],
@@ -5638,7 +5632,6 @@ pub static SRUM_PUSH_NOTIFICATION: ArtifactDescriptor = ArtifactDescriptor {
     triage_priority: TriagePriority::High,
     related_artifacts: &[],
     sources: &[
-        "https://attack.mitre.org/techniques/T1059/",
         "https://www.sans.org/white-papers/36660/",
         "https://github.com/EricZimmerman/Srum",
     ],

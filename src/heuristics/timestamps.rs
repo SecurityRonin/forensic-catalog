@@ -43,6 +43,43 @@ pub fn is_plausible_install_date(unix_secs: u32) -> bool {
     unix_secs >= MIN_PLAUSIBLE_INSTALL_DATE_SECS
 }
 
+/// Returns `true` if a file's creation (born) time is *later* than its last-modified time.
+///
+/// # Semantics
+///
+/// On NTFS, the born timestamp (`$SI.$CREATED`) records when the file *arrived on this volume*.
+///
+/// - **born < modified** — NORMAL: file was created here, then edited one or more times.
+/// - **born > modified** — FOREIGN FILE: the file was copied or extracted from elsewhere.
+///   Windows preserves the source's `LastModified` but stamps `CREATED` as the arrival time.
+///   Common sources: USB drops, archive extraction, downloads, lateral movement staging.
+///   This is a *provenance* indicator, not necessarily tampering.
+/// - **born == modified** — Newly created and never edited, or a timestomping tool set both
+///   to the same value (see `is_all_macb_identical`).
+///
+/// # Parameters
+/// - `born_ns`: `$SI.$CREATED` as Unix nanoseconds
+/// - `modified_ns`: `$SI.$MODIFIED` (last-write) as Unix nanoseconds
+#[must_use]
+pub fn is_foreign_file(born_ns: i64, modified_ns: i64) -> bool {
+    born_ns > modified_ns
+}
+
+/// Returns `true` if a timestamp is in the future relative to `now_ns`.
+///
+/// Future timestamps indicate clock skew, deliberate manipulation, or a
+/// source system with a misconfigured clock. Any positive gap beyond a
+/// small allowance is suspicious; here we treat any strictly-future value
+/// as a flag (callers can apply their own tolerance before calling).
+///
+/// # Parameters
+/// - `ts_ns`: timestamp to check, as Unix nanoseconds
+/// - `now_ns`: current wall-clock time, as Unix nanoseconds
+#[must_use]
+pub fn is_future_timestamp(ts_ns: i64, now_ns: i64) -> bool {
+    ts_ns > now_ns
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 #[cfg(test)]
 mod tests {
@@ -133,5 +170,71 @@ mod tests {
     fn plausible_install_date_below_threshold() {
         // 999_999_999 → false
         assert!(!is_plausible_install_date(999_999_999));
+    }
+
+    // ── is_foreign_file ───────────────────────────────────────────────────────
+
+    #[test]
+    fn foreign_file_born_after_modified_is_foreign() {
+        // born = 2023-06-01, modified = 2020-01-01 (came from elsewhere)
+        let modified_ns = 1_577_836_800_000_000_000i64; // 2020-01-01 UTC
+        let born_ns = 1_685_577_600_000_000_000i64;     // 2023-06-01 UTC
+        assert!(is_foreign_file(born_ns, modified_ns));
+    }
+
+    #[test]
+    fn foreign_file_born_before_modified_is_normal() {
+        // born = 2020-01-01, modified = 2023-06-01 (created here, then edited)
+        let born_ns = 1_577_836_800_000_000_000i64;     // 2020-01-01 UTC
+        let modified_ns = 1_685_577_600_000_000_000i64; // 2023-06-01 UTC
+        assert!(!is_foreign_file(born_ns, modified_ns));
+    }
+
+    #[test]
+    fn foreign_file_equal_timestamps_is_not_foreign() {
+        // born == modified — newly created, not edited (or same-value stomp)
+        let ts = 1_600_000_000_000_000_000i64;
+        assert!(!is_foreign_file(ts, ts));
+    }
+
+    #[test]
+    fn foreign_file_born_one_ns_after_modified() {
+        // Minimal difference → still foreign
+        assert!(is_foreign_file(101, 100));
+    }
+
+    #[test]
+    fn foreign_file_born_one_ns_before_modified() {
+        // born just before modified → normal
+        assert!(!is_foreign_file(100, 101));
+    }
+
+    // ── is_future_timestamp ───────────────────────────────────────────────────
+
+    #[test]
+    fn future_timestamp_strictly_greater_than_now() {
+        let now_ns = 1_700_000_000_000_000_000i64;
+        let ts_ns = now_ns + 1;
+        assert!(is_future_timestamp(ts_ns, now_ns));
+    }
+
+    #[test]
+    fn future_timestamp_equal_to_now_is_not_future() {
+        let now_ns = 1_700_000_000_000_000_000i64;
+        assert!(!is_future_timestamp(now_ns, now_ns));
+    }
+
+    #[test]
+    fn future_timestamp_in_past_is_not_future() {
+        let now_ns = 1_700_000_000_000_000_000i64;
+        let ts_ns = now_ns - 1_000_000_000; // 1 second ago
+        assert!(!is_future_timestamp(ts_ns, now_ns));
+    }
+
+    #[test]
+    fn future_timestamp_far_future() {
+        let now_ns = 1_700_000_000_000_000_000i64;
+        let ts_ns = now_ns + 86_400_000_000_000i64; // 1 day ahead
+        assert!(is_future_timestamp(ts_ns, now_ns));
     }
 }

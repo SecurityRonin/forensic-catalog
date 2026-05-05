@@ -72,6 +72,185 @@ pub fn is_hour_outside_working_hours(hour: u8) -> bool {
     !(WORKING_HOURS_START..WORKING_HOURS_END).contains(&h)
 }
 
+// ── SI/FN timestomp detection ─────────────────────────────────────────────────
+
+/// Clock-resolution tolerance for SI/FN timestamp comparison (1 second in ns).
+///
+/// `$STANDARD_INFORMATION` born time that predates `$FILE_NAME` born time by
+/// more than this amount is definitive evidence of timestomping (T1070.006).
+/// Legitimate tools always write `$FILE_NAME` first; `$SI` is updated after.
+pub const SI_PRECEDES_FN_THRESHOLD_NS: i64 = 1_000_000_000; // 1 s
+
+/// Returns `true` if `$STANDARD_INFORMATION.born` predates `$FILE_NAME.born`
+/// by more than [`SI_PRECEDES_FN_THRESHOLD_NS`].
+#[must_use]
+pub fn is_si_before_fn(si_born_ns: i64, fn_born_ns: i64) -> bool {
+    fn_born_ns - si_born_ns > SI_PRECEDES_FN_THRESHOLD_NS
+}
+
+// ── Null / wiped timestamp detection ─────────────────────────────────────────
+
+/// Timestamps within this window of Unix epoch 0 are treated as null/wiped.
+pub const NULL_TIMESTAMP_WINDOW_NS: i64 = 86_400_000_000_000; // 1 day
+
+/// Returns `true` if the timestamp is zero, negative, or within one day of the
+/// Unix epoch (null/wiped indicator).
+#[must_use]
+pub fn is_null_timestamp(ts_ns: i64) -> bool {
+    ts_ns < NULL_TIMESTAMP_WINDOW_NS
+}
+
+// ── Rapid-access burst detection ─────────────────────────────────────────────
+
+/// Two events within this window of each other are considered "rapid".
+pub const RAPID_ACCESS_THRESHOLD_NS: i64 = 1_000_000_000; // 1 s
+
+/// Returns `true` if two timestamps are within [`RAPID_ACCESS_THRESHOLD_NS`].
+#[must_use]
+pub fn is_rapid_sequence(ts1_ns: i64, ts2_ns: i64) -> bool {
+    (ts1_ns - ts2_ns).unsigned_abs() < RAPID_ACCESS_THRESHOLD_NS as u64
+}
+
+/// Returns `true` if ALL consecutive pairs in the slice are within
+/// [`RAPID_ACCESS_THRESHOLD_NS`]. Empty or single-element slices return `false`.
+#[must_use]
+pub fn is_burst_access(timestamps_ns: &[i64]) -> bool {
+    if timestamps_ns.len() < 2 {
+        return false;
+    }
+    timestamps_ns
+        .windows(2)
+        .all(|w| is_rapid_sequence(w[0], w[1]))
+}
+
+// ── Network port heuristics ───────────────────────────────────────────────────
+
+/// Lowest ephemeral port (IANA dynamic/private range).
+pub const MIN_EPHEMERAL_PORT: u16 = 49152;
+
+/// Highest registered port (below ephemeral range).
+pub const MAX_REGISTERED_PORT: u16 = 49151;
+
+/// Lowest well-known / reserved port.
+pub const MIN_RESERVED_PORT: u16 = 1;
+
+/// Highest well-known / reserved port.
+pub const MAX_RESERVED_PORT: u16 = 1023;
+
+/// Stratum mining protocol ports (XMRig default + common pool variants).
+pub const MINER_STRATUM_PORTS: &[u16] = &[3333, 4444, 5555, 14444, 45700];
+
+/// Common loopback tunnel endpoints (SSH -L, SOCKS5, C2 forwarders).
+pub const COMMON_TUNNEL_PORTS: &[u16] = &[1080, 3128, 8080, 8443, 9050, 9150];
+
+/// Returns `true` if `port` is in the OS-assigned ephemeral range (≥ 49152).
+#[must_use]
+pub fn is_ephemeral_port(port: u16) -> bool {
+    port >= MIN_EPHEMERAL_PORT
+}
+
+/// Returns `true` if `port` is a known stratum mining port.
+#[must_use]
+pub fn is_miner_port(port: u16) -> bool {
+    MINER_STRATUM_PORTS.contains(&port)
+}
+
+/// Returns `true` if `port` is a common tunnel/proxy endpoint.
+#[must_use]
+pub fn is_common_tunnel_port(port: u16) -> bool {
+    COMMON_TUNNEL_PORTS.contains(&port)
+}
+
+// ── UID/GID boundary heuristics ───────────────────────────────────────────────
+
+/// UIDs at or below this value are system/service accounts on Linux.
+pub const MAX_SYSTEM_UID: u32 = 999;
+
+/// Returns `true` if `uid` is a system/service account (0 ..= 999).
+#[must_use]
+pub fn is_system_uid(uid: u32) -> bool {
+    uid <= MAX_SYSTEM_UID
+}
+
+/// Returns `true` if `uid` is a regular user account (> 999).
+#[must_use]
+pub fn is_user_uid(uid: u32) -> bool {
+    uid > MAX_SYSTEM_UID
+}
+
+// ── C2 beacon interval regularity ────────────────────────────────────────────
+
+/// Jitter tolerance for beacon detection in parts-per-thousand (25 = 2.5 %).
+pub const BEACON_JITTER_PPT: u64 = 25;
+
+/// Returns `true` if the intervals are "regular" — consistent with a C2 beacon.
+///
+/// Requires ≥ 3 intervals, all positive. Computes the median of the (assumed
+/// already-sortable) slice, then verifies every value falls within
+/// `median ± (median × BEACON_JITTER_PPT / 1000)`.
+#[must_use]
+pub fn is_regular_interval(intervals_ns: &[i64]) -> bool {
+    if intervals_ns.len() < 3 {
+        return false;
+    }
+    if intervals_ns.iter().any(|&v| v <= 0) {
+        return false;
+    }
+
+    // Copy and sort to find the median without modifying the caller's slice.
+    let mut sorted: [i64; 64] = [0; 64];
+    let n = intervals_ns.len().min(sorted.len());
+    sorted[..n].copy_from_slice(&intervals_ns[..n]);
+    // Insertion sort — fine for small forensic slices, zero deps.
+    for i in 1..n {
+        let key = sorted[i];
+        let mut j = i;
+        while j > 0 && sorted[j - 1] > key {
+            sorted[j] = sorted[j - 1];
+            j -= 1;
+        }
+        sorted[j] = key;
+    }
+
+    let median = if n % 2 == 1 {
+        sorted[n / 2]
+    } else {
+        // integer average of two middle values (no overflow: both positive i64)
+        (sorted[n / 2 - 1] / 2) + (sorted[n / 2] / 2)
+    };
+
+    let tolerance = (median as u64)
+        .saturating_mul(BEACON_JITTER_PPT)
+        / 1000;
+    let lo = median - tolerance as i64;
+    let hi = median + tolerance as i64;
+
+    intervals_ns[..n].iter().all(|&v| v >= lo && v <= hi)
+}
+
+// ── File size heuristics ──────────────────────────────────────────────────────
+
+/// Files smaller than this are rarely forensically significant as standalone
+/// artifacts (hollow / placeholder indicator).
+pub const MIN_MEANINGFUL_FILE_BYTES: u64 = 4;
+
+/// Files at or above this size warrant inspection as potential containers,
+/// memory dumps, or exfil archives.
+pub const LARGE_FILE_THRESHOLD_BYTES: u64 = 1_073_741_824; // 1 GiB
+
+/// Returns `true` if the file is suspiciously small (hollow / placeholder).
+#[must_use]
+pub fn is_hollow_file(size_bytes: u64) -> bool {
+    size_bytes < MIN_MEANINGFUL_FILE_BYTES
+}
+
+/// Returns `true` if the file is large enough to be a container, dump, or
+/// exfil package.
+#[must_use]
+pub fn is_potential_container(size_bytes: u64) -> bool {
+    size_bytes >= LARGE_FILE_THRESHOLD_BYTES
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 #[cfg(test)]
 mod tests {

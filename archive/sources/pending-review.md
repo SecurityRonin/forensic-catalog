@@ -12620,3 +12620,45 @@ Mark `[x]` when reviewed, `[→]` when artifact tasks were created.
 - [ ] [Update README.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/a5613e0cd14be5713b92d1de68d511e0e629d935) — Blue_Team_Hunting_Field_Notes
 - [ ] [Update 4.3.03_JScript_VBS_HTA_Analysis.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/38b6d158a0e81d4d942f28d785cf6d6171cbea4e) — Blue_Team_Hunting_Field_Notes
 - [ ] [Create 8.1.30_COM_Automation_and_IDispatch_Interface.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/9034714806a5bed6ae1355da7ef5e506175608ec) — Blue_Team_Hunting_Field_Notes
+
+## 2026-05-05
+
+- [ ] [Things I learned from bad managers](https://andreafortuna.org/2026/05/04/bad-managers/) — Andrea Fortuna
+- [ ] [AI-Generated CSAM: Staying Ahead Of The Threat](https://www.forensicfocus.com/articles/ai-generated-csam-staying-ahead-of-the-threat/) — Forensic Focus
+- [ ] [Windows forensics: Understanding and analyzing Pagefile.sys artifacts](https://www.magnetforensics.com/blog/windows-forensics-understanding-and-analyzing-pagefile-sys-artifacts-2/) — Magnet Forensics
+- [ ] [ISC Stormcast For Tuesday, May 5th, 2026 https://isc.sans.edu/podcastdetail/9918, (Tue, May 5th)](https://isc.sans.edu/diary/rss/32952) — SANS Internet Storm Center
+- [ ] [TeamPCP Weekly Analysis: 2026-W18 (2026-04-27 through 2026-05-03), (Mon, May 4th)](https://isc.sans.edu/diary/rss/32950) — SANS Internet Storm Center
+- [ ] [DShield Honeypot Update, (Mon, May 4th)](https://isc.sans.edu/diary/rss/32948) — SANS Internet Storm Center
+- [ ] [InfoSec News Nuggets 05/04/2026](https://aboutdfir.com/infosec-news-nuggets-05-04-2026/) — AboutDFIR
+- [ ] [The bicentenary of Frederic Edwin Church: 1857-77](https://eclecticlight.co/2026/05/04/the-bicentenary-of-frederic-edwin-church-1857-77/) — The Eclectic Light Company
+- [ ] [Solutions to Saturday Mac riddles 358](https://eclecticlight.co/2026/05/04/solutions-to-saturday-mac-riddles-358/) — The Eclectic Light Company
+- [ ] [macOS virtual machines and audio-video syncing](https://eclecticlight.co/2026/05/04/macos-virtual-machines-and-audio-video-syncing/) — The Eclectic Light Company
+- [ ] [Red Canary CFP tracker: May 2026](https://redcanary.com/blog/news-events/red-canary-cfp-tracker-may-2026/) — Red Canary Blog
+- [ ] [CrowdStrike Technical Risk Assessments Reveal Common Exposure Patterns](https://www.crowdstrike.com/en-us/blog/crowdstrike-technical-risk-assessments-reveal-common-exposure-patterns/) — CrowdStrike blog
+- [ ] [Cyberattacks are raising your prices (Lock and Code S07E09)](https://www.malwarebytes.com/blog/podcast/2026/05/cyberattacks-are-raising-your-prices-lock-and-code-s07e09) — Malwarebytes Labs
+- [ ] [Thousands of Facebook accounts stolen by phishing emails sent through Google](https://www.malwarebytes.com/blog/news/2026/05/thousands-of-facebook-accounts-stolen-by-phishing-emails-sent-through-google) — Malwarebytes Labs
+- [ ] [The 2026 World Cup scam economy is already running before the first whistle](https://www.malwarebytes.com/blog/threat-intel/2026/05/the-2026-world-cup-scam-economy-is-already-running-before-the-first-whistle) — Malwarebytes Labs
+- [ ] [A week in security (April 27 &#8211; May 3)](https://www.malwarebytes.com/blog/news/2026/05/a-week-in-security-april-27-may-3-3) — Malwarebytes Labs
+- [ ] [Weaver E-cology critical bug exploited in attacks since March](https://www.bleepingcomputer.com/news/security/weaver-e-cology-critical-bug-exploited-in-attacks-since-march/) — BleepingComputer
+- [ ] [Amazon SES increasingly abused in phishing to evade detection](https://www.bleepingcomputer.com/news/security/amazon-ses-increasingly-abused-in-phishing-to-evade-detection/) — BleepingComputer
+- [ ] [Backdoored PyTorch Lightning package drops credential stealer](https://www.bleepingcomputer.com/news/security/backdoored-pytorch-lightning-package-drops-credential-stealer/) — BleepingComputer
+- [ ] [Trellix discloses data breach after source code repository hack](https://www.bleepingcomputer.com/news/security/trellix-discloses-data-breach-after-source-code-repository-hack/) — BleepingComputer
+- [ ] [They don’t hack, they borrow: How fraudsters target credit unions](https://www.bleepingcomputer.com/news/security/they-dont-hack-they-borrow-how-fraudsters-target-credit-unions/) — BleepingComputer
+- [ ] [Progress warns of critical MOVEit Automation auth bypass flaw](https://www.bleepingcomputer.com/news/security/moveit-automation-customers-warned-to-patch-critical-auth-bypass-flaw/) — BleepingComputer
+- [ ] [Webinar: Why MSPs must rethink security and backup strategies](https://www.bleepingcomputer.com/news/security/webinar-why-msps-must-rethink-security-and-backup-strategies/) — BleepingComputer
+- [ ] [CISA says ‘Copy Fail’ flaw now exploited to root Linux systems](https://www.bleepingcomputer.com/news/security/cisa-says-copy-fail-flaw-now-exploited-to-root-linux-systems/) — BleepingComputer
+- [ ] [Microsoft confirms April Windows updates cause backup failures](https://www.bleepingcomputer.com/news/microsoft/microsoft-confirms-backup-failures-caused-by-vulnerable-driver-block/) — BleepingComputer
+- [ ] [RMM Tools Fuel Stealthy Phishing Campaign](https://www.darkreading.com/cyberattacks-data-breaches/rmm-tools-stealthy-phishing-campaign) — Dark Reading
+- [ ] [Exploit Cyber-Frenzy Threatens Millions via Critical cPanel Vulnerability](https://www.darkreading.com/threat-intelligence/exploit-cyber-frenzy-critical-cpanel-vulnerability) — Dark Reading
+- [ ] [Silver Fox Springs Tax-Themed Attacks on Orgs in India, Russia](https://www.darkreading.com/endpoint-security/silver-fox-tax-themed-attacks-india-russia) — Dark Reading
+- [ ] [How Dark Reading Lifted Off the Launchpad in 2006](https://www.darkreading.com/vulnerabilities-threats/how-dark-reading-lifted-off-launchpad-2006) — Dark Reading
+- [ ] [Update keywords3.md](https://github.com/kacos2000/Win10/commit/d39f62d323b320bf55cd2e9c643aa3feaed54eb8) — kacos2000_Win10
+- [ ] [Update keywords2.md](https://github.com/kacos2000/Win10/commit/94505f2d0a8030c871929ceb8ead3f03b73c5065) — kacos2000_Win10
+- [ ] [Update OpCodes2.csv](https://github.com/kacos2000/Win10/commit/a13fba537f39e4691c3fbc6f1b5a42b0b9cf0414) — kacos2000_Win10
+- [ ] [Update OpCodes2.csv](https://github.com/kacos2000/Win10/commit/e0373afe5c0a6cb5701b0a17ca4e4face2b5639d) — kacos2000_Win10
+- [ ] [Add files via upload](https://github.com/kacos2000/Win10/commit/ac3bcb6d5f4afa1282c55fb1718cd0737d1ae67e) — kacos2000_Win10
+- [ ] [Update readme.md](https://github.com/kacos2000/Win10/commit/b4752efe6166ea2db560640ca8dc73ae5036fe27) — kacos2000_Win10
+- [ ] [Windows Start/Stop times](https://github.com/kacos2000/Win10/commit/a83edfde1eedb4ce7b0cc22cff26e97ac91e3466) — kacos2000_Win10
+- [ ] [Update README.md](https://github.com/kacos2000/Win10/commit/5ecf8ed7fce5b1a29ebf068b8361e75ba6623c67) — kacos2000_Win10
+- [ ] [Update readme.md](https://github.com/kacos2000/Win10/commit/fa6c6baec39ab7a05035155df43ad9c9627a82a3) — kacos2000_Win10
+- [ ] [Windows Start/Stop times](https://github.com/kacos2000/Win10/commit/e5fd00400a1c1855b411b521c99afb3961222ea2) — kacos2000_Win10

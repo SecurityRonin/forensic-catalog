@@ -7,7 +7,7 @@ Generated from:
 
 Category counts:
 - directory: 3
-- feed: 65
+- feed: 66
 - knowledge-base: 36
 - practitioner-blog: 1
 - primary-reference: 9
@@ -96,6 +96,8 @@ Category counts:
 - Initialization Vectors: https://abrignoni.blogspot.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - JPCERT/CC English Blog: https://blogs.jpcert.or.jp/en/
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- kacos2000/Win10 (Windows forensic field notes): https://github.com/kacos2000/Win10
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Krebs on Security: https://krebsonsecurity.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`

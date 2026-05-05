@@ -4,7 +4,7 @@
     "directories": "archive/sources/catalog-directories.json",
     "manual": "archive/sources/manual-sources.json"
   },
-  "total_sources": 114,
+  "total_sources": 115,
   "sources": [
     {
       "id": "aboutdfir-blogs",
@@ -520,6 +520,19 @@
       "kind": "rss-feed",
       "html_url": "https://blogs.jpcert.or.jp/en/",
       "feed_url": "https://blogs.jpcert.or.jp/en/atom.xml",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "kacos2000-win10-windows-forensic-field-notes",
+      "title": "kacos2000/Win10 (Windows forensic field notes)",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://github.com/kacos2000/Win10",
+      "feed_url": "https://github.com/kacos2000/Win10/commits/master.atom",
       "update_strategy": "rss",
       "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
       "sources": [

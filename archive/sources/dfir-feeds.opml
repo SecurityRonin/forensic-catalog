@@ -64,7 +64,7 @@
       <!-- AboutDFIR — community resource hub; tool announcements, blog aggregation -->
       <outline type="rss" text="AboutDFIR" title="AboutDFIR" xmlUrl="https://aboutdfir.com/feed/" htmlUrl="https://aboutdfir.com/"/>
       <!-- Lee Whitfield — weekly DFIR news roundup, DFIR.Training awards -->
-      <outline type="rss" text="Forensic 4cast" title="Forensic 4cast" xmlUrl="https://4cast.whitfields.org/?feed=rss2" htmlUrl="https://forensic4cast.com/"/>
+      <outline type="rss" text="Forensic 4cast" title="Forensic 4cast" xmlUrl="https://forensic4cast.com/feed/" htmlUrl="https://forensic4cast.com/blog/"/>
       <!-- Juliet Doering — weekly DFIR content digest; aggregates blog posts, papers, tools -->
       <outline type="rss" text="This Week In 4n6" title="This Week In 4n6" xmlUrl="https://thisweekin4n6.wordpress.com/feed/" htmlUrl="https://thisweekin4n6.com/"/>
       <!-- Brian Carrier — The Sleuth Kit open-source forensic toolkit; release announcements -->
@@ -162,14 +162,12 @@
       <!-- abuse.ch suite — actively maintained, machine-readable threat intel -->
       <!-- URLhaus: daily CSV at https://urlhaus.abuse.ch/downloads/csv_recent/ -->
       <!-- synced via scripts/sync_urlhaus.py → archive/sources/urlhaus_domains.json -->
-      <!-- abuse.ch blog — project news and methodology posts; IOC-adjacent, skipped in fetch_all_sources -->
+      <!-- abuse.ch blog — administrative/project news only; IOC data consumed via CSV downloads, not RSS -->
       <outline type="rss" text="abuse.ch blog" title="abuse.ch blog" xmlUrl="https://abuse.ch/blog/feed/" htmlUrl="https://abuse.ch/"/>
-      <!-- URLhaus — malware distribution URLs; ~1000s of new entries/day; use CSV download not RSS -->
-      <outline type="rss" text="URLhaus" title="URLhaus — malware distribution URLs" xmlUrl="https://urlhaus.abuse.ch/rss/" htmlUrl="https://urlhaus.abuse.ch/"/>
-      <!-- MalwareBazaar — malware samples with SHA256/YARA/family tags; high-volume IOC feed -->
-      <outline type="rss" text="MalwareBazaar" title="MalwareBazaar — malware samples" xmlUrl="https://bazaar.abuse.ch/rss/" htmlUrl="https://bazaar.abuse.ch/"/>
-      <!-- ThreatFox — C2 IOCs (IP:port, domain, URL) with malware family tags -->
-      <outline type="rss" text="ThreatFox" title="ThreatFox — IOC sharing" xmlUrl="https://threatfox.abuse.ch/rss/" htmlUrl="https://threatfox.abuse.ch/"/>
+      <!-- URLhaus/MalwareBazaar/ThreatFox: IOC feeds (not blog posts) — RSS endpoints removed by abuse.ch;
+           consume via CSV/API instead: https://urlhaus.abuse.ch/downloads/csv_recent/
+                                        https://bazaar.abuse.ch/export/
+                                        https://threatfox.abuse.ch/export/ -->
       <!-- Cisco Umbrella 1M popularity list: daily snapshot, useful as baseline whitelist -->
       <!-- https://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip -->
       <!-- MISP taxonomies: https://github.com/MISP/misp-taxonomies — circl:threat-type, enisa:threats -->

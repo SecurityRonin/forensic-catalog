@@ -57,8 +57,8 @@
       <outline type="rss" text="13cubed (YouTube)" title="13cubed (YouTube)" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCy8ntxFEudOCRZYT1f7ya9Q" htmlUrl="https://www.youtube.com/@13cubed"/>
       <!-- SANS Internet Storm Center — daily handler diaries, often artifact-relevant. -->
       <outline type="rss" text="SANS Internet Storm Center" title="SANS Internet Storm Center" xmlUrl="https://isc.sans.edu/rssfeed_full.xml" htmlUrl="https://isc.sans.edu/"/>
-      <!-- DFIR Training — training resource directory; new course/tool announcements -->
-      <outline type="rss" text="DFIR Training" title="DFIR Training" xmlUrl="https://www.dfir.training/dfir-training-categories-k2/itemlist?format=feed" htmlUrl="https://www.dfir.training/"/>
+      <!-- Brett Shavers — dfir.training blog; digital forensics methodology, training, tools -->
+      <outline type="rss" text="DFIR Training Blog" title="DFIR Training Blog" xmlUrl="https://www.dfir.training/blog?format=feed" htmlUrl="https://www.dfir.training/blog"/>
       <!-- MSAB — XRY mobile forensics vendor; acquisition technique updates, new device support -->
       <outline type="rss" text="MSAB" title="MSAB" xmlUrl="https://www.msab.com/feed/" htmlUrl="https://www.msab.com/"/>
       <!-- AboutDFIR — community resource hub; tool announcements, blog aggregation -->

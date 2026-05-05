@@ -4,6 +4,45 @@
 // (= 1 second in 100-ns ticks) was written with only second-level precision —
 // a common timestomping artifact.
 
+/// Returns `true` if the FILETIME has sub-second precision.
+/// Legitimate NTFS timestamps almost always have non-zero sub-second components.
+#[must_use]
+pub fn has_subsecond_precision(filetime: u64) -> bool {
+    filetime % 10_000_000 != 0
+}
+
+/// Returns `true` if the FILETIME was written with only second-level precision
+/// (sub-second component is exactly zero). Common timestomping indicator.
+#[must_use]
+pub fn is_low_precision_timestamp(filetime: u64) -> bool {
+    filetime != 0 && !has_subsecond_precision(filetime)
+}
+
+/// Returns `true` if all four MACB timestamps are identical.
+/// Timestomping tools commonly set all four to the same value.
+#[must_use]
+pub fn is_all_macb_identical(m: i64, a: i64, c: i64, b: i64) -> bool {
+    m == a && a == c && c == b
+}
+
+/// Returns `true` if the timestamp (Unix nanoseconds) falls on an exact UTC hour boundary.
+/// Manually-set timestamps are often rounded to whole hours — a human-set indicator.
+#[must_use]
+pub fn is_round_hour_timestamp(ts_ns: i64) -> bool {
+    ts_ns > 0 && ts_ns % 3_600_000_000_000 == 0
+}
+
+/// Minimum plausible Windows install date (Unix seconds).
+/// 2001-09-09 01:46:40 UTC = 1_000_000_000 — no legitimate install predates Windows XP.
+pub const MIN_PLAUSIBLE_INSTALL_DATE_SECS: u32 = 1_000_000_000;
+
+/// Returns `true` if the registry InstallDate is within a plausible range.
+/// Values below MIN_PLAUSIBLE_INSTALL_DATE_SECS are spoofed or garbage.
+#[must_use]
+pub fn is_plausible_install_date(unix_secs: u32) -> bool {
+    unix_secs >= MIN_PLAUSIBLE_INSTALL_DATE_SECS
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 #[cfg(test)]
 mod tests {

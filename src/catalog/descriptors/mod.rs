@@ -6,6 +6,7 @@
 
 #![allow(clippy::too_many_lines)]
 
+mod browser_ext;
 mod generated;
 mod linux_ext;
 mod macos_ext;
@@ -13786,4 +13787,18 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     generated::velociraptor_generated::VELOCIRAPTOR_SYSTEM_CURRENTCONTROLSET_SERVICES,
     generated::velociraptor_generated::VELOCIRAPTOR_FILE_DLL_EXE,
     generated::velociraptor_generated::VELOCIRAPTOR_FILE_C_MFT,
+    // ── Browser-forensic v2 profiles ─────────────────────────────────────
+    browser_ext::BROWSER_CHROME_HISTORY,
+    browser_ext::BROWSER_CHROME_COOKIES,
+    browser_ext::BROWSER_CHROME_DOWNLOADS,
+    browser_ext::BROWSER_CHROME_BOOKMARKS,
+    browser_ext::BROWSER_CHROME_EXTENSIONS,
+    browser_ext::BROWSER_CHROME_LOGIN_DATA_V2,
+    browser_ext::BROWSER_CHROME_AUTOFILL,
+    browser_ext::BROWSER_CHROME_CACHE,
+    browser_ext::BROWSER_CHROME_SESSION,
+    browser_ext::BROWSER_FIREFOX_HISTORY,
+    browser_ext::BROWSER_FIREFOX_COOKIES,
+    browser_ext::BROWSER_FIREFOX_DOWNLOADS,
+    browser_ext::BROWSER_SAFARI_HISTORY,
 ];

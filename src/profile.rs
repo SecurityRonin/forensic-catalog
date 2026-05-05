@@ -1682,6 +1682,136 @@ pub static ARTIFACT_PROFILES: &[ArtifactProfile] = &[
         volatility_rationale: "SAM hive persists across reboots; protected in-use by Windows",
     },
     ArtifactProfile {
+        id: "browser_chrome_history",
+        evidence_strength: EvidenceStrength::Corroborative,
+        evidence_caveats: &[
+            "URL visited, not necessarily user-initiated; could be redirect or prefetch",
+            "History can be cleared by user or extensions; absence is not evidence of non-visit",
+        ],
+        volatility: VolatilityClass::ActivityDriven,
+        volatility_rationale: "Overwritten by browser activity; no fixed size limit but old entries pruned",
+    },
+    ArtifactProfile {
+        id: "browser_chrome_cookies",
+        evidence_strength: EvidenceStrength::Corroborative,
+        evidence_caveats: &[
+            "Cookie presence proves domain contact, not user intent; third-party cookies common",
+            "Expiration and creation timestamps useful for timeline reconstruction",
+        ],
+        volatility: VolatilityClass::ActivityDriven,
+        volatility_rationale: "Cookies expire or are overwritten by site updates",
+    },
+    ArtifactProfile {
+        id: "browser_chrome_downloads",
+        evidence_strength: EvidenceStrength::Strong,
+        evidence_caveats: &[
+            "File was downloaded; user may not have opened or executed it",
+            "Download record persists even if file was deleted from disk",
+        ],
+        volatility: VolatilityClass::Persistent,
+        volatility_rationale: "Download records persist until user clears download history",
+    },
+    ArtifactProfile {
+        id: "browser_chrome_bookmarks",
+        evidence_strength: EvidenceStrength::Circumstantial,
+        evidence_caveats: &[
+            "Bookmark proves awareness of URL, not visit frequency",
+            "May be synced from another device; check sync metadata",
+        ],
+        volatility: VolatilityClass::Persistent,
+        volatility_rationale: "Bookmarks persist until deleted by user",
+    },
+    ArtifactProfile {
+        id: "browser_chrome_extensions",
+        evidence_strength: EvidenceStrength::Corroborative,
+        evidence_caveats: &[
+            "Extension installed, possibly auto-installed by enterprise policy",
+            "Extension version and update timestamps useful for timeline",
+        ],
+        volatility: VolatilityClass::Persistent,
+        volatility_rationale: "Extensions persist until uninstalled",
+    },
+    ArtifactProfile {
+        id: "browser_chrome_login_data_v2",
+        evidence_strength: EvidenceStrength::Strong,
+        evidence_caveats: &[
+            "Credential saved; timestamp shows last use; passwords encrypted by OS credential store",
+            "Presence proves user entered credentials on the site at least once",
+        ],
+        volatility: VolatilityClass::Persistent,
+        volatility_rationale: "Credentials persist until deleted from browser or profile deletion",
+    },
+    ArtifactProfile {
+        id: "browser_chrome_autofill",
+        evidence_strength: EvidenceStrength::Corroborative,
+        evidence_caveats: &[
+            "Form data was saved; may have been auto-populated not manually typed",
+            "Timestamps show when autofill entry was created and last used",
+        ],
+        volatility: VolatilityClass::Persistent,
+        volatility_rationale: "Autofill data persists until browser data cleared",
+    },
+    ArtifactProfile {
+        id: "browser_chrome_cache",
+        evidence_strength: EvidenceStrength::Corroborative,
+        evidence_caveats: &[
+            "Cache entry proves resource was fetched; evicted under size pressure",
+            "Response headers (Last-Modified, ETag) may reveal server-side timestamps",
+        ],
+        volatility: VolatilityClass::RotatingBuffer,
+        volatility_rationale: "Evicted when cache size limit reached; newest entries overwrite oldest",
+    },
+    ArtifactProfile {
+        id: "browser_chrome_session",
+        evidence_strength: EvidenceStrength::Corroborative,
+        evidence_caveats: &[
+            "Tab state reflects last browser close; unreliable if crash occurred",
+            "SNSS format is binary and partially documented",
+        ],
+        volatility: VolatilityClass::Volatile,
+        volatility_rationale: "Overwritten on every browser launch; lost on clean exit without restore",
+    },
+    ArtifactProfile {
+        id: "browser_firefox_history",
+        evidence_strength: EvidenceStrength::Corroborative,
+        evidence_caveats: &[
+            "Same caveats as Chrome history; stored in places.sqlite",
+            "Firefox uses moz_places + moz_historyvisits join for full timeline",
+        ],
+        volatility: VolatilityClass::ActivityDriven,
+        volatility_rationale: "Overwritten by browser activity; no fixed size limit",
+    },
+    ArtifactProfile {
+        id: "browser_firefox_cookies",
+        evidence_strength: EvidenceStrength::Corroborative,
+        evidence_caveats: &[
+            "Same caveats as Chrome cookies; stored in cookies.sqlite",
+            "Firefox stores isHttpOnly and sameSite flags useful for security analysis",
+        ],
+        volatility: VolatilityClass::ActivityDriven,
+        volatility_rationale: "Cookies expire or are overwritten by site updates",
+    },
+    ArtifactProfile {
+        id: "browser_firefox_downloads",
+        evidence_strength: EvidenceStrength::Strong,
+        evidence_caveats: &[
+            "Same caveats as Chrome downloads; stored in places.sqlite moz_annos",
+            "Download annotations reference moz_places entries",
+        ],
+        volatility: VolatilityClass::Persistent,
+        volatility_rationale: "Download records persist until user clears history",
+    },
+    ArtifactProfile {
+        id: "browser_safari_history",
+        evidence_strength: EvidenceStrength::Corroborative,
+        evidence_caveats: &[
+            "Same caveats as Chrome history; stored in History.db",
+            "Safari has history_tombstones table tracking deleted URLs with timestamps",
+        ],
+        volatility: VolatilityClass::ActivityDriven,
+        volatility_rationale: "Overwritten by browser activity; tombstones provide deletion evidence",
+    },
+    ArtifactProfile {
         id: "nirsoft_network_passwords_cred_dir",
         evidence_strength: EvidenceStrength::Definitive,
         evidence_caveats: &["Encrypted browser passwords; key in OS credential store; timestamp shows last use"],

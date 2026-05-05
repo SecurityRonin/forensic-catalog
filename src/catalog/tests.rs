@@ -264,7 +264,7 @@ mod decode_tests {
     #[test]
     fn catalog_has_entries() {
         assert!(!CATALOG.list().is_empty());
-        assert_eq!(CATALOG.list().len(), 6577);
+        assert_eq!(CATALOG.list().len(), 6590);
     }
 
     #[test]
@@ -2597,7 +2597,7 @@ mod tests_batch_d {
     #[test]
     fn catalog_count_after_srum_network_connections() {
         // +1 from srum_network_connections
-        assert_eq!(CATALOG.list().len(), 6577);
+        assert_eq!(CATALOG.list().len(), 6590);
     }
 
     // ── EVTX channels ─────────────────────────────────────────────────────
@@ -3498,7 +3498,7 @@ mod phase2_registry_tests {
     #[test]
     fn catalog_count_includes_phase2() {
         // Updated to 354 after phase-2b file artifact additions
-        assert_eq!(CATALOG.list().len(), 6577);
+        assert_eq!(CATALOG.list().len(), 6590);
     }
 
     #[test]
@@ -3643,7 +3643,7 @@ mod phase2b_files_tests {
     fn catalog_count_includes_phase2b() {
         // phase2a adds 30 registry artifacts (284→314), phase2b adds 40 file artifacts (314→354)
         // Note: chrome_login_data was already present from Phase 1; not duplicated here.
-        assert_eq!(CATALOG.list().len(), 6577);
+        assert_eq!(CATALOG.list().len(), 6590);
     }
 
     #[test]
@@ -3946,7 +3946,7 @@ mod phase3_persistence_tests {
         // phase3 adds 7 net-new artifacts not already in catalog (354 → 361)
         // Note: winlogon_shell, winlogon_userinit, appinit_dlls, boot_execute,
         //       ifeo_debugger, netsh_helper_dlls, mountpoints2 were already present.
-        assert_eq!(CATALOG.list().len(), 6577);
+        assert_eq!(CATALOG.list().len(), 6590);
     }
 
     // ── Pre-existing artifacts verified present ───────────────────────────────
@@ -4661,7 +4661,9 @@ mod tests_recycle_bin_enrichment {
     use crate::catalog::CATALOG;
 
     fn desc() -> &'static crate::catalog::ArtifactDescriptor {
-        CATALOG.by_id("recycle_bin").expect("recycle_bin must exist")
+        CATALOG
+            .by_id("recycle_bin")
+            .expect("recycle_bin must exist")
     }
 
     #[test]
@@ -4757,14 +4759,21 @@ mod tests_recycle_bin_enrichment {
         // EricZimmerman/RBCmd is the standard tool for $I parsing
         let d = desc();
         let cites = d.sources.iter().any(|s| s.contains("RBCmd"));
-        assert!(cites, "recycle_bin sources must cite RBCmd; got: {:?}", d.sources);
+        assert!(
+            cites,
+            "recycle_bin sources must cite RBCmd; got: {:?}",
+            d.sources
+        );
     }
 
     #[test]
     fn recycle_bin_cites_akhil_dara() {
         // Binary format reference: $I offset schema and version semantics
         let d = desc();
-        let cites = d.sources.iter().any(|s| s.contains("akhil-dara") || s.contains("RecycleBin-Forensic"));
+        let cites = d
+            .sources
+            .iter()
+            .any(|s| s.contains("akhil-dara") || s.contains("RecycleBin-Forensic"));
         assert!(
             cites,
             "recycle_bin sources must cite akhil-dara/RecycleBin-Forensic-Explorer; got: {:?}",
@@ -4776,7 +4785,10 @@ mod tests_recycle_bin_enrichment {
     fn recycle_bin_triage_is_high_or_critical() {
         use crate::catalog::TriagePriority;
         let d = desc();
-        let is_high_value = matches!(d.triage_priority, TriagePriority::High | TriagePriority::Critical);
+        let is_high_value = matches!(
+            d.triage_priority,
+            TriagePriority::High | TriagePriority::Critical
+        );
         assert!(
             is_high_value,
             "recycle_bin triage should be High or Critical — $I files reveal deletion time \

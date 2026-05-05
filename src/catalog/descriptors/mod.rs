@@ -2523,10 +2523,95 @@ pub static POWERSHELL_HISTORY: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
-/// Recycle Bin ($I metadata files) — deletion evidence (T1070.004).
+/// $I file binary schema — Vista+ format.
 ///
-/// Each `$I{RAND}` file (8 bytes header + original path) records file size,
-/// deletion timestamp, and original full path of the deleted file.
+/// Offsets documented in https://github.com/akhil-dara/RecycleBin-Forensic-Explorer
+/// (parse_dollar_i_file function). Version 1 = Vista/7/8/8.1; Version 2 = Win10/11.
+/// Path offset differs between versions (24 vs 28); all other fields are identical.
+pub const RECYCLE_BIN_FIELDS: &[FieldSchema] = &[
+    FieldSchema {
+        name: "version",
+        value_type: ValueType::UnsignedInt,
+        description: "uint64 at offset 0: 1=Vista/7/8/8.1 (path@24), 2=Win10/11 (path@28); \
+                      selects correct UTF-16LE path offset",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "original_size",
+        value_type: ValueType::UnsignedInt,
+        description: "uint64 at offset 8: size of deleted file in bytes; \
+                      zero if file was a directory",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "deletion_time",
+        value_type: ValueType::Timestamp,
+        description: "FILETIME (100-ns intervals since 1601-01-01) at offset 16: \
+                      moment the file was moved to Recycle.Bin — not secure-delete time; \
+                      convert: (filetime - 116444736000000000) / 10000000 = Unix epoch",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "original_path",
+        value_type: ValueType::Text,
+        description: "UTF-16LE null-terminated string starting at offset 24 (v1) or 28 (v2): \
+                      full pre-deletion Windows path (e.g. C:\\Users\\alice\\Documents\\creds.xlsx); \
+                      survives Recycle.Bin emptying if $I file is not overwritten",
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "sid",
+        value_type: ValueType::Text,
+        description: "Security Identifier from parent directory name, format S-1-5-21-…-{RID}; \
+                      identifies which user deleted the file; pivot to SAM hive \
+                      (HKLM\\SAM\\SAM\\Domains\\Account\\Users) for username resolution",
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "i_filename",
+        value_type: ValueType::Text,
+        description: "$I{hex} — the metadata filename; hex suffix links to matching $R{hex} \
+                      content file; suffix is random but consistent within the pair",
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "r_file_exists",
+        value_type: ValueType::Bool,
+        description: "bool: whether $R{hex} content file is present; False = file permanently \
+                      deleted or Bin emptied — but $I metadata still recoverable; \
+                      analysts can reconstruct deletion evidence from $I alone",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "mft_addr",
+        value_type: ValueType::UnsignedInt,
+        description: "NTFS MFT record address (meta.addr via pytsk3) of the $I file itself; \
+                      pivot to $MFT for additional timeline anchors independent of $I timestamps",
+        is_uid_component: false,
+    },
+];
+
+/// Recycle Bin ($I metadata files) — deletion evidence.
+///
+/// `$I{RAND}` files in `C:\$Recycle.Bin\{SID}\` contain a 24-byte (v1) or 28-byte (v2)
+/// binary header encoding the deleted file's original path, size, and deletion timestamp
+/// in FILETIME format.
+///
+/// ## Why High triage priority
+///
+/// $I files survive Recycle.Bin emptying until NTFS overwrites the MFT entry. Even
+/// an empty Recycle.Bin may contain $I remnants. The deletion_time field reveals
+/// *when* an adversary tried to destroy evidence; original_path reveals *what*.
+///
+/// ## Version semantics
+///
+/// - Version 1 (Vista/7/8/8.1): path starts at byte offset 24
+/// - Version 2 (Win10/11): path starts at byte offset 28 (4-byte path-length prefix added)
+///
+/// ## User attribution
+///
+/// Each SID subdirectory corresponds to one user. Pivot SID → SAM hive for username.
+/// Domain-joined machines: SID → AD for domain user resolution.
 pub static RECYCLE_BIN: ArtifactDescriptor = ArtifactDescriptor {
     id: "recycle_bin",
     name: "Recycle Bin ($I Metadata)",
@@ -2534,22 +2619,33 @@ pub static RECYCLE_BIN: ArtifactDescriptor = ArtifactDescriptor {
     hive: None,
     key_path: "",
     value_name: None,
-    file_path: Some(r"C:\$Recycle.Bin\*"),
+    // SID-keyed subdirectories: C:\$Recycle.Bin\{SID}\$I{hex} (metadata)
+    //                           C:\$Recycle.Bin\{SID}\$R{hex} (content)
+    file_path: Some(r"C:\$Recycle.Bin\{SID}\$I*"),
     scope: DataScope::User,
     os_scope: OsScope::Win7Plus,
     decoder: Decoder::Identity,
-    meaning: "$I files reveal original path and deletion time even after Recycle Bin is emptied",
-    mitre_techniques: &["T1070.004", "T1083"],
-    fields: DIR_ENTRY_FIELDS,
+    meaning: "$I files reveal original path and deletion timestamp even after Recycle Bin is \
+              emptied; version field selects correct path offset (24 vs 28); SID directory \
+              links deletion to a specific user account (pivot to SAM hive for username); \
+              $R absence means content is unrecoverable but $I metadata always survives until \
+              MFT slot is reused",
+    mitre_techniques: &[
+        "T1070.004", // Indicator Removal: File Deletion — adversary sent to Bin to cover tracks
+        "T1083",     // File and Directory Discovery — reveals original file system layout
+        "T1078.003", // Valid Accounts: Local Accounts — SID attribution to local user
+    ],
+    fields: RECYCLE_BIN_FIELDS,
     retention: None,
-    triage_priority: TriagePriority::Medium,
-    related_artifacts: &[],
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["sam_users", "mft_file", "usnjrnl", "lnk_files"],
     sources: &[
         "https://www.sans.org/blog/digital-forensics-recycle-bin-forensics/",
         "https://windowsir.blogspot.com/2010/02/more-on-recycle-bin.html",
         "https://www.magnetforensics.com/blog/artifact-profile-recycle-bin/",
         "https://andreafortuna.org/2019/09/26/windows-forensics-analysis-of-recycle-bin-artifacts/",
         "https://github.com/EricZimmerman/RBCmd",
+        "https://github.com/akhil-dara/RecycleBin-Forensic-Explorer",
         "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
     ],
 };

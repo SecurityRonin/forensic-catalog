@@ -1123,3 +1123,286 @@ pub(crate) static USRCLASS_DAT_FILE: ArtifactDescriptor = ArtifactDescriptor {
         "https://www.sans.org/blog/windows-shellbag-forensics-in-depth/",
     ],
 };
+
+// ── Group A: Windows Plaintext Logs ──────────────────────────────────────────
+
+pub(crate) static CBS_LOG: ArtifactDescriptor = ArtifactDescriptor {
+    id: "cbs_log",
+    name: "CBS.log (Component Based Servicing Log)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"%SystemRoot%\Logs\CBS\CBS.log"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "Component Based Servicing log recording Windows Update, hotfix, and feature-on-demand activity. Each entry includes a timestamp, severity (Info/Warning/Error), component name, and message. Forensically valuable for: (1) correlating KB installation times with compromise timelines, (2) detecting update suppression (expected patches absent), (3) identifying tampering with system binary integrity (CBS validates component hashes — corruption messages indicate file replacement). Rotates to CBS.persist.log when it exceeds ~50 MB.",
+    mitre_techniques: &["T1562.001"],
+    fields: &[
+        FieldSchema { name: "timestamp", value_type: ValueType::Timestamp, description: "Log entry timestamp (YYYY-MM-DD HH:MM:SS, local time)", is_uid_component: false },
+        FieldSchema { name: "severity", value_type: ValueType::Text, description: "Entry type: Info, Warning, Error", is_uid_component: false },
+        FieldSchema { name: "component", value_type: ValueType::Text, description: "CBS component or package name", is_uid_component: false },
+        FieldSchema { name: "message", value_type: ValueType::Text, description: "Human-readable status or error message", is_uid_component: false },
+    ],
+    retention: Some("Rotates to CBS.persist.log at ~50 MB; persist.log may be deleted"),
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["windows_update_session", "setupapi_dev_log"],
+    sources: &[
+        "https://learn.microsoft.com/en-us/troubleshoot/windows-server/deployment/understanding-cbs-log-file",
+        "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WindowsUpdateLogs.tkape",
+    ],
+};
+
+pub(crate) static PFRO_LOG: ArtifactDescriptor = ArtifactDescriptor {
+    id: "pfro_log",
+    name: "PFRO.log (Pending File Rename Operations Log)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"%SystemRoot%\PFRO.log"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "Records file rename and delete operations scheduled via MoveFileEx with MOVEFILE_DELAY_UNTIL_REBOOT. Created at reboot from the PendingFileRenameOperations registry value (HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager). Malware uses this mechanism for staged deletion of dropper files or replacement of system binaries after reboot. Presence of this file alone is suspicious; each entry shows source path (blank = delete) and destination path. Compare entries against known-good binaries and MFT timestamps.",
+    mitre_techniques: &["T1036.003", "T1070.004"],
+    fields: &[
+        FieldSchema { name: "source_path", value_type: ValueType::Text, description: "Path of file to be renamed or deleted (blank source = delete operation)", is_uid_component: true },
+        FieldSchema { name: "destination_path", value_type: ValueType::Text, description: "Target path; empty string indicates deletion", is_uid_component: true },
+    ],
+    retention: Some("Written at each reboot; overwritten on next reboot"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["setupapi_dev_log", "mft_file"],
+    sources: &[
+        "https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-movefileexw",
+        "https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/windows-setup-log-files-and-event-logs",
+    ],
+};
+
+pub(crate) static SETUPERR_LOG: ArtifactDescriptor = ArtifactDescriptor {
+    id: "setuperr_log",
+    name: "setuperr.log (Windows Setup Error Log)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"%SystemRoot%\setuperr.log"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "Error-only companion to setupapi.dev.log; generated during Windows Setup (initial install or upgrade). Contains driver and hardware initialization errors during OS deployment. Useful for establishing the original OS install timeline and identifying hardware that was present at install time. Absence of this file on a running system is normal; presence indicates the system recently went through a Setup phase.",
+    mitre_techniques: &[],
+    fields: &[
+        FieldSchema { name: "timestamp", value_type: ValueType::Timestamp, description: "Entry timestamp in setup log format", is_uid_component: false },
+        FieldSchema { name: "error_code", value_type: ValueType::Text, description: "Win32 error code or HRESULT", is_uid_component: false },
+        FieldSchema { name: "message", value_type: ValueType::Text, description: "Setup error message", is_uid_component: false },
+    ],
+    retention: Some("Retained from most recent Setup run; may be absent on stable systems"),
+    triage_priority: TriagePriority::Low,
+    related_artifacts: &["setupapi_dev_log", "setupapi_upgrade_log"],
+    sources: &[
+        "https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/windows-setup-log-files-and-event-logs",
+    ],
+};
+
+pub(crate) static SETUPAPI_UPGRADE_LOG: ArtifactDescriptor = ArtifactDescriptor {
+    id: "setupapi_upgrade_log",
+    name: "setupapi.upgrade.log (In-Place Upgrade Driver Log)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"%SystemRoot%\inf\setupapi.upgrade.log"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win10Plus,
+    decoder: Decoder::Identity,
+    meaning: "Records driver migration during Windows in-place upgrade (e.g., Win7→Win10, Win10→Win11). Format identical to setupapi.dev.log: timestamped sections per driver package with install/migrate result. Forensically useful for (1) establishing the upgrade timeline, (2) detecting drivers added or migrated that were not present in the original OS, (3) identifying USB devices connected during the upgrade window.",
+    mitre_techniques: &[],
+    fields: &[
+        FieldSchema { name: "timestamp", value_type: ValueType::Timestamp, description: "Section entry timestamp", is_uid_component: false },
+        FieldSchema { name: "driver_name", value_type: ValueType::Text, description: "INF file name of migrated driver package", is_uid_component: false },
+        FieldSchema { name: "result", value_type: ValueType::Text, description: "Migration outcome: Success or error code", is_uid_component: false },
+    ],
+    retention: Some("Retained from most recent upgrade; absent on clean-install systems"),
+    triage_priority: TriagePriority::Low,
+    related_artifacts: &["setupapi_dev_log", "setuperr_log"],
+    sources: &[
+        "https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/windows-setup-log-files-and-event-logs",
+        "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WindowsUpdateLogs.tkape",
+    ],
+};
+
+// ── Group B: Windows Error Reporting Split ────────────────────────────────────
+
+pub(crate) static WER_REPORTS_USER: ArtifactDescriptor = ArtifactDescriptor {
+    id: "wer_reports_user",
+    name: "WER ReportArchive (User-scope Crash Reports)",
+    artifact_type: ArtifactType::Directory,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"%APPDATA%\Microsoft\Windows\WER\ReportArchive"),
+    scope: DataScope::User,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "Per-user Windows Error Reporting archive. Each subdirectory contains a Report.wer (INI-like format) and optional memory dumps. Key fields: EventType, AppName, AppPath, AppVersion, ExceptionCode, ModuleName, ModuleVersion. Crash reports reveal: (1) malware crashes at unusual paths (C:\\Users\\...\\AppData), (2) exploitation attempts (ExceptionCode 0xC0000005 access violation = code injection gone wrong), (3) injected DLL names in ModuleName, (4) tool execution evidence even without process logs. Compare AppPath against known-good locations.",
+    mitre_techniques: &["T1055", "T1059"],
+    fields: &[
+        FieldSchema { name: "event_type", value_type: ValueType::Text, description: "WER bucket type (e.g., APPCRASH, CLR20r3)", is_uid_component: false },
+        FieldSchema { name: "app_name", value_type: ValueType::Text, description: "Crashing process executable name", is_uid_component: true },
+        FieldSchema { name: "app_path", value_type: ValueType::Text, description: "Full path of crashing executable", is_uid_component: true },
+        FieldSchema { name: "exception_code", value_type: ValueType::UnsignedInt, description: "Win32 exception code (0xC0000005 = access violation, injection indicator)", is_uid_component: false },
+        FieldSchema { name: "module_name", value_type: ValueType::Text, description: "Faulting module (DLL) name", is_uid_component: true },
+        FieldSchema { name: "timestamp", value_type: ValueType::Timestamp, description: "Crash report creation time", is_uid_component: false },
+    ],
+    retention: Some("Up to 10 reports per application; controlled by WER policy"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["wer_reports", "wer_reports_system", "evtx_application"],
+    sources: &[
+        "https://learn.microsoft.com/en-us/windows/win32/wer/about-wer",
+        "https://learn.microsoft.com/en-us/windows/win32/wer/wer-report-file-format",
+    ],
+};
+
+pub(crate) static WER_REPORTS_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
+    id: "wer_reports_system",
+    name: "WER ReportArchive (System-scope Crash Reports)",
+    artifact_type: ArtifactType::Directory,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"%ProgramData%\Microsoft\Windows\WER\ReportArchive"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "System-wide Windows Error Reporting archive for crashes running as SYSTEM or elevated. Same .wer report format as user-scope. System-scope reports are particularly valuable for: (1) kernel-mode crashes from rootkits or driver exploits, (2) service crashes (svchost-hosted services) revealing injected payloads, (3) elevated process failures at unusual paths. Correlate ModuleName against known-good Windows binaries and check AppPath for non-standard locations.",
+    mitre_techniques: &["T1055", "T1543.003"],
+    fields: &[
+        FieldSchema { name: "event_type", value_type: ValueType::Text, description: "WER bucket type (e.g., APPCRASH, BlueScreen)", is_uid_component: false },
+        FieldSchema { name: "app_name", value_type: ValueType::Text, description: "Crashing process executable name", is_uid_component: true },
+        FieldSchema { name: "app_path", value_type: ValueType::Text, description: "Full path of crashing executable", is_uid_component: true },
+        FieldSchema { name: "exception_code", value_type: ValueType::UnsignedInt, description: "Win32 exception code", is_uid_component: false },
+        FieldSchema { name: "module_name", value_type: ValueType::Text, description: "Faulting module (DLL) name", is_uid_component: true },
+        FieldSchema { name: "timestamp", value_type: ValueType::Timestamp, description: "Crash report creation time", is_uid_component: false },
+    ],
+    retention: Some("Up to 10 reports per application; controlled by WER policy"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["wer_reports", "wer_reports_user", "evtx_application"],
+    sources: &[
+        "https://learn.microsoft.com/en-us/windows/win32/wer/about-wer",
+        "https://learn.microsoft.com/en-us/windows/win32/wer/wer-report-file-format",
+    ],
+};
+
+// ── Group F: Windows AppX/Modern App ─────────────────────────────────────────
+
+pub(crate) static APPX_PACKAGES_USER: ArtifactDescriptor = ArtifactDescriptor {
+    id: "appx_packages_user",
+    name: "AppX/UWP Package Data Directory",
+    artifact_type: ArtifactType::Directory,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"%LocalAppData%\Packages"),
+    scope: DataScope::User,
+    os_scope: OsScope::Win10Plus,
+    decoder: Decoder::Identity,
+    meaning: "Per-user UWP (Universal Windows Platform) application data directory. Each installed Store app gets a subdirectory named by its package family name (e.g., Microsoft.WindowsStore_8wekyb3d8bbwe). Subdirectories of interest: LocalCache (offline data), LocalState (app databases and settings), AC\\INetCache (browser-like caches for app WebViews), Settings\\settings.dat (roaming settings). Forensically relevant for: (1) identifying installed Store apps including sideloaded packages, (2) browser-like forensics on apps using WebView2, (3) detecting masquerading via lookalike store package names.",
+    mitre_techniques: &["T1036", "T1059.007"],
+    fields: &[
+        FieldSchema { name: "package_family_name", value_type: ValueType::Text, description: "UWP package family name (Publisher_Hash format)", is_uid_component: true },
+        FieldSchema { name: "app_display_name", value_type: ValueType::Text, description: "Human-readable app name from AppxManifest.xml", is_uid_component: false },
+    ],
+    retention: Some("Exists while app is installed; removed with app uninstall"),
+    triage_priority: TriagePriority::Low,
+    related_artifacts: &["usrclass_dat_file"],
+    sources: &[
+        "https://learn.microsoft.com/en-us/windows/uwp/design/app-settings/store-and-retrieve-app-data",
+        "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/AppsData.tkape",
+    ],
+};
+
+pub(crate) static APPX_INSTALL_LOG: ArtifactDescriptor = ArtifactDescriptor {
+    id: "appx_install_log",
+    name: "DISM.log (Deployment Image Servicing Log)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"%SystemRoot%\Logs\DISM\dism.log"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "DISM (Deployment Image Servicing and Management) operation log. Records Windows optional feature enable/disable, package install/remove, and image servicing operations. Forensically significant for: (1) LOLBin coverage — enabling Windows Subsystem for Linux, .NET Framework, Hyper-V, or IIS via DISM provides legitimate-looking infrastructure for staging attacks, (2) detecting feature manipulation to weaken defenses (disabling Windows Defender feature), (3) timeline of when WSL or other optional components were enabled.",
+    mitre_techniques: &["T1218", "T1562.001"],
+    fields: &[
+        FieldSchema { name: "timestamp", value_type: ValueType::Timestamp, description: "Operation timestamp", is_uid_component: false },
+        FieldSchema { name: "operation", value_type: ValueType::Text, description: "DISM operation type (EnableFeature, AddPackage, etc.)", is_uid_component: false },
+        FieldSchema { name: "feature_name", value_type: ValueType::Text, description: "Windows optional feature or package name", is_uid_component: true },
+        FieldSchema { name: "result", value_type: ValueType::Text, description: "Operation outcome (success or HRESULT error code)", is_uid_component: false },
+    ],
+    retention: Some("Appended continuously; no automatic rotation"),
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["setupapi_dev_log", "cbs_log"],
+    sources: &[
+        "https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/deployment-image-servicing-and-management--dism--technical-reference",
+        "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WindowsUpdateLogs.tkape",
+    ],
+};
+
+// ── Group G: Windows Diagnostic/Telemetry ────────────────────────────────────
+
+pub(crate) static DIAGNOSTIC_DATA_DIR: ArtifactDescriptor = ArtifactDescriptor {
+    id: "diagnostic_data_dir",
+    name: "Windows Diagnostic Data ETL Directory",
+    artifact_type: ArtifactType::Directory,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"%ProgramData%\Microsoft\Diagnosis\ETLLogs"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win10Plus,
+    decoder: Decoder::Identity,
+    meaning: "Windows diagnostic telemetry Event Trace Log (ETL) files collected by DiagTrack (Connected User Experiences and Telemetry). Contains AutoLogger, ShutdownLogger, and DiagTrack subdirectories with binary ETL files. Low forensic priority for most investigations, but relevant when: (1) telemetry exfiltration is suspected (T1005 data collection before exfil), (2) verifying which diagnostic data left the system, (3) parsing ETL files for application usage and connectivity events that lack other artifacts. Parse with Windows Performance Analyzer (WPA) or wevtutil.",
+    mitre_techniques: &["T1005"],
+    fields: &[
+        FieldSchema { name: "etl_filename", value_type: ValueType::Text, description: "ETL file name indicating logger (AutoLogger-DiagTrack-Listener.etl, etc.)", is_uid_component: false },
+    ],
+    retention: Some("Rotated by DiagTrack service; controlled by diagnostic data level setting"),
+    triage_priority: TriagePriority::Low,
+    related_artifacts: &["evtx_system"],
+    sources: &[
+        "https://learn.microsoft.com/en-us/windows/privacy/diagnostic-data-collection",
+        "https://learn.microsoft.com/en-us/windows-hardware/test/wpt/recording-for-basic-system-diagnosis",
+    ],
+};
+
+pub(crate) static WINDOWS_UPDATE_SESSION: ArtifactDescriptor = ArtifactDescriptor {
+    id: "windows_update_session",
+    name: "Windows Update ReportingEvents.log",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"%SystemRoot%\SoftwareDistribution\ReportingEvents.log"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "Tab-delimited log of Windows Update agent operations. Each line: {timestamp}\\t{agent}\\t{status}\\t{update_title}\\t{kb_number}\\t{error_code}. Forensically critical for correlating the patch state of a system with the compromise timeline: if a known CVE was exploited, verify whether the relevant KB was installed before or after the intrusion. Absence of expected updates indicates suppression (T1562.001). Also reveals when Windows Defender definition updates were applied.",
+    mitre_techniques: &["T1562.001", "T1190"],
+    fields: &[
+        FieldSchema { name: "timestamp", value_type: ValueType::Timestamp, description: "Update event time (ISO 8601 UTC)", is_uid_component: false },
+        FieldSchema { name: "agent", value_type: ValueType::Text, description: "WU agent component (WindowsUpdateClient, AutomaticUpdates, etc.)", is_uid_component: false },
+        FieldSchema { name: "status", value_type: ValueType::Text, description: "Operation result: Success, Failed, or error code", is_uid_component: false },
+        FieldSchema { name: "update_title", value_type: ValueType::Text, description: "Human-readable update name", is_uid_component: false },
+        FieldSchema { name: "kb_number", value_type: ValueType::Text, description: "KB article number (e.g., KB5034441)", is_uid_component: true },
+    ],
+    retention: Some("Appended continuously; no automatic rotation"),
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["cbs_log", "evtx_system"],
+    sources: &[
+        "https://learn.microsoft.com/en-us/windows/deployment/update/windows-update-logs",
+        "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WindowsUpdateLogs.tkape",
+    ],
+};

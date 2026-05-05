@@ -7442,6 +7442,9 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     windows_evtx_ext::EVTX_LSA_PROTECTION,
     windows_evtx_ext::EVTX_CAPI2,
     windows_evtx_ext::EVTX_POWERSHELL_CLASSIC,
+    // Group C: Additional EVTX channels (batch I)
+    windows_evtx_ext::EVTX_DNS_CLIENT,
+    windows_evtx_ext::EVTX_TERMINAL_SERVICES,
     // Extended macOS artifacts (macos_ext)
     macos_ext::MACOS_FSEVENTS,
     macos_ext::MACOS_SPOTLIGHT_STORE,
@@ -7502,6 +7505,10 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     linux_ext::LINUX_CHKROOTKIT_OUTPUT,
     linux_ext::LINUX_RKHUNTER_LOG,
     linux_ext::LINUX_SYSCTL_CONF,
+    // Group D/E: Linux kernel/proc/auth (batch I)
+    linux_ext::LINUX_DMESG,
+    linux_ext::LINUX_BOOT_LOG,
+    linux_ext::LINUX_FAILLOG,
     // Batch I: Windows crash dump, WER, and miscellaneous artifacts
     windows_logs_ext::WINDOWS_CRASH_DUMP,
     windows_logs_ext::WINDOWS_MINIDUMP,
@@ -7581,6 +7588,17 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     windows_files_ext::COPILOT_RECALL_UKG,
     windows_files_ext::NTUSER_DAT_FILE,
     windows_files_ext::USRCLASS_DAT_FILE,
+    // Groups A, B, F, G: Windows logs/WER/AppX/diagnostics (batch I)
+    windows_files_ext::CBS_LOG,
+    windows_files_ext::PFRO_LOG,
+    windows_files_ext::SETUPERR_LOG,
+    windows_files_ext::SETUPAPI_UPGRADE_LOG,
+    windows_files_ext::WER_REPORTS_USER,
+    windows_files_ext::WER_REPORTS_SYSTEM,
+    windows_files_ext::APPX_PACKAGES_USER,
+    windows_files_ext::APPX_INSTALL_LOG,
+    windows_files_ext::DIAGNOSTIC_DATA_DIR,
+    windows_files_ext::WINDOWS_UPDATE_SESSION,
     // Phase-3 net-new persistence artifacts not yet in catalog (windows_registry_ext3)
     // Note: winlogon_shell, winlogon_userinit, appinit_dlls, boot_execute,
     //       ifeo_debugger, netsh_helper_dlls, mountpoints2 already exist above.

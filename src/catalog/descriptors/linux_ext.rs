@@ -829,3 +829,89 @@ pub(crate) static LINUX_SYSCTL_CONF: ArtifactDescriptor = ArtifactDescriptor {
         "https://man7.org/linux/man-pages/man8/sysctl.8.html",
     ],
 };
+
+// ── Group D: Linux Kernel / Proc (new artifacts only — LINUX_KERN_LOG already defined above) ──
+
+pub(crate) static LINUX_DMESG: ArtifactDescriptor = ArtifactDescriptor {
+    id: "linux_dmesg",
+    name: "Kernel Ring Buffer Log (dmesg)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some("/var/log/dmesg"),
+    scope: DataScope::System,
+    os_scope: OsScope::Linux,
+    decoder: Decoder::Identity,
+    meaning: "Persisted copy of the kernel ring buffer from the most recent boot. Written by the init system (systemd/SysV) at boot completion. Contains hardware initialization, device driver probe messages, module loading at boot time, and kernel taint information. Forensically distinct from kern.log in that it captures only the boot-time window. Key indicators: LKM load events during boot (rootkit persistence via /etc/modules or initrd), taint flags set during boot, unexpected hardware appearing in lspci/lsusb output but not here (indicates late/live insertion). The live ring buffer is volatile — accessible via 'dmesg' command on running systems.",
+    mitre_techniques: &["T1014", "T1547.006"],
+    fields: &[
+        FieldSchema { name: "elapsed_seconds", value_type: ValueType::Text, description: "Seconds since boot (kernel monotonic clock, e.g. [    1.234567])", is_uid_component: false },
+        FieldSchema { name: "subsystem", value_type: ValueType::Text, description: "Kernel subsystem prefix (usb, pci, net, etc.)", is_uid_component: false },
+        FieldSchema { name: "message", value_type: ValueType::Text, description: "Kernel ring buffer message text", is_uid_component: false },
+    ],
+    retention: Some("Overwritten at each boot; in-memory ring buffer is volatile"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["linux_kern_log", "linux_proc_modules", "linux_dmesg_log"],
+    sources: &[
+        "https://man7.org/linux/man-pages/man1/dmesg.1.html",
+        "https://www.kernel.org/doc/html/latest/admin-guide/tainted-kernels.html",
+    ],
+};
+
+pub(crate) static LINUX_BOOT_LOG: ArtifactDescriptor = ArtifactDescriptor {
+    id: "linux_boot_log",
+    name: "Boot Log (/var/log/boot.log)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some("/var/log/boot.log"),
+    scope: DataScope::System,
+    os_scope: OsScope::Linux,
+    decoder: Decoder::Identity,
+    meaning: "Service start/stop messages captured during system boot by bootlogd or the init system. On systemd systems, equivalent output is in the journal. boot.log records service success/failure status lines (OK/FAILED/SKIPPED) with service names. Forensically valuable as a temporal anchor: comparing boot.log timestamps against MFT/inode change times establishes whether files were modified before or after a known boot event. Unusual FAILED entries may indicate rootkit interference with service initialization.",
+    mitre_techniques: &["T1014"],
+    fields: &[
+        FieldSchema { name: "timestamp", value_type: ValueType::Timestamp, description: "Boot event timestamp", is_uid_component: false },
+        FieldSchema { name: "service_name", value_type: ValueType::Text, description: "Service or unit name", is_uid_component: false },
+        FieldSchema { name: "status", value_type: ValueType::Text, description: "OK, FAILED, or SKIPPED", is_uid_component: false },
+    ],
+    retention: Some("Overwritten at each boot on many distributions"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["linux_kern_log", "linux_journal_dir"],
+    sources: &[
+        "https://man7.org/linux/man-pages/man8/bootlogd.8.html",
+        "https://www.freedesktop.org/software/systemd/man/latest/systemd-journald.service.html",
+    ],
+};
+
+// ── Group E: Linux Auth/Binary Logs ──────────────────────────────────────────
+
+pub(crate) static LINUX_FAILLOG: ArtifactDescriptor = ArtifactDescriptor {
+    id: "linux_faillog",
+    name: "Failed Login Log (/var/log/faillog)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some("/var/log/faillog"),
+    scope: DataScope::System,
+    os_scope: OsScope::Linux,
+    decoder: Decoder::Identity,
+    meaning: "Binary database of failed login counts indexed by UID. Fixed-size records (struct faillog): fail_cnt (int16, consecutive failure count), fail_max (int16, lockout threshold), fail_time (time_t, last failure time), fail_line (tty string, 12 bytes), fail_locktime (int32, lockout duration in seconds). Read with 'faillog -a' or parse directly at struct offset UID * sizeof(faillog). High fail_cnt values for specific UIDs indicate brute-force targeting. Last failure time provides a timestamp independent of text log rotation. Root UID (0) attacks show at offset 0.",
+    mitre_techniques: &["T1110"],
+    fields: &[
+        FieldSchema { name: "uid", value_type: ValueType::UnsignedInt, description: "User ID (record index; struct offset = uid * record_size)", is_uid_component: true },
+        FieldSchema { name: "fail_cnt", value_type: ValueType::UnsignedInt, description: "Number of consecutive login failures for this UID", is_uid_component: false },
+        FieldSchema { name: "fail_time", value_type: ValueType::Timestamp, description: "Unix timestamp of most recent failure", is_uid_component: false },
+        FieldSchema { name: "fail_line", value_type: ValueType::Text, description: "TTY or PAM service of most recent failure attempt", is_uid_component: false },
+    ],
+    retention: Some("Persistent binary file; not affected by logrotate unless explicitly configured"),
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["linux_auth_log", "linux_utmp", "linux_wtmp"],
+    sources: &[
+        "https://man7.org/linux/man-pages/man5/faillog.5.html",
+        "https://man7.org/linux/man-pages/man8/faillog.8.html",
+    ],
+};

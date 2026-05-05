@@ -531,3 +531,65 @@ pub(crate) static EVTX_POWERSHELL_CLASSIC: ArtifactDescriptor = ArtifactDescript
         "https://github.com/Yamato-Security/hayabusa-rules",
     ],
 };
+
+// ── Group C: Additional EVTX Channels ────────────────────────────────────────
+
+pub(crate) static EVTX_DNS_CLIENT: ArtifactDescriptor = ArtifactDescriptor {
+    id: "evtx_dns_client",
+    name: "DNS Client Operational Event Log",
+    artifact_type: ArtifactType::EventLog,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"%SystemRoot%\System32\winevt\Logs\Microsoft-Windows-DNS-Client%4Operational.evtx"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win10Plus,
+    decoder: Decoder::Identity,
+    meaning: "Windows DNS client query/response log. DISABLED by default — must be enabled via Group Policy or: wevtutil sl Microsoft-Windows-DNS-Client/Operational /e:true. Key EventIDs: 3008 (DNS query sent — includes QueryName, QueryType, QueryResults, InterfaceIndex), 3020 (DNS response received). Forensically critical for detecting C2 channel activity: reveals domain lookups even without network packet capture. Compare QueryName values against threat intel feeds, look for DGA-pattern names, excessive NXDOMAIN responses (T1071.004 DNS C2), and tunneling indicators (long labels, high-entropy names).",
+    mitre_techniques: &["T1071.004"],
+    fields: &[
+        FieldSchema { name: "event_id", value_type: ValueType::UnsignedInt, description: "3008=query sent, 3020=response received", is_uid_component: false },
+        FieldSchema { name: "query_name", value_type: ValueType::Text, description: "DNS name queried", is_uid_component: true },
+        FieldSchema { name: "query_type", value_type: ValueType::UnsignedInt, description: "DNS record type (1=A, 28=AAAA, 15=MX, 16=TXT)", is_uid_component: false },
+        FieldSchema { name: "query_results", value_type: ValueType::Text, description: "Resolved IP addresses or NXDOMAIN", is_uid_component: false },
+        FieldSchema { name: "timestamp", value_type: ValueType::Timestamp, description: "Event timestamp (UTC)", is_uid_component: false },
+    ],
+    retention: Some("Disabled by default; when enabled, default 1 MB"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["evtx_security", "networklist_profiles"],
+    sources: &[
+        "https://learn.microsoft.com/en-us/windows/win32/ndf/microsoft-windows-dns-client",
+        "https://github.com/palantir/windows-event-forwarding/tree/master/group-policy-objects",
+        "https://github.com/Yamato-Security/hayabusa-rules",
+    ],
+};
+
+pub(crate) static EVTX_TERMINAL_SERVICES: ArtifactDescriptor = ArtifactDescriptor {
+    id: "evtx_terminal_services",
+    name: "Terminal Services Local Session Manager Operational Log",
+    artifact_type: ArtifactType::EventLog,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"%SystemRoot%\System32\winevt\Logs\Microsoft-Windows-TerminalServices-LocalSessionManager%4Operational.evtx"),
+    scope: DataScope::System,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "TerminalServices-LocalSessionManager/Operational log. Primary artifact for RDP lateral movement destination analysis. Key EventIDs: 21 (session logon — includes Source Network Address = attacker IP), 22 (shell start), 23 (session logoff), 24 (session disconnect), 25 (session reconnect). EventID 21 with a non-loopback Source Network Address = RDP inbound connection. Combined with evtx_rdp_inbound for full RDP session reconstruction. Note: 'localhost' or '127.0.0.1' in Source Network Address indicates console session, not remote.",
+    mitre_techniques: &["T1021.001"],
+    fields: &[
+        FieldSchema { name: "event_id", value_type: ValueType::UnsignedInt, description: "21=logon, 22=shell, 23=logoff, 24=disconnect, 25=reconnect", is_uid_component: false },
+        FieldSchema { name: "user", value_type: ValueType::Text, description: "Username of the session user (Domain\\Username format)", is_uid_component: true },
+        FieldSchema { name: "session_id", value_type: ValueType::UnsignedInt, description: "RDP/Terminal Services session number", is_uid_component: false },
+        FieldSchema { name: "source_network_address", value_type: ValueType::Text, description: "Source IP address of RDP client (attacker IP on event 21)", is_uid_component: true },
+        FieldSchema { name: "timestamp", value_type: ValueType::Timestamp, description: "Event timestamp (UTC)", is_uid_component: false },
+    ],
+    retention: Some("Default 20 MB"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["evtx_rdp_inbound", "evtx_security", "evtx_rdp_client"],
+    sources: &[
+        "https://www.13cubed.com/downloads/rdp_forensics.pdf",
+        "https://dfironthemountain.wordpress.com/2019/02/15/rdp-event-log-dfir/",
+        "https://github.com/Yamato-Security/hayabusa-rules",
+    ],
+};

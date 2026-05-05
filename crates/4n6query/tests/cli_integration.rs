@@ -497,7 +497,10 @@ fn triage_priority_critical_only_contains_critical_entries() {
     assert_eq!(out.code, 0);
     let val: serde_json::Value = serde_json::from_str(&out.stdout).unwrap();
     let arr = val["artifacts"].as_array().unwrap();
-    assert!(!arr.is_empty(), "--priority critical must return some artifacts");
+    assert!(
+        !arr.is_empty(),
+        "--priority critical must return some artifacts"
+    );
     for entry in arr {
         assert_eq!(
             entry["triage_priority"], "critical",
@@ -512,7 +515,10 @@ fn triage_priority_high_only_contains_high_entries() {
     assert_eq!(out.code, 0);
     let val: serde_json::Value = serde_json::from_str(&out.stdout).unwrap();
     let arr = val["artifacts"].as_array().unwrap();
-    assert!(!arr.is_empty(), "--priority high must return some artifacts");
+    assert!(
+        !arr.is_empty(),
+        "--priority high must return some artifacts"
+    );
     for entry in arr {
         assert_eq!(
             entry["triage_priority"], "high",
@@ -523,7 +529,13 @@ fn triage_priority_high_only_contains_high_entries() {
 
 #[test]
 fn triage_priority_critical_high_returns_both() {
-    let out = run(&["--triage", "--priority", "critical,high", "--format", "json"]);
+    let out = run(&[
+        "--triage",
+        "--priority",
+        "critical,high",
+        "--format",
+        "json",
+    ]);
     assert_eq!(out.code, 0);
     let val: serde_json::Value = serde_json::from_str(&out.stdout).unwrap();
     let arr = val["artifacts"].as_array().unwrap();

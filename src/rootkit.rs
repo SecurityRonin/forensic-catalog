@@ -128,9 +128,7 @@ pub const KNOWN_LD_PRELOAD_ROOTKITS: &[&str] = &[
 ///   <https://attack.mitre.org/techniques/T1574/006/>
 pub fn is_known_rootkit_lib(filename: &str) -> bool {
     let lower = filename.to_ascii_lowercase();
-    KNOWN_LD_PRELOAD_ROOTKITS
-        .iter()
-        .any(|k| lower.contains(*k))
+    KNOWN_LD_PRELOAD_ROOTKITS.iter().any(|k| lower.contains(*k))
 }
 
 /// Returns `true` if `gid` matches a known rootkit magic GID.

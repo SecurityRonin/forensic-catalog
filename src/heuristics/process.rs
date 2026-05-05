@@ -5,13 +5,13 @@
 /// Returns `true` if the PID is a valid Windows process ID.
 /// Windows PIDs are always multiples of 4 and non-zero.
 #[must_use]
-pub fn is_valid_windows_pid(_pid: u32) -> bool { todo!() }
+pub fn is_valid_windows_pid(pid: u32) -> bool { pid != 0 && pid % 4 == 0 }
 
 /// Returns `true` if the child process appears to have been created before its parent.
 /// This is impossible under normal conditions and indicates PPID spoofing (T1134.004).
 #[must_use]
-pub fn is_child_born_before_parent(_child_create_ns: i64, _parent_create_ns: i64) -> bool {
-    todo!()
+pub fn is_child_born_before_parent(child_create_ns: i64, parent_create_ns: i64) -> bool {
+    child_create_ns < parent_create_ns
 }
 
 // ── Windows logon type constants (Event ID 4624) ──────────────────────────
@@ -26,22 +26,26 @@ pub const LOGON_REMOTE_INTERACTIVE: u32 = 10; // RDP
 
 /// Returns `true` for network-originating logon types (lateral movement candidates).
 #[must_use]
-pub fn is_remote_logon(_logon_type: u32) -> bool { todo!() }
+pub fn is_remote_logon(logon_type: u32) -> bool {
+    matches!(logon_type, LOGON_NETWORK | LOGON_REMOTE_INTERACTIVE | LOGON_NETWORK_CLEARTEXT)
+}
 
 /// Returns `true` for logon types commonly used in lateral movement / credential abuse.
 #[must_use]
-pub fn is_lateral_movement_logon(_logon_type: u32) -> bool { todo!() }
+pub fn is_lateral_movement_logon(logon_type: u32) -> bool {
+    matches!(logon_type, LOGON_NEW_CREDENTIALS | LOGON_NETWORK | LOGON_NETWORK_CLEARTEXT)
+}
 
 /// Returns `true` if the Windows session ID indicates Session 0 (system/service, non-interactive).
 #[must_use]
-pub fn is_system_session(_session_id: u32) -> bool { todo!() }
+pub fn is_system_session(session_id: u32) -> bool { session_id == 0 }
 
 /// Token elevation type 3 = full admin token (UAC bypassed or already elevated).
 pub const TOKEN_ELEVATION_FULL: u32 = 3;
 
 /// Returns `true` if the token elevation type indicates a fully elevated (admin) token.
 #[must_use]
-pub fn is_elevated_token(_elevation_type: u32) -> bool { todo!() }
+pub fn is_elevated_token(elevation_type: u32) -> bool { elevation_type == TOKEN_ELEVATION_FULL }
 
 // ── Linux process heuristics ────────────────────────────────────────────────
 
@@ -52,7 +56,9 @@ pub const SUSPICIOUS_PID_GAP: u32 = 50;
 /// Returns `true` if the sorted PID list contains a gap larger than `max_gap`.
 /// A gap in consecutive /proc entries means processes were hidden.
 #[must_use]
-pub fn has_pid_gap(_sorted_pids: &[u32], _max_gap: u32) -> bool { todo!() }
+pub fn has_pid_gap(sorted_pids: &[u32], max_gap: u32) -> bool {
+    sorted_pids.windows(2).any(|w| w[1].saturating_sub(w[0]) > max_gap)
+}
 
 // Linux POSIX capability numbers (from linux/capability.h)
 pub const CAP_DAC_OVERRIDE: u32 = 1;  // bypass file permission checks
@@ -65,7 +71,7 @@ pub const DANGEROUS_CAPS: &[u32] = &[CAP_DAC_OVERRIDE, CAP_NET_RAW, CAP_SYS_PTRA
 
 /// Returns `true` if `cap` is in the dangerous capabilities list.
 #[must_use]
-pub fn is_dangerous_capability(_cap: u32) -> bool { todo!() }
+pub fn is_dangerous_capability(cap: u32) -> bool { DANGEROUS_CAPS.contains(&cap) }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 #[cfg(test)]

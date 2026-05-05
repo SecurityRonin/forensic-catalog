@@ -12,7 +12,7 @@ pub const ZONE_RESTRICTED: u32 = 4;
 /// or a restricted zone (ZoneId >= 3). Executables with this mark running without
 /// warning indicate MOTW bypass (T1553.005).
 #[must_use]
-pub fn is_internet_download(_zone_id: u32) -> bool { todo!() }
+pub fn is_internet_download(zone_id: u32) -> bool { zone_id >= ZONE_INTERNET }
 
 // ── File name anomalies ────────────────────────────────────────────────────
 
@@ -22,22 +22,34 @@ pub fn is_internet_download(_zone_id: u32) -> bool { todo!() }
 /// Logic: the filename (without directory) contains at least two `.` characters
 /// and neither the first nor second extension from the right is empty.
 #[must_use]
-pub fn is_double_extension(_filename: &str) -> bool { todo!() }
+pub fn is_double_extension(filename: &str) -> bool {
+    // Work on the base name only (after last path separator)
+    let name = filename.rsplit(['/', '\\']).next().unwrap_or(filename);
+    let parts: Vec<&str> = name.splitn(3, '.').collect();
+    // Need at least: stem, first-ext, second-ext — all non-empty
+    parts.len() == 3 && parts.iter().all(|p| !p.is_empty())
+}
 
 /// Returns `true` if the path contains an Alternate Data Stream separator.
 /// ADS paths look like `C:\file.txt:hidden_stream`.
 /// Skips the drive-letter colon (first two characters).
 #[must_use]
-pub fn is_alternate_data_stream(_path: &str) -> bool { todo!() }
+pub fn is_alternate_data_stream(path: &str) -> bool {
+    path.chars().skip(2).any(|c| c == ':')
+}
 
 /// Returns `true` if the filename begins with a dot (Linux/macOS hidden file convention).
 #[must_use]
-pub fn is_linux_hidden_name(_name: &str) -> bool { todo!() }
+pub fn is_linux_hidden_name(name: &str) -> bool {
+    name.starts_with('.') && name.len() > 1
+}
 
 /// Returns `true` if the path begins with a UNC prefix (`\\` or `//`).
 /// UNC paths in LNK files or prefetch indicate network execution (T1021).
 #[must_use]
-pub fn is_unc_path(_path: &str) -> bool { todo!() }
+pub fn is_unc_path(path: &str) -> bool {
+    path.starts_with("\\\\") || path.starts_with("//")
+}
 
 /// Path prefixes associated with suspicious execution locations.
 pub const SUSPICIOUS_EXEC_PREFIXES: &[&str] = &[
@@ -48,7 +60,9 @@ pub const SUSPICIOUS_EXEC_PREFIXES: &[&str] = &[
 
 /// Returns `true` if the path contains a suspicious execution prefix.
 #[must_use]
-pub fn is_suspicious_exec_path(_path: &str) -> bool { todo!() }
+pub fn is_suspicious_exec_path(path: &str) -> bool {
+    SUSPICIOUS_EXEC_PREFIXES.iter().any(|p| path.contains(p))
+}
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 #[cfg(test)]

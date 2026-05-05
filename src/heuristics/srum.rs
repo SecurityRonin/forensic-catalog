@@ -13,18 +13,22 @@ pub const EXFIL_VOLUME_BYTES: u64 = 100 * 1024 * 1024; // 100 MiB
 /// Returns `true` if background CPU cycles dominate foreground cycles by the
 /// dominance ratio threshold. Zero foreground cycles also returns `true`.
 #[must_use]
-pub fn is_background_cpu_dominant(_background_cycles: u64, _foreground_cycles: u64) -> bool {
-    todo!()
+pub fn is_background_cpu_dominant(background_cycles: u64, foreground_cycles: u64) -> bool {
+    foreground_cycles == 0
+        || background_cycles / foreground_cycles >= BACKGROUND_CPU_DOMINANCE_RATIO
 }
 
 /// Returns `true` if outbound bytes exceed inbound bytes by the exfil ratio threshold.
 /// Zero bytes-received returns `true` when bytes-sent is non-zero.
 #[must_use]
-pub fn is_exfil_ratio(_bytes_sent: u64, _bytes_received: u64) -> bool { todo!() }
+pub fn is_exfil_ratio(bytes_sent: u64, bytes_received: u64) -> bool {
+    bytes_sent > 0
+        && (bytes_received == 0 || bytes_sent / bytes_received >= EXFIL_BYTES_RATIO)
+}
 
 /// Returns `true` if total outbound bytes exceed the exfiltration volume threshold.
 #[must_use]
-pub fn is_exfil_volume(_bytes_sent: u64) -> bool { todo!() }
+pub fn is_exfil_volume(bytes_sent: u64) -> bool { bytes_sent >= EXFIL_VOLUME_BYTES }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 #[cfg(test)]

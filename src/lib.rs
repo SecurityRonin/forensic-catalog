@@ -138,6 +138,7 @@ pub mod playbooks;
 pub mod plugin;
 pub mod profile;
 pub mod sigma;
+pub mod sqlite;
 pub mod stix;
 pub mod temporal;
 pub mod toolchain;

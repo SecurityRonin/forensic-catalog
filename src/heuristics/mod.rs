@@ -41,6 +41,23 @@ pub const BORN_BEFORE_INSTALL_THRESHOLD_NS: i64 = 86_400_000_000_000; // 24 h
 /// Use `i128` arithmetic when converting to nanoseconds to avoid overflow.
 pub const FILETIME_EPOCH_DIFF_100NS: i128 = 116_444_736_000_000_000;
 
+/// WebKit timestamp epoch offset in microseconds.
+///
+/// WebKit counts microseconds since 1601-01-01 UTC. Subtract this value
+/// from a WebKit timestamp to obtain Unix microseconds (since 1970-01-01).
+///
+/// Used by: Chromium/Chrome history (`last_visit_time`), cookies (`creation_utc`),
+/// bookmarks (`date_added`), downloads (`start_time`), autofill (`date_created`).
+pub const WEBKIT_EPOCH_OFFSET_US: i64 = 11_644_473_600 * 1_000_000;
+
+/// Apple Core Data epoch offset in seconds.
+///
+/// Core Data stores timestamps as seconds since 2001-01-01 UTC. Add this value
+/// to a Core Data timestamp to obtain Unix seconds (since 1970-01-01).
+///
+/// Used by: Safari history (`visit_time`), Safari cookies (`creation`).
+pub const CORE_DATA_EPOCH_OFFSET_SECS: i64 = 978_307_200;
+
 // ── Temporal: working-hours anomaly ───────────────────────────────────────────
 
 /// Start of the standard corporate working-hours window (inclusive), UTC.

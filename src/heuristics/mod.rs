@@ -13,6 +13,9 @@
 //! only on primitive types (`i64`, `u32`, `u8`). Anything requiring `chrono`,
 //! `serde`, or I/O belongs in a higher layer (e.g., `rt-correlation`).
 
+pub mod entropy;
+pub mod scoring;
+
 // ── Temporal: born-before-OS-install ──────────────────────────────────────────
 
 /// Default threshold for born-before-OS-install timestomp detection: 24 hours

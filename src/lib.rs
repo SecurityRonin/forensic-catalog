@@ -163,4 +163,5 @@ pub mod ports;
 pub mod processes;
 pub mod references;
 pub mod remote_access;
+pub mod rootkit;
 pub mod third_party;

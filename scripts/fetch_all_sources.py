@@ -460,6 +460,36 @@ def parse_sans_blog_html(html_text: str) -> list[tuple[str, str, str]]:
     return entries
 
 
+def parse_dfir_training_html(html_text: str) -> list[tuple[str, str, str]]:
+    """Parse dfir.training/blog HTML index → list[(title, url, date)].
+
+    Joomla/EasyBlog site. Posts live at /blog/<slug>. Excludes meta-pages:
+    /blog/categories/, /blog/blogger/, /blog/tags/, and the bare /blog index.
+    Date is '' — the index page carries no per-post timestamps.
+    """
+    import re as _re
+    if not html_text:
+        return []
+
+    seen: set[str] = set()
+    entries: list[tuple[str, str, str]] = []
+
+    for m in _re.finditer(
+        r'href=["\'](/blog/((?!categories/|blogger/|tags/)[^"\'#?]+))["\']',
+        html_text,
+    ):
+        path = m.group(1)
+        if path in seen:
+            continue
+        seen.add(path)
+        url = f"https://www.dfir.training{path}"
+        anchor = _re.search(_re.escape(f'href="{path}"') + r'[^>]*>([^<]+)<', html_text)
+        title_text = anchor.group(1).strip() if anchor else path.rsplit("/", 1)[-1].replace("-", " ").title()
+        entries.append((title_text, url, ""))
+
+    return entries
+
+
 def fetch_sans_blog(max_pages: int = 80) -> list[tuple[str, str, str]]:
     """Fetch all SANS blog posts by paginating ?page=N."""
     all_entries: list[tuple[str, str, str]] = []
@@ -1025,6 +1055,11 @@ def main(argv: list[str] | None = None) -> int:
             if "sans.org" in html_url:
                 # SANS blog: Remix SSR with embedded JSON — full archive via ?page=N
                 entries = fetch_sans_blog(max_pages=args.max_pages)
+            elif "dfir.training" in html_url:
+                # Joomla/EasyBlog — all posts on one index page, no RSS
+                html_text = _fetch(html_url)
+                if html_text:
+                    entries = parse_dfir_training_html(html_text)
             else:
                 # Static HTML site with no RSS — scrape post links from the index page
                 html_text = _fetch(html_url)

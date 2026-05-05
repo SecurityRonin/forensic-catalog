@@ -118,7 +118,8 @@ pub(crate) static BROWSER_CHROME_LOGIN_DATA_V2: ArtifactDescriptor = ArtifactDes
     scope: DataScope::Mixed,
     os_scope: OsScope::Win7Plus,
     decoder: Decoder::Identity,
-    meaning: "Chrome saved credentials SQLite database (passwords encrypted with DPAPI/OS keystore).",
+    meaning:
+        "Chrome saved credentials SQLite database (passwords encrypted with DPAPI/OS keystore).",
     mitre_techniques: &["T1555.003"],
     fields: &[],
     retention: None,

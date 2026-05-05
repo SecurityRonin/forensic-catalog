@@ -12662,3 +12662,9 @@ Mark `[x]` when reviewed, `[→]` when artifact tasks were created.
 - [ ] [Update README.md](https://github.com/kacos2000/Win10/commit/5ecf8ed7fce5b1a29ebf068b8361e75ba6623c67) — kacos2000_Win10
 - [ ] [Update readme.md](https://github.com/kacos2000/Win10/commit/fa6c6baec39ab7a05035155df43ad9c9627a82a3) — kacos2000_Win10
 - [ ] [Windows Start/Stop times](https://github.com/kacos2000/Win10/commit/e5fd00400a1c1855b411b521c99afb3961222ea2) — kacos2000_Win10
+
+## 2026-05-05
+
+- [ ] [When the AI lies to its own logs in a world of internal LLMs and autonomous agents](https://andreafortuna.org/2026/05/04/when-ai-lies-to-its-own-logs-forensic-readiness/) — Andrea Fortuna
+- [ ] [How to store and manage metadata in macOS](https://eclecticlight.co/2026/05/05/how-to-store-and-manage-metadata-in-macos/) — The Eclectic Light Company
+- [ ] [The Three Ways Mobile Security Teams Are Flying Blind — And How to Fix It](https://cellebrite.com/en/blog/mobile-security-testing-alternatives-ios-blind-spot/) — Cellebrite Blog

@@ -1994,7 +1994,10 @@ mod tests {
     fn browser_chrome_cookies_profile_exists() {
         let p = profile_for("browser_chrome_cookies");
         assert!(p.is_some(), "browser_chrome_cookies profile must exist");
-        assert_eq!(p.unwrap().evidence_strength, EvidenceStrength::Corroborative);
+        assert_eq!(
+            p.unwrap().evidence_strength,
+            EvidenceStrength::Corroborative
+        );
     }
 
     #[test]
@@ -2008,14 +2011,20 @@ mod tests {
     fn browser_chrome_bookmarks_profile_exists() {
         let p = profile_for("browser_chrome_bookmarks");
         assert!(p.is_some());
-        assert_eq!(p.unwrap().evidence_strength, EvidenceStrength::Circumstantial);
+        assert_eq!(
+            p.unwrap().evidence_strength,
+            EvidenceStrength::Circumstantial
+        );
     }
 
     #[test]
     fn browser_chrome_extensions_profile_exists() {
         let p = profile_for("browser_chrome_extensions");
         assert!(p.is_some());
-        assert_eq!(p.unwrap().evidence_strength, EvidenceStrength::Corroborative);
+        assert_eq!(
+            p.unwrap().evidence_strength,
+            EvidenceStrength::Corroborative
+        );
     }
 
     #[test]
@@ -2029,7 +2038,10 @@ mod tests {
     fn browser_chrome_autofill_profile_exists() {
         let p = profile_for("browser_chrome_autofill");
         assert!(p.is_some());
-        assert_eq!(p.unwrap().evidence_strength, EvidenceStrength::Corroborative);
+        assert_eq!(
+            p.unwrap().evidence_strength,
+            EvidenceStrength::Corroborative
+        );
     }
 
     #[test]
@@ -2050,7 +2062,10 @@ mod tests {
     fn browser_firefox_history_profile_exists() {
         let p = profile_for("browser_firefox_history");
         assert!(p.is_some());
-        assert_eq!(p.unwrap().evidence_strength, EvidenceStrength::Corroborative);
+        assert_eq!(
+            p.unwrap().evidence_strength,
+            EvidenceStrength::Corroborative
+        );
     }
 
     #[test]
@@ -2070,6 +2085,9 @@ mod tests {
     fn browser_safari_history_profile_exists() {
         let p = profile_for("browser_safari_history");
         assert!(p.is_some());
-        assert_eq!(p.unwrap().evidence_strength, EvidenceStrength::Corroborative);
+        assert_eq!(
+            p.unwrap().evidence_strength,
+            EvidenceStrength::Corroborative
+        );
     }
 }

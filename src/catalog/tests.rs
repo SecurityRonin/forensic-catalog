@@ -4649,3 +4649,166 @@ mod tests_prefetch_mft_enrichment {
         );
     }
 }
+
+// ── Recycle Bin $I schema enrichment ─────────────────────────────────────────
+//
+// Source: https://github.com/akhil-dara/RecycleBin-Forensic-Explorer
+// $I binary format: version(u64@0) | size(u64@8) | deletion_time(FILETIME@16)
+//                   | original_path(UTF-16LE@24 v1, @28 v2)
+//
+#[cfg(test)]
+mod tests_recycle_bin_enrichment {
+    use crate::catalog::CATALOG;
+
+    fn desc() -> &'static crate::catalog::ArtifactDescriptor {
+        CATALOG.by_id("recycle_bin").expect("recycle_bin must exist")
+    }
+
+    #[test]
+    fn recycle_bin_has_version_field() {
+        // uint64 at offset 0: 1=Vista/7/8/8.1, 2=Win10/11 (different path offset)
+        let d = desc();
+        let has_version = d
+            .fields
+            .iter()
+            .any(|f| f.name == "version" || f.name == "i_version");
+        assert!(
+            has_version,
+            "recycle_bin fields must include version (uint64 @0); got: {:?}",
+            d.fields.iter().map(|f| f.name).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn recycle_bin_has_original_size_field() {
+        // uint64 at offset 8: deleted file size in bytes
+        let d = desc();
+        let has_field = d
+            .fields
+            .iter()
+            .any(|f| f.name.contains("size") || f.name == "original_size");
+        assert!(
+            has_field,
+            "recycle_bin fields must include original_size (uint64 @8); got: {:?}",
+            d.fields.iter().map(|f| f.name).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn recycle_bin_has_deletion_time_field() {
+        // FILETIME at offset 16: moment the file was sent to Recycle.Bin
+        let d = desc();
+        let has_field = d
+            .fields
+            .iter()
+            .any(|f| f.name.contains("deletion") || f.name.contains("deleted_time"));
+        assert!(
+            has_field,
+            "recycle_bin fields must include deletion_time (FILETIME @16); got: {:?}",
+            d.fields.iter().map(|f| f.name).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn recycle_bin_has_original_path_field() {
+        // UTF-16LE string at offset 24 (v1) or 28 (v2): full pre-deletion Windows path
+        let d = desc();
+        let has_field = d
+            .fields
+            .iter()
+            .any(|f| f.name.contains("path") || f.name == "original_path");
+        assert!(
+            has_field,
+            "recycle_bin fields must include original_path (UTF-16LE); got: {:?}",
+            d.fields.iter().map(|f| f.name).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn recycle_bin_has_sid_field() {
+        // SID from directory name: S-1-5-21-{Authority}-{Sub1}-{Sub2}-{RID}
+        // pivot to SAM hive for username resolution
+        let d = desc();
+        let has_field = d.fields.iter().any(|f| f.name.contains("sid"));
+        assert!(
+            has_field,
+            "recycle_bin fields must include sid (directory attribution); got: {:?}",
+            d.fields.iter().map(|f| f.name).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn recycle_bin_has_r_file_exists_field() {
+        // bool: $R file presence (content recoverable vs metadata-only)
+        let d = desc();
+        let has_field = d
+            .fields
+            .iter()
+            .any(|f| f.name.contains("r_file") || f.name.contains("content_recoverable"));
+        assert!(
+            has_field,
+            "recycle_bin fields must include r_file_exists (content recovery indicator); got: {:?}",
+            d.fields.iter().map(|f| f.name).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn recycle_bin_cites_rbcmd() {
+        // EricZimmerman/RBCmd is the standard tool for $I parsing
+        let d = desc();
+        let cites = d.sources.iter().any(|s| s.contains("RBCmd"));
+        assert!(cites, "recycle_bin sources must cite RBCmd; got: {:?}", d.sources);
+    }
+
+    #[test]
+    fn recycle_bin_cites_akhil_dara() {
+        // Binary format reference: $I offset schema and version semantics
+        let d = desc();
+        let cites = d.sources.iter().any(|s| s.contains("akhil-dara") || s.contains("RecycleBin-Forensic"));
+        assert!(
+            cites,
+            "recycle_bin sources must cite akhil-dara/RecycleBin-Forensic-Explorer; got: {:?}",
+            d.sources
+        );
+    }
+
+    #[test]
+    fn recycle_bin_triage_is_high_or_critical() {
+        use crate::catalog::TriagePriority;
+        let d = desc();
+        let is_high_value = matches!(d.triage_priority, TriagePriority::High | TriagePriority::Critical);
+        assert!(
+            is_high_value,
+            "recycle_bin triage should be High or Critical — $I files reveal deletion time \
+             and original path even after Recycle Bin emptied; got: {:?}",
+            d.triage_priority
+        );
+    }
+
+    #[test]
+    fn recycle_bin_has_t1078_003_for_user_attribution() {
+        // T1078.003 Valid Accounts: Local Accounts — SID → username pivoting
+        let d = desc();
+        let has_t = d.mitre_techniques.iter().any(|t| t.starts_with("T1078"));
+        assert!(
+            has_t,
+            "recycle_bin should include T1078 (user attribution via SID); got: {:?}",
+            d.mitre_techniques
+        );
+    }
+
+    #[test]
+    fn recycle_bin_related_includes_sam_users() {
+        // SID in $I directory requires SAM hive for username resolution
+        let d = desc();
+        let has_sam = d
+            .related_artifacts
+            .iter()
+            .any(|r| r.contains("sam") || r.contains("user"));
+        assert!(
+            has_sam,
+            "recycle_bin related must include sam_users (SID attribution); got: {:?}",
+            d.related_artifacts
+        );
+    }
+}

@@ -84,6 +84,12 @@ struct Cli {
     #[arg(long = "type", value_name = "TACTIC")]
     tactic: Option<String>,
 
+    /// Triage priority filter (use with --triage).
+    /// Comma-separated list: critical, high, medium, low
+    /// Example: --priority critical,high
+    #[arg(long, value_name = "PRIORITY")]
+    priority: Option<String>,
+
     /// List investigation playbooks, or show steps for a specific playbook ID.
     /// Without a value: list all 6 playbooks.
     /// With a value: show the full step-by-step investigation path.
@@ -160,7 +166,12 @@ fn main() {
             Commands::Dump { format, dataset } => run_dump(format, dataset),
         }
     } else if cli.triage {
-        run_triage(cli.format, cli.scenario.as_deref(), cli.tactic.as_deref())
+        run_triage(
+            cli.format,
+            cli.scenario.as_deref(),
+            cli.tactic.as_deref(),
+            cli.priority.as_deref(),
+        )
     } else if let Some(pb_arg) = cli.playbook {
         run_playbook(&pb_arg, cli.format)
     } else if let Some(term) = cli.term {
@@ -381,7 +392,12 @@ fn artifact_matches_prefixes(mitre_techniques: &[&'static str], prefixes: &[&'st
 // Triage
 // ---------------------------------------------------------------------------
 
-fn run_triage(format: Format, scenario: Option<&str>, tactic: Option<&str>) -> i32 {
+fn run_triage(
+    format: Format,
+    scenario: Option<&str>,
+    tactic: Option<&str>,
+    priority: Option<&str>,
+) -> i32 {
     // Validate scenario if provided
     let scenario_prefixes: Option<&'static [&'static str]> = if let Some(s) = scenario {
         match techniques_for_scenario(s) {
@@ -416,7 +432,30 @@ fn run_triage(format: Format, scenario: Option<&str>, tactic: Option<&str>) -> i
         None
     };
 
-    // Start from Critical+High triage list
+    // Parse --priority filter (comma-separated: critical,high,medium,low)
+    let priority_set: Option<Vec<TriagePriority>> = if let Some(p) = priority {
+        let mut levels = Vec::new();
+        for token in p.split(',') {
+            match token.trim() {
+                "critical" => levels.push(TriagePriority::Critical),
+                "high" => levels.push(TriagePriority::High),
+                "medium" => levels.push(TriagePriority::Medium),
+                "low" => levels.push(TriagePriority::Low),
+                other => {
+                    eprintln!(
+                        "error: unknown priority '{}'. Valid values: critical, high, medium, low",
+                        other
+                    );
+                    return 1;
+                }
+            }
+        }
+        Some(levels)
+    } else {
+        None
+    };
+
+    // Start from full triage-sorted list
     let all_hits = CATALOG.for_triage();
 
     // Apply filters (AND logic: artifact must match all supplied filters)
@@ -430,6 +469,11 @@ fn run_triage(format: Format, scenario: Option<&str>, tactic: Option<&str>) -> i
             }
             if let Some(tp) = tactic_prefixes {
                 if !artifact_matches_prefixes(d.mitre_techniques, tp) {
+                    return false;
+                }
+            }
+            if let Some(ref ps) = priority_set {
+                if !ps.contains(&d.triage_priority) {
                     return false;
                 }
             }

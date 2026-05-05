@@ -667,5 +667,79 @@ class TestParseSansBlogHtml(unittest.TestCase):
         self.assertIn("DFIR Post", titles)
 
 
+_DFIR_TRAINING_HTML_FIXTURE = """\
+<!DOCTYPE html><html><head><title>DFIR Training Blog</title></head><body>
+<nav><a href="/blog">Blog</a></nav>
+<div class="eb-blog-index">
+  <article><a href="/blog/ai-enhanced-crime-will-expose-dfir-practitioners">AI-Enhanced Crime</a></article>
+  <article><a href="/blog/a-practical-map-of-the-dfir-internet">A Practical Map of the DFIR Internet</a></article>
+  <article><a href="/blog/its-not-artifact-worship">It's Not Artifact Worship</a></article>
+  <a href="/blog/categories/tools">Tools category</a>
+  <a href="/blog/blogger/dfirtng">Author page</a>
+  <a href="/blog/tags/windows">Tag page</a>
+  <a href="/blog">Blog index</a>
+</div>
+</body></html>
+"""
+
+
+class TestParseDfirTrainingHtml(unittest.TestCase):
+    """parse_dfir_training_html(html) → list[(title, url, date)]
+
+    dfir.training is a Joomla/EasyBlog site. Posts live at /blog/<slug>.
+    Must exclude /blog/categories/, /blog/blogger/, /blog/tags/, and /blog itself.
+    """
+
+    def test_returns_list_of_tuples(self):
+        result = ba.parse_dfir_training_html(_DFIR_TRAINING_HTML_FIXTURE)
+        self.assertIsInstance(result, list)
+        for item in result:
+            self.assertEqual(len(item), 3)
+
+    def test_parses_three_posts(self):
+        result = ba.parse_dfir_training_html(_DFIR_TRAINING_HTML_FIXTURE)
+        self.assertEqual(len(result), 3)
+
+    def test_url_is_absolute(self):
+        result = ba.parse_dfir_training_html(_DFIR_TRAINING_HTML_FIXTURE)
+        for _, url, _ in result:
+            self.assertTrue(url.startswith("https://www.dfir.training/blog/"),
+                            f"URL must be absolute: {url}")
+
+    def test_excludes_categories(self):
+        result = ba.parse_dfir_training_html(_DFIR_TRAINING_HTML_FIXTURE)
+        urls = [url for _, url, _ in result]
+        self.assertFalse(any("/categories/" in u for u in urls))
+
+    def test_excludes_blogger(self):
+        result = ba.parse_dfir_training_html(_DFIR_TRAINING_HTML_FIXTURE)
+        urls = [url for _, url, _ in result]
+        self.assertFalse(any("/blogger/" in u for u in urls))
+
+    def test_excludes_tags(self):
+        result = ba.parse_dfir_training_html(_DFIR_TRAINING_HTML_FIXTURE)
+        urls = [url for _, url, _ in result]
+        self.assertFalse(any("/tags/" in u for u in urls))
+
+    def test_excludes_bare_blog_index(self):
+        result = ba.parse_dfir_training_html(_DFIR_TRAINING_HTML_FIXTURE)
+        urls = [url for _, url, _ in result]
+        self.assertNotIn("https://www.dfir.training/blog", urls)
+
+    def test_date_is_empty_string(self):
+        """dfir.training HTML index has no per-post dates; date field is ''."""
+        result = ba.parse_dfir_training_html(_DFIR_TRAINING_HTML_FIXTURE)
+        for _, _, date in result:
+            self.assertEqual(date, "")
+
+    def test_empty_html_returns_empty(self):
+        self.assertEqual(ba.parse_dfir_training_html(""), [])
+
+    def test_no_posts_returns_empty(self):
+        self.assertEqual(ba.parse_dfir_training_html(
+            "<html><body><a href='/blog/categories/tools'>cat</a></body></html>"
+        ), [])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -488,3 +488,87 @@ pub(crate) static MACOS_DIAGNOSTIC_REPORTS: ArtifactDescriptor = ArtifactDescrip
     related_artifacts: &["macos_unified_log"],
     sources: &["https://www.mac4n6.com/blog/2016/4/18/crash-logs-in-os-x"],
 };
+
+/// macOS QuickLook thumbnail cache — proves file was previewed.
+///
+/// macOS generates thumbnails proactively when Finder renders column view,
+/// gallery view, or the user presses Space (Quick Look). The SQLite database
+/// `index.sqlite` records the previewed file's path and last access time even
+/// after the original file is deleted, making this a stronger evidentiary claim
+/// than most file-accessed timestamps.
+///
+/// Two files coexist in `com.apple.QuickLook.thumbnailcache/`:
+/// - `index.sqlite`    — metadata (file_path, last_hit_date, hit_count, volume_uuid)
+/// - `thumbnails.data` — proprietary raw bitmap format; not standard image headers;
+///                       extractable via hex offset analysis (RGB Alpha bitmaps)
+///
+/// The directory location uses NSURL-style volatile temp paths
+/// (`/private/var/folders/<random>/<random>/C/`) — enumerate all user subdirs.
+///
+/// # Sources
+/// - <https://az4n6.blogspot.com/2016/10/quicklook-thumbnailsdata-parser.html> — thumbnails.data
+///   bitmap format, hex extraction via GIMP raw importer
+/// - <https://az4n6.blogspot.com/2016/01/quicklook-thumbnails-parser.html> — index.sqlite schema
+pub(crate) static MACOS_QUICKLOOK_THUMBNAILS: ArtifactDescriptor = ArtifactDescriptor {
+    id: "quicklook_thumbnails",
+    name: "QuickLook Thumbnail Cache",
+    artifact_type: ArtifactType::DatabaseEntry,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some("/private/var/folders/*/*/C/com.apple.QuickLook.thumbnailcache/index.sqlite"),
+    scope: DataScope::User,
+    os_scope: OsScope::MacOS,
+    decoder: Decoder::Identity,
+    meaning: "SQLite database recording every file for which macOS generated a Quick Look \
+        thumbnail (Finder column/gallery view, Space-bar preview). Retains file_path and \
+        last_hit_date even after the original file is deleted — stronger evidence of human \
+        file access than MRU or accessed timestamps alone. hit_count indicates repeated access. \
+        The co-located thumbnails.data file contains raw RGB Alpha bitmaps without standard \
+        headers; images recoverable via hex offset analysis or GIMP raw import. \
+        Directory path uses volatile NSURL temp folders — enumerate all \
+        /private/var/folders/*/*/C/ subdirectories.",
+    mitre_techniques: &["T1005", "T1083"],
+    fields: &[
+        FieldSchema {
+            name: "file_path",
+            value_type: ValueType::Text,
+            description: "Full path of the file whose thumbnail was generated; \
+                persists after file deletion until cache is cleared",
+            is_uid_component: true,
+        },
+        FieldSchema {
+            name: "last_hit_date",
+            value_type: ValueType::Timestamp,
+            description: "Cocoa epoch (Jan 1 2001) timestamp of last thumbnail access \
+                or generation; convert: unix_ts = cocoa_ts + 978307200",
+            is_uid_component: false,
+        },
+        FieldSchema {
+            name: "hit_count",
+            value_type: ValueType::UnsignedInt,
+            description: "Number of times a thumbnail was requested for this file; \
+                > 1 indicates repeated viewing",
+            is_uid_component: false,
+        },
+        FieldSchema {
+            name: "volume_uuid",
+            value_type: ValueType::Text,
+            description: "UUID of the volume containing the original file; \
+                pivot to mount history if file is on removable media",
+            is_uid_component: false,
+        },
+    ],
+    retention: Some(
+        "Cache cleared on logout/reboot rotation; survives across sessions \
+        until macOS quota enforcement evicts entries",
+    ),
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["macos_fsevents"],
+    sources: &[
+        // Source: thumbnails.data bitmap format, hex carving, GIMP raw import
+        "https://az4n6.blogspot.com/2016/10/quicklook-thumbnailsdata-parser.html",
+        // Source: index.sqlite schema (file_path, last_hit_date, hit_count, volume_uuid)
+        "https://az4n6.blogspot.com/2016/01/quicklook-thumbnails-parser.html",
+    ],
+};

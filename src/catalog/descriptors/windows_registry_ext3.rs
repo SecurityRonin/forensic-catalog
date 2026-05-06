@@ -305,3 +305,65 @@ pub(crate) static SERVICES_HKLM: ArtifactDescriptor = ArtifactDescriptor {
         "https://learn.microsoft.com/en-us/sysinternals/downloads/autoruns",
     ],
 };
+
+/// Windows OS installation date — unreliable after Feature Updates.
+///
+/// `HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\InstallDate` (REG_DWORD)
+/// stores the OS installation timestamp as Unix epoch seconds. However, Windows
+/// Feature Updates (starting with v.1607 / Anniversary Update, 2016) RESET this
+/// value to the update installation date, not the original OS install. Event logs
+/// are also wiped/recreated on Feature Update, so log creation dates likewise
+/// reflect the Feature Update.
+///
+/// **Evidence reliability: Low** without corroboration from CBS.log, Windows Update
+/// history, or setup*.log files.
+///
+/// # Sources
+/// - <https://az4n6.blogspot.com/2017/02/when-windows-lies.html> — Feature Update
+///   1607 resets InstallDate on multiple tested systems; log timestamps cleared too
+pub(crate) static WINDOWS_INSTALL_DATE: ArtifactDescriptor = ArtifactDescriptor {
+    id: "windows_install_date",
+    name: "Windows Install Date",
+    artifact_type: ArtifactType::RegistryValue,
+    hive: Some(HiveTarget::HklmSoftware),
+    key_path: r"SOFTWARE\Microsoft\Windows NT\CurrentVersion",
+    value_name: Some("InstallDate"),
+    file_path: None,
+    scope: DataScope::System,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::DwordLe,
+    meaning: "OS installation timestamp (REG_DWORD, Unix epoch seconds). \
+        CAUTION: Windows Feature Updates (starting v.1607/Anniversary Update, 2016) \
+        reset this value to the update date, not the original install. \
+        Event logs are also wiped on Feature Update. \
+        Evidence reliability is Low without corroboration from CBS.log, \
+        Windows Update history (Software\\Microsoft\\Windows\\CurrentVersion\\WindowsUpdate\\Auto Update\\Results), \
+        or setupapi.upgrade.log. \
+        Cross-validate: if InstallDate matches a known Feature Update KB date, \
+        the original install date is unknown.",
+    mitre_techniques: &[],
+    fields: &[
+        FieldSchema {
+            name: "install_date",
+            value_type: ValueType::Timestamp,
+            description: "REG_DWORD Unix epoch seconds; reflects latest Feature Update date \
+                on Win10+ systems that received Anniversary Update or later",
+            is_uid_component: false,
+        },
+        FieldSchema {
+            name: "install_time",
+            value_type: ValueType::Timestamp,
+            description: "InstallTime REG_QWORD FILETIME (same key, same caveat); \
+                higher precision but same reset behaviour as InstallDate",
+            is_uid_component: false,
+        },
+    ],
+    retention: None,
+    triage_priority: TriagePriority::Low,
+    related_artifacts: &["cbs_log", "setupapi_upgrade_log", "windows_update_session"],
+    sources: &[
+        // Source: Feature Update 1607 resets InstallDate; tested on multiple systems
+        "https://az4n6.blogspot.com/2017/02/when-windows-lies.html",
+        "https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/windows-setup-log-files-and-event-logs",
+    ],
+};

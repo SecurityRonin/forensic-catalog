@@ -7467,6 +7467,7 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     macos_ext::MACOS_MDM_ENROLLMENT,
     macos_ext::MACOS_ASL_LOGS,
     macos_ext::MACOS_DIAGNOSTIC_REPORTS,
+    macos_ext::MACOS_QUICKLOOK_THUMBNAILS,
     // Extended Linux artifacts (linux_ext)
     linux_ext::LINUX_AUDITD_LOG,
     linux_ext::LINUX_AUDIT_RULES,
@@ -7609,6 +7610,7 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     windows_registry_ext3::SCREENSAVER_PERSISTENCE,
     windows_registry_ext3::PRINT_MONITOR_DLLS,
     windows_registry_ext3::SERVICES_HKLM,
+    windows_registry_ext3::WINDOWS_INSTALL_DATE,
     // ── Generated artifact descriptors (mass-import pipeline) ────────────────
     // Total: 6187 generated entries
     // ── browsers_generated (37 entries) ────────────────────────────────────

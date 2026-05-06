@@ -8,6 +8,95 @@ pub mod search;
 pub mod theme;
 pub mod ui;
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn make_app(dataset: usize, query: &str, preset: usize) -> app::App {
+        let mut a = app::App::new();
+        a.switch_dataset(dataset);
+        a.search_query = query.to_string();
+        a.preset_idx = preset;
+        a
+    }
+
+    #[test]
+    fn build_render_data_catalog_full_length() {
+        let a = make_app(0, "", 0);
+        let rd = build_render_data(&a);
+        assert!(
+            rd.list_items.len() > 100,
+            "catalog must have >100 items, got {}",
+            rd.list_items.len()
+        );
+    }
+
+    #[test]
+    fn build_render_data_windows_lolbins_dataset() {
+        let a = make_app(1, "", 0);
+        let rd = build_render_data(&a);
+        assert!(!rd.list_items.is_empty(), "windows lolbins must be non-empty");
+    }
+
+    #[test]
+    fn build_render_data_preset_windows_crit_filters() {
+        let a = make_app(0, "", 1); // preset 1 = Windows CRIT
+        let rd = build_render_data(&a);
+        let full_count = {
+            let a2 = make_app(0, "", 0);
+            build_render_data(&a2).list_items.len()
+        };
+        assert!(
+            rd.list_items.len() < full_count,
+            "Windows CRIT preset must filter catalog; got {} vs full {}",
+            rd.list_items.len(),
+            full_count
+        );
+        for item in &rd.list_items {
+            assert!(item.contains("Critical"), "item must be Critical: {item}");
+        }
+    }
+
+    #[test]
+    fn build_render_data_search_filters_catalog() {
+        let a = make_app(0, "prefetch", 0);
+        let rd = build_render_data(&a);
+        assert!(!rd.list_items.is_empty(), "search 'prefetch' must match something");
+        for item in &rd.list_items {
+            assert!(
+                item.to_lowercase().contains("prefetch"),
+                "filtered item must contain query: {item}"
+            );
+        }
+    }
+
+    #[test]
+    fn build_render_data_empty_query_returns_all() {
+        let a = make_app(0, "", 0);
+        let rd = build_render_data(&a);
+        let expected = forensicnomicon::catalog::CATALOG.list().len();
+        assert_eq!(rd.list_items.len(), expected);
+    }
+
+    #[test]
+    fn build_render_data_detail_shows_selected_artifact() {
+        let mut a = make_app(0, "prefetch_file", 0);
+        a.selected = 0; // first search result
+        let rd = build_render_data(&a);
+        let combined = rd.detail_lines.join("\n");
+        assert!(
+            combined.contains("prefetch") || combined.contains("Prefetch"),
+            "detail must mention selected artifact; got: {combined}"
+        );
+    }
+
+    #[test]
+    fn load_theme_returns_default_on_missing_file() {
+        let t = load_theme();
+        assert_ne!(t.crit_fg, ratatui::style::Color::Reset);
+    }
+}
+
 use crossterm::{
     event::{self, Event},
     execute,

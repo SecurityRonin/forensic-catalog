@@ -12668,3 +12668,541 @@ Mark `[x]` when reviewed, `[→]` when artifact tasks were created.
 - [ ] [When the AI lies to its own logs in a world of internal LLMs and autonomous agents](https://andreafortuna.org/2026/05/04/when-ai-lies-to-its-own-logs-forensic-readiness/) — Andrea Fortuna
 - [ ] [How to store and manage metadata in macOS](https://eclecticlight.co/2026/05/05/how-to-store-and-manage-metadata-in-macos/) — The Eclectic Light Company
 - [ ] [The Three Ways Mobile Security Teams Are Flying Blind — And How to Fix It](https://cellebrite.com/en/blog/mobile-security-testing-alternatives-ios-blind-spot/) — Cellebrite Blog
+
+
+## 2026-05-06 (RapidTriage research citations)
+
+<!-- 
+  528 source URLs extracted from ~/src/RapidTriage research/ and docs/ markdown files.
+  These are citations used in RapidTriage forensic research that may contain
+  artifact findings not yet in the forensicnomicon catalog.
+-->
+
+- [ ] [Registry Explorer Recmd](https://aboutdfir.com/toolsandartifacts/windows/registry-explorer-recmd/) — AboutDFIR
+- [ ] [Volume Shadow Copies In Forensic Analysis](https://andreafortuna.org/2017/10/02/volume-shadow-copies-in-forensic-analysis/) — Andrea Fortuna
+- [ ] [Windows Registry In Forensic Analysis](https://andreafortuna.org/2017/10/18/windows-registry-in-forensic-analysis/) — Andrea Fortuna
+- [ ] [Some Forensic Thoughts About Windows 10 Timeline](https://andreafortuna.org/2019/10/03/some-forensic-thoughts-about-windows-10-timeline/) — Andrea Fortuna
+- [ ] [Windows Registry Transaction Logs In Forensic Analysis](https://andreafortuna.org/2021/02/06/windows-registry-transaction-logs-in-forensic-analysis/) — Andrea Fortuna
+- [ ] [Usn Journal](https://andreafortuna.org/2025/09/06/usn-journal) — Andrea Fortuna
+- [ ] [Proc Filesystem](https://andreafortuna.org/2026/01/19/proc-filesystem) — Andrea Fortuna
+- [ ] [Windows11 Pca Artifact](https://andreafortuna.org/2026/03/19/windows11-pca-artifact/) — Andrea Fortuna
+- [ ] [Windows Secure](https://artefacts.help/windows_secure.html) — Artefacts.help
+- [ ] [Windows Shimcache](https://artefacts.help/windows_shimcache.html) — Artefacts.help
+- [ ] [Activitiescachedatabase](https://artifacts-kb.readthedocs.io/en/latest/sources/windows/ActivitiesCacheDatabase.html) — Artifacts KB
+- [ ] [Jumplists](https://artifacts-kb.readthedocs.io/en/latest/sources/windows/JumpLists.html) — Artifacts KB
+- [ ] [Recentfilecache](https://artifacts-kb.readthedocs.io/en/latest/sources/windows/RecentFileCache.html) — Artifacts KB
+- [ ] [Systemresourceusagemonitor](https://artifacts-kb.readthedocs.io/en/latest/sources/windows/SystemResourceUsageMonitor.html) — Artifacts KB
+- [ ] [Countering Anti Forensic Efforts Part 2](https://belkasoft.com/countering-anti-forensic-efforts-part-2) — Belkasoft
+- [ ] [Dfir Trends 2025](https://belkasoft.com/dfir-trends-2025) — Belkasoft
+- [ ] [Ram Forensics Tools Techniques](https://belkasoft.com/ram-forensics-tools-techniques) — Belkasoft
+- [ ] [Ssd 2016 Part3](https://belkasoft.com/ssd-2016-part3) — Belkasoft
+- [ ] [Windows Registry Analysis Techniques](https://belkasoft.com/windows-registry-analysis-techniques) — Belkasoft
+- [ ] [Windows Registry Forensics Structure And Aquisition](https://belkasoft.com/windows-registry-forensics-structure-and-aquisition) — Belkasoft
+- [ ] [X](https://belkasoft.com/x) — Belkasoft
+- [ ] [Digging Mac Os Keychains](https://blog.elcomsoft.com/2015/09/digging-mac-os-keychains/) — ElcomSoft
+- [ ] [Mac Os Forensics Attacking Filevault 2](https://blog.elcomsoft.com/2016/07/mac-os-forensics-attacking-filevault-2/) — ElcomSoft
+- [ ] [Breaking Veracrypt Obtaining And Extracting On The Fly Encryption Keys](https://blog.elcomsoft.com/2021/06/breaking-veracrypt-obtaining-and-extracting-on-the-fly-encryption-keys/) — ElcomSoft
+- [ ] [Breaking Into Password Managers From Bitwarden To Zoho Vault](https://blog.elcomsoft.com/2025/09/breaking-into-password-managers-from-bitwarden-to-zoho-vault/) — ElcomSoft
+- [ ] [Browser Forensics In 2026 App Bound Encryption And Live Triage](https://blog.elcomsoft.com/2026/01/browser-forensics-in-2026-app-bound-encryption-and-live-triage/) — ElcomSoft
+- [ ] [The Cloud Gap Forensic Triage Vs Disk Imaging In The Age Of On Demand Sync](https://blog.elcomsoft.com/2026/01/the-cloud-gap-forensic-triage-vs-disk-imaging-in-the-age-of-on-demand-sync/) — ElcomSoft
+- [ ] [Forensic Analysis Of Windows 10 And 11 Event Logs](https://blog.elcomsoft.com/2026/02/forensic-analysis-of-windows-10-and-11-event-logs/) — ElcomSoft
+- [ ] [Investigating Windows Registry](https://blog.elcomsoft.com/2026/02/investigating-windows-registry/) — ElcomSoft
+- [ ] [Usb Device Forensics On Windows 10 And 11](https://blog.elcomsoft.com/2026/02/usb-device-forensics-on-windows-10-and-11/) — ElcomSoft
+- [ ] [Featureusage](https://blog.group-ib.com/featureusage) — Group-IB
+- [ ] [Hiding Data In The Registry](https://dfir.ru/2018/10/07/hiding-data-in-the-registry/) — DFIR.ru
+- [ ] [Tools That Recover Deleted Registry Data Dont Do The Same Job](https://dfir.ru/2018/11/18/tools-that-recover-deleted-registry-data-dont-do-the-same-job/) — DFIR.ru
+- [ ] [Exploring Intermediate States Of A Registry Hive Using Transaction Log Files](https://dfir.ru/2018/11/19/exploring-intermediate-states-of-a-registry-hive-using-transaction-log-files/) — DFIR.ru
+- [ ] [Containerized Registry Hives In Windows](https://dfir.ru/2020/08/15/containerized-registry-hives-in-windows/) — DFIR.ru
+- [ ] [Standard Information Vs File Name](https://dfir.ru/2021/01/10/standard_information-vs-file_name/) — DFIR.ru
+- [ ] [All Your Tls Keys Are Belong To Us A Novel Approach To Live Memory Forensic Key Extraction](https://dfrws.org/presentation/all-your-tls-keys-are-belong-to-us-a-novel-approach-to-live-memory-forensic-key-extraction/) — DFRWS
+- [ ] [2009 Usa Paper The Persistence Of Memory   Forensic Identification And Extraction Of Cryptographic Keys (Pdf)](https://dfrws.org/sites/default/files/session-files/2009_USA_paper-the_persistence_of_memory_-_forensic_identification_and_extraction_of_cryptographic_keys.pdf) — DFRWS
+- [ ] [2014 Usa Pres Memory Forensics With Hyper V Virtual Machines (Pdf)](https://dfrws.org/sites/default/files/session-files/2014_USA_pres-memory_forensics_with_hyper-v_virtual_machines.pdf) — DFRWS
+- [ ] [2019 Eu Paper Deleted File Fragment Dating By Analysis Of Allocated Neighbors (Pdf)](https://dfrws.org/wp-content/uploads/2019/06/2019_EU_paper-deleted_file_fragment_dating_by_analysis_of_allocated_neighbors.pdf) — DFRWS
+- [ ] [Paper Forensic Analysis Of Multiple Device Btrfs Configurations Using The Sleuth Kit (Pdf)](https://dfrws.org/wp-content/uploads/2019/06/paper_forensic_analysis_of_multiple_device_btrfs_configurations_using_the_sleuth_kit.pdf) — DFRWS
+- [ ] [Artifacts For Detecting Timestamp Manipulati 2020 Forensic Science Internati (Pdf)](https://dfrws.org/wp-content/uploads/2020/05/Artifacts-for-Detecting-Timestamp-Manipulati_2020_Forensic-Science-Internati.pdf) — DFRWS
+- [ ] [2020 Usa Paper Memory Foreshadow Memory Forensics Of Hardware Cryptocurrency Wallets A Tool And Visualization (Pdf)](https://dfrws.org/wp-content/uploads/2020/10/2020_USA_paper-memory_foreshadow_memory_forensics_of_hardware_cryptocurrency_wallets_a_tool_and_visualization.pdf) — DFRWS
+- [ ] [2021 Apac Paper Forensic Analysis Of Refs Journaling (Pdf)](https://dfrws.org/wp-content/uploads/2021/01/2021_APAC_paper-forensic_analysis_of_refs_journaling.pdf) — DFRWS
+- [ ] [Leveraging Memory Forensics To Investigate And Detect Illegal 3D Printing Activities (Pdf)](https://dfrws.org/wp-content/uploads/2025/05/Leveraging-memory-forensics-to-investigate-and-detect-illegal-3D-printing-activities.pdf) — DFRWS
+- [ ] [Windows.Forensics.Bam](https://docs.velociraptor.app/artifact_references/pages/windows.forensics.bam/) — Velociraptor Docs
+- [ ] [Windows.Forensics.Recyclebin](https://docs.velociraptor.app/artifact_references/pages/windows.forensics.recyclebin/) — Velociraptor Docs
+- [ ] [Windows.Forensics.Sam](https://docs.velociraptor.app/artifact_references/pages/windows.forensics.sam/) — Velociraptor Docs
+- [ ] [Windows.Ntfs.Extendedattributes](https://docs.velociraptor.app/artifact_references/pages/windows.ntfs.extendedattributes/) — Velociraptor Docs
+- [ ] [Windows.Registry.Rdp](https://docs.velociraptor.app/artifact_references/pages/windows.registry.rdp/) — Velociraptor Docs
+- [ ] [Windows.Registry.Sysinternals.Eulacheck](https://docs.velociraptor.app/artifact_references/pages/windows.registry.sysinternals.eulacheck/) — Velociraptor Docs
+- [ ] [Windows.Registry.Userassist](https://docs.velociraptor.app/artifact_references/pages/windows.registry.userassist/) — Velociraptor Docs
+- [ ] [2020 11 13 The Windows Usn Journal F0C55C9010E](https://docs.velociraptor.app/blog/2020/2020-11-13-the-windows-usn-journal-f0c55c9010e/) — Velociraptor Docs
+- [ ] [Evidence Of Execution](https://docs.velociraptor.app/docs/forensic/evidence_of_execution/) — Velociraptor Docs
+- [ ] [Overview](https://docs.velociraptor.app/docs/overview/) — Velociraptor Docs
+- [ ] [Custom.Windows.Mobaxterm.Passwords](https://docs.velociraptor.app/exchange/artifacts/pages/custom.windows.mobaxterm.passwords/) — Velociraptor Docs
+- [ ] [Windows.Forensics.Notificationsdatabase](https://docs.velociraptor.app/exchange/artifacts/pages/windows.forensics.notificationsdatabase/) — Velociraptor Docs
+- [ ] [Xattr Com Apple Quarantine The Quarantine Flag](https://eclecticlight.co/2017/12/11/xattr-com-apple-quarantine-the-quarantine-flag/) — Eclectic Light
+- [ ] [Xattr Com Apple Finderinfo Information For The Finder](https://eclecticlight.co/2017/12/19/xattr-com-apple-finderinfo-information-for-the-finder/) — Eclectic Light
+- [ ] [Quarantine Sip And Macl Macos Per File Security Controls](https://eclecticlight.co/2020/01/30/quarantine-sip-and-macl-macos-per-file-security-controls/) — Eclectic Light
+- [ ] [Quarantine And The Quarantine Flag](https://eclecticlight.co/2020/10/29/quarantine-and-the-quarantine-flag/) — Eclectic Light
+- [ ] [How Macos Now Tracks The Provenance Of Apps](https://eclecticlight.co/2023/05/10/how-macos-now-tracks-the-provenance-of-apps/) — Eclectic Light
+- [ ] [Apfs Extended Attributes Revisited](https://eclecticlight.co/2024/05/13/apfs-extended-attributes-revisited/) — Eclectic Light
+- [ ] [Filevault And Volume Encryption Explained](https://eclecticlight.co/2025/01/10/filevault-and-volume-encryption-explained/) — Eclectic Light
+- [ ] [Bitlocker Disk Encryption](https://forensics.wiki/bitlocker_disk_encryption/) — Forensics Wiki
+- [ ] [Hiberfil.Sys](https://forensics.wiki/hiberfil.sys/) — Forensics Wiki
+- [ ] [Jump Lists](https://forensics.wiki/jump_lists/) — Forensics Wiki
+- [ ] [List Of Windows Mru Locations](https://forensics.wiki/list_of_windows_mru_locations/) — Forensics Wiki
+- [ ] [Lnk](https://forensics.wiki/lnk/) — Forensics Wiki
+- [ ] [Personal Folder File (Pab, Pst, Ost](https://forensics.wiki/personal_folder_file_(pab,_pst,_ost) — Forensics Wiki
+- [ ] [Prefetch](https://forensics.wiki/prefetch/) — Forensics Wiki
+- [ ] [Windows](https://forensics.wiki/windows/) — Forensics Wiki
+- [ ] [Windows Boot Configuration Data](https://forensics.wiki/windows_boot_configuration_data/) — Forensics Wiki
+- [ ] [Windows Desktop Search](https://forensics.wiki/windows_desktop_search/) — Forensics Wiki
+- [ ] [Windows Nt Registry File (Regf](https://forensics.wiki/windows_nt_registry_file_(regf) — Forensics Wiki
+- [ ] [Windows Prefetch File Format](https://forensics.wiki/windows_prefetch_file_format/) — Forensics Wiki
+- [ ] [Windows Shadow Volumes](https://forensics.wiki/windows_shadow_volumes/) — Forensics Wiki
+- [ ] [Windows Thumbcache](https://forensics.wiki/windows_thumbcache/) — Forensics Wiki
+- [ ] [MBrassey/623f7b8d02766fa2d826bf9eca3fe005](https://gist.github.com/MBrassey/623f7b8d02766fa2d826bf9eca3fe005) — GitHub
+- [ ] [alexdhital/156077d873ea06a7a3058e56747f2dd6](https://gist.github.com/alexdhital/156077d873ea06a7a3058e56747f2dd6) — GitHub
+- [ ] [jpatters/4553139](https://gist.github.com/jpatters/4553139) — GitHub
+- [ ] [4144414D/pytruecrypt](https://github.com/4144414D/pytruecrypt) — GitHub
+- [ ] [4n6h4x0r/winreg-forensic"](https://github.com/4n6h4x0r/winreg-forensic") — GitHub
+- [ ] [504ensicsLabs/LiME](https://github.com/504ensicsLabs/LiME) — GitHub
+- [ ] [504ensicsLabs/LiME/blob/master/src/lime.h](https://github.com/504ensicsLabs/LiME/blob/master/src/lime.h) — GitHub
+- [ ] [Abyss-W4tcher/volatility3-symbols](https://github.com/Abyss-W4tcher/volatility3-symbols) — GitHub
+- [ ] [Aegrah/PANIX](https://github.com/Aegrah/PANIX) — GitHub
+- [ ] [AlessandroZ/LaZagneForensic](https://github.com/AlessandroZ/LaZagneForensic) — GitHub
+- [ ] [Aorimn/dislocker](https://github.com/Aorimn/dislocker) — GitHub
+- [ ] [Arizona-Cyber-Threat-Response-Alliance/rmm-detection](https://github.com/Arizona-Cyber-Threat-Response-Alliance/rmm-detection) — GitHub
+- [ ] [Arvanaghi/SessionGopher](https://github.com/Arvanaghi/SessionGopher) — GitHub
+- [ ] [Beercow/OneDriveExplorer](https://github.com/Beercow/OneDriveExplorer) — GitHub
+- [ ] [Beercow/XstReader](https://github.com/Beercow/XstReader) — GitHub
+- [ ] [Bert-JanP/Open-Source-Threat-Intel-Feeds](https://github.com/Bert-JanP/Open-Source-Threat-Intel-Feeds) — GitHub
+- [ ] [BetaHydri/RDP-Forensic](https://github.com/BetaHydri/RDP-Forensic) — GitHub
+- [ ] [ColinFinck/nt-hive](https://github.com/ColinFinck/nt-hive) — GitHub
+- [ ] [DFIRScience/Efficient-NSRL](https://github.com/DFIRScience/Efficient-NSRL) — GitHub
+- [ ] [DevExzh/litchi](https://github.com/DevExzh/litchi) — GitHub
+- [ ] [ElevenPaths/FOCA](https://github.com/ElevenPaths/FOCA) — GitHub
+- [ ] [EricZimmerman/AmcacheParser](https://github.com/EricZimmerman/AmcacheParser) — GitHub
+- [ ] [EricZimmerman/AppCompatCacheParser](https://github.com/EricZimmerman/AppCompatCacheParser) — GitHub
+- [ ] [EricZimmerman/JLECmd](https://github.com/EricZimmerman/JLECmd) — GitHub
+- [ ] [EricZimmerman/RECmd](https://github.com/EricZimmerman/RECmd) — GitHub
+- [ ] [EricZimmerman/RegistryExplorer](https://github.com/EricZimmerman/RegistryExplorer) — GitHub
+- [ ] [EricZimmerman/RegistryExplorerBookmarks](https://github.com/EricZimmerman/RegistryExplorerBookmarks) — GitHub
+- [ ] [EricZimmerman/RegistryPlugins](https://github.com/EricZimmerman/RegistryPlugins) — GitHub
+- [ ] [EricZimmerman/RegistryPlugins/blob/master/RegistryPlugin.UserAssist/UserAssist.cs](https://github.com/EricZimmerman/RegistryPlugins/blob/master/RegistryPlugin.UserAssist/UserAssist.cs) — GitHub
+- [ ] [EricZimmerman/bstrings](https://github.com/EricZimmerman/bstrings) — GitHub
+- [ ] [EvanMcBroom/lsa-whisperer](https://github.com/EvanMcBroom/lsa-whisperer) — GitHub
+- [ ] [ForensicArtifacts/artifacts](https://github.com/ForensicArtifacts/artifacts) — GitHub
+- [ ] [ForensicRS](https://github.com/ForensicRS) — GitHub
+- [ ] [GhostPack/Rubeus](https://github.com/GhostPack/Rubeus) — GitHub
+- [ ] [GhostPack/SharpDPAPI](https://github.com/GhostPack/SharpDPAPI) — GitHub
+- [ ] [GuidoBartoli/sherloq](https://github.com/GuidoBartoli/sherloq) — GitHub
+- [ ] [InQuest/awesome-yara](https://github.com/InQuest/awesome-yara) — GitHub
+- [ ] [J-F-Liu/lopdf](https://github.com/J-F-Liu/lopdf) — GitHub
+- [ ] [JusticeRage/Manalyze/blob/master/bin/yara_rules/bitcoin.yara](https://github.com/JusticeRage/Manalyze/blob/master/bin/yara_rules/bitcoin.yara) — GitHub
+- [ ] [KDE/kwallet](https://github.com/KDE/kwallet) — GitHub
+- [ ] [Karneades/awesome-malware-persistence](https://github.com/Karneades/awesome-malware-persistence) — GitHub
+- [ ] [Kracken256/ssh-keyfinder](https://github.com/Kracken256/ssh-keyfinder) — GitHub
+- [ ] [KyleBruene/mtf](https://github.com/KyleBruene/mtf) — GitHub
+- [ ] [LETHAL-FORENSICS/MemProcFS-Analyzer](https://github.com/LETHAL-FORENSICS/MemProcFS-Analyzer) — GitHub
+- [ ] [LinearTapeFileSystem/ltfs](https://github.com/LinearTapeFileSystem/ltfs) — GitHub
+- [ ] [MISP/misp-warninglists](https://github.com/MISP/misp-warninglists) — GitHub
+- [ ] [MarkBaggett/srum-dump](https://github.com/MarkBaggett/srum-dump) — GitHub
+- [ ] [MatheuZSecurity/RingReaper](https://github.com/MatheuZSecurity/RingReaper) — GitHub
+- [ ] [MatheuZSecurity/Singularity](https://github.com/MatheuZSecurity/Singularity) — GitHub
+- [ ] [MetaMask/vault-decryptor](https://github.com/MetaMask/vault-decryptor) — GitHub
+- [ ] [MichaelGrafnetter/DSInternals](https://github.com/MichaelGrafnetter/DSInternals) — GitHub
+- [ ] [Microsoft/WSL/issues/2777](https://github.com/Microsoft/WSL/issues/2777) — GitHub
+- [ ] [MrSuicideParrot/Yara-Secrets](https://github.com/MrSuicideParrot/Yara-Secrets) — GitHub
+- [ ] [NateBrune/silk-guardian](https://github.com/NateBrune/silk-guardian) — GitHub
+- [ ] [Neo23x0/signature-base](https://github.com/Neo23x0/signature-base) — GitHub
+- [ ] [Neo23x0/signature-base/blob/master/yara/pua_xmrig_monero_miner.yar](https://github.com/Neo23x0/signature-base/blob/master/yara/pua_xmrig_monero_miner.yar) — GitHub
+- [ ] [NetSPI/sshkey-grab](https://github.com/NetSPI/sshkey-grab) — GitHub
+- [ ] [Psmths/windows-forensic-artifacts](https://github.com/Psmths/windows-forensic-artifacts) — GitHub
+- [ ] [Psmths/windows-forensic-artifacts/blob/main/account/sam-hive.md](https://github.com/Psmths/windows-forensic-artifacts/blob/main/account/sam-hive.md) — GitHub
+- [ ] [Psmths/windows-forensic-artifacts/blob/main/execution/bam-dam.md](https://github.com/Psmths/windows-forensic-artifacts/blob/main/execution/bam-dam.md) — GitHub
+- [ ] [Psmths/windows-forensic-artifacts/blob/main/execution/evtx-4688-process-created.md](https://github.com/Psmths/windows-forensic-artifacts/blob/main/execution/evtx-4688-process-created.md) — GitHub
+- [ ] [Psmths/windows-forensic-artifacts/blob/main/persistence/registry-services.md](https://github.com/Psmths/windows-forensic-artifacts/blob/main/persistence/registry-services.md) — GitHub
+- [ ] [ReFirmLabs/binwalk](https://github.com/ReFirmLabs/binwalk) — GitHub
+- [ ] [RealityNet/kobackupdec](https://github.com/RealityNet/kobackupdec) — GitHub
+- [ ] [RegSeek/regseek.github.io](https://github.com/RegSeek/regseek.github.io) — GitHub
+- [ ] [SecureAuthCorp/impacket](https://github.com/SecureAuthCorp/impacket) — GitHub
+- [ ] [SecurityRonin/browser-forensic](https://github.com/SecurityRonin/browser-forensic) — GitHub
+- [ ] [SecurityRonin/ewf](https://github.com/SecurityRonin/ewf) — GitHub
+- [ ] [SecurityRonin/ext4fs-forensic](https://github.com/SecurityRonin/ext4fs-forensic) — GitHub
+- [ ] [SecurityRonin/forensicnomicon](https://github.com/SecurityRonin/forensicnomicon) — GitHub
+- [ ] [SecurityRonin/rapidtriage](https://github.com/SecurityRonin/rapidtriage) — GitHub
+- [ ] [SecurityRonin/rapidtriage/blob/main/LICENSE](https://github.com/SecurityRonin/rapidtriage/blob/main/LICENSE) — GitHub
+- [ ] [SecurityRonin/srum-forensic](https://github.com/SecurityRonin/srum-forensic) — GitHub
+- [ ] [SecurityRonin/winevt-forensic](https://github.com/SecurityRonin/winevt-forensic) — GitHub
+- [ ] [TheIc3Root/GCP-Credential-File-Comparison](https://github.com/TheIc3Root/GCP-Credential-File-Comparison) — GitHub
+- [ ] [Velocidex/WinPmem](https://github.com/Velocidex/WinPmem) — GitHub
+- [ ] [VirusTotal/yara-x](https://github.com/VirusTotal/yara-x) — GitHub
+- [ ] [Xumeiquer/yara-forensics](https://github.com/Xumeiquer/yara-forensics) — GitHub
+- [ ] [Yara-Rules/rules](https://github.com/Yara-Rules/rules) — GitHub
+- [ ] [Yelp/detect-secrets](https://github.com/Yelp/detect-secrets) — GitHub
+- [ ] [advanced-threat-research/Yara-Rules](https://github.com/advanced-threat-research/Yara-Rules) — GitHub
+- [ ] [advanced-threat-research/Yara-Rules/blob/master/miners/MINER_Monero.yar](https://github.com/advanced-threat-research/Yara-Rules/blob/master/miners/MINER_Monero.yar) — GitHub
+- [ ] [aff4/Standard/blob/master/inprogress/AFF4StandardSpecification-v1.0a.md](https://github.com/aff4/Standard/blob/master/inprogress/AFF4StandardSpecification-v1.0a.md) — GitHub
+- [ ] [aff4/c-aff4](https://github.com/aff4/c-aff4) — GitHub
+- [ ] [aff4/pyaff4](https://github.com/aff4/pyaff4) — GitHub
+- [ ] [airbus-cert/regrippy](https://github.com/airbus-cert/regrippy) — GitHub
+- [ ] [al3ks1s/AD1-tools](https://github.com/al3ks1s/AD1-tools) — GitHub
+- [ ] [albertobsd/crackBTCwallet](https://github.com/albertobsd/crackBTCwallet) — GitHub
+- [ ] [apache/tika](https://github.com/apache/tika) — GitHub
+- [ ] [bitcoin/bips/blob/master/bip-0032.mediawiki](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) — GitHub
+- [ ] [bitcoin/bips/blob/master/bip-0039.mediawiki](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) — GitHub
+- [ ] [bitcoin/bips/blob/master/bip-0044.mediawiki](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) — GitHub
+- [ ] [bitcoin/bips/tree/master/bip-0039](https://github.com/bitcoin/bips/tree/master/bip-0039) — GitHub
+- [ ] [bitcoin/bitcoin/blob/master/src/key.h](https://github.com/bitcoin/bitcoin/blob/master/src/key.h) — GitHub
+- [ ] [bitcoin/bitcoin/blob/master/src/wallet/crypter.cpp](https://github.com/bitcoin/bitcoin/blob/master/src/wallet/crypter.cpp) — GitHub
+- [ ] [bitpay/bitcore-wallet-bdb2jsonl](https://github.com/bitpay/bitcore-wallet-bdb2jsonl) — GitHub
+- [ ] [breppo/Volatility-BitLocker](https://github.com/breppo/Volatility-BitLocker) — GitHub
+- [ ] [cgsecurity/testdisk](https://github.com/cgsecurity/testdisk) — GitHub
+- [ ] [codebasebo/Solana-Wallet-Key-Generation-and-Conversion-Tools](https://github.com/codebasebo/Solana-Wallet-Key-Generation-and-Conversion-Tools) — GitHub
+- [ ] [cryptolok/CryKeX](https://github.com/cryptolok/CryKeX) — GitHub
+- [ ] [cyclone-github/metamask_pwn](https://github.com/cyclone-github/metamask_pwn) — GitHub
+- [ ] [decalage2/oletools](https://github.com/decalage2/oletools) — GitHub
+- [ ] [dennisss/acronis-tib](https://github.com/dennisss/acronis-tib) — GitHub
+- [ ] [dfir-dd/dfir-toolkit](https://github.com/dfir-dd/dfir-toolkit) — GitHub
+- [ ] [dfir-dd/nt-hive2](https://github.com/dfir-dd/nt-hive2) — GitHub
+- [ ] [digital-preservation/droid](https://github.com/digital-preservation/droid) — GitHub
+- [ ] [drb-ra/C2IntelFeeds](https://github.com/drb-ra/C2IntelFeeds) — GitHub
+- [ ] [dropbox/finderinfo-rust](https://github.com/dropbox/finderinfo-rust) — GitHub
+- [ ] [dunhamsteve/ios](https://github.com/dunhamsteve/ios) — GitHub
+- [ ] [dzxs/Xdecrypt](https://github.com/dzxs/Xdecrypt) — GitHub
+- [ ] [elastic/protections-artifacts](https://github.com/elastic/protections-artifacts) — GitHub
+- [ ] [elceef/bitlocker](https://github.com/elceef/bitlocker) — GitHub
+- [ ] [ethereum/eth-keyfile](https://github.com/ethereum/eth-keyfile) — GitHub
+- [ ] [ewilded/Windows_persistence/blob/master/REGISTRY.md](https://github.com/ewilded/Windows_persistence/blob/master/REGISTRY.md) — GitHub
+- [ ] [exiftool/exiftool](https://github.com/exiftool/exiftool) — GitHub
+- [ ] [felixc/rexiv2](https://github.com/felixc/rexiv2) — GitHub
+- [ ] [file/file](https://github.com/file/file) — GitHub
+- [ ] [firehol/blocklist-ipsets](https://github.com/firehol/blocklist-ipsets) — GitHub
+- [ ] [fortra/impacket](https://github.com/fortra/impacket) — GitHub
+- [ ] [franckferman/LastLog-Audit](https://github.com/franckferman/LastLog-Audit) — GitHub
+- [ ] [frizb/PasswordDecrypts](https://github.com/frizb/PasswordDecrypts) — GitHub
+- [ ] [gentilkiwi/mimikatz](https://github.com/gentilkiwi/mimikatz) — GitHub
+- [ ] [gentilkiwi/mimikatz/wiki/howto-~-scheduled-tasks-credentials](https://github.com/gentilkiwi/mimikatz/wiki/howto-~-scheduled-tasks-credentials) — GitHub
+- [ ] [gitleaks/gitleaks](https://github.com/gitleaks/gitleaks) — GitHub
+- [ ] [google/google-authenticator/wiki/Key-Uri-Format](https://github.com/google/google-authenticator/wiki/Key-Uri-Format) — GitHub
+- [ ] [google/rekall](https://github.com/google/rekall) — GitHub
+- [ ] [gquere/mRemoteNG_password_decrypt](https://github.com/gquere/mRemoteNG_password_decrypt) — GitHub
+- [ ] [gtworek/PSBits/blob/master/docs/filehistory.md](https://github.com/gtworek/PSBits/blob/master/docs/filehistory.md) — GitHub
+- [ ] [gurnec/btcrecover](https://github.com/gurnec/btcrecover) — GitHub
+- [ ] [gustaebel/vma-tool](https://github.com/gustaebel/vma-tool) — GitHub
+- [ ] [h33tlit/secret-regex-list](https://github.com/h33tlit/secret-regex-list) — GitHub
+- [ ] [h4x0r/memory-forensic"](https://github.com/h4x0r/memory-forensic") — GitHub
+- [ ] [hexastrike/PyrsistenceSniper](https://github.com/hexastrike/PyrsistenceSniper) — GitHub
+- [ ] [horrorho/InflatableDonkey](https://github.com/horrorho/InflatableDonkey) — GitHub
+- [ ] [hslatman/awesome-threat-intelligence](https://github.com/hslatman/awesome-threat-intelligence) — GitHub
+- [ ] [idealo/imagededup](https://github.com/idealo/imagededup) — GitHub
+- [ ] [intelowlproject/IntelOwl](https://github.com/intelowlproject/IntelOwl) — GitHub
+- [ ] [ionescu007/clfs-docs](https://github.com/ionescu007/clfs-docs) — GitHub
+- [ ] [irsdl/IIS-ShortName-Scanner](https://github.com/irsdl/IIS-ShortName-Scanner) — GitHub
+- [ ] [ivan-sincek/memory-dumper](https://github.com/ivan-sincek/memory-dumper) — GitHub
+- [ ] [jancc/vma-extractor](https://github.com/jancc/vma-extractor) — GitHub
+- [ ] [jfjallid/go-secdump](https://github.com/jfjallid/go-secdump) — GitHub
+- [ ] [jischell-msft/RemoteManagementMonitoringTools](https://github.com/jischell-msft/RemoteManagementMonitoringTools) — GitHub
+- [ ] [joaomotap/FEA](https://github.com/joaomotap/FEA) — GitHub
+- [ ] [joshbrunty/DFIR-Regular-Expressions](https://github.com/joshbrunty/DFIR-Regular-Expressions) — GitHub
+- [ ] [jschicht/EaTools](https://github.com/jschicht/EaTools) — GitHub
+- [ ] [jschicht/Secure2Csv](https://github.com/jschicht/Secure2Csv) — GitHub
+- [ ] [jsharkey13/iphone_backup_decrypt](https://github.com/jsharkey13/iphone_backup_decrypt) — GitHub
+- [ ] [juuso/keychaindump](https://github.com/juuso/keychaindump) — GitHub
+- [ ] [k4m4/monero-regex](https://github.com/k4m4/monero-regex) — GitHub
+- [ ] [kamadak/exif-rs](https://github.com/kamadak/exif-rs) — GitHub
+- [ ] [kernelwernel/VMAware](https://github.com/kernelwernel/VMAware) — GitHub
+- [ ] [keydet89/RegRipper3.0](https://github.com/keydet89/RegRipper3.0) — GitHub
+- [ ] [keydet89/RegRipper4.0](https://github.com/keydet89/RegRipper4.0) — GitHub
+- [ ] [kholia/fvde2john](https://github.com/kholia/fvde2john) — GitHub
+- [ ] [kionactf/crypto-detection](https://github.com/kionactf/crypto-detection) — GitHub
+- [ ] [klandermans/unraveling_sql_server_bak](https://github.com/klandermans/unraveling_sql_server_bak) — GitHub
+- [ ] [knjcode/imgdupes](https://github.com/knjcode/imgdupes) — GitHub
+- [ ] [korczis/foremost](https://github.com/korczis/foremost) — GitHub
+- [ ] [last-byte/PersistenceSniper](https://github.com/last-byte/PersistenceSniper) — GitHub
+- [ ] [last-byte/PersistenceSniper/wiki/3-%E2%80%90-Detections](https://github.com/last-byte/PersistenceSniper/wiki/3-%E2%80%90-Detections) — GitHub
+- [ ] [lclevy/firepwd](https://github.com/lclevy/firepwd) — GitHub
+- [ ] [libyal/dtformats/blob/main/documentation/RecentFileCache.bcf%20format.asciidoc](https://github.com/libyal/dtformats/blob/main/documentation/RecentFileCache.bcf%20format.asciidoc) — GitHub
+- [ ] [libyal/dtformats/blob/main/documentation/Restore%20point%20formats.asciidoc](https://github.com/libyal/dtformats/blob/main/documentation/Restore%20point%20formats.asciidoc) — GitHub
+- [ ] [libyal/libbde/blob/main/documentation/BitLocker%20Drive%20Encryption%20(BDE](https://github.com/libyal/libbde/blob/main/documentation/BitLocker%20Drive%20Encryption%20(BDE) — GitHub
+- [ ] [libyal/libesedb](https://github.com/libyal/libesedb) — GitHub
+- [ ] [libyal/libesedb/blob/main/documentation](https://github.com/libyal/libesedb/blob/main/documentation/) — GitHub
+- [ ] [libyal/libevtx](https://github.com/libyal/libevtx) — GitHub
+- [ ] [libyal/libewf](https://github.com/libyal/libewf) — GitHub
+- [ ] [libyal/libewf/blob/main/documentation/Expert%20Witness%20Compression%20Format%20(EWF](https://github.com/libyal/libewf/blob/main/documentation/Expert%20Witness%20Compression%20Format%20(EWF) — GitHub
+- [ ] [libyal/libewf/blob/main/documentation/Expert%20Witness%20Compression%20Format%202%20(EWF2](https://github.com/libyal/libewf/blob/main/documentation/Expert%20Witness%20Compression%20Format%202%20(EWF2) — GitHub
+- [ ] [libyal/libfsapfs](https://github.com/libyal/libfsapfs) — GitHub
+- [ ] [libyal/libfsapfs/blob/main/documentation/Apple%20File%20System%20(APFS](https://github.com/libyal/libfsapfs/blob/main/documentation/Apple%20File%20System%20(APFS) — GitHub
+- [ ] [libyal/libfsclfs/blob/main/documenation/Common%20Log%20File%20System%20(CLFS](https://github.com/libyal/libfsclfs/blob/main/documenation/Common%20Log%20File%20System%20(CLFS) — GitHub
+- [ ] [libyal/libfvde](https://github.com/libyal/libfvde) — GitHub
+- [ ] [libyal/libfvde/blob/main/documentation/FileVault%20Drive%20Encryption%20(FVDE](https://github.com/libyal/libfvde/blob/main/documentation/FileVault%20Drive%20Encryption%20(FVDE) — GitHub
+- [ ] [libyal/libfwsi](https://github.com/libyal/libfwsi) — GitHub
+- [ ] [libyal/libfwsi/blob/main/documentation/Windows%20Shell%20Item%20format.asciidoc](https://github.com/libyal/libfwsi/blob/main/documentation/Windows%20Shell%20Item%20format.asciidoc) — GitHub
+- [ ] [libyal/libhibr/blob/main/documentation/Windows%20Hibernation%20File%20(hiberfil.sys](https://github.com/libyal/libhibr/blob/main/documentation/Windows%20Hibernation%20File%20(hiberfil.sys) — GitHub
+- [ ] [libyal/liblnk](https://github.com/libyal/liblnk) — GitHub
+- [ ] [libyal/liblnk/blob/main/documentation](https://github.com/libyal/liblnk/blob/main/documentation/) — GitHub
+- [ ] [libyal/liblnk/blob/main/documentation/Windows%20Shell%20Link%20(.lnk](https://github.com/libyal/liblnk/blob/main/documentation/Windows%20Shell%20Link%20(.lnk) — GitHub
+- [ ] [libyal/libmodi](https://github.com/libyal/libmodi) — GitHub
+- [ ] [libyal/libmodi/blob/main/documentation/Mac%20OS%20disk%20image%20types.asciidoc](https://github.com/libyal/libmodi/blob/main/documentation/Mac%20OS%20disk%20image%20types.asciidoc) — GitHub
+- [ ] [libyal/libolecf](https://github.com/libyal/libolecf) — GitHub
+- [ ] [libyal/libpff](https://github.com/libyal/libpff) — GitHub
+- [ ] [libyal/libpff/blob/main/documentation/Personal%20Folder%20File%20(PFF](https://github.com/libyal/libpff/blob/main/documentation/Personal%20Folder%20File%20(PFF) — GitHub
+- [ ] [libyal/libqcow/blob/main/documentation/QEMU%20Copy-On-Write%20file%20format.asciidoc](https://github.com/libyal/libqcow/blob/main/documentation/QEMU%20Copy-On-Write%20file%20format.asciidoc) — GitHub
+- [ ] [libyal/libregf](https://github.com/libyal/libregf) — GitHub
+- [ ] [libyal/libregf/blob/main/documentation](https://github.com/libyal/libregf/blob/main/documentation/) — GitHub
+- [ ] [libyal/libregf/blob/main/documentation/Windows%20NT%20Registry%20File%20(REGF](https://github.com/libyal/libregf/blob/main/documentation/Windows%20NT%20Registry%20File%20(REGF) — GitHub
+- [ ] [libyal/libscca](https://github.com/libyal/libscca) — GitHub
+- [ ] [libyal/libscca/blob/main/documentation](https://github.com/libyal/libscca/blob/main/documentation/) — GitHub
+- [ ] [libyal/libscca/blob/main/documentation/Windows%20Prefetch%20File%20(PF](https://github.com/libyal/libscca/blob/main/documentation/Windows%20Prefetch%20File%20(PF) — GitHub
+- [ ] [libyal/libvhdi](https://github.com/libyal/libvhdi) — GitHub
+- [ ] [libyal/libvhdi/blob/main/documentation/Virtual%20Hard%20Disk%20(VHD](https://github.com/libyal/libvhdi/blob/main/documentation/Virtual%20Hard%20Disk%20(VHD) — GitHub
+- [ ] [libyal/libvhdi/blob/main/documentation/Virtual%20Hard%20Disk%20version%202%20(VHDX](https://github.com/libyal/libvhdi/blob/main/documentation/Virtual%20Hard%20Disk%20version%202%20(VHDX) — GitHub
+- [ ] [libyal/libvmdk](https://github.com/libyal/libvmdk) — GitHub
+- [ ] [libyal/libvmdk/blob/main/documentation/VMWare%20Virtual%20Disk%20Format%20(VMDK](https://github.com/libyal/libvmdk/blob/main/documentation/VMWare%20Virtual%20Disk%20Format%20(VMDK) — GitHub
+- [ ] [libyal/libvshadow](https://github.com/libyal/libvshadow) — GitHub
+- [ ] [libyal/libvshadow/blob/main/documentation/Volume%20Shadow%20Snapshot%20(VSS](https://github.com/libyal/libvshadow/blob/main/documentation/Volume%20Shadow%20Snapshot%20(VSS) — GitHub
+- [ ] [libyal/winreg-kb](https://github.com/libyal/winreg-kb) — GitHub
+- [ ] [log2timeline/plaso](https://github.com/log2timeline/plaso) — GitHub
+- [ ] [lorelyai/volatility3-bitlocker](https://github.com/lorelyai/volatility3-bitlocker) — GitHub
+- [ ] [m0nad/Diamorphine](https://github.com/m0nad/Diamorphine) — GitHub
+- [ ] [magicsword-io/LOLRMM](https://github.com/magicsword-io/LOLRMM) — GitHub
+- [ ] [magicsword-io/LOLRMM.git](https://github.com/magicsword-io/LOLRMM.git) — GitHub
+- [ ] [magicsword-io/LOLRMM/tree/main/yaml](https://github.com/magicsword-io/LOLRMM/tree/main/yaml) — GitHub
+- [ ] [makedumpfile/makedumpfile/blob/master/IMPLEMENTATION](https://github.com/makedumpfile/makedumpfile/blob/master/IMPLEMENTATION) — GitHub
+- [ ] [makedumpfile/makedumpfile/blob/master/diskdump_mod.h](https://github.com/makedumpfile/makedumpfile/blob/master/diskdump_mod.h) — GitHub
+- [ ] [mandiant/ShimCacheParser](https://github.com/mandiant/ShimCacheParser) — GitHub
+- [ ] [marcuspat/secret-scan](https://github.com/marcuspat/secret-scan) — GitHub
+- [ ] [markuta/bw-dump](https://github.com/markuta/bw-dump) — GitHub
+- [ ] [mazen160/secrets-patterns-db](https://github.com/mazen160/secrets-patterns-db) — GitHub
+- [ ] [microsoft/avml](https://github.com/microsoft/avml) — GitHub
+- [ ] [microsoft/outlook-pst-rs](https://github.com/microsoft/outlook-pst-rs) — GitHub
+- [ ] [mikesxrs/Open-Source-YARA-rules](https://github.com/mikesxrs/Open-Source-YARA-rules) — GitHub
+- [ ] [mildsunrise/protobuf-inspector](https://github.com/mildsunrise/protobuf-inspector) — GitHub
+- [ ] [mindeng/nom-exif](https://github.com/mindeng/nom-exif) — GitHub
+- [ ] [mitre-attack/attack-stix-data](https://github.com/mitre-attack/attack-stix-data) — GitHub
+- [ ] [mitre/cti](https://github.com/mitre/cti) — GitHub
+- [ ] [mmozeiko/aes-finder](https://github.com/mmozeiko/aes-finder) — GitHub
+- [ ] [mnrkbys/vss_carver](https://github.com/mnrkbys/vss_carver) — GitHub
+- [ ] [montysecurity/C2-Tracker](https://github.com/montysecurity/C2-Tracker) — GitHub
+- [ ] [msuhanov/regf](https://github.com/msuhanov/regf) — GitHub
+- [ ] [msuhanov/regf-samples](https://github.com/msuhanov/regf-samples) — GitHub
+- [ ] [msuhanov/regf-samples/blob/master/10-missing_log_entries/Missing%20log%20entries.md](https://github.com/msuhanov/regf-samples/blob/master/10-missing_log_entries/Missing%20log%20entries.md) — GitHub
+- [ ] [msuhanov/regf-samples/blob/master/8.1-unreconciled/Flush%20strategies%20in%20the%20Windows%20registry.md](https://github.com/msuhanov/regf-samples/blob/master/8.1-unreconciled/Flush%20strategies%20in%20the%20Windows%20registry.md) — GitHub
+- [ ] [msuhanov/regf/blob/master/Windows%20registry%20file%20format%20specification.md](https://github.com/msuhanov/regf/blob/master/Windows%20registry%20file%20format%20specification.md) — GitHub
+- [ ] [msuhanov/yarp](https://github.com/msuhanov/yarp) — GitHub
+- [ ] [mtth-bfft/mquire](https://github.com/mtth-bfft/mquire) — GitHub
+- [ ] [n0fate/chainbreaker](https://github.com/n0fate/chainbreaker) — GitHub
+- [ ] [n0fate/volafox](https://github.com/n0fate/volafox) — GitHub
+- [ ] [netero1010/GhostTask](https://github.com/netero1010/GhostTask) — GitHub
+- [ ] [nforest/dumplib/blob/master/DMPTemplate.bt](https://github.com/nforest/dumplib/blob/master/DMPTemplate.bt) — GitHub
+- [ ] [nikaiw/VMkatz](https://github.com/nikaiw/VMkatz) — GitHub
+- [ ] [nsacyber/Mitigating-Web-Shells](https://github.com/nsacyber/Mitigating-Web-Shells) — GitHub
+- [ ] [numirias/firefed](https://github.com/numirias/firefed) — GitHub
+- [ ] [obsidianforensics/hindsight](https://github.com/obsidianforensics/hindsight) — GitHub
+- [ ] [omerbenamram/mft](https://github.com/omerbenamram/mft) — GitHub
+- [ ] [opencontainers/image-spec](https://github.com/opencontainers/image-spec) — GitHub
+- [ ] [openphish/public_feed](https://github.com/openphish/public_feed) — GitHub
+- [ ] [openssl/openssl/blob/master/NOTES-WINDOWS.md](https://github.com/openssl/openssl/blob/master/NOTES-WINDOWS.md) — GitHub
+- [ ] [outflanknl/SharpHide](https://github.com/outflanknl/SharpHide) — GitHub
+- [ ] [peitaosu/regf](https://github.com/peitaosu/regf) — GitHub
+- [ ] [photostructure/exif-oxide](https://github.com/photostructure/exif-oxide) — GitHub
+- [ ] [polyfloyd/rust-id3](https://github.com/polyfloyd/rust-id3) — GitHub
+- [ ] [qemu/qemu/blob/master/dump/dump.c](https://github.com/qemu/qemu/blob/master/dump/dump.c) — GitHub
+- [ ] [redcanaryco/atomic-red-team](https://github.com/redcanaryco/atomic-red-team) — GitHub
+- [ ] [redcanaryco/atomic-red-team/blob/master/atomics/T1003.004/T1003.004.md](https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1003.004/T1003.004.md) — GitHub
+- [ ] [redcanaryco/atomic-red-team/blob/master/atomics/T1098.004/T1098.004.md](https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1098.004/T1098.004.md) — GitHub
+- [ ] [redcanaryco/atomic-red-team/blob/master/atomics/T1137.002/T1137.002.md](https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1137.002/T1137.002.md) — GitHub
+- [ ] [redcanaryco/atomic-red-team/blob/master/atomics/T1137.004/T1137.004.md](https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1137.004/T1137.004.md) — GitHub
+- [ ] [redcanaryco/atomic-red-team/blob/master/atomics/T1137.006/T1137.006.md](https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1137.006/T1137.006.md) — GitHub
+- [ ] [redcanaryco/atomic-red-team/blob/master/atomics/T1197/T1197.md](https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1197/T1197.md) — GitHub
+- [ ] [redcanaryco/atomic-red-team/blob/master/atomics/T1490/T1490.md](https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1490/T1490.md) — GitHub
+- [ ] [redcanaryco/atomic-red-team/blob/master/atomics/T1546.001/T1546.001.md](https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1546.001/T1546.001.md) — GitHub
+- [ ] [redcanaryco/atomic-red-team/blob/master/atomics/T1546.011/T1546.011.md](https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1546.011/T1546.011.md) — GitHub
+- [ ] [redcanaryco/atomic-red-team/blob/master/atomics/T1546.012/T1546.012.md](https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1546.012/T1546.012.md) — GitHub
+- [ ] [redcanaryco/atomic-red-team/blob/master/atomics/T1547.001/T1547.001.md](https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1547.001/T1547.001.md) — GitHub
+- [ ] [redcanaryco/atomic-red-team/blob/master/atomics/T1552.001/T1552.001.md](https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1552.001/T1552.001.md) — GitHub
+- [ ] [redcanaryco/atomic-red-team/blob/master/atomics/T1552.003/T1552.003.md](https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1552.003/T1552.003.md) — GitHub
+- [ ] [redcanaryco/atomic-red-team/blob/master/atomics/T1564.004/T1564.004.md](https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1564.004/T1564.004.md) — GitHub
+- [ ] [reitermarkus/quarantine/blob/master/findings.md](https://github.com/reitermarkus/quarantine/blob/master/findings.md) — GitHub
+- [ ] [richardlehane/siegfried](https://github.com/richardlehane/siegfried) — GitHub
+- [ ] [schen0x/kirbi2hashcat](https://github.com/schen0x/kirbi2hashcat) — GitHub
+- [ ] [scito/extract_otp_secrets](https://github.com/scito/extract_otp_secrets) — GitHub
+- [ ] [sgan81/apfs-fuse](https://github.com/sgan81/apfs-fuse) — GitHub
+- [ ] [shaehni/password-manager-forensics](https://github.com/shaehni/password-manager-forensics) — GitHub
+- [ ] [simsong/bulk_extractor](https://github.com/simsong/bulk_extractor) — GitHub
+- [ ] [skelsec/pypykatz](https://github.com/skelsec/pypykatz) — GitHub
+- [ ] [sleuthkit/autopsy_addon_modules](https://github.com/sleuthkit/autopsy_addon_modules) — GitHub
+- [ ] [sleuthkit/scalpel](https://github.com/sleuthkit/scalpel) — GitHub
+- [ ] [stamparm/ipsum](https://github.com/stamparm/ipsum) — GitHub
+- [ ] [strozfriedberg/notatin](https://github.com/strozfriedberg/notatin) — GitHub
+- [ ] [stuhli/awesome-event-ids](https://github.com/stuhli/awesome-event-ids) — GitHub
+- [ ] [swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Windows%20-%20Persistence.md](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Windows%20-%20Persistence.md) — GitHub
+- [ ] [theflakes/fmd](https://github.com/theflakes/fmd) — GitHub
+- [ ] [ticarpi/jwt_tool](https://github.com/ticarpi/jwt_tool) — GitHub
+- [ ] [ticarpi/jwt_tool"](https://github.com/ticarpi/jwt_tool") — GitHub
+- [ ] [topics/memory-forensics?l=rust](https://github.com/topics/memory-forensics?l=rust) — GitHub
+- [ ] [torvalds/linux/blob/master/drivers/md/dm-crypt.c](https://github.com/torvalds/linux/blob/master/drivers/md/dm-crypt.c) — GitHub
+- [ ] [torvalds/linux/blob/master/fs/ext4/acl.h](https://github.com/torvalds/linux/blob/master/fs/ext4/acl.h) — GitHub
+- [ ] [torvalds/linux/blob/master/include/linux/posix_acl_xattr.h](https://github.com/torvalds/linux/blob/master/include/linux/posix_acl_xattr.h) — GitHub
+- [ ] [torvalds/linux/blob/master/include/linux/sched.h](https://github.com/torvalds/linux/blob/master/include/linux/sched.h) — GitHub
+- [ ] [torvalds/linux/blob/master/include/net/inet_sock.h](https://github.com/torvalds/linux/blob/master/include/net/inet_sock.h) — GitHub
+- [ ] [torvalds/linux/blob/master/include/net/sock.h](https://github.com/torvalds/linux/blob/master/include/net/sock.h) — GitHub
+- [ ] [torvalds/linux/blob/master/include/uapi/linux/posix_acl.h](https://github.com/torvalds/linux/blob/master/include/uapi/linux/posix_acl.h) — GitHub
+- [ ] [trailofbits/mquire](https://github.com/trailofbits/mquire) — GitHub
+- [ ] [tribalchicken/volatility-bitlocker](https://github.com/tribalchicken/volatility-bitlocker) — GitHub
+- [ ] [tribalchicken/volatility-filevault2](https://github.com/tribalchicken/volatility-filevault2) — GitHub
+- [ ] [trufflesecurity/trufflehog](https://github.com/trufflesecurity/trufflehog) — GitHub
+- [ ] [ufrisk/LeechCore/wiki/Device_HyperV_SavedState](https://github.com/ufrisk/LeechCore/wiki/Device_HyperV_SavedState) — GitHub
+- [ ] [ufrisk/MemProcFS](https://github.com/ufrisk/MemProcFS) — GitHub
+- [ ] [ufrisk/MemProcFS/wiki/Dev_Rust](https://github.com/ufrisk/MemProcFS/wiki/Dev_Rust) — GitHub
+- [ ] [ufrisk/MemProcFS/wiki/FS_Forensic](https://github.com/ufrisk/MemProcFS/wiki/FS_Forensic) — GitHub
+- [ ] [unode/firefox_decrypt](https://github.com/unode/firefox_decrypt) — GitHub
+- [ ] [volatilityfoundation/dwarf2json](https://github.com/volatilityfoundation/dwarf2json) — GitHub
+- [ ] [volatilityfoundation/volatility](https://github.com/volatilityfoundation/volatility) — GitHub
+- [ ] [volatilityfoundation/volatility/wiki/Crash-Address-Space](https://github.com/volatilityfoundation/volatility/wiki/Crash-Address-Space) — GitHub
+- [ ] [volatilityfoundation/volatility/wiki/Lime-Address-Space](https://github.com/volatilityfoundation/volatility/wiki/Lime-Address-Space) — GitHub
+- [ ] [volatilityfoundation/volatility/wiki/VMware-Snapshot-File](https://github.com/volatilityfoundation/volatility/wiki/VMware-Snapshot-File) — GitHub
+- [ ] [volatilityfoundation/volatility/wiki/Virtual-Box-Core-Dump](https://github.com/volatilityfoundation/volatility/wiki/Virtual-Box-Core-Dump) — GitHub
+- [ ] [volatilityfoundation/volatility3](https://github.com/volatilityfoundation/volatility3) — GitHub
+- [ ] [vstinner/hachoir](https://github.com/vstinner/hachoir) — GitHub
+- [ ] [wesmar/KvcForensic](https://github.com/wesmar/KvcForensic) — GitHub
+- [ ] [williballenthin/python-registry](https://github.com/williballenthin/python-registry) — GitHub
+- [ ] [williballenthin/shellbags](https://github.com/williballenthin/shellbags) — GitHub
+- [ ] [xillwillx/MobaXterm-Decryptor](https://github.com/xillwillx/MobaXterm-Decryptor) — GitHub
+- [ ] [xmrig/xmrig/releases"](https://github.com/xmrig/xmrig/releases") — GitHub
+- [ ] [yampelo/samparser](https://github.com/yampelo/samparser) — GitHub
+- [ ] [yanivsh84/amcache-evilhunter](https://github.com/yanivsh84/amcache-evilhunter) — GitHub
+- [ ] [ydkhatri/OneDrive](https://github.com/ydkhatri/OneDrive) — GitHub
+- [ ] [Persistence Screensaver](https://pentestlab.blog/2019/10/09/persistence-screensaver/) — PentestLab
+- [ ] [Persistence Time Providers](https://pentestlab.blog/2019/10/22/persistence-time-providers/) — PentestLab
+- [ ] [Persistence Port Monitors](https://pentestlab.blog/2019/10/28/persistence-port-monitors/) — PentestLab
+- [ ] [Persistence Netsh Helper Dll](https://pentestlab.blog/2019/10/29/persistence-netsh-helper-dll/) — PentestLab
+- [ ] [Persistence Office Application Startup](https://pentestlab.blog/2019/12/11/persistence-office-application-startup/) — PentestLab
+- [ ] [Persistence Wmi Event Subscription](https://pentestlab.blog/2020/01/21/persistence-wmi-event-subscription/) — PentestLab
+- [ ] [Persistence Scheduled Task Tampering](https://pentestlab.blog/2023/11/20/persistence-scheduled-task-tampering/) — PentestLab
+- [ ] [Web Browser Stored Credentials](https://pentestlab.blog/2024/08/20/web-browser-stored-credentials/) — PentestLab
+- [ ] [Persistence](https://pentestlab.blog/category/persistence/) — PentestLab
+- [ ] [Linux Reverse Shell Detection And Forensics](https://sandflysecurity.com/blog/linux-reverse-shell-detection-and-forensics) — Sandfly Security
+- [ ] [Linux Stealth Rootkit Process Decloaking Tool Sandfly Processdecloak](https://sandflysecurity.com/blog/linux-stealth-rootkit-process-decloaking-tool-sandfly-processdecloak) — Sandfly Security
+- [ ] [Obsolete Linux Password Hash Threats](https://sandflysecurity.com/blog/obsolete-linux-password-hash-threats) — Sandfly Security
+- [ ] [Ssh Lateral Movement Risks On Linux Webinar And White Paper](https://sandflysecurity.com/blog/ssh-lateral-movement-risks-on-linux-webinar-and-white-paper) — Sandfly Security
+- [ ] [Using Linux Utmpdump For Forensics And Detecting Log File Tampering](https://sandflysecurity.com/blog/using-linux-utmpdump-for-forensics-and-detecting-log-file-tampering) — Sandfly Security
+- [ ] [117622](https://securelist.com/amcache-forensic-artifact/117622/) — Securelist
+- [ ] [117680](https://securelist.com/forensic-artifacts-in-windows-11/117680/) — Securelist
+- [ ] [116911](https://securelist.com/userassist-artifact-forensic-value-for-incident-response/116911/) — Securelist
+- [ ] [Cobalt Strike Memory Analysis](https://unit42.paloaltonetworks.com/cobalt-strike-memory-analysis/) — Unit 42
+- [ ] [Ais](https://www.cisa.gov/ais) — CISA
+- [ ] [T1546.011](https://www.cisa.gov/eviction-strategies-tool/info-attack/T1546.011) — CISA
+- [ ] [T1556.008](https://www.cisa.gov/eviction-strategies-tool/info-attack/T1556.008) — CISA
+- [ ] [Known Exploited Vulnerabilities Catalog](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) — CISA
+- [ ] [Velociraptor](https://www.cisa.gov/resources-tools/services/velociraptor) — CISA
+- [ ] [How To Detect And Prevent Impackets Wmiexec](https://www.crowdstrike.com/en-us/blog/how-to-detect-and-prevent-impackets-wmiexec/) — CrowdStrike
+- [ ] [How To Employ Featureusage For Windows 10 Taskbar Forensics](https://www.crowdstrike.com/en-us/blog/how-to-employ-featureusage-for-windows-10-taskbar-forensics/) — CrowdStrike
+- [ ] [Digital Forensics And Incident Response Dfir](https://www.crowdstrike.com/en-us/cybersecurity-101/exposure-management/digital-forensics-and-incident-response-dfir/) — CrowdStrike
+- [ ] [Analysis Of Super Timeline Created Using Plaso Log2Timeline](https://www.cyberengage.org/post/analysis-of-super-timeline-created-using-plaso-log2timeline) — CyberEngage
+- [ ] [Bam And Dam In Windows Forensics Tracking Executed Applications](https://www.cyberengage.org/post/bam-and-dam-in-windows-forensics-tracking-executed-applications) — CyberEngage
+- [ ] [Browser Credential Storage And Forensic Password Recovery](https://www.cyberengage.org/post/browser-credential-storage-and-forensic-password-recovery) — CyberEngage
+- [ ] [Extracting Memory Objects With Memprocfs Volatility3 Bstrings A Practical Guide](https://www.cyberengage.org/post/extracting-memory-objects-with-memprocfs-volatility3-bstrings-a-practical-guide) — CyberEngage
+- [ ] [Handling Incident Response A Guide With Velociraptor And Kape](https://www.cyberengage.org/post/handling-incident-response-a-guide-with-velociraptor-and-kape) — CyberEngage
+- [ ] [Metadata Investigation Exiftool A Powerful Tool In Digital Forensics](https://www.cyberengage.org/post/metadata-investigation-exiftool-a-powerful-tool-in-digital-forensics) — CyberEngage
+- [ ] [Power Of Ntfs Journaling In Digital Forensics Logfile Usnjrnl](https://www.cyberengage.org/post/power-of-ntfs-journaling-in-digital-forensics-logfile-usnjrnl) — CyberEngage
+- [ ] [Unveiling File Origins The Role Of Alternate Data Streams Ads Zone Identifier In Forensic Inve](https://www.cyberengage.org/post/unveiling-file-origins-the-role-of-alternate-data-streams-ads-zone-identifier-in-forensic-inve) — CyberEngage
+- [ ] [Userassist A Powerful Yet Complex Forensic Artifact For Tracking Application Execution](https://www.cyberengage.org/post/userassist-a-powerful-yet-complex-forensic-artifact-for-tracking-application-execution) — CyberEngage
+- [ ] [Computer Forensic Tools Comparison 2026](https://www.cybertriage.com/blog/computer-forensic-tools-comparison-2026/) — Cyber Triage
+- [ ] [Computer Forensic Tools Comparison Chart 2026](https://www.cybertriage.com/blog/computer-forensic-tools-comparison-chart-2026/) — Cyber Triage
+- [ ] [Jump List Forensics 2025](https://www.cybertriage.com/blog/jump-list-forensics-2025/) — Cyber Triage
+- [ ] [Ntuser Dat Forensics Analysis 2026](https://www.cybertriage.com/blog/ntuser-dat-forensics-analysis-2026/) — Cyber Triage
+- [ ] [Remote Forensic Collection Tools 2025](https://www.cybertriage.com/blog/remote-forensic-collection-tools-2025/) — Cyber Triage
+- [ ] [Shellbags Forensic Analysis 2026](https://www.cybertriage.com/blog/shellbags-forensic-analysis-2026/) — Cyber Triage
+- [ ] [Shimcache And Amcache Forensic Analysis 2026](https://www.cybertriage.com/blog/shimcache-and-amcache-forensic-analysis-2026/) — Cyber Triage
+- [ ] [Userassist Forensics 2025](https://www.cybertriage.com/blog/userassist-forensics-2025/) — Cyber Triage
+- [ ] [Windows Registry Forensics 2025](https://www.cybertriage.com/blog/windows-registry-forensics-2025/) — Cyber Triage
+- [ ] [Windows Registry Forensics 2026](https://www.cybertriage.com/blog/windows-registry-forensics-2026/) — Cyber Triage
+- [ ] [Windows Registry Forensics Cheat Sheet 2025](https://www.cybertriage.com/blog/windows-registry-forensics-cheat-sheet-2025/) — Cyber Triage
+- [ ] [Windows Registry Forensics Cheat Sheet 2026](https://www.cybertriage.com/blog/windows-registry-forensics-cheat-sheet-2026/) — Cyber Triage
+- [ ] [Velociraptor](https://www.cybertriage.com/integration/velociraptor/) — Cyber Triage
+- [ ] [Registry](https://www.dfir.training/artifact/win-os/registry) — DFIR Training
+- [ ] [Git Hook Child Process](https://www.elastic.co/guide/en/security/8.19/git-hook-child-process.html) — Elastic Blog
+- [ ] [Persistence Via Wmi Event Subscription](https://www.elastic.co/guide/en/security/8.19/persistence-via-wmi-event-subscription.html) — Elastic Blog
+- [ ] [Potential Linux Credential Dumping Via Proc Filesystem](https://www.elastic.co/guide/en/security/8.19/potential-linux-credential-dumping-via-proc-filesystem.html) — Elastic Blog
+- [ ] [Prebuilt Rule 1 0 2 Potential Port Monitor Or Print Processor Registration Abuse](https://www.elastic.co/guide/en/security/8.19/prebuilt-rule-1-0-2-potential-port-monitor-or-print-processor-registration-abuse.html) — Elastic Blog
+- [ ] [Detection Engine Overview](https://www.elastic.co/guide/en/security/current/detection-engine-overview.html) — Elastic Blog
+- [ ] [Message Of The Day Motd File Creation](https://www.elastic.co/guide/en/security/current/message-of-the-day-motd-file-creation.html) — Elastic Blog
+- [ ] [Network Connections Initiated Through Xdg Autostart Entry](https://www.elastic.co/guide/en/security/current/network-connections-initiated-through-xdg-autostart-entry.html) — Elastic Blog
+- [ ] [Potential Privilege Escalation Via Sudoers File Modification](https://www.elastic.co/guide/en/security/current/potential-privilege-escalation-via-sudoers-file-modification.html) — Elastic Blog
+- [ ] [Prebuilt Rules](https://www.elastic.co/guide/en/security/current/prebuilt-rules.html) — Elastic Blog
+- [ ] [Process Spawned From Message Of The Day Motd](https://www.elastic.co/guide/en/security/current/process-spawned-from-message-of-the-day-motd.html) — Elastic Blog
+- [ ] [Ssh Authorized Keys File Modification](https://www.elastic.co/guide/en/security/current/ssh-authorized-keys-file-modification.html) — Elastic Blog
+- [ ] [Suspicious Apt Package Manager Execution](https://www.elastic.co/guide/en/security/current/suspicious-apt-package-manager-execution.html) — Elastic Blog
+- [ ] [Unusual Dpkg Execution](https://www.elastic.co/guide/en/security/current/unusual-dpkg-execution.html) — Elastic Blog
+- [ ] [Declawing Pumakit](https://www.elastic.co/security-labs/declawing-pumakit) — Elastic Blog
+- [ ] [Flipswitch Linux Rootkit](https://www.elastic.co/security-labs/flipswitch-linux-rootkit) — Elastic Blog
+- [ ] [Linux Rootkits 1 Hooked On Linux](https://www.elastic.co/security-labs/linux-rootkits-1-hooked-on-linux) — Elastic Blog
+- [ ] [Linux Rootkits 2 Caught In The Act](https://www.elastic.co/security-labs/linux-rootkits-2-caught-in-the-act) — Elastic Blog
+- [ ] [Primer On Persistence Mechanisms](https://www.elastic.co/security-labs/primer-on-persistence-mechanisms) — Elastic Blog
+- [ ] [Sequel On Persistence Mechanisms](https://www.elastic.co/security-labs/sequel-on-persistence-mechanisms) — Elastic Blog
+- [ ] [The Grand Finale On Linux Persistence](https://www.elastic.co/security-labs/the-grand-finale-on-linux-persistence) — Elastic Blog
+- [ ] [Using The Registryt](https://www.fireeye.com/blog/threat-research/2017/03/using_the_registryt.html) — www.fireeye.com
+- [ ] [Blogs](https://www.forensafe.com/blogs/) — Forensafe
+- [ ] [7Zip](https://www.forensafe.com/blogs/7zip.html) — Forensafe
+- [ ] [Adobeacrobat](https://www.forensafe.com/blogs/adobeacrobat.html) — Forensafe
+- [ ] [Microsoftedge](https://www.forensafe.com/blogs/microsoftedge.html) — Forensafe
+- [ ] [Onedrive](https://www.forensafe.com/blogs/onedrive.html) — Forensafe
+- [ ] [Thunderbird](https://www.forensafe.com/blogs/thunderbird.html) — Forensafe
+- [ ] [Winrar](https://www.forensafe.com/blogs/winrar.html) — Forensafe
+- [ ] [Processing Thousands Of Images](https://www.forensicfocus.com/forums/general/processing-thousands-of-images/) — www.forensicfocus.com
+- [ ] [Dumping Credentials From Lsass.Exe Process Memory](https://www.ired.team/offensive-security/credential-access-and-credential-dumping/dumping-credentials-from-lsass.exe-process-memory) — ired.team
+- [ ] [Forcing Wdigest To Store Credentials In Plaintext](https://www.ired.team/offensive-security/credential-access-and-credential-dumping/forcing-wdigest-to-store-credentials-in-plaintext) — ired.team
+- [ ] [Intercepting Logon Credentials Via Custom Security Support Provider And Authentication Package](https://www.ired.team/offensive-security/credential-access-and-credential-dumping/intercepting-logon-credentials-via-custom-security-support-provider-and-authentication-package) — ired.team
+- [ ] [Persistence](https://www.ired.team/offensive-security/persistence) — ired.team
+- [ ] [T1128 Netsh Helper Dll](https://www.ired.team/offensive-security/persistence/t1128-netsh-helper-dll) — ired.team
+- [ ] [T1180 Screensaver Hijack](https://www.ired.team/offensive-security/persistence/t1180-screensaver-hijack) — ired.team
+- [ ] [Windows Logon Helper](https://www.ired.team/offensive-security/persistence/windows-logon-helper) — ired.team
+- [ ] [Artifact Exchange](https://www.magnetforensics.com/artifact-exchange/) — Magnet Forensics
+- [ ] [Artifact Profile Recycle Bin](https://www.magnetforensics.com/blog/artifact-profile-recycle-bin/) — Magnet Forensics
+- [ ] [Artifact Profile Usb Devices](https://www.magnetforensics.com/blog/artifact-profile-usb-devices/) — Magnet Forensics
+- [ ] [Artifact Profile Userassist](https://www.magnetforensics.com/blog/artifact-profile-userassist/) — Magnet Forensics
+- [ ] [Forensic Analysis Of Lnk Files](https://www.magnetforensics.com/blog/forensic-analysis-of-lnk-files/) — Magnet Forensics
+- [ ] [Forensic Analysis Of Muicache Files In Windows](https://www.magnetforensics.com/blog/forensic-analysis-of-muicache-files-in-windows/) — Magnet Forensics
+- [ ] [Forensic Analysis Of Prefetch Files In Windows](https://www.magnetforensics.com/blog/forensic-analysis-of-prefetch-files-in-windows/) — Magnet Forensics
+- [ ] [Forensic Analysis Of Windows Shellbags](https://www.magnetforensics.com/blog/forensic-analysis-of-windows-shellbags/) — Magnet Forensics
+- [ ] [How To Use The Magnet Custom Artifact Generator](https://www.magnetforensics.com/blog/how-to-use-the-magnet-custom-artifact-generator/) — Magnet Forensics
+- [ ] [Keyboard Shortcuts To Help Your Axiom Examinations Run More Efficiently](https://www.magnetforensics.com/blog/keyboard-shortcuts-to-help-your-axiom-examinations-run-more-efficiently/) — Magnet Forensics
+- [ ] [Magnet Axiom Mcfe Certification New Forensic Fundamentals Course Launched](https://www.magnetforensics.com/blog/magnet-axiom-mcfe-certification-new-forensic-fundamentals-course-launched/) — Magnet Forensics
+- [ ] [Rdp Artifacts In Incident Response](https://www.magnetforensics.com/blog/rdp-artifacts-in-incident-response/) — Magnet Forensics
+- [ ] [Shimcache Vs Amcache Key Windows Forensic Artifacts](https://www.magnetforensics.com/blog/shimcache-vs-amcache-key-windows-forensic-artifacts/) — Magnet Forensics
+- [ ] [Srum Forensic Analysis Of Windows System Resource Utilization Monitor](https://www.magnetforensics.com/blog/srum-forensic-analysis-of-windows-system-resource-utilization-monitor/) — Magnet Forensics
+- [ ] [The Importance Of Powershell Logs In Digital Forensics](https://www.magnetforensics.com/blog/the-importance-of-powershell-logs-in-digital-forensics/) — Magnet Forensics
+- [ ] [Three New Magnet Training Certifications Available To Demonstrate Your Expertise](https://www.magnetforensics.com/blog/three-new-magnet-training-certifications-available-to-demonstrate-your-expertise/) — Magnet Forensics
+- [ ] [When Windows Takes A Nap And Leaves You Evidence Inside Hiberfil Sys](https://www.magnetforensics.com/blog/when-windows-takes-a-nap-and-leaves-you-evidence-inside-hiberfil-sys/) — Magnet Forensics
+- [ ] [How Deduplication Can Help Your Forensic Analysis](https://www.magnetforensics.com/resources/how-deduplication-can-help-your-forensic-analysis/) — Magnet Forensics
+- [ ] [Magnet Custom Artifact Generator](https://www.magnetforensics.com/resources/magnet-custom-artifact-generator/) — Magnet Forensics
+- [ ] [State Of Enterprise Dfir 2025 Report](https://www.magnetforensics.com/resources/state-of-enterprise-dfir-2025-report/) — Magnet Forensics
+- [ ] [Training Osp](https://www.magnetforensics.com/training-osp/) — Magnet Forensics
+- [ ] [Index.Php](https://www.passcape.com/index.php?section=docsys&cmd=details&id=28) — Passcape
+- [ ] [Windows Password Recovery Dpapi Credhist](https://www.passcape.com/windows_password_recovery_dpapi_credhist) — Passcape
+- [ ] [Windows Password Recovery Dpapi Credhist Dump](https://www.passcape.com/windows_password_recovery_dpapi_credhist_dump) — Passcape
+- [ ] [Windows Password Recovery Dpapi Master Key](https://www.passcape.com/windows_password_recovery_dpapi_master_key) — Passcape
+- [ ] [Windows Password Recovery Vault Explorer](https://www.passcape.com/windows_password_recovery_vault_explorer) — Passcape
+- [ ] [Windows Password Recovery Windows Hello Credentials](https://www.passcape.com/windows_password_recovery_windows_hello_credentials) — Passcape
+- [ ] [Computer Forensic Artifacts Windows 7 Shellbags](https://www.sans.org/blog/computer-forensic-artifacts-windows-7-shellbags) — SANS
+- [ ] [Digital Forensic Sifting Colorized Super Timeline Template For Log2Timeline Output Files](https://www.sans.org/blog/digital-forensic-sifting-colorized-super-timeline-template-for-log2timeline-output-files) — SANS
+- [ ] [Digital Forensic Sifting Registry And Filesystem Timeline Creation](https://www.sans.org/blog/digital-forensic-sifting-registry-and-filesystem-timeline-creation) — SANS
+- [ ] [Digital Forensics Detecting Time Stamp Manipulation](https://www.sans.org/blog/digital-forensics-detecting-time-stamp-manipulation/) — SANS
+- [ ] [Finding Evil Wmi Event Consumers With Disk Forensics](https://www.sans.org/blog/finding-evil-wmi-event-consumers-with-disk-forensics/) — SANS
+- [ ] [Mac Os Forensics How To Simple Ram Acquisition And Analysis With Mac Memory Reader Part 2](https://www.sans.org/blog/mac-os-forensics-how-to-simple-ram-acquisition-and-analysis-with-mac-memory-reader-part-2) — SANS
+- [ ] [Mass Triage Part 4 Processing Returned Files Appcache Shimcache](https://www.sans.org/blog/mass-triage-part-4-processing-returned-files-appcache-shimcache) — SANS
+- [ ] [Mass Triage Part 5 Processing Returned Files Amcache](https://www.sans.org/blog/mass-triage-part-5-processing-returned-files-amcache) — SANS
+- [ ] [Opensavemru And Lastvisitedmru](https://www.sans.org/blog/opensavemru-and-lastvisitedmru) — SANS
+- [ ] [Protecting Privileged Domain Accounts Lsa Secrets Good](https://www.sans.org/blog/protecting-privileged-domain-accounts-lsa-secrets-good/) — SANS
+- [ ] [Recreating Onedrive S Folder Structure From Usercid Dat](https://www.sans.org/blog/recreating-onedrive-s-folder-structure-from-usercid-dat) — SANS
+- [ ] [Securing Ssh Keys Cloud Environments Practical Guidance Security Forensics Legal Accountability](https://www.sans.org/blog/securing-ssh-keys-cloud-environments-practical-guidance-security-forensics-legal-accountability) — SANS
+- [ ] [When Redundant Yields Different Results](https://www.sans.org/blog/when-redundant-yields-different-results/) — SANS
+- [ ] [Rekall Cheat Sheet](https://www.sans.org/posters/rekall-cheat-sheet/) — SANS
+- [ ] [Windows Forensic Analysis](https://www.sans.org/posters/windows-forensic-analysis) — SANS
+- [ ] [Bstrings](https://www.sans.org/tools/bstrings) — SANS
+- [ ] [Registry Explorer](https://www.sans.org/tools/registry-explorer) — SANS
+- [ ] [Registry Explorer](https://www.sans.org/tools/registry-explorer/) — SANS
+- [ ] [Ccleaner Forensics](https://www.synacktiv.com/en/publications/ccleaner-forensics) — Synacktiv
+- [ ] [Forensic Aspects Of Microsoft Remote Access Vpn](https://www.synacktiv.com/en/publications/forensic-aspects-of-microsoft-remote-access-vpn) — Synacktiv
+- [ ] [Legitimate Rats A Comprehensive Forensic Analysis Of The Usual Suspects](https://www.synacktiv.com/en/publications/legitimate-rats-a-comprehensive-forensic-analysis-of-the-usual-suspects) — Synacktiv
+- [ ] [Traces Of Windows Remote Command Execution](https://www.synacktiv.com/en/publications/traces-of-windows-remote-command-execution) — Synacktiv
+- [ ] [Using Veeam Metadata For Efficient Extraction Of Backup Artefacts 13](https://www.synacktiv.com/en/publications/using-veeam-metadata-for-efficient-extraction-of-backup-artefacts-13) — Synacktiv
+- [ ] [Whfb And Entra Id Say Hello To Your New Cache Flow](https://www.synacktiv.com/en/publications/whfb-and-entra-id-say-hello-to-your-new-cache-flow) — Synacktiv
+- [ ] [Windows Secrets Extraction A Summary](https://www.synacktiv.com/en/publications/windows-secrets-extraction-a-summary) — Synacktiv

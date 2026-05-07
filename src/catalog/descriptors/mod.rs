@@ -371,6 +371,81 @@ pub static WINDOWS_HOSTS_FILE: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
+/// Name Resolution Policy Table (NRPT) — `HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters\DnsPolicyConfig\{UUID}`.
+///
+/// The NRPT is a Windows 7+ feature that lets the DNS client redirect queries
+/// for specific FQDNs / suffixes to caller-specified DNS servers, **before**
+/// consulting the system-configured resolver. Each rule is stored as a
+/// subkey under `DnsPolicyConfig` keyed by a per-rule UUID.
+///
+/// Carvey's 2024-01 *EDRSilencer* post (addendum 18 Dec) flags NRPT abuse as
+/// a third EDR-silencing technique alongside WFP filters and hosts-file
+/// edits. Per Fabian Bader's 2024-12 Cloudbrothers analysis, an attacker can
+/// run `Add-DnsClientNrptRule -Namespace ".endpoint.security.microsoft.com"
+/// -NameServers 127.0.0.1` to blackhole all DNS queries for an EDR vendor's
+/// cloud endpoint — and crucially, the resulting registry values are not
+/// captured by Defender for Endpoint registry telemetry, because the `Name`
+/// value is `REG_MULTI_SZ` and Sysmon stores it as opaque "Binary Data".
+pub static DNS_POLICY_CONFIG_NRPT: ArtifactDescriptor = ArtifactDescriptor {
+    id: "dns_policy_config_nrpt",
+    name: "DNS Name Resolution Policy Table (NRPT)",
+    artifact_type: ArtifactType::RegistryKey,
+    hive: Some(HiveTarget::HklmSystem),
+    key_path: r"CurrentControlSet\Services\Dnscache\Parameters\DnsPolicyConfig",
+    value_name: None,
+    file_path: None,
+    scope: DataScope::System,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "Name Resolution Policy Table (NRPT) — per-FQDN / per-suffix DNS \
+              redirection rules consulted before the system DNS resolver. \
+              EDR-silencing tradecraft (Carvey 2024-01 addendum, Cloudbrothers \
+              2024-12) creates a UUID subkey here per rule mapping an EDR vendor \
+              or C2 hostname to 127.0.0.1 to blackhole agent telemetry. Benign \
+              uses include VPN clients (e.g. Tailscale) that redirect DNS for \
+              split-DNS configurations.",
+    mitre_techniques: &["T1562.001", "T1562.006"],
+    fields: &[
+        FieldSchema {
+            // Source: https://cloudbrothers.info/en/edr-silencers-exploring-methods-block-edr-communication-part-1/
+            name: "Name",
+            value_type: ValueType::List,
+            description: "REG_MULTI_SZ — list of FQDNs or DNS suffixes the rule applies to. \
+                          Sysmon stores this as opaque 'Binary Data', limiting EDR registry \
+                          telemetry visibility.",
+            is_uid_component: true,
+        },
+        FieldSchema {
+            // Source: https://cloudbrothers.info/en/edr-silencers-exploring-methods-block-edr-communication-part-1/
+            name: "GenericDNSServers",
+            value_type: ValueType::Text,
+            description: "Target IP address(es) the matching DNS query is redirected to \
+                          (e.g. 127.0.0.1 for blackhole). Matches the \
+                          `-NameServers` parameter of `Add-DnsClientNrptRule`.",
+            is_uid_component: false,
+        },
+        FieldSchema {
+            name: "Comment",
+            value_type: ValueType::Text,
+            description: "Optional rule comment from `Add-DnsClientNrptRule -Comment`. \
+                          Carvey-style triage flag: free-text strings like \
+                          \"Silenced by Name Resolution Policy Table\" are explicit IOCs.",
+            is_uid_component: false,
+        },
+    ],
+    retention: None,
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["windows_hosts_file"],
+    // Source: Harlan Carvey 2024-01-15 EDRSilencer (18 Dec addendum); registry
+    // path & value schema documented in Fabian Bader's Cloudbrothers post.
+    sources: &[
+        "https://windowsir.blogspot.com/2024/01/edrsilencer.html",
+        "https://cloudbrothers.info/en/edr-silencers-exploring-methods-block-edr-communication-part-1/",
+        "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/dn593632(v=ws.11)",
+        "https://learn.microsoft.com/en-us/powershell/module/dnsclient/add-dnsclientnrptrule",
+    ],
+};
+
 // ── Run key HKCU variants ────────────────────────────────────────────────────
 
 /// HKCU Run key — per-user autostart persistence.
@@ -7445,6 +7520,7 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     PCA_APPLAUNCH_DIC,
     PCA_GENERAL_DB,
     WINDOWS_HOSTS_FILE,
+    DNS_POLICY_CONFIG_NRPT,
     IFEO_DEBUGGER,
     SHELLBAGS_USER,
     AMCACHE_APP_FILE,

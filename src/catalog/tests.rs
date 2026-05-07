@@ -264,7 +264,7 @@ mod decode_tests {
     #[test]
     fn catalog_has_entries() {
         assert!(!CATALOG.list().is_empty());
-        assert_eq!(CATALOG.list().len(), 6616);
+        assert_eq!(CATALOG.list().len(), 6618);
     }
 
     #[test]
@@ -2597,7 +2597,7 @@ mod tests_batch_d {
     #[test]
     fn catalog_count_after_srum_network_connections() {
         // +1 from srum_network_connections
-        assert_eq!(CATALOG.list().len(), 6616);
+        assert_eq!(CATALOG.list().len(), 6618);
     }
 
     // ── EVTX channels ─────────────────────────────────────────────────────
@@ -3498,7 +3498,7 @@ mod phase2_registry_tests {
     #[test]
     fn catalog_count_includes_phase2() {
         // Updated to 354 after phase-2b file artifact additions
-        assert_eq!(CATALOG.list().len(), 6616);
+        assert_eq!(CATALOG.list().len(), 6618);
     }
 
     #[test]
@@ -3643,7 +3643,7 @@ mod phase2b_files_tests {
     fn catalog_count_includes_phase2b() {
         // phase2a adds 30 registry artifacts (284→314), phase2b adds 40 file artifacts (314→354)
         // Note: chrome_login_data was already present from Phase 1; not duplicated here.
-        assert_eq!(CATALOG.list().len(), 6616);
+        assert_eq!(CATALOG.list().len(), 6618);
     }
 
     #[test]
@@ -3946,7 +3946,7 @@ mod phase3_persistence_tests {
         // phase3 adds 7 net-new artifacts not already in catalog (354 → 361)
         // Note: winlogon_shell, winlogon_userinit, appinit_dlls, boot_execute,
         //       ifeo_debugger, netsh_helper_dlls, mountpoints2 were already present.
-        assert_eq!(CATALOG.list().len(), 6616);
+        assert_eq!(CATALOG.list().len(), 6618);
     }
 
     // ── Pre-existing artifacts verified present ───────────────────────────────
@@ -6450,5 +6450,310 @@ mod az4n6_mac_live_imaging_tests {
                 .contains(&"google_takeout_semantic_location_history"),
             "must cross-reference semantic_location_history"
         );
+    }
+}
+
+// ── Samsung Gallery3d Trash ─────────────────────────────────────────────────
+
+#[cfg(test)]
+mod tests_samsung_gallery3d_trash {
+    use super::*;
+
+    #[test]
+    fn exists_in_catalog() {
+        assert!(
+            CATALOG.by_id("samsung_gallery3d_trash").is_some(),
+            "catalog must contain 'samsung_gallery3d_trash'"
+        );
+    }
+
+    #[test]
+    fn is_android_scope() {
+        let d = CATALOG.by_id("samsung_gallery3d_trash").unwrap();
+        assert_eq!(
+            d.os_scope,
+            OsScope::Android,
+            "samsung_gallery3d_trash must be Android scope"
+        );
+    }
+
+    #[test]
+    fn is_database_entry_type() {
+        let d = CATALOG.by_id("samsung_gallery3d_trash").unwrap();
+        assert_eq!(
+            d.artifact_type,
+            ArtifactType::DatabaseEntry,
+            "samsung_gallery3d_trash must be DatabaseEntry type"
+        );
+    }
+
+    #[test]
+    fn triage_is_high() {
+        let d = CATALOG.by_id("samsung_gallery3d_trash").unwrap();
+        assert_eq!(
+            d.triage_priority,
+            TriagePriority::High,
+            "samsung_gallery3d_trash must be High triage priority"
+        );
+    }
+
+    #[test]
+    fn file_path_contains_local_db() {
+        let d = CATALOG.by_id("samsung_gallery3d_trash").unwrap();
+        let path = d.file_path.expect("must have file_path");
+        assert!(
+            path.contains("local.db"),
+            "file_path must reference local.db; got: {path}"
+        );
+    }
+
+    #[test]
+    fn file_path_contains_gallery3d_package() {
+        let d = CATALOG.by_id("samsung_gallery3d_trash").unwrap();
+        let path = d.file_path.unwrap();
+        assert!(
+            path.contains("com.sec.android.gallery3d"),
+            "file_path must contain com.sec.android.gallery3d; got: {path}"
+        );
+    }
+
+    #[test]
+    fn has_origin_path_field() {
+        let d = CATALOG.by_id("samsung_gallery3d_trash").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "__originPath"),
+            "samsung_gallery3d_trash must have '__originPath' field"
+        );
+    }
+
+    #[test]
+    fn has_delete_time_field() {
+        let d = CATALOG.by_id("samsung_gallery3d_trash").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "__deleteTime"),
+            "samsung_gallery3d_trash must have '__deleteTime' field"
+        );
+    }
+
+    #[test]
+    fn delete_time_is_timestamp_type() {
+        let d = CATALOG.by_id("samsung_gallery3d_trash").unwrap();
+        let f = d
+            .fields
+            .iter()
+            .find(|f| f.name == "__deleteTime")
+            .unwrap();
+        assert_eq!(
+            f.value_type,
+            ValueType::Timestamp,
+            "__deleteTime must be Timestamp type"
+        );
+    }
+
+    #[test]
+    fn has_abs_path_field() {
+        let d = CATALOG.by_id("samsung_gallery3d_trash").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "__absPath"),
+            "samsung_gallery3d_trash must have '__absPath' field"
+        );
+    }
+
+    #[test]
+    fn has_restore_extra_field() {
+        let d = CATALOG.by_id("samsung_gallery3d_trash").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "__restoreExtra"),
+            "samsung_gallery3d_trash must have '__restoreExtra' field"
+        );
+    }
+
+    #[test]
+    fn restore_extra_is_json_type() {
+        let d = CATALOG.by_id("samsung_gallery3d_trash").unwrap();
+        let f = d
+            .fields
+            .iter()
+            .find(|f| f.name == "__restoreExtra")
+            .unwrap();
+        assert_eq!(
+            f.value_type,
+            ValueType::Json,
+            "__restoreExtra must be Json type"
+        );
+    }
+
+    #[test]
+    fn has_media_type_field() {
+        let d = CATALOG.by_id("samsung_gallery3d_trash").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "__mediaType"),
+            "samsung_gallery3d_trash must have '__mediaType' field"
+        );
+    }
+
+    #[test]
+    fn meaning_mentions_trash() {
+        let d = CATALOG.by_id("samsung_gallery3d_trash").unwrap();
+        let lc = d.meaning.to_ascii_lowercase();
+        assert!(
+            lc.contains("trash"),
+            "meaning must mention trash; got: {}", d.meaning
+        );
+    }
+
+    #[test]
+    fn cites_cheeky4n6monkey() {
+        let d = CATALOG.by_id("samsung_gallery3d_trash").unwrap();
+        assert!(
+            d.sources
+                .iter()
+                .any(|s| s.contains("cheeky4n6monkey")),
+            "samsung_gallery3d_trash must cite cheeky4n6monkey blog; sources: {:?}",
+            d.sources
+        );
+    }
+
+    #[test]
+    fn relates_to_log() {
+        let d = CATALOG.by_id("samsung_gallery3d_trash").unwrap();
+        assert!(
+            d.related_artifacts.contains(&"samsung_gallery3d_log"),
+            "samsung_gallery3d_trash must relate to samsung_gallery3d_log"
+        );
+    }
+
+    #[test]
+    fn scope_is_user() {
+        let d = CATALOG.by_id("samsung_gallery3d_trash").unwrap();
+        assert_eq!(d.scope, DataScope::User, "must be User scope");
+    }
+}
+
+// ── Samsung Gallery3d Log ───────────────────────────────────────────────────
+
+#[cfg(test)]
+mod tests_samsung_gallery3d_log {
+    use super::*;
+
+    #[test]
+    fn exists_in_catalog() {
+        assert!(
+            CATALOG.by_id("samsung_gallery3d_log").is_some(),
+            "catalog must contain 'samsung_gallery3d_log'"
+        );
+    }
+
+    #[test]
+    fn is_android_scope() {
+        let d = CATALOG.by_id("samsung_gallery3d_log").unwrap();
+        assert_eq!(
+            d.os_scope,
+            OsScope::Android,
+            "samsung_gallery3d_log must be Android scope"
+        );
+    }
+
+    #[test]
+    fn is_database_entry_type() {
+        let d = CATALOG.by_id("samsung_gallery3d_log").unwrap();
+        assert_eq!(
+            d.artifact_type,
+            ArtifactType::DatabaseEntry,
+            "samsung_gallery3d_log must be DatabaseEntry type"
+        );
+    }
+
+    #[test]
+    fn triage_is_high() {
+        let d = CATALOG.by_id("samsung_gallery3d_log").unwrap();
+        assert_eq!(
+            d.triage_priority,
+            TriagePriority::High,
+            "samsung_gallery3d_log must be High triage priority"
+        );
+    }
+
+    #[test]
+    fn file_path_contains_local_db() {
+        let d = CATALOG.by_id("samsung_gallery3d_log").unwrap();
+        let path = d.file_path.expect("must have file_path");
+        assert!(
+            path.contains("local.db"),
+            "file_path must reference local.db; got: {path}"
+        );
+    }
+
+    #[test]
+    fn has_timestamp_field() {
+        let d = CATALOG.by_id("samsung_gallery3d_log").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "__timestamp"),
+            "samsung_gallery3d_log must have '__timestamp' field"
+        );
+    }
+
+    #[test]
+    fn has_log_field() {
+        let d = CATALOG.by_id("samsung_gallery3d_log").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "__log"),
+            "samsung_gallery3d_log must have '__log' field"
+        );
+    }
+
+    #[test]
+    fn has_category_field() {
+        let d = CATALOG.by_id("samsung_gallery3d_log").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "__category"),
+            "samsung_gallery3d_log must have '__category' field"
+        );
+    }
+
+    #[test]
+    fn meaning_mentions_base64() {
+        let d = CATALOG.by_id("samsung_gallery3d_log").unwrap();
+        let lc = d.meaning.to_ascii_lowercase();
+        assert!(
+            lc.contains("base64"),
+            "meaning must mention base64-encoded paths; got: {}", d.meaning
+        );
+    }
+
+    #[test]
+    fn meaning_mentions_move_to_trash() {
+        let d = CATALOG.by_id("samsung_gallery3d_log").unwrap();
+        assert!(
+            d.meaning.contains("MOVE_TO_TRASH"),
+            "meaning must mention MOVE_TO_TRASH action; got: {}", d.meaning
+        );
+    }
+
+    #[test]
+    fn cites_cheeky4n6monkey() {
+        let d = CATALOG.by_id("samsung_gallery3d_log").unwrap();
+        assert!(
+            d.sources
+                .iter()
+                .any(|s| s.contains("cheeky4n6monkey")),
+            "samsung_gallery3d_log must cite cheeky4n6monkey blog; sources: {:?}",
+            d.sources
+        );
+    }
+
+    #[test]
+    fn relates_to_trash() {
+        let d = CATALOG.by_id("samsung_gallery3d_log").unwrap();
+        assert!(
+            d.related_artifacts.contains(&"samsung_gallery3d_trash"),
+            "samsung_gallery3d_log must relate to samsung_gallery3d_trash"
+        );
+    }
+
+    #[test]
+    fn scope_is_user() {
+        let d = CATALOG.by_id("samsung_gallery3d_log").unwrap();
+        assert_eq!(d.scope, DataScope::User, "must be User scope");
     }
 }

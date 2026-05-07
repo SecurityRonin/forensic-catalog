@@ -4985,8 +4985,8 @@ mod tests_batch_i_presence {
     fn catalog_count_includes_batch_i() {
         assert_eq!(
             CATALOG.list().len(),
-            6626,
-            "catalog count after batch I + quicklook + install_date + winscp + wifi + clipboard + unified_log + apfs + samsung + honda + ios14_maps + garmin"
+            6627,
+            "catalog count after batch I + quicklook + install_date + winscp + wifi + clipboard + unified_log + apfs + samsung + honda + ios14_maps + garmin + aws_cloudtrail"
         );
     }
 }
@@ -5244,8 +5244,8 @@ mod tests_quicklook_install_date {
     fn catalog_count_includes_quicklook_and_install_date() {
         assert_eq!(
             CATALOG.list().len(),
-            6626,
-            "catalog count after quicklook + install_date + winscp + wifi + clipboard + unified_log + apfs + samsung + honda + ios14_maps + garmin"
+            6627,
+            "catalog count after quicklook + install_date + winscp + wifi + clipboard + unified_log + apfs + samsung + honda + ios14_maps + garmin + aws_cloudtrail"
         );
     }
 }
@@ -5402,8 +5402,8 @@ mod tests_winscp_ini {
     fn catalog_count_includes_winscp_ini() {
         assert_eq!(
             CATALOG.list().len(),
-            6626,
-            "catalog count after winscp + wifi + clipboard + apfs + samsung + honda + ios14_maps + garmin"
+            6627,
+            "catalog count after winscp + wifi + clipboard + apfs + samsung + honda + ios14_maps + garmin + aws_cloudtrail"
         );
     }
 }
@@ -5658,8 +5658,8 @@ mod tests_windows_clipboard_history {
     fn catalog_count_includes_clipboard_history() {
         assert_eq!(
             CATALOG.list().len(),
-            6626,
-            "catalog count after valley_rat + ntuser_man + apfs + samsung + honda + ios14_maps + garmin"
+            6627,
+            "catalog count after valley_rat + ntuser_man + apfs + samsung + honda + ios14_maps + garmin + aws_cloudtrail"
         );
     }
 }

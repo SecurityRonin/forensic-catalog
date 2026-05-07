@@ -1990,6 +1990,17 @@ pub static ARTIFACT_PROFILES: &[ArtifactProfile] = &[
         volatility: VolatilityClass::Persistent,
         volatility_rationale: "Stored on 16 MB flash; persists until manually deleted or device is reflashed",
     },
+    ArtifactProfile {
+        id: "aws_cloudtrail_iam_events",
+        evidence_strength: EvidenceStrength::Definitive,
+        evidence_caveats: &[
+            "CloudTrail logs can be disabled or deleted by an attacker with sufficient IAM permissions",
+            "Log delivery latency of 1-3 minutes means near-real-time events may not yet appear",
+            "S3 bucket policy changes can prevent log delivery; check CloudTrail status before concluding absence",
+        ],
+        volatility: VolatilityClass::Persistent,
+        volatility_rationale: "CloudTrail logs persist in S3 per retention policy (default indefinite); events appear within ~2 min of the action",
+    },
 ];
 
 /// Returns the combined profile for a given artifact ID, or `None` if unknown.

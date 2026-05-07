@@ -131,36 +131,36 @@ Mark `[x]` when reviewed, `[→]` when artifact tasks were created.
 - [x] [7 Data Collection Mistakes That Compromise Corporate Investigations and How to Avoid Them](https://cellebrite.com/en/blog/7-data-collection-mistakes-that-compromise-corporate-investigations-and-how-to-avoid-them/) — Cellebrite Blog <!-- investigation methodology tips; no artifacts -->
 - [x] [Digital Evidence is Now Central to VAWG Investigations. Are Your Investigators Equipped?](https://cellebrite.com/en/resources/webinars/digital-evidence-is-now-central-to-vawg-investigations-are-your-investigators-equipped/) — Cellebrite Blog <!-- webinar announcement; no artifacts -->
 - [x] [AI-Generated CSAM: Staying Ahead of the Threat](https://cellebrite.com/en/blog/ai-generated-csam-stay-ahead-of-the-threat/) — Cellebrite Blog <!-- policy/threat discussion; no artifacts -->
-- [ ] [iLEAPP and RLEAPP updates and dev thoughts](https://dfir.science/2022/08/iLEAPP-and-RLEAPP-updates) — DFIR Science
-- [ ] [What data can you find in RAM?](https://dfir.science/2022/08/What-data-can-you-find-in-RAM) — DFIR Science
-- [ ] [Modular artifact scripts coming to iLEAPP](https://dfir.science/2022/08/Modular-artifact-scripts-coming-to-iLEAPP) — DFIR Science
-- [ ] [Forensic 4:Cast Awards - The real award is DFriends we made along the way](https://dfir.science/2022/08/Forensic-4-Cast-Awards-The-real-award-is-DFriends-we-made-along-the-way) — DFIR Science
-- [ ] [Digital Forensics and the Military - Interview with Andrew Lister](https://dfir.science/2022/08/Digital-Forensics-and-the-Military-Interview-with-Andrew-Lister) — DFIR Science
-- [ ] [Acquire and Analyze Random Access Memory](https://dfir.science/2022/07/Acquire-and-Analyze-Random-Access-Memory) — DFIR Science
-- [ ] [What is Random Access Memory?](https://dfir.science/2022/07/What-is-Random-Access-Memory) — DFIR Science
-- [ ] [DFIR Science nominated for Forensic 4:cast Award](https://dfir.science/2022/07/DFIR-Science-nominated-for-Forensic-4Cast-Award) — DFIR Science
-- [ ] [🇺🇳 Africa DFIR CTF 2022 Award Ceremony 🎉](https://dfir.science/2022/07/Africa-DFIR-CTF-2022-Award-Ceremony) — DFIR Science
-- [ ] [Fast password cracking - Hashcat wordlists from RAM](https://dfir.science/2022/06/Fast-password-cracking-Hashcat-wordlists-from-RAM) — DFIR Science
-- [ ] [Tune In: The Future of AI-Powered Vulnerability Discovery](https://www.crowdstrike.com/en-us/blog/tune-in-future-of-ai-powered-vulnerability-discovery/) — CrowdStrike blog
-- [ ] [Critrical cPanel flaw mass-exploited in "Sorry" ransomware attacks](https://www.bleepingcomputer.com/news/security/critrical-cpanel-flaw-mass-exploited-in-sorry-ransomware-attacks/) — BleepingComputer
-- [ ] [ConsentFix v3 attacks target Azure with automated OAuth abuse](https://www.bleepingcomputer.com/news/security/consentfix-v3-attacks-target-azure-with-automated-oauth-abuse/) — BleepingComputer
-- [ ] [Adding VirusTotal link to DevToolsLauncher.yml, closes #155](https://github.com/LOLBAS-Project/LOLBAS/commit/db6da5b0308bce011616beb9d818359d8f5ffa2b) — LOLBAS Project (Windows)
-- [ ] [Create Logger.yml (#448)](https://github.com/LOLBAS-Project/LOLBAS/commit/2a21e4a4b4e256b562416412ffcc0ed39768be27) — LOLBAS Project (Windows)
-- [ ] [Create Nmcap.yml (#462)](https://github.com/LOLBAS-Project/LOLBAS/commit/6a6364085becb5edaa6147eb10b573d0d81a094a) — LOLBAS Project (Windows)
-- [ ] [Add App Paths Hijacking (Proxy Execution) to WorkFolders.exe (#490)](https://github.com/LOLBAS-Project/LOLBAS/commit/41458bdce05a062a7fd11dadd412573068ad036a) — LOLBAS Project (Windows)
-- [ ] [Add new Proxy Execution techniques for dxcap.exe and cmstp.exe (#489)](https://github.com/LOLBAS-Project/LOLBAS/commit/fb87ee5f080acb8c865337767f21e71add08ef6e) — LOLBAS Project (Windows)
-- [ ] [Create write.yml (#440)](https://github.com/LOLBAS-Project/LOLBAS/commit/c39a24f3ce946d4535ddbbadbc83ec5d2114e94c) — LOLBAS Project (Windows)
-- [ ] [Adding cipher.exe entry (#274)](https://github.com/LOLBAS-Project/LOLBAS/commit/cea80b95eeafe6eb9ad50837d18330e2236ab6db) — LOLBAS Project (Windows)
-- [ ] [UAC bypass via odbcad32.exe GUI (#460)](https://github.com/LOLBAS-Project/LOLBAS/commit/42a5add3c7d662f86ac24d95dd616cc239cdc944) — LOLBAS Project (Windows)
-- [ ] [Added Sigverif.yml (#469)](https://github.com/LOLBAS-Project/LOLBAS/commit/0c3b8d778607ed338ab8a0a847e0b48c727e74ae) — LOLBAS Project (Windows)
-- [ ] [Create IntelliTrace.yml (#464)](https://github.com/LOLBAS-Project/LOLBAS/commit/b463e865f3ecfb3b17441c798aa5bce381accc67) — LOLBAS Project (Windows)
-- [ ] [Add version constraint for xdg-user-dir](https://github.com/GTFOBins/GTFOBins.github.io/commit/7382261ef936e35896ba70e7a6b833352ffb9a22) — GTFOBins (Linux)
-- [ ] [Fix cpulimit invocation](https://github.com/GTFOBins/GTFOBins.github.io/commit/dacbcc4cfa34fbe5dd8b2f481e8ad3f593505682) — GTFOBins (Linux)
-- [ ] [Fix command syntax in tcpdump instructions](https://github.com/GTFOBins/GTFOBins.github.io/commit/c922862e18dc55edfb272ef1f296530f5f335c33) — GTFOBins (Linux)
-- [ ] [Add back sqlite3 inherit](https://github.com/GTFOBins/GTFOBins.github.io/commit/869f965b285f5d42182ca48769892413cf833caa) — GTFOBins (Linux)
-- [ ] [Fix sqlite3 quotes](https://github.com/GTFOBins/GTFOBins.github.io/commit/32283c756e6acb350ef567b09359aa6c1367c743) — GTFOBins (Linux)
-- [ ] [Merge #568](https://github.com/GTFOBins/GTFOBins.github.io/commit/890af27684e3c9a768f34178308aaf896980a08a) — GTFOBins (Linux) <!-- bbot file-read capability; bbot already in LOLBAS_LINUX -->
-- [ ] [Convert and simplify bbot](https://github.com/GTFOBins/GTFOBins.github.io/commit/5f6782139dd8a2412319fb2067ff03b3955790bb) — GTFOBins (Linux) <!-- bbot entry reformatted; bbot already in LOLBAS_LINUX -->
+- [x] [iLEAPP and RLEAPP updates and dev thoughts](https://dfir.science/2022/08/iLEAPP-and-RLEAPP-updates) — DFIR Science <!-- tooling development update; discusses LAVA report viewer and logarchive JSON parsing but no new artifact paths or schemas -->
+- [x] [What data can you find in RAM?](https://dfir.science/2022/08/What-data-can-you-find-in-RAM) — DFIR Science <!-- general RAM forensics overview; mem_running_processes, mem_network_connections, mem_loaded_modules already in catalog -->
+- [x] [Modular artifact scripts coming to iLEAPP](https://dfir.science/2022/08/Modular-artifact-scripts-coming-to-iLEAPP) — DFIR Science <!-- iLEAPP architecture discussion; modular plugin system, no new artifact paths -->
+- [x] [Forensic 4:Cast Awards - The real award is DFriends we made along the way](https://dfir.science/2022/08/Forensic-4-Cast-Awards-The-real-award-is-DFriends-we-made-along-the-way) — DFIR Science <!-- community post; no artifacts -->
+- [x] [Digital Forensics and the Military - Interview with Andrew Lister](https://dfir.science/2022/08/Digital-Forensics-and-the-Military-Interview-with-Andrew-Lister) — DFIR Science <!-- interview; no artifacts -->
+- [x] [Acquire and Analyze Random Access Memory](https://dfir.science/2022/07/Acquire-and-Analyze-Random-Access-Memory) — DFIR Science <!-- RAM acquisition methodology overview; no new artifact structures -->
+- [x] [What is Random Access Memory?](https://dfir.science/2022/07/What-is-Random-Access-Memory) — DFIR Science <!-- introductory explainer; no artifacts -->
+- [x] [DFIR Science nominated for Forensic 4:cast Award](https://dfir.science/2022/07/DFIR-Science-nominated-for-Forensic-4Cast-Award) — DFIR Science <!-- community announcement; no artifacts -->
+- [x] [Africa DFIR CTF 2022 Award Ceremony](https://dfir.science/2022/07/Africa-DFIR-CTF-2022-Award-Ceremony) — DFIR Science <!-- CTF results; no artifacts -->
+- [x] [Fast password cracking - Hashcat wordlists from RAM](https://dfir.science/2022/06/Fast-password-cracking-Hashcat-wordlists-from-RAM) — DFIR Science <!-- methodology tutorial on extracting strings from RAM dumps for hashcat; no new artifact structures -->
+- [x] [Tune In: The Future of AI-Powered Vulnerability Discovery](https://www.crowdstrike.com/en-us/blog/tune-in-future-of-ai-powered-vulnerability-discovery/) — CrowdStrike blog <!-- podcast announcement; no artifacts -->
+- [x] [Critrical cPanel flaw mass-exploited in "Sorry" ransomware attacks](https://www.bleepingcomputer.com/news/security/critrical-cpanel-flaw-mass-exploited-in-sorry-ransomware-attacks/) — BleepingComputer <!-- server-side cPanel CVE exploitation news; no client-side forensic artifacts -->
+- [x] [ConsentFix v3 attacks target Azure with automated OAuth abuse](https://www.bleepingcomputer.com/news/security/consentfix-v3-attacks-target-azure-with-automated-oauth-abuse/) — BleepingComputer <!-- Azure OAuth phishing campaign; linux_azure_credentials already covers ~/.azure/ token cache -->
+- [x] [Adding VirusTotal link to DevToolsLauncher.yml, closes #155](https://github.com/LOLBAS-Project/LOLBAS/commit/db6da5b0308bce011616beb9d818359d8f5ffa2b) — LOLBAS Project (Windows) <!-- metadata update; Devtoolslauncher.exe already in LOLBAS_WINDOWS -->
+- [x] [Create Logger.yml (#448)](https://github.com/LOLBAS-Project/LOLBAS/commit/2a21e4a4b4e256b562416412ffcc0ed39768be27) — LOLBAS Project (Windows) <!-- Logger.exe already in LOLBAS_WINDOWS -->
+- [x] [Create Nmcap.yml (#462)](https://github.com/LOLBAS-Project/LOLBAS/commit/6a6364085becb5edaa6147eb10b573d0d81a094a) — LOLBAS Project (Windows) <!-- Nmcap.exe already in LOLBAS_WINDOWS -->
+- [x] [Add App Paths Hijacking (Proxy Execution) to WorkFolders.exe (#490)](https://github.com/LOLBAS-Project/LOLBAS/commit/41458bdce05a062a7fd11dadd412573068ad036a) — LOLBAS Project (Windows) <!-- WorkFolders.exe already in LOLBAS_WINDOWS with UC_PROXY -->
+- [x] [Add new Proxy Execution techniques for dxcap.exe and cmstp.exe (#489)](https://github.com/LOLBAS-Project/LOLBAS/commit/fb87ee5f080acb8c865337767f21e71add08ef6e) — LOLBAS Project (Windows) <!-- dxcap.exe and cmstp.exe already in LOLBAS_WINDOWS -->
+- [x] [Create write.yml (#440)](https://github.com/LOLBAS-Project/LOLBAS/commit/c39a24f3ce946d4535ddbbadbc83ec5d2114e94c) — LOLBAS Project (Windows) <!-- write.exe already in LOLBAS_WINDOWS -->
+- [x] [Adding cipher.exe entry (#274)](https://github.com/LOLBAS-Project/LOLBAS/commit/cea80b95eeafe6eb9ad50837d18330e2236ab6db) — LOLBAS Project (Windows) <!-- cipher.exe already in LOLBAS_WINDOWS -->
+- [x] [UAC bypass via odbcad32.exe GUI (#460)](https://github.com/LOLBAS-Project/LOLBAS/commit/42a5add3c7d662f86ac24d95dd616cc239cdc944) — LOLBAS Project (Windows) <!-- odbcad32.exe already in LOLBAS_WINDOWS with UC_BYPASS -->
+- [x] [Added Sigverif.yml (#469)](https://github.com/LOLBAS-Project/LOLBAS/commit/0c3b8d778607ed338ab8a0a847e0b48c727e74ae) — LOLBAS Project (Windows) <!-- Sigverif.exe already in LOLBAS_WINDOWS -->
+- [x] [Create IntelliTrace.yml (#464)](https://github.com/LOLBAS-Project/LOLBAS/commit/b463e865f3ecfb3b17441c798aa5bce381accc67) — LOLBAS Project (Windows) <!-- IntelliTrace.exe already in LOLBAS_WINDOWS -->
+- [x] [Add version constraint for xdg-user-dir](https://github.com/GTFOBins/GTFOBins.github.io/commit/7382261ef936e35896ba70e7a6b833352ffb9a22) — GTFOBins (Linux) <!-- version metadata update; xdg-user-dir already in LOLBAS_LINUX -->
+- [x] [Fix cpulimit invocation](https://github.com/GTFOBins/GTFOBins.github.io/commit/dacbcc4cfa34fbe5dd8b2f481e8ad3f593505682) — GTFOBins (Linux) <!-- syntax fix; cpulimit already in LOLBAS_LINUX -->
+- [x] [Fix command syntax in tcpdump instructions](https://github.com/GTFOBins/GTFOBins.github.io/commit/c922862e18dc55edfb272ef1f296530f5f335c33) — GTFOBins (Linux) <!-- syntax fix; tcpdump already in LOLBAS_LINUX -->
+- [x] [Add back sqlite3 inherit](https://github.com/GTFOBins/GTFOBins.github.io/commit/869f965b285f5d42182ca48769892413cf833caa) — GTFOBins (Linux) <!-- capability fix; sqlite3 already in LOLBAS_LINUX -->
+- [x] [Fix sqlite3 quotes](https://github.com/GTFOBins/GTFOBins.github.io/commit/32283c756e6acb350ef567b09359aa6c1367c743) — GTFOBins (Linux) <!-- syntax fix; sqlite3 already in LOLBAS_LINUX -->
+- [x] [Merge #568](https://github.com/GTFOBins/GTFOBins.github.io/commit/890af27684e3c9a768f34178308aaf896980a08a) — GTFOBins (Linux) <!-- bbot file-read capability; bbot already in LOLBAS_LINUX -->
+- [x] [Convert and simplify bbot](https://github.com/GTFOBins/GTFOBins.github.io/commit/5f6782139dd8a2412319fb2067ff03b3955790bb) — GTFOBins (Linux) <!-- bbot entry reformatted; bbot already in LOLBAS_LINUX -->
 - [ ] [Sync with master](https://github.com/GTFOBins/GTFOBins.github.io/commit/4e26b0b72ce4968e1c3da8318cb1adb1d8c72313) — GTFOBins (Linux)
 - [ ] [Merge #567](https://github.com/GTFOBins/GTFOBins.github.io/commit/24c6ef53cf2c5885006e9681e771b350b7fd0947) — GTFOBins (Linux) <!-- codex shell-escape capability; codex already in LOLBAS_LINUX -->
 - [ ] [Fix codex](https://github.com/GTFOBins/GTFOBins.github.io/commit/da68f4cc293273a2e9724ad3befaa12fe6a368ea) — GTFOBins (Linux)

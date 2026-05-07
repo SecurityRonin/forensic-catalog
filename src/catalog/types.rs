@@ -84,6 +84,9 @@ pub enum OsScope {
     MacOS13Plus,
     /// macOS 14 Sonoma and later.
     MacOS14Plus,
+    // ── iOS ─────────────────────────────────────────────────────────────
+    /// Apple iOS (all versions).
+    IOS,
 }
 
 // ── Binary field layout ──────────────────────────────────────────────────────

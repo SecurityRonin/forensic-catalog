@@ -4985,8 +4985,8 @@ mod tests_batch_i_presence {
     fn catalog_count_includes_batch_i() {
         assert_eq!(
             CATALOG.list().len(),
-            6612,
-            "catalog must have 6612 entries after batch I + quicklook_thumbnails + windows_install_date + winscp_ini + macos_wifi_intelligence + windows_clipboard_history"
+            6613,
+            "catalog must have 6613 entries after batch I + quicklook_thumbnails + windows_install_date + winscp_ini + macos_wifi_intelligence + windows_clipboard_history + ios_unified_log"
         );
     }
 }
@@ -5147,8 +5147,8 @@ mod tests_quicklook_install_date {
     fn catalog_count_includes_quicklook_and_install_date() {
         assert_eq!(
             CATALOG.list().len(),
-            6612,
-            "catalog must have 6612 entries after adding quicklook_thumbnails + windows_install_date + winscp_ini + macos_wifi_intelligence + windows_clipboard_history"
+            6613,
+            "catalog must have 6613 entries after adding quicklook_thumbnails + windows_install_date + winscp_ini + macos_wifi_intelligence + windows_clipboard_history + ios_unified_log"
         );
     }
 }
@@ -5780,6 +5780,153 @@ mod tests_ntuser_man_persistence {
         assert!(
             d.fields.iter().any(|f| f.name == "file_modified_time"),
             "ntuser_man_persistence must have 'file_modified_time' field"
+        );
+    }
+}
+
+// ── iOS Unified Log descriptor ──────────────────────────────────────────────
+
+#[cfg(test)]
+mod tests_ios_unified_log {
+    use super::*;
+
+    #[test]
+    fn ios_unified_log_exists() {
+        assert!(
+            CATALOG.by_id("ios_unified_log").is_some(),
+            "catalog must contain 'ios_unified_log'"
+        );
+    }
+
+    #[test]
+    fn ios_unified_log_is_ios_scope() {
+        let d = CATALOG.by_id("ios_unified_log").unwrap();
+        assert_eq!(
+            d.os_scope,
+            OsScope::IOS,
+            "ios_unified_log must be IOS scope"
+        );
+    }
+
+    #[test]
+    fn ios_unified_log_triage_is_critical() {
+        let d = CATALOG.by_id("ios_unified_log").unwrap();
+        assert_eq!(
+            d.triage_priority,
+            TriagePriority::Critical,
+            "ios_unified_log must be Critical triage priority"
+        );
+    }
+
+    #[test]
+    fn ios_unified_log_is_directory_type() {
+        let d = CATALOG.by_id("ios_unified_log").unwrap();
+        assert_eq!(
+            d.artifact_type,
+            ArtifactType::Directory,
+            "ios_unified_log must be Directory artifact type"
+        );
+    }
+
+    #[test]
+    fn ios_unified_log_has_diagnostics_path() {
+        let d = CATALOG.by_id("ios_unified_log").unwrap();
+        let path = d.file_path.unwrap();
+        assert!(
+            path.contains("/private/var/db/diagnostics"),
+            "ios_unified_log file_path must reference /private/var/db/diagnostics; got: {path}"
+        );
+    }
+
+    #[test]
+    fn ios_unified_log_has_timestamp_field() {
+        let d = CATALOG.by_id("ios_unified_log").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "timestamp"),
+            "ios_unified_log must have 'timestamp' field"
+        );
+    }
+
+    #[test]
+    fn ios_unified_log_has_process_id_field() {
+        let d = CATALOG.by_id("ios_unified_log").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "process_id"),
+            "ios_unified_log must have 'process_id' field"
+        );
+    }
+
+    #[test]
+    fn ios_unified_log_has_subsystem_field() {
+        let d = CATALOG.by_id("ios_unified_log").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "subsystem"),
+            "ios_unified_log must have 'subsystem' field"
+        );
+    }
+
+    #[test]
+    fn ios_unified_log_has_category_field() {
+        let d = CATALOG.by_id("ios_unified_log").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "category"),
+            "ios_unified_log must have 'category' field"
+        );
+    }
+
+    #[test]
+    fn ios_unified_log_has_event_message_field() {
+        let d = CATALOG.by_id("ios_unified_log").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "event_message"),
+            "ios_unified_log must have 'event_message' field"
+        );
+    }
+
+    #[test]
+    fn ios_unified_log_has_trace_id_field() {
+        let d = CATALOG.by_id("ios_unified_log").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "trace_id"),
+            "ios_unified_log must have 'trace_id' field"
+        );
+    }
+
+    #[test]
+    fn ios_unified_log_cites_abrignoni() {
+        let d = CATALOG.by_id("ios_unified_log").unwrap();
+        assert!(
+            d.sources.iter().any(|s| s.contains("abrignoni.blogspot.com")),
+            "ios_unified_log must cite abrignoni blog post; sources: {:?}",
+            d.sources
+        );
+    }
+
+    #[test]
+    fn ios_unified_log_cites_ios_unifiedlogs() {
+        let d = CATALOG.by_id("ios_unified_log").unwrap();
+        assert!(
+            d.sources.iter().any(|s| s.contains("ios-unifiedlogs.com")),
+            "ios_unified_log must cite ios-unifiedlogs.com; sources: {:?}",
+            d.sources
+        );
+    }
+
+    #[test]
+    fn ios_unified_log_has_mitre_techniques() {
+        let d = CATALOG.by_id("ios_unified_log").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1070.001"),
+            "ios_unified_log must include T1070.001 (Indicator Removal: Clear Logs)"
+        );
+    }
+
+    #[test]
+    fn ios_unified_log_relates_to_macos_unified_log() {
+        let d = CATALOG.by_id("ios_unified_log").unwrap();
+        assert!(
+            d.related_artifacts.contains(&"macos_unified_log"),
+            "ios_unified_log must relate to macos_unified_log"
         );
     }
 }

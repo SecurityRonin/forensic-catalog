@@ -6021,4 +6021,27 @@ mod tests_apfs_container {
             "apfs_container must relate to macos_fsevents"
         );
     }
+
+    #[test]
+    fn apfs_container_cites_az4n6_windows_post() {
+        let d = CATALOG.by_id("apfs_container").unwrap();
+        assert!(
+            d.sources
+                .iter()
+                .any(|s| s.contains("how-to-mount-mac-apfs-images-in-windows")),
+            "apfs_container must cite az4n6 Windows APFS mounting post; sources: {:?}",
+            d.sources
+        );
+    }
+
+    #[test]
+    fn apfs_container_meaning_mentions_windows_mounting() {
+        let d = CATALOG.by_id("apfs_container").unwrap();
+        assert!(
+            d.meaning.contains("Windows")
+                || d.meaning.contains("Paragon")
+                || d.meaning.contains("Arsenal"),
+            "apfs_container meaning should mention Windows mounting workflow"
+        );
+    }
 }

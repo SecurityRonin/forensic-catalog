@@ -13973,6 +13973,7 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     browser_ext::BROWSER_SAFARI_HISTORY,
     // ── iOS ─────────────────────────────────────────────────────────────────
     macos_ext::IOS_UNIFIED_LOG,
+    macos_ext::IOS14_MAPS_HISTORY,
     // ── Android ─────────────────────────────────────────────────────────────
     android_ext::SAMSUNG_GALLERY3D_TRASH,
     android_ext::SAMSUNG_GALLERY3D_LOG,

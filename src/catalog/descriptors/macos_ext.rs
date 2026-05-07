@@ -887,3 +887,126 @@ pub(crate) static IOS_UNIFIED_LOG: ArtifactDescriptor = ArtifactDescriptor {
         "https://developer.apple.com/documentation/os/logging",
     ],
 };
+
+// ── iOS14 Apple Maps History (MapsSync_0.0.1) ────────────────────────────────
+
+/// Field schema for the ZHISTORYITEM + ZMIXINMAPITEM tables in MapsSync_0.0.1.
+/// SQL query from Heather Mahalik's research (adapted by cheeky4n6monkey):
+///   SELECT ZHISTORYITEM.z_pk, z_ent, ZCREATETIME, ZMODIFICATIONTIME,
+///          ZQUERY, ZLOCATIONDISPLAY, ZLATITUDE, ZLONGITUDE,
+///          ZROUTEREQUESTSTORAGE, ZMAPITEMSTORAGE
+///   FROM ZHISTORYITEM LEFT JOIN ZMIXINMAPITEM ON ZMIXINMAPITEM.Z_PK=ZHISTORYITEM.ZMAPITEM;
+/// Source: https://cheeky4n6monkey.blogspot.com/2020/11/ios14-maps-history-blob-script.html
+pub(crate) static IOS14_MAPS_HISTORY_FIELDS: &[FieldSchema] = &[
+    FieldSchema {
+        name: "z_pk",
+        value_type: ValueType::Integer,
+        description: "Primary key / item number in ZHISTORYITEM table",
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "z_ent",
+        value_type: ValueType::Integer,
+        // Source: https://cheeky4n6monkey.blogspot.com/2020/11/ios14-maps-history-blob-script.html
+        description: "Entry type indicator: 14 = coordinates of search, \
+            16 = location search (text), 12 = navigation journey. Determines \
+            which BLOB columns are populated",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "ZCREATETIME",
+        value_type: ValueType::Timestamp,
+        // Source: https://cheeky4n6monkey.blogspot.com/2020/11/ios14-maps-history-blob-script.html
+        description: "Apple Cocoa epoch timestamp (seconds since 2001-01-01 00:00:00 UTC; \
+            add 978307200 for UNIX epoch). Per Heather Mahalik's research, this is NOT \
+            an accurate record of when the search was actually executed",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "ZMODIFICATIONTIME",
+        value_type: ValueType::Timestamp,
+        description: "Apple Cocoa epoch timestamp of last modification (same caveat as \
+            ZCREATETIME — may not reflect actual search execution time)",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "ZQUERY",
+        value_type: ValueType::Text,
+        description: "Location search text entered by the user (populated for z_ent=16 \
+            'location search' entries)",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "ZLOCATIONDISPLAY",
+        value_type: ValueType::Text,
+        description: "Display name of the location city/area associated with the search",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "ZLATITUDE",
+        value_type: ValueType::Text,
+        description: "Latitude coordinate in decimal degrees (populated for z_ent=14 \
+            'coordinates of search' entries)",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "ZLONGITUDE",
+        value_type: ValueType::Text,
+        description: "Longitude coordinate in decimal degrees (populated for z_ent=14 \
+            'coordinates of search' entries)",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "ZROUTEREQUESTSTORAGE",
+        value_type: ValueType::Bytes,
+        description: "Protobuf BLOB containing start/end locations for navigation journeys \
+            (z_ent=12). Can be decoded with protobuf_inspector. May contain destination \
+            Yelp reviews and epoch millisecond timestamps after a GUID",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "ZMAPITEMSTORAGE",
+        value_type: ValueType::Bytes,
+        description: "Protobuf BLOB from ZMIXINMAPITEM table containing map item storage \
+            data (populated for z_ent=14 'coordinates of search' entries). Can be decoded \
+            with protobuf_inspector",
+        is_uid_component: false,
+    },
+];
+
+pub(crate) static IOS14_MAPS_HISTORY: ArtifactDescriptor = ArtifactDescriptor {
+    id: "ios14_maps_history",
+    name: "iOS14 Apple Maps History (MapsSync_0.0.1)",
+    artifact_type: ArtifactType::DatabaseEntry,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    // Source: https://cheeky4n6monkey.blogspot.com/2020/11/ios14-maps-history-blob-script.html
+    file_path: Some("/private/var/mobile/Containers/Shared/AppGroup/<UUID>/MapsSync_0.0.1"),
+    scope: DataScope::User,
+    os_scope: OsScope::IOS,
+    decoder: Decoder::Identity,
+    retention: Some("Last 3-5 directions/searches retained"),
+    meaning: "Apple Maps ZHISTORYITEM and ZMIXINMAPITEM tables in the MapsSync_0.0.1 SQLite \
+        database on iOS 14+. Contains the last 3-5 map directions and searches. Three entry \
+        types exist: 'location search' (z_ent=16, user-entered text query), 'coordinates of \
+        search' (z_ent=14, lat/long with optional ZMAPITEMSTORAGE protobuf BLOB), and \
+        'navigation journey' (z_ent=12, with ZROUTEREQUESTSTORAGE protobuf BLOB containing \
+        start/end locations). Location searches are typically followed by coordinate entries. \
+        Navigation journey entries may appear even without explicit user navigation requests. \
+        Timestamps use Apple Cocoa epoch (add 978307200 for UNIX) but per Heather Mahalik's \
+        research are NOT accurate records of when searches were executed. The database has \
+        32 tables total but forensic value concentrates in ZHISTORYITEM. Protobuf BLOBs can \
+        be decoded with protobuf_inspector for additional details including Yelp reviews \
+        and potential timestamps.",
+    mitre_techniques: &[],
+    fields: IOS14_MAPS_HISTORY_FIELDS,
+    triage_priority: TriagePriority::High,
+    sources: &[
+        "https://cheeky4n6monkey.blogspot.com/2020/11/ios14-maps-history-blob-script.html",
+        // Source: Heather Mahalik's iOS14 research documenting the ZHISTORYITEM query
+        "https://smarterforensics.com/2020/09/rotten-to-the-core-nah-ios14-is-mostly-sweet/",
+        "https://github.com/cheeky4n6monkey/4n6-scripts",
+    ],
+    related_artifacts: &[],
+};

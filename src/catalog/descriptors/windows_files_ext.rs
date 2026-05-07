@@ -1406,3 +1406,88 @@ pub(crate) static WINDOWS_UPDATE_SESSION: ArtifactDescriptor = ArtifactDescripto
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WindowsUpdateLogs.tkape",
     ],
 };
+
+// ── NTUSER.MAN Mandatory Profile Persistence ────────────────────────────────
+/// NTUSER.MAN is a mandatory user profile hive that Windows loads *instead of*
+/// NTUSER.DAT when present in the user's profile directory. This is an
+/// intended Windows feature (originally for kiosk/shared workstations), but
+/// attackers can abuse it to establish registry persistence that bypasses
+/// EDR registry callbacks entirely.
+///
+/// The technique works because `CmRegisterCallbackEx` monitors registry API
+/// calls (`RegSetValue`, `RegCreateKey`), but hive loading from disk is not
+/// a registry operation — it's a filesystem operation. An attacker can:
+/// 1. Export the target user's HKCU hive as .reg text (no elevation required)
+/// 2. Add persistence keys (Run keys, COM hijacks, etc.) to the .reg file
+/// 3. Convert to binary hive format (e.g. using HiveSwarming)
+/// 4. Write the modified hive as NTUSER.MAN in %USERPROFILE%
+/// 5. On next logon, Windows loads the poisoned hive — no registry callbacks fire
+///
+/// Medium integrity is sufficient (user writes to own profile directory).
+/// The user hive is locked while the session is active, so activation
+/// requires logoff/logon or reboot — making this a persistence mechanism,
+/// not immediate execution.
+///
+/// Mandatory profiles are rare in modern environments. Their mere presence
+/// outside kiosk/shared workstation configurations warrants investigation.
+///
+// Source: https://deceptiq.com/blog/ntuser-man-registry-persistence
+// Source: https://windowsir.blogspot.com/2026/01/grab-bag.html
+// Source: https://learn.microsoft.com/en-us/windows/client-management/client-tools/mandatory-user-profile
+pub(crate) static NTUSER_MAN_PERSISTENCE: ArtifactDescriptor = ArtifactDescriptor {
+    id: "ntuser_man_persistence",
+    name: "NTUSER.MAN Mandatory Profile Persistence",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    // Source: https://deceptiq.com/blog/ntuser-man-registry-persistence
+    file_path: Some("%USERPROFILE%\\NTUSER.MAN"),
+    scope: DataScope::User,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "NTUSER.MAN is a mandatory profile hive that Windows loads instead of \
+              NTUSER.DAT when present. Attackers abuse this to establish registry \
+              persistence (Run keys, COM hijacks, shell extensions) that bypasses \
+              EDR registry callbacks (CmRegisterCallbackEx). The hive is loaded \
+              directly from disk — not through registry APIs — so endpoint security \
+              products monitoring registry operations see nothing. Medium integrity \
+              is sufficient since users can write to their own profile directory. \
+              Activation requires logoff/logon or reboot. In environments not using \
+              mandatory profiles, the mere existence of NTUSER.MAN is a high-confidence \
+              indicator of compromise. Can also be used for lateral movement via \
+              roaming profile shares or AD profilePath attribute modification.",
+    mitre_techniques: &[
+        "T1547.001", // Boot or Logon Autostart Execution: Registry Run Keys
+        "T1112",     // Modify Registry
+    ],
+    fields: &[
+        FieldSchema {
+            name: "is_mandatory_profile",
+            value_type: ValueType::Bool,
+            description: "Whether NTUSER.MAN exists in the profile directory; \
+                          its presence alone is the primary indicator — mandatory \
+                          profiles are rare outside kiosk deployments",
+            is_uid_component: false,
+        },
+        FieldSchema {
+            name: "file_modified_time",
+            value_type: ValueType::Timestamp,
+            description: "Last modification timestamp of NTUSER.MAN; compare against \
+                          NTUSER.DAT modification time — a recently created .MAN file \
+                          alongside an older .DAT is suspicious",
+            is_uid_component: false,
+        },
+    ],
+    retention: Some("Persistent until file is deleted; survives reboots by design"),
+    triage_priority: TriagePriority::Critical,
+    related_artifacts: &["run_key_hkcu", "run_key_hklm"],
+    sources: &[
+        // Source: DeceptIQ — technique discovery, EDR bypass via mandatory profile hive loading
+        "https://deceptiq.com/blog/ntuser-man-registry-persistence",
+        // Source: Harlan Carvey commentary and cross-reference
+        "https://windowsir.blogspot.com/2026/01/grab-bag.html",
+        // Source: Microsoft documentation on mandatory user profiles
+        "https://learn.microsoft.com/en-us/windows/client-management/client-tools/mandatory-user-profile",
+    ],
+};

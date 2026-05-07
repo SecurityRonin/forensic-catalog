@@ -442,3 +442,67 @@ pub(crate) static WINDOWS_CLIPBOARD_HISTORY: ArtifactDescriptor = ArtifactDescri
         "https://windowsir.blogspot.com/2026/01/whats-on-your-clipboard.html",
     ],
 };
+
+// ── Valley RAT Registry Persistence ─────────────────────────────────────────
+/// Valley RAT (Silver Fox / 银狐) stores its configuration and downloaded
+/// plugins under `HKCU\Console`, abusing a legitimate-looking path that
+/// blends with the default Console subsystem key. Config values sit directly
+/// under `HKCU\Console`; plugins are stored in subkeys such as
+/// `HKCU\Console\0\<md5_hash>`.
+///
+/// Because the data lives under HKCU, it is tied to a specific user account,
+/// providing attribution. The `HKCU\Console` key normally contains only a
+/// handful of well-known values (FaceName, FontSize, etc.); unexpected
+/// subkeys or values are strong indicators of compromise.
+///
+// Source: https://www.cloudsek.com/blog/silver-fox-targeting-india-using-tax-themed-phishing-lures
+// Source: https://windowsir.blogspot.com/2026/01/grab-bag.html
+pub(crate) static VALLEY_RAT_REGISTRY: ArtifactDescriptor = ArtifactDescriptor {
+    id: "valley_rat_registry",
+    name: "Valley RAT Registry Config & Plugins",
+    artifact_type: ArtifactType::RegistryKey,
+    hive: Some(HiveTarget::NtUser),
+    // Source: https://www.cloudsek.com/blog/silver-fox-targeting-india-using-tax-themed-phishing-lures
+    key_path: "HKCU\\Console",
+    value_name: None,
+    file_path: None,
+    scope: DataScope::User,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "Valley RAT (Silver Fox / 银狐 campaign) stores its configuration \
+              directly under HKCU\\Console and downloaded plugins under \
+              HKCU\\Console\\0\\<md5_hash>. The legitimate Console key normally \
+              holds only display settings (FaceName, FontSize, etc.), so \
+              unexpected subkeys or binary values are strong IOCs. Data is \
+              per-user — useful for attribution. During timeline analysis, \
+              any non-standard Console subkey should stand out immediately.",
+    mitre_techniques: &[
+        "T1547.001", // Boot or Logon Autostart Execution: Registry Run Keys
+        "T1005",     // Data from Local System
+    ],
+    fields: &[
+        FieldSchema {
+            name: "config_data",
+            value_type: ValueType::Bytes,
+            description: "RAT configuration values stored directly under HKCU\\Console; \
+                          may include C2 addresses, encryption keys, or campaign identifiers",
+            is_uid_component: false,
+        },
+        FieldSchema {
+            name: "plugin_subkey",
+            value_type: ValueType::Text,
+            description: "Plugin storage subkey path, typically HKCU\\Console\\0\\<md5_hash>; \
+                          contains downloaded RAT modules and their configuration",
+            is_uid_component: false,
+        },
+    ],
+    retention: Some("Persistent until manually removed or user profile deleted"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["run_key_hkcu"],
+    sources: &[
+        // Source: CloudSEK Silver Fox campaign analysis — Valley RAT Stage 4 registry paths
+        "https://www.cloudsek.com/blog/silver-fox-targeting-india-using-tax-themed-phishing-lures",
+        // Source: Harlan Carvey commentary on Valley RAT registry storage
+        "https://windowsir.blogspot.com/2026/01/grab-bag.html",
+    ],
+};

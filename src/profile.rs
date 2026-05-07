@@ -1958,6 +1958,16 @@ pub static ARTIFACT_PROFILES: &[ArtifactProfile] = &[
         volatility: VolatilityClass::Persistent,
         volatility_rationale: "Amcache hive persists on disk; survives reboot",
     },
+    ArtifactProfile {
+        id: "ntuser_man_persistence",
+        evidence_strength: EvidenceStrength::Definitive,
+        evidence_caveats: &[
+            "Presence of NTUSER.MAN in a non-kiosk environment is a high-confidence IOC",
+            "File content is a full registry hive — parse it to extract persistence keys",
+        ],
+        volatility: VolatilityClass::Persistent,
+        volatility_rationale: "File persists on disk until manually deleted; survives reboots by design",
+    },
 ];
 
 /// Returns the combined profile for a given artifact ID, or `None` if unknown.

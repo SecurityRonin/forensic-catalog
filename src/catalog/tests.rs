@@ -6243,3 +6243,41 @@ mod tests_services_imagepath_ps_enrichment {
         );
     }
 }
+
+// ── az4n6 Mac Live Imaging enrichment ───────────────────────────────────────
+#[cfg(test)]
+mod az4n6_mac_live_imaging_tests {
+    use super::*;
+
+    /// The blog post documents that on a running FileVault2-encrypted Mac the
+    /// logical volume appears as "Unlocked Encrypted" in diskutil output and can
+    /// be imaged via /dev/rdisk (raw, unbuffered device) using dd.  The
+    /// apfs_container descriptor should reference this source and mention live
+    /// acquisition of unlocked encrypted volumes and the rdisk performance note.
+    #[test]
+    fn apfs_container_cites_az4n6_live_imaging_post() {
+        let d = CATALOG.by_id("apfs_container").unwrap();
+        assert!(
+            d.sources.iter().any(|s| s.contains("mac-live-imaging-functionality-versus")),
+            "apfs_container must cite az4n6 Mac Live Imaging post as a source"
+        );
+    }
+
+    #[test]
+    fn apfs_container_meaning_mentions_live_acquisition() {
+        let d = CATALOG.by_id("apfs_container").unwrap();
+        assert!(
+            d.meaning.contains("live") || d.meaning.contains("Live"),
+            "apfs_container meaning must mention live acquisition of unlocked encrypted volumes"
+        );
+    }
+
+    #[test]
+    fn apfs_container_meaning_mentions_rdisk() {
+        let d = CATALOG.by_id("apfs_container").unwrap();
+        assert!(
+            d.meaning.contains("rdisk"),
+            "apfs_container meaning must mention /dev/rdisk for faster raw device imaging"
+        );
+    }
+}

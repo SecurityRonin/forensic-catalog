@@ -5561,8 +5561,227 @@ mod tests_windows_clipboard_history {
     fn catalog_count_includes_clipboard_history() {
         assert_eq!(
             CATALOG.list().len(),
-            6610,
-            "catalog must have 6610 entries after adding windows_clipboard_history"
+            6612,
+            "catalog must have 6612 entries after adding valley_rat_registry and ntuser_man_persistence"
+        );
+    }
+}
+
+// ── Valley RAT Registry (from WinIR Grab Bag 2026-01) ──────────────────────
+
+#[cfg(test)]
+mod tests_valley_rat_registry {
+    use super::*;
+
+    #[test]
+    fn valley_rat_registry_exists() {
+        assert!(CATALOG.by_id("valley_rat_registry").is_some());
+    }
+
+    #[test]
+    fn valley_rat_registry_os_scope() {
+        let d = CATALOG.by_id("valley_rat_registry").unwrap();
+        assert_eq!(d.os_scope, OsScope::Win7Plus);
+    }
+
+    #[test]
+    fn valley_rat_registry_triage_priority() {
+        let d = CATALOG.by_id("valley_rat_registry").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::High);
+    }
+
+    #[test]
+    fn valley_rat_registry_hive_ntuser() {
+        let d = CATALOG.by_id("valley_rat_registry").unwrap();
+        assert_eq!(d.hive, Some(HiveTarget::NtUser));
+    }
+
+    #[test]
+    fn valley_rat_registry_key_path() {
+        let d = CATALOG.by_id("valley_rat_registry").unwrap();
+        assert!(
+            d.key_path.contains("HKCU\\Console"),
+            "key_path must reference HKCU\\Console"
+        );
+    }
+
+    #[test]
+    fn valley_rat_registry_user_scope() {
+        let d = CATALOG.by_id("valley_rat_registry").unwrap();
+        assert_eq!(d.scope, DataScope::User);
+    }
+
+    #[test]
+    fn valley_rat_registry_has_config_field() {
+        let d = CATALOG.by_id("valley_rat_registry").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "config_data"),
+            "valley_rat_registry must have 'config_data' field"
+        );
+    }
+
+    #[test]
+    fn valley_rat_registry_has_plugin_path_field() {
+        let d = CATALOG.by_id("valley_rat_registry").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "plugin_subkey"),
+            "valley_rat_registry must have 'plugin_subkey' field"
+        );
+    }
+
+    #[test]
+    fn valley_rat_registry_mitre_t1547_001() {
+        let d = CATALOG.by_id("valley_rat_registry").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1547.001"),
+            "valley_rat_registry must map to T1547.001 (Registry Run Keys)"
+        );
+    }
+
+    #[test]
+    fn valley_rat_registry_mitre_t1005() {
+        let d = CATALOG.by_id("valley_rat_registry").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1005"),
+            "valley_rat_registry must map to T1005 (Data from Local System)"
+        );
+    }
+
+    #[test]
+    fn valley_rat_registry_cites_cloudsek() {
+        let d = CATALOG.by_id("valley_rat_registry").unwrap();
+        assert!(
+            d.sources.iter().any(|s| s.contains("cloudsek.com")),
+            "valley_rat_registry must cite cloudsek.com as source"
+        );
+    }
+
+    #[test]
+    fn valley_rat_registry_cites_windowsir() {
+        let d = CATALOG.by_id("valley_rat_registry").unwrap();
+        assert!(
+            d.sources
+                .iter()
+                .any(|s| s.contains("windowsir.blogspot.com")),
+            "valley_rat_registry must cite windowsir.blogspot.com as source"
+        );
+    }
+
+    #[test]
+    fn valley_rat_registry_is_registry_key() {
+        let d = CATALOG.by_id("valley_rat_registry").unwrap();
+        assert_eq!(d.artifact_type, ArtifactType::RegistryKey);
+    }
+}
+
+// ── NTUSER.MAN Persistence (from WinIR Grab Bag 2026-01 + DeceptIQ) ────────
+
+#[cfg(test)]
+mod tests_ntuser_man_persistence {
+    use super::*;
+
+    #[test]
+    fn ntuser_man_persistence_exists() {
+        assert!(CATALOG.by_id("ntuser_man_persistence").is_some());
+    }
+
+    #[test]
+    fn ntuser_man_persistence_os_scope() {
+        let d = CATALOG.by_id("ntuser_man_persistence").unwrap();
+        assert_eq!(d.os_scope, OsScope::Win7Plus);
+    }
+
+    #[test]
+    fn ntuser_man_persistence_triage_priority() {
+        let d = CATALOG.by_id("ntuser_man_persistence").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::Critical);
+    }
+
+    #[test]
+    fn ntuser_man_persistence_is_file() {
+        let d = CATALOG.by_id("ntuser_man_persistence").unwrap();
+        assert_eq!(d.artifact_type, ArtifactType::File);
+    }
+
+    #[test]
+    fn ntuser_man_persistence_file_path() {
+        let d = CATALOG.by_id("ntuser_man_persistence").unwrap();
+        assert!(
+            d.file_path
+                .unwrap_or("")
+                .contains("NTUSER.MAN"),
+            "file_path must reference NTUSER.MAN"
+        );
+    }
+
+    #[test]
+    fn ntuser_man_persistence_user_scope() {
+        let d = CATALOG.by_id("ntuser_man_persistence").unwrap();
+        assert_eq!(d.scope, DataScope::User);
+    }
+
+    #[test]
+    fn ntuser_man_persistence_mitre_t1547_001() {
+        let d = CATALOG.by_id("ntuser_man_persistence").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1547.001"),
+            "ntuser_man_persistence must map to T1547.001 (Registry Run Keys)"
+        );
+    }
+
+    #[test]
+    fn ntuser_man_persistence_mitre_t1112() {
+        let d = CATALOG.by_id("ntuser_man_persistence").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1112"),
+            "ntuser_man_persistence must map to T1112 (Modify Registry)"
+        );
+    }
+
+    #[test]
+    fn ntuser_man_persistence_cites_deceptiq() {
+        let d = CATALOG.by_id("ntuser_man_persistence").unwrap();
+        assert!(
+            d.sources.iter().any(|s| s.contains("deceptiq.com")),
+            "ntuser_man_persistence must cite deceptiq.com as source"
+        );
+    }
+
+    #[test]
+    fn ntuser_man_persistence_cites_windowsir() {
+        let d = CATALOG.by_id("ntuser_man_persistence").unwrap();
+        assert!(
+            d.sources
+                .iter()
+                .any(|s| s.contains("windowsir.blogspot.com")),
+            "ntuser_man_persistence must cite windowsir.blogspot.com as source"
+        );
+    }
+
+    #[test]
+    fn ntuser_man_persistence_related_run_keys() {
+        let d = CATALOG.by_id("ntuser_man_persistence").unwrap();
+        assert!(
+            d.related_artifacts.contains(&"run_key_hkcu"),
+            "ntuser_man_persistence should relate to run_key_hkcu"
+        );
+    }
+
+    #[test]
+    fn ntuser_man_persistence_has_mandatory_profile_field() {
+        let d = CATALOG.by_id("ntuser_man_persistence").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "is_mandatory_profile"),
+            "ntuser_man_persistence must have 'is_mandatory_profile' field"
+        );
+    }
+
+    #[test]
+    fn ntuser_man_persistence_has_file_timestamp_field() {
+        let d = CATALOG.by_id("ntuser_man_persistence").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "file_modified_time"),
+            "ntuser_man_persistence must have 'file_modified_time' field"
         );
     }
 }

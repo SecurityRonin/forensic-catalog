@@ -264,7 +264,7 @@ mod decode_tests {
     #[test]
     fn catalog_has_entries() {
         assert!(!CATALOG.list().is_empty());
-        assert_eq!(CATALOG.list().len(), 6622, "catalog must have 6622 entries");
+        assert_eq!(CATALOG.list().len(), 6623, "catalog must have 6622 entries");
     }
 
     #[test]
@@ -2597,7 +2597,7 @@ mod tests_batch_d {
     #[test]
     fn catalog_count_after_srum_network_connections() {
         // +1 from srum_network_connections
-        assert_eq!(CATALOG.list().len(), 6622, "catalog must have 6622 entries");
+        assert_eq!(CATALOG.list().len(), 6623, "catalog must have 6622 entries");
     }
 
     // ── EVTX channels ─────────────────────────────────────────────────────
@@ -3498,7 +3498,7 @@ mod phase2_registry_tests {
     #[test]
     fn catalog_count_includes_phase2() {
         // Updated to 354 after phase-2b file artifact additions
-        assert_eq!(CATALOG.list().len(), 6622, "catalog must have 6622 entries");
+        assert_eq!(CATALOG.list().len(), 6623, "catalog must have 6622 entries");
     }
 
     #[test]
@@ -3643,7 +3643,7 @@ mod phase2b_files_tests {
     fn catalog_count_includes_phase2b() {
         // phase2a adds 30 registry artifacts (284→314), phase2b adds 40 file artifacts (314→354)
         // Note: chrome_login_data was already present from Phase 1; not duplicated here.
-        assert_eq!(CATALOG.list().len(), 6622, "catalog must have 6622 entries");
+        assert_eq!(CATALOG.list().len(), 6623, "catalog must have 6622 entries");
     }
 
     #[test]
@@ -3946,7 +3946,7 @@ mod phase3_persistence_tests {
         // phase3 adds 7 net-new artifacts not already in catalog (354 → 361)
         // Note: winlogon_shell, winlogon_userinit, appinit_dlls, boot_execute,
         //       ifeo_debugger, netsh_helper_dlls, mountpoints2 were already present.
-        assert_eq!(CATALOG.list().len(), 6622, "catalog must have 6622 entries");
+        assert_eq!(CATALOG.list().len(), 6623, "catalog must have 6622 entries");
     }
 
     // ── Pre-existing artifacts verified present ───────────────────────────────
@@ -6956,5 +6956,62 @@ mod tests_honda_accord_bluetooth {
     fn relates_to_phonedb() {
         let d = CATALOG.by_id("honda_accord_bluetooth").unwrap();
         assert!(d.related_artifacts.contains(&"honda_accord_phonedb"));
+    }
+}
+
+// ── iOS14 Apple Maps History ───────────────────────────────────────────────
+
+#[cfg(test)]
+mod tests_ios14_maps_history {
+    use super::*;
+
+    #[test]
+    fn exists_in_catalog() {
+        assert!(
+            CATALOG.by_id("ios14_maps_history").is_some(),
+            "catalog must contain 'ios14_maps_history'"
+        );
+    }
+
+    #[test]
+    fn is_database_entry_type() {
+        let d = CATALOG.by_id("ios14_maps_history").unwrap();
+        assert_eq!(d.artifact_type, ArtifactType::DatabaseEntry);
+    }
+
+    #[test]
+    fn is_ios_scope() {
+        let d = CATALOG.by_id("ios14_maps_history").unwrap();
+        assert_eq!(d.os_scope, OsScope::IOS);
+    }
+
+    #[test]
+    fn triage_is_high() {
+        let d = CATALOG.by_id("ios14_maps_history").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::High);
+    }
+
+    #[test]
+    fn has_key_fields() {
+        let d = CATALOG.by_id("ios14_maps_history").unwrap();
+        let names: Vec<&str> = d.fields.iter().map(|f| f.name).collect();
+        assert!(names.contains(&"z_pk"));
+        assert!(names.contains(&"z_ent"));
+        assert!(names.contains(&"ZCREATETIME"));
+        assert!(names.contains(&"ZLATITUDE"));
+        assert!(names.contains(&"ZLONGITUDE"));
+        assert!(names.contains(&"ZQUERY"));
+    }
+
+    #[test]
+    fn has_sources() {
+        let d = CATALOG.by_id("ios14_maps_history").unwrap();
+        assert!(!d.sources.is_empty());
+    }
+
+    #[test]
+    fn scope_is_user() {
+        let d = CATALOG.by_id("ios14_maps_history").unwrap();
+        assert_eq!(d.scope, DataScope::User);
     }
 }

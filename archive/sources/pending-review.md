@@ -24,7 +24,7 @@ Mark `[x]` when reviewed, `[→]` when artifact tasks were created.
 - [x] [Finding and Decoding Malicious PowerShell Scripts](https://az4n6.blogspot.com/2017/10/finding-and-decoding-malicious.html) — Another Forensics Blog <!-- Part 1 of 3: enriched evtx_system (7045 PS-as-service, misleading 7000/7009, COMSPEC pattern) + services_imagepath (encodedcommand/base64/gzip in binPath); added T1059.001, T1027 -->
 - [x] [Onion Peeler: Batch Tor Lookup Program](https://az4n6.blogspot.com/2017/02/onion-peeler-batch-tor-lookup-program.html) — Another Forensics Blog <!-- no artifacts: tool announcement only (Python batch Tor IP lookup via OnionOO API); no file paths, registry keys, or forensic artifact data documented -->
 - [x] [When Windows Lies](https://az4n6.blogspot.com/2017/02/when-windows-lies.html) — Another Forensics Blog <!-- enriched: windows_install_date — added systeminfo caveat, spoliation false-positive warning, corporate clone/image caveat from az4n6 post -->
-- [ ] [Quicklook thumbnails.data parser](https://az4n6.blogspot.com/2016/10/quicklook-thumbnailsdata-parser.html) — Another Forensics Blog <!-- task #16: quicklook_thumbnails macOS descriptor -->
+- [x] [Quicklook thumbnails.data parser](https://az4n6.blogspot.com/2016/10/quicklook-thumbnailsdata-parser.html) — Another Forensics Blog <!-- enriched: quicklook_thumbnails — added original_file_size + original_last_modified fields from version BLOB, fixed dead source URL, added IACIS citation, noted removable media persistence -->
 - [ ] [Mac Live Imaging: Functionality Versus Speed](https://az4n6.blogspot.com/2016/09/mac-live-imaging-functionality-versus.html) — Another Forensics Blog
 - [ ] [KAPE 0.9.2.0 released!](https://binaryforay.blogspot.com/2020/05/kape-0920-released.html) — binary foray
 - [ ] [KAPE 0.8.7.0 released!](https://binaryforay.blogspot.com/2019/08/kape-0870-released.html) — binary foray
@@ -1625,7 +1625,7 @@ Mark `[x]` when reviewed, `[→]` when artifact tasks were created.
 - [ ] [Mounting and Reimaging an Encrypted FileVault2 Mac Image in Linux](https://az4n6.blogspot.com/2016/07/mounting-and-reimaging-encrypted.html) — Another Forensics Blog
 - [ ] [How to image a Mac using Single User Mode](https://az4n6.blogspot.com/2016/07/how-to-image-mac-using-single-user-mode.html) — Another Forensics Blog
 - [ ] [How to image a Mac with Live Linux bootable USB](https://az4n6.blogspot.com/2016/06/how-to-image-mac-with-live-linux.html) — Another Forensics Blog
-- [ ] [QuickLook Python Parser - all your BLOBs belong to us](https://az4n6.blogspot.com/2016/05/quicklook-python-parser-all-your-blobs.html) — Another Forensics Blog
+- [x] [QuickLook Python Parser - all your BLOBs belong to us](https://az4n6.blogspot.com/2016/05/quicklook-python-parser-all-your-blobs.html) — Another Forensics Blog <!-- enriched: quicklook_thumbnails — version BLOB plist fields (original_file_size, original_last_modified), removable media note; companion to Oct 2016 thumbnails.data post -->
 - [ ] [More on Trust Records, Macros and Security, Oh My!](https://az4n6.blogspot.com/2016/02/more-on-trust-records-macros-and.html) — Another Forensics Blog
 - [ ] [Who's your Master? : MFT Parsers Reviewed](https://az4n6.blogspot.com/2015/09/whos-your-master-mft-parsers-reviewed.html) — Another Forensics Blog
 - [ ] [SQLite Deleted Data Parser Update - Leave no "Leaf" unturned](https://az4n6.blogspot.com/2015/06/sqlite-deleted-data-parser-update-leave.html) — Another Forensics Blog

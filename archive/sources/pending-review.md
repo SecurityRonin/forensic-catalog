@@ -6,13 +6,13 @@ Mark `[x]` when reviewed, `[→]` when artifact tasks were created.
 
 ## 2026-05-03
 
-- [ ] [LNK Files](https://windowsir.blogspot.com/2026/03/lnk-files.html) — Windows Incident Response
-- [ ] [Links](https://windowsir.blogspot.com/2026/03/links.html) — Windows Incident Response
-- [ ] [Devices](https://windowsir.blogspot.com/2026/02/devices.html) — Windows Incident Response <!-- 404 on 2026-05-03; SSL unreachable 2026-05-07; general USB/device forensics discussion; USBSTOR + USB registry keys already covered -->
+- [x] [LNK Files](https://windowsir.blogspot.com/2026/03/lnk-files.html) — Windows Incident Response <!-- editorial commentary linking to Wietze Beukema's LNK post; no new artifact paths/fields; lnk_files already fully covered -->
+- [x] [Links](https://windowsir.blogspot.com/2026/03/links.html) — Windows Incident Response <!-- links roundup post; references DOCX RSIDs (external source), USB forensics, PCA files — all covered or external; no new artifact data in this post -->
+- [x] [Devices](https://windowsir.blogspot.com/2026/02/devices.html) — Windows Incident Response <!-- general USB/device forensics discussion; mentions USBSTOR, DriverFrameworks-UserMode, ShellBags, MsiInstaller — all covered or discussed editorially without new field schemas -->
 - [ ] [Views on AI & the Anthropic Report](https://windowsir.blogspot.com/2026/01/views-on-ai-anthropic-report.html) — Windows Incident Response
 - [ ] [What's on your clipboard?](https://windowsir.blogspot.com/2026/01/whats-on-your-clipboard.html) — Windows Incident Response
 - [ ] [Questions I've Been Asked](https://windowsir.blogspot.com/2026/01/questions-ive-been-asked.html) — Windows Incident Response
-- [ ] [Windows Defender Support Logs](https://windowsir.blogspot.com/2026/01/windows-defender-support-logs.html) — Windows Incident Response
+- [x] [Windows Defender Support Logs](https://windowsir.blogspot.com/2026/01/windows-defender-support-logs.html) — Windows Incident Response <!-- mentions C:\ProgramData\Microsoft\Windows Defender\Support\MpWppTracing-*.bin; already covered by kape_file_windows_defender_support and fa_file_support_mplog_log; no new field schemas -->
 - [ ] [Grab Bag](https://windowsir.blogspot.com/2026/01/grab-bag.html) — Windows Incident Response
 - [ ] [Question on Open Source Tools](https://windowsir.blogspot.com/2025/12/question-on-open-source-tools.html) — Windows Incident Response
 - [ ] [Perspectives on Cybersecurity](https://windowsir.blogspot.com/2025/12/perspectives-on-cybersecurity.html) — Windows Incident Response
@@ -66,7 +66,7 @@ Mark `[x]` when reviewed, `[→]` when artifact tasks were created.
 - [ ] [Android Tor Browser Thumbnails. What?](https://abrignoni.blogspot.com/2021/12/tor-thumbnails-what.html) — Initialization Vectors <!-- task: android_tor_browser_thumbnails — RIFF/WEBP thumbnail files at /data/data/org.torproject.torbrowser/cache/mozac_browser_thumbnails/thumbnails/ and /data/user/0/org.torproject.torbrowser/cache/mozac_browser_thumbnails/thumbnails/; GUID-named .0 files showing opened Tor tabs; OsScope::ANDROID; source: https://abrignoni.blogspot.com/2021/12/tor-thumbnails-what.html -->
 - [ ] [vLEAPP - Vehicle Logs Events And Properties Parser](https://abrignoni.blogspot.com/2021/07/vleapp-vehicle-logs-events-and.html) — Initialization Vectors <!-- vLEAPP intro post; vehicle/infotainment forensics tool (GPS, contacts, call logs); no specific artifact file paths enumerated in post -->
 - [ ] [CLEAPP it! - ChromeOS Logs Events And Protobuf Parser](https://abrignoni.blogspot.com/2021/05/cleapp-it-chromeos-logs-events-and.html) — Initialization Vectors <!-- task: chromeos_extraction_tgz — Chromebook full extraction delivered as extracted.tgz; CLEAPP parses 38 artifact categories (device details/logs, Chromium LevelDB, RDP, VNC, Instagram Threads, Google Docs); no ChromeOS artifact descriptors exist in catalog; OsScope::CHROMEOS; source: https://abrignoni.blogspot.com/2021/05/cleapp-it-chromeos-logs-events-and.html + https://github.com/markmckinnon/cLeapp -->
-- [ ] [New Wifi database from Apple intelligence](http://www.swiftforensics.com/2025/01/new-wifi-database-from-apple.html) — Yogesh Khatri's forensic blog
+- [x] [New Wifi database from Apple intelligence](http://www.swiftforensics.com/2025/01/new-wifi-database-from-apple.html) — Yogesh Khatri's forensic blog <!-- implemented: macos_wifi_intelligence descriptor -->
 - [ ] [mac_apt update to BTM processing](http://www.swiftforensics.com/2025/01/macapt-update-to-btm-processing.html) — Yogesh Khatri's forensic blog
 - [ ] [NSKeyedArchive Deserializer update](http://www.swiftforensics.com/2024/08/nskeyedarchive-deserializer-update.html) — Yogesh Khatri's forensic blog <!-- library update v1.4.0 — recursive NSKA deserialization; tooling/methodology note, no new artifact path -->
 - [ ] [Reading OneDrive Logs Part 2](http://www.swiftforensics.com/2022/11/reading-onedrive-logs-part-2.html) — Yogesh Khatri's forensic blog <!-- task: onedrive_odl_logs — ODL log encryption change (Apr 2022): general.keystore JSON file at \AppData\Local\Microsoft\OneDrive\logs\{Business1|Personal}\general.keystore holds AES key; existing descriptor covers the folder but not the ODL substructure or keystore format; OsScope::Win10Plus; source: http://www.swiftforensics.com/2022/11/reading-onedrive-logs-part-2.html -->

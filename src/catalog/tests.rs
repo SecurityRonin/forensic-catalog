@@ -7916,3 +7916,128 @@ mod tests_ios_mobile_container_manager {
         assert_eq!(d.scope, DataScope::System);
     }
 }
+
+// ── android_gboard_trainingcache ────────────────────────────────────────────
+#[cfg(test)]
+mod tests_android_gboard_trainingcache {
+    use super::*;
+
+    #[test]
+    fn exists_in_catalog() {
+        assert!(
+            CATALOG.by_id("android_gboard_trainingcache").is_some(),
+            "android_gboard_trainingcache descriptor must exist"
+        );
+    }
+
+    #[test]
+    fn has_correct_os_scope() {
+        let d = CATALOG.by_id("android_gboard_trainingcache").unwrap();
+        assert_eq!(d.os_scope, OsScope::Android);
+    }
+
+    #[test]
+    fn has_correct_artifact_type() {
+        let d = CATALOG.by_id("android_gboard_trainingcache").unwrap();
+        assert_eq!(d.artifact_type, ArtifactType::DatabaseEntry);
+    }
+
+    #[test]
+    fn has_correct_file_path() {
+        let d = CATALOG.by_id("android_gboard_trainingcache").unwrap();
+        assert!(
+            d.file_path
+                .unwrap()
+                .contains("com.google.android.inputmethod.latin/databases"),
+            "file_path must reference Gboard's databases directory"
+        );
+    }
+
+    #[test]
+    fn file_path_mentions_trainingcache() {
+        let d = CATALOG.by_id("android_gboard_trainingcache").unwrap();
+        assert!(
+            d.file_path.unwrap().contains("trainingcache"),
+            "file_path must reference trainingcache database"
+        );
+    }
+
+    #[test]
+    fn has_keystroke_fields() {
+        let d = CATALOG.by_id("android_gboard_trainingcache").unwrap();
+        let field_names: Vec<&str> = d.fields.iter().map(|f| f.name).collect();
+        assert!(
+            field_names.contains(&"app_package"),
+            "must have app_package field"
+        );
+        assert!(
+            field_names.contains(&"input_field"),
+            "must have input_field field"
+        );
+        assert!(
+            field_names.contains(&"timestamp"),
+            "must have timestamp field"
+        );
+        assert!(
+            field_names.contains(&"typed_text"),
+            "must have typed_text field"
+        );
+    }
+
+    #[test]
+    fn meaning_mentions_keystrokes() {
+        let d = CATALOG.by_id("android_gboard_trainingcache").unwrap();
+        let m = d.meaning.to_ascii_lowercase();
+        assert!(
+            m.contains("keystroke") || m.contains("typed"),
+            "meaning must mention keystrokes or typed text"
+        );
+    }
+
+    #[test]
+    fn meaning_mentions_deleted_apps() {
+        let d = CATALOG.by_id("android_gboard_trainingcache").unwrap();
+        let m = d.meaning.to_ascii_lowercase();
+        assert!(
+            m.contains("deleted"),
+            "meaning must mention recovery of data from deleted apps"
+        );
+    }
+
+    #[test]
+    fn has_mitre_techniques() {
+        let d = CATALOG.by_id("android_gboard_trainingcache").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1056.001"),
+            "must include T1056.001 (Input Capture: Keylogging)"
+        );
+    }
+
+    #[test]
+    fn has_sources() {
+        let d = CATALOG.by_id("android_gboard_trainingcache").unwrap();
+        assert!(
+            d.sources
+                .iter()
+                .any(|s| s.contains("swiftforensics.com")),
+            "sources must include swiftforensics.com blog post"
+        );
+    }
+
+    #[test]
+    fn triage_priority_is_high() {
+        let d = CATALOG.by_id("android_gboard_trainingcache").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::High);
+    }
+
+    #[test]
+    fn scope_is_user() {
+        let d = CATALOG.by_id("android_gboard_trainingcache").unwrap();
+        assert_eq!(d.scope, DataScope::User);
+    }
+
+    #[test]
+    fn catalog_count_updated() {
+        assert_eq!(CATALOG.list().len(), 6634);
+    }
+}

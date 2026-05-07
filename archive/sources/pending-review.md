@@ -42,10 +42,10 @@ Mark `[x]` when reviewed, `[→]` when artifact tasks were created.
 - [x] [iOS14 Maps History BLOB Script](https://cheeky4n6monkey.blogspot.com/2020/11/ios14-maps-history-blob-script.html) — Cheeky4n6Monkey <!-- implemented: ios14_maps_history — MapsSync_0.0.1 ZHISTORYITEM + ZMIXINMAPITEM with protobuf BLOBs -->
 - [x] [Recovering and Replaying Garmin Voice Instructions](https://cheeky4n6monkey.blogspot.com/2020/05/recovering-and-replaying-garmin-voice.html) — Cheeky4n6Monkey <!-- implemented: garmin_nuvi_voice_log — vpm_log_all.log TTS navigation instructions on FAT32 -->
 - [x] [A Monkey Forays Into USB Flashdrives](https://cheeky4n6monkey.blogspot.com/2020/03/a-monkey-forays-into-usb-flashdrives.html) — Cheeky4n6Monkey <!-- verified: physical hardware repair post (soldering, resistors); no new software forensic artifacts -->
-- [ ] [Monkey takes a .heic](https://cheeky4n6monkey.blogspot.com/2017/10/monkey-takes-heic.html) — Cheeky4n6Monkey
-- [ ] [Monkey Unpacks Some Python](https://cheeky4n6monkey.blogspot.com/2017/08/monkey-unpacks-some-python.html) — Cheeky4n6Monkey
-- [ ] [Monkey Plays (LAN) Turtle](https://cheeky4n6monkey.blogspot.com/2017/01/monkey-plays-lan-turtle.html) — Cheeky4n6Monkey
-- [ ] [Google S2 Mapping Scripts](https://cheeky4n6monkey.blogspot.com/2016/08/google-s2-mapping-scripts.html) — Cheeky4n6Monkey
+- [x] [Monkey takes a .heic](https://cheeky4n6monkey.blogspot.com/2017/10/monkey-takes-heic.html) — Cheeky4n6Monkey <!-- implemented: heic_image_file — HEIF container format with ftyp/meta/hdlr box structure, EXIF/GPS metadata fields; iOS 11+ / macOS High Sierra+ -->
+- [x] [Monkey Unpacks Some Python](https://cheeky4n6monkey.blogspot.com/2017/08/monkey-unpacks-some-python.html) — Cheeky4n6Monkey <!-- verified: Python struct tutorial for reading binary data; no discrete forensic artifact -->
+- [x] [Monkey Plays (LAN) Turtle](https://cheeky4n6monkey.blogspot.com/2017/01/monkey-plays-lan-turtle.html) — Cheeky4n6Monkey <!-- implemented: lan_turtle_loot — Hak5 LAN Turtle /root/loot/ credential directory with Responder NTLMv2 captures; OpenWrt Linux -->
+- [x] [Google S2 Mapping Scripts](https://cheeky4n6monkey.blogspot.com/2016/08/google-s2-mapping-scripts.html) — Cheeky4n6Monkey <!-- verified: Google S2 cell ID geo-encoding utility/methodology; no discrete forensic artifact -->
 - [ ] [Daily Blog #815: I missed a day](https://www.hecfblog.com/2025/04/daily-blog-815-i-missed-day.html) — HECF / Hacking Exposed Computer Forensics Blog
 - [ ] [Daily Blog #814: Sunday Funday 4/20/25](https://www.hecfblog.com/2025/04/daily-blog-814-sunday-funday-42025.html) — HECF / Hacking Exposed Computer Forensics Blog
 - [ ] [Daily Blog #813: Solution Saturday 4/19/25](https://www.hecfblog.com/2025/04/daily-blog-813-solution-saturday-41925.html) — HECF / Hacking Exposed Computer Forensics Blog

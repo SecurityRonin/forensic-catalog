@@ -7664,3 +7664,90 @@ mod tests_android_tor_browser_thumbnails {
         assert_eq!(d.scope, DataScope::User);
     }
 }
+
+// ── macOS BTM Background Tasks ──────────────────────────────────────────────
+#[cfg(test)]
+mod tests_macos_btm_background_tasks {
+    use super::*;
+
+    #[test]
+    fn exists_in_catalog() {
+        assert!(
+            CATALOG.by_id("macos_btm_background_tasks").is_some(),
+            "macos_btm_background_tasks must exist in catalog"
+        );
+    }
+
+    #[test]
+    fn artifact_type_is_file() {
+        let d = CATALOG.by_id("macos_btm_background_tasks").unwrap();
+        assert_eq!(d.artifact_type, ArtifactType::File);
+    }
+
+    #[test]
+    fn os_scope_is_macos13plus() {
+        let d = CATALOG.by_id("macos_btm_background_tasks").unwrap();
+        assert_eq!(d.os_scope, OsScope::MacOS13Plus);
+    }
+
+    #[test]
+    fn file_path_contains_backgroundtaskmanagement() {
+        let d = CATALOG.by_id("macos_btm_background_tasks").unwrap();
+        let fp = d.file_path.unwrap();
+        assert!(
+            fp.contains("backgroundtaskmanagement"),
+            "file_path must reference backgroundtaskmanagement directory"
+        );
+    }
+
+    #[test]
+    fn has_persistence_mitre_technique() {
+        let d = CATALOG.by_id("macos_btm_background_tasks").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1543.001"),
+            "must map to T1543.001 (Create or Modify System Process: Launch Agent)"
+        );
+    }
+
+    #[test]
+    fn has_fields_for_type_and_disposition() {
+        let d = CATALOG.by_id("macos_btm_background_tasks").unwrap();
+        let field_names: Vec<&str> = d.fields.iter().map(|f| f.name).collect();
+        assert!(field_names.contains(&"item_type"), "must have item_type field");
+        assert!(
+            field_names.contains(&"disposition"),
+            "must have disposition field"
+        );
+    }
+
+    #[test]
+    fn meaning_mentions_login_items() {
+        let d = CATALOG.by_id("macos_btm_background_tasks").unwrap();
+        let m = d.meaning.to_ascii_lowercase();
+        assert!(
+            m.contains("login item") || m.contains("background task"),
+            "meaning must mention login items or background tasks"
+        );
+    }
+
+    #[test]
+    fn has_swiftforensics_source() {
+        let d = CATALOG.by_id("macos_btm_background_tasks").unwrap();
+        assert!(
+            d.sources.iter().any(|s| s.contains("swiftforensics.com")),
+            "sources must include swiftforensics.com blog post"
+        );
+    }
+
+    #[test]
+    fn triage_priority_is_high() {
+        let d = CATALOG.by_id("macos_btm_background_tasks").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::High);
+    }
+
+    #[test]
+    fn scope_is_system() {
+        let d = CATALOG.by_id("macos_btm_background_tasks").unwrap();
+        assert_eq!(d.scope, DataScope::Mixed);
+    }
+}

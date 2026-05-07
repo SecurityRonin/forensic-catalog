@@ -6045,3 +6045,103 @@ mod tests_apfs_container {
         );
     }
 }
+
+// ── az4n6 "Finding and Decoding Malicious PowerShell Scripts" enrichments ───
+// Source: https://az4n6.blogspot.com/2017/10/finding-and-decoding-malicious.html
+#[cfg(test)]
+mod tests_evtx_system_ps_service_enrichment {
+    use super::*;
+
+    #[test]
+    fn evtx_system_cites_az4n6_ps_services_post() {
+        let d = CATALOG.by_id("evtx_system").unwrap();
+        assert!(
+            d.sources
+                .iter()
+                .any(|s| s.contains("az4n6.blogspot.com") && s.contains("finding-and-decoding")),
+            "evtx_system must cite az4n6 'Finding and Decoding Malicious PowerShell Scripts' post; sources: {:?}",
+            d.sources
+        );
+    }
+
+    #[test]
+    fn evtx_system_meaning_mentions_comspec_ps_abuse() {
+        let d = CATALOG.by_id("evtx_system").unwrap();
+        assert!(
+            d.meaning.contains("COMSPEC") || d.meaning.contains("%COMSPEC%"),
+            "evtx_system meaning should mention %%COMSPEC%% PowerShell service abuse pattern"
+        );
+    }
+
+    #[test]
+    fn evtx_system_meaning_mentions_misleading_7000_7009() {
+        let d = CATALOG.by_id("evtx_system").unwrap();
+        assert!(
+            d.meaning.contains("7000") && d.meaning.contains("7009"),
+            "evtx_system meaning should warn about misleading 7000/7009 errors after PS service creation"
+        );
+    }
+
+    #[test]
+    fn evtx_system_has_t1059_001() {
+        let d = CATALOG.by_id("evtx_system").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1059.001"),
+            "evtx_system must have T1059.001 (PowerShell) for PS-as-service abuse"
+        );
+    }
+}
+
+#[cfg(test)]
+mod tests_services_imagepath_ps_enrichment {
+    use super::*;
+
+    #[test]
+    fn services_imagepath_cites_az4n6_ps_services_post() {
+        let d = CATALOG.by_id("services_imagepath").unwrap();
+        assert!(
+            d.sources
+                .iter()
+                .any(|s| s.contains("az4n6.blogspot.com") && s.contains("finding-and-decoding")),
+            "services_imagepath must cite az4n6 PS services post; sources: {:?}",
+            d.sources
+        );
+    }
+
+    #[test]
+    fn services_imagepath_meaning_mentions_encodedcommand() {
+        let d = CATALOG.by_id("services_imagepath").unwrap();
+        assert!(
+            d.meaning.contains("encodedcommand") || d.meaning.contains("-EncodedCommand")
+                || d.meaning.contains("base64"),
+            "services_imagepath meaning should mention encoded PowerShell abuse in binPath"
+        );
+    }
+
+    #[test]
+    fn services_imagepath_has_t1059_001() {
+        let d = CATALOG.by_id("services_imagepath").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1059.001"),
+            "services_imagepath must have T1059.001 (PowerShell) for PS-encoded service abuse"
+        );
+    }
+
+    #[test]
+    fn services_imagepath_has_t1027() {
+        let d = CATALOG.by_id("services_imagepath").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1027"),
+            "services_imagepath must have T1027 (Obfuscated Files) for base64/gzip obfuscation"
+        );
+    }
+
+    #[test]
+    fn services_imagepath_relates_to_evtx_system() {
+        let d = CATALOG.by_id("services_imagepath").unwrap();
+        assert!(
+            d.related_artifacts.contains(&"evtx_system"),
+            "services_imagepath must relate to evtx_system (7045 records service installs)"
+        );
+    }
+}

@@ -712,8 +712,14 @@ pub(crate) static APFS_CONTAINER: ArtifactDescriptor = ArtifactDescriptor {
         so that Paragon APFS for Windows auto-detects and mounts the volume — but this \
         does not work for FileVault-encrypted disks. The container superblock (magic \
         'NXSB') anchors all volume metadata. Encrypted volumes require the user password \
-        or recovery key. Critical for any macOS 10.13+ disk forensics — without proper \
-        APFS support, the primary data volume is inaccessible.",
+        or recovery key. For live acquisition of a FileVault2-encrypted Mac, the logged-in \
+        system presents the decrypted logical volume (visible as 'Unlocked Encrypted' in \
+        diskutil list output). Image via /dev/rdisk (raw, unbuffered device node) rather \
+        than /dev/disk for significantly faster throughput — dd with rdisk completes in \
+        ~15 minutes vs ~2 hours with FTK Imager CLI on equivalent hardware. Use \
+        'dd if=/dev/rdisk1 bs=4k conv=sync,noerror | tee image.dd | md5' for simultaneous \
+        imaging and hash verification. Critical for any macOS 10.13+ disk forensics — \
+        without proper APFS support, the primary data volume is inaccessible.",
     mitre_techniques: &["T1005", "T1006"],
     fields: &[
         FieldSchema {
@@ -764,6 +770,9 @@ pub(crate) static APFS_CONTAINER: ArtifactDescriptor = ArtifactDescriptor {
         "https://az4n6.blogspot.com/2018/01/mounting-apfs-image-in-linux.html",
         // Source: https://github.com/sgan81/apfs-fuse — experimental Linux APFS FUSE driver
         "https://github.com/sgan81/apfs-fuse",
+        // Source: https://az4n6.blogspot.com/2016/09/mac-live-imaging-functionality-versus.html
+        // — live imaging FileVault2 via dd + /dev/rdisk; speed comparison dd vs FTK Imager CLI
+        "https://az4n6.blogspot.com/2016/09/mac-live-imaging-functionality-versus.html",
     ],
 };
 

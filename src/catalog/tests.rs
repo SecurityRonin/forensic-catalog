@@ -6258,7 +6258,9 @@ mod az4n6_mac_live_imaging_tests {
     fn apfs_container_cites_az4n6_live_imaging_post() {
         let d = CATALOG.by_id("apfs_container").unwrap();
         assert!(
-            d.sources.iter().any(|s| s.contains("mac-live-imaging-functionality-versus")),
+            d.sources
+                .iter()
+                .any(|s| s.contains("mac-live-imaging-functionality-versus")),
             "apfs_container must cite az4n6 Mac Live Imaging post as a source"
         );
     }

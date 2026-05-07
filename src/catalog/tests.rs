@@ -8158,3 +8158,190 @@ mod tests_hyperv_guest_params {
         );
     }
 }
+
+// ── Registry: FeatureUsage (Win10 1903+ taskbar telemetry) ────────────────────
+//
+// Source: https://www.crowdstrike.com/en-us/blog/how-to-employ-featureusage-for-windows-10-taskbar-forensics/
+// Source: https://windowsir.blogspot.com/2025/11/registry-featureusage.html
+
+#[cfg(test)]
+mod tests_registry_featureusage {
+    use super::*;
+
+    #[test]
+    fn registry_featureusage_exists() {
+        assert!(
+            CATALOG.by_id("registry_featureusage").is_some(),
+            "catalog must contain 'registry_featureusage'"
+        );
+    }
+
+    #[test]
+    fn registry_featureusage_is_registry_key() {
+        let d = CATALOG.by_id("registry_featureusage").unwrap();
+        assert_eq!(d.artifact_type, ArtifactType::RegistryKey);
+    }
+
+    #[test]
+    fn registry_featureusage_hive_ntuser() {
+        let d = CATALOG.by_id("registry_featureusage").unwrap();
+        assert_eq!(
+            d.hive,
+            Some(HiveTarget::NtUser),
+            "FeatureUsage lives in NTUSER.DAT (per-user)"
+        );
+    }
+
+    #[test]
+    fn registry_featureusage_scope_user() {
+        let d = CATALOG.by_id("registry_featureusage").unwrap();
+        assert_eq!(d.scope, DataScope::User);
+    }
+
+    #[test]
+    fn registry_featureusage_os_scope_win10plus() {
+        let d = CATALOG.by_id("registry_featureusage").unwrap();
+        assert_eq!(
+            d.os_scope,
+            OsScope::Win10Plus,
+            "FeatureUsage was introduced in Windows 10 1903"
+        );
+    }
+
+    #[test]
+    fn registry_featureusage_key_path() {
+        let d = CATALOG.by_id("registry_featureusage").unwrap();
+        assert!(
+            d.key_path.contains(r"Explorer\FeatureUsage"),
+            "key_path must reference Explorer\\FeatureUsage; got: {}",
+            d.key_path
+        );
+    }
+
+    #[test]
+    fn registry_featureusage_meaning_mentions_taskbar() {
+        let d = CATALOG.by_id("registry_featureusage").unwrap();
+        let m = d.meaning.to_lowercase();
+        assert!(
+            m.contains("taskbar"),
+            "meaning must mention taskbar (FeatureUsage tracks taskbar interactions); got: {}",
+            d.meaning
+        );
+    }
+
+    #[test]
+    fn registry_featureusage_meaning_mentions_interactive_logon() {
+        let d = CATALOG.by_id("registry_featureusage").unwrap();
+        let m = d.meaning.to_lowercase();
+        assert!(
+            m.contains("interactive"),
+            "meaning must note that the key only exists after interactive logon; got: {}",
+            d.meaning
+        );
+    }
+
+    #[test]
+    fn registry_featureusage_has_appswitched_field() {
+        let d = CATALOG.by_id("registry_featureusage").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "AppSwitched"),
+            "fields must document AppSwitched subkey"
+        );
+    }
+
+    #[test]
+    fn registry_featureusage_has_applaunch_field() {
+        let d = CATALOG.by_id("registry_featureusage").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "AppLaunch"),
+            "fields must document AppLaunch subkey"
+        );
+    }
+
+    #[test]
+    fn registry_featureusage_has_showjumpview_field() {
+        let d = CATALOG.by_id("registry_featureusage").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "ShowJumpView"),
+            "fields must document ShowJumpView subkey"
+        );
+    }
+
+    #[test]
+    fn registry_featureusage_has_appbadgeupdated_field() {
+        let d = CATALOG.by_id("registry_featureusage").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "AppBadgeUpdated"),
+            "fields must document AppBadgeUpdated subkey"
+        );
+    }
+
+    #[test]
+    fn registry_featureusage_has_traybuttonclicked_field() {
+        let d = CATALOG.by_id("registry_featureusage").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "TrayButtonClicked"),
+            "fields must document TrayButtonClicked subkey"
+        );
+    }
+
+    #[test]
+    fn registry_featureusage_has_keycreationtime_field() {
+        let d = CATALOG.by_id("registry_featureusage").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "KeyCreationTime"),
+            "fields must document KeyCreationTime (REG_QWORD = first interactive logon)"
+        );
+    }
+
+    #[test]
+    fn registry_featureusage_mitre_t1204_002() {
+        let d = CATALOG.by_id("registry_featureusage").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1204.002"),
+            "must map to T1204.002 (User Execution: Malicious File)"
+        );
+    }
+
+    #[test]
+    fn registry_featureusage_triage_medium() {
+        let d = CATALOG.by_id("registry_featureusage").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::Medium);
+    }
+
+    #[test]
+    fn registry_featureusage_cites_crowdstrike() {
+        let d = CATALOG.by_id("registry_featureusage").unwrap();
+        assert!(
+            d.sources.iter().any(|s| s.contains("crowdstrike.com") && s.contains("featureusage")),
+            "must cite CrowdStrike Jai Minton 2020 post"
+        );
+    }
+
+    #[test]
+    fn registry_featureusage_cites_windowsir() {
+        let d = CATALOG.by_id("registry_featureusage").unwrap();
+        assert!(
+            d.sources.iter().any(|s| s.contains("windowsir.blogspot.com") && s.contains("featureusage")),
+            "must cite Carvey WindowsIR 2025-11 post"
+        );
+    }
+
+    #[test]
+    fn registry_featureusage_cites_regripper() {
+        let d = CATALOG.by_id("registry_featureusage").unwrap();
+        assert!(
+            d.sources.iter().any(|s| s.contains("RegRipper") && s.contains("featureusage")),
+            "must cite RegRipper3.0 featureusage.pl plugin"
+        );
+    }
+
+    #[test]
+    fn catalog_count_after_registry_featureusage() {
+        assert_eq!(
+            CATALOG.list().len(),
+            6636,
+            "catalog count after registry_featureusage"
+        );
+    }
+}

@@ -321,6 +321,56 @@ pub static PCA_GENERAL_DB: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
+/// Windows `hosts` file (`C:\Windows\System32\drivers\etc\hosts`).
+///
+/// Static name → IP mapping consulted *before* DNS in Microsoft's TCP/IP
+/// host name resolution order, making it a small, high-leverage tampering
+/// target for adversaries who want to silently break agent telemetry.
+///
+/// Per Harlan Carvey's 2024-01 *EDRSilencer* post (and Dray's prompt cited
+/// therein), modifying `hosts` to map an EDR vendor's cloud endpoint to
+/// `127.0.0.1`/`0.0.0.0` is the simplest of three "silence EDR" alternatives
+/// to WFP filters — alongside custom routes and Name Resolution Policy Table
+/// edits. Unlike WFP filters, hosts-file modification leaves a trivially
+/// triaged on-disk artifact, but most "current investigators and analysts"
+/// (Carvey) no longer recognize the resolution order well enough to spot it.
+pub static WINDOWS_HOSTS_FILE: ArtifactDescriptor = ArtifactDescriptor {
+    id: "windows_hosts_file",
+    name: "Windows hosts File",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"C:\Windows\System32\drivers\etc\hosts"),
+    scope: DataScope::System,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "Static name-to-IP overrides consulted before DNS during host name resolution. \
+              Adversary tradecraft (per Carvey/EDRSilencer write-ups) maps EDR vendor or C2 \
+              hostnames to 127.0.0.1 / 0.0.0.0 to blackhole agent telemetry without touching \
+              the EDR process — a stealthier alternative to WFP filters that nonetheless \
+              leaves a trivially-collected on-disk artifact. Any non-default entry warrants \
+              triage during incident response.",
+    mitre_techniques: &["T1562.001", "T1565.001"],
+    fields: &[FieldSchema {
+        name: "value",
+        value_type: ValueType::Text,
+        description: "Raw hosts-file contents — one record per non-comment line: \
+                      <IP> <hostname1> [hostname2 ...] [# comment]",
+        is_uid_component: false,
+    }],
+    retention: None,
+    triage_priority: TriagePriority::High,
+    related_artifacts: &[],
+    // Source: Harlan Carvey, "EDRSilencer" (2024-01-15) — explicitly enumerates
+    // the hosts file as an EDR-silencing technique alongside WFP and NRPT.
+    sources: &[
+        "https://windowsir.blogspot.com/2024/01/edrsilencer.html",
+        "https://support.microsoft.com/en-us/topic/microsoft-tcp-ip-host-name-resolution-order-dae00cc9-7e9c-c0cc-8360-477b99cb978a",
+        "https://academy.bluraven.io/blog/edr-silencer-and-beyond-exploring-methods-to-block-edr-communication-part-2",
+    ],
+};
+
 // ── Run key HKCU variants ────────────────────────────────────────────────────
 
 /// HKCU Run key — per-user autostart persistence.
@@ -7394,6 +7444,7 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     TYPED_URLS_TIME,
     PCA_APPLAUNCH_DIC,
     PCA_GENERAL_DB,
+    WINDOWS_HOSTS_FILE,
     IFEO_DEBUGGER,
     SHELLBAGS_USER,
     AMCACHE_APP_FILE,

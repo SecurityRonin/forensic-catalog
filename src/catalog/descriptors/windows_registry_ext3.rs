@@ -705,3 +705,95 @@ pub static REGISTRY_FEATUREUSAGE: ArtifactDescriptor = ArtifactDescriptor {
         "https://github.com/keydet89/RegRipper3.0/blob/master/plugins/featureusage.pl",
     ],
 };
+
+// ── EnablePeriodicBackup — registry-key time-stomping detection enabler ──────
+
+/// `HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Configuration Manager\EnablePeriodicBackup`
+///
+/// REG_DWORD (1 = enabled). Starting with Windows 10 v1803 (Redstone 4, April
+/// 2018), Microsoft disabled the legacy 10-day periodic backup of the SYSTEM,
+/// SOFTWARE, SAM, SECURITY, and DEFAULT hives to `%SystemRoot%\System32\config\RegBack`.
+/// As a result, on a default Win10 1803+ installation the RegBack directory
+/// contains 0-byte stub files (or pre-1803 backups frozen at upgrade time) and
+/// is no longer a usable forensic baseline.
+///
+/// Setting `EnablePeriodicBackup` to `1` and rebooting restores the original
+/// behaviour: the `RegIdleBackup` Scheduled Task runs every 10 days and
+/// rewrites the RegBack hives. Carvey explicitly recommends configuring this
+/// value on managed endpoints as a way to detect registry-key time stomping
+/// (T1070.006): with two snapshots of every monitored hive separated by up to
+/// 10 days, an analyst can compare LastWrite timestamps between the live hive
+/// and the most recent RegBack copy. If a Run-key (or other) LastWrite in the
+/// live hive predates the RegBack copy of the same key (i.e. the timestamp
+/// went backwards), the live timestamp has been tampered with.
+///
+/// **Forensic value**:
+/// - Presence of this value (set to 1) on a Win10 1803+/Win11 system means the
+///   analyst has access to a periodic baseline of the SYSTEM/SOFTWARE/SAM/
+///   SECURITY/DEFAULT hives. Pull `%SystemRoot%\System32\config\RegBack\*`
+///   alongside the live hives during triage.
+/// - Absence/value 0 on Win10 1803+ means RegBack is empty — Carvey's
+///   recommended Run-key time-stomp comparison is not possible from this host.
+/// - Pair with `Microsoft-Windows-Shell-Core/Operational.evtx` event ID 9707
+///   (Run-value processed at logon): a Run value that fires at logon but whose
+///   parent key LastWrite is years old is the classic time-stomp constellation.
+///
+/// **OS scope caveat**: The value technically existed on Win7/Win8 too (where
+/// RegBack was on by default and toggled by this same key), but its forensic
+/// relevance — and Carvey's 2023 recommendation — applies specifically to
+/// Win10 1803+ where RegBack is *off* by default.
+pub(crate) static ENABLE_PERIODIC_BACKUP: ArtifactDescriptor = ArtifactDescriptor {
+    id: "enable_periodic_backup",
+    name: "EnablePeriodicBackup (RegBack toggle)",
+    artifact_type: ArtifactType::RegistryValue,
+    hive: Some(HiveTarget::HklmSystem),
+    // Source: https://learn.microsoft.com/en-us/troubleshoot/windows-client/deployment/system-registry-no-backed-up-regback-folder
+    key_path: r"CurrentControlSet\Control\Session Manager\Configuration Manager",
+    value_name: Some("EnablePeriodicBackup"),
+    file_path: None,
+    scope: DataScope::System,
+    os_scope: OsScope::Win10Plus,
+    decoder: Decoder::DwordLe,
+    meaning: "REG_DWORD that re-enables the 10-day periodic RegBack hive backup that Windows 10 \
+        v1803 disabled by default. When set to 1 (and after reboot), the RegIdleBackup Scheduled \
+        Task copies SYSTEM/SOFTWARE/SAM/SECURITY/DEFAULT hives to %SystemRoot%\\System32\\config\\\
+        RegBack every ~10 days. Carvey's 2023-10 'Investigating Time Stomping' EndNote recommends \
+        configuring this on managed endpoints as a detection enabler for registry-key time \
+        stomping (T1070.006): with periodic snapshots of every hive, analysts can compare \
+        LastWrite timestamps between the live hive and the most recent RegBack copy — a Run-key \
+        LastWrite in the live hive that predates the RegBack copy of the same key indicates \
+        timestamp tampering. Cross-correlate with Microsoft-Windows-Shell-Core/Operational.evtx \
+        Run/RunOnce processed events. CAVEAT: on Win10 1803+ default installs the value is absent \
+        or 0 and RegBack contains 0-byte stubs — no usable baseline.",
+    mitre_techniques: &["T1070.006"],
+    fields: &[FieldSchema {
+        name: "enabled",
+        value_type: ValueType::Bool,
+        description: "1 = periodic RegBack backups re-enabled; 0/absent = RegBack disabled \
+            (Win10 1803+ default, RegBack hives are 0-byte stubs)",
+        is_uid_component: false,
+    }],
+    retention: None,
+    triage_priority: TriagePriority::Low,
+    related_artifacts: &[
+        // RegBack destination — direct artifact this toggle controls
+        "fa_file_regback_system",
+        // Cross-correlation log per Carvey: Run/RunOnce processed events
+        "evtx_microsoft_windows_shell_core_operational",
+        // Time-stomping target — file-system equivalent of the same TTP
+        "fa_file_environ_systemdrive_mft",
+        // USN journal — corroborates file-system time stomp via change records
+        "fa_file_extend_usnjrnl",
+    ],
+    sources: &[
+        // Source: Microsoft KB documenting EnablePeriodicBackup value name, type, and
+        // the 1803+ default-disabled behaviour. This is the value's authoritative reference.
+        "https://learn.microsoft.com/en-us/troubleshoot/windows-client/deployment/system-registry-no-backed-up-regback-folder",
+        // Source: Carvey 2023-10 — EndNote explicitly recommends enabling this value
+        // as a means to detect registry time stomping by hive-vs-RegBack comparison.
+        "https://windowsir.blogspot.com/2023/10/investigating-time-stomping.html",
+        // Source: Lina Lau's defence-evasion timestomping reference (cited by Carvey)
+        // documents the $SI/$FN attack model and Run-key tampering technique.
+        "https://www.inversecos.com/2022/04/malicious-registry-timestamp.html",
+    ],
+};

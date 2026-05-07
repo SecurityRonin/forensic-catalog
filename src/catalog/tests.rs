@@ -8619,6 +8619,164 @@ mod tests_windows_hosts_file {
     }
 }
 
+mod tests_enable_periodic_backup {
+    use super::*;
+
+    #[test]
+    fn enable_periodic_backup_exists() {
+        assert!(
+            CATALOG.by_id("enable_periodic_backup").is_some(),
+            "catalog must contain 'enable_periodic_backup'"
+        );
+    }
+
+    #[test]
+    fn enable_periodic_backup_is_registry_value() {
+        let d = CATALOG.by_id("enable_periodic_backup").unwrap();
+        assert_eq!(d.artifact_type, ArtifactType::RegistryValue);
+    }
+
+    #[test]
+    fn enable_periodic_backup_hive_system() {
+        let d = CATALOG.by_id("enable_periodic_backup").unwrap();
+        assert_eq!(
+            d.hive,
+            Some(HiveTarget::HklmSystem),
+            "EnablePeriodicBackup lives in HKLM\\SYSTEM under CurrentControlSet"
+        );
+    }
+
+    #[test]
+    fn enable_periodic_backup_key_path() {
+        let d = CATALOG.by_id("enable_periodic_backup").unwrap();
+        assert!(
+            d.key_path
+                .contains(r"Session Manager\Configuration Manager"),
+            "key_path must reference Session Manager\\Configuration Manager; got: {}",
+            d.key_path
+        );
+    }
+
+    #[test]
+    fn enable_periodic_backup_value_name() {
+        let d = CATALOG.by_id("enable_periodic_backup").unwrap();
+        assert_eq!(d.value_name, Some("EnablePeriodicBackup"));
+    }
+
+    #[test]
+    fn enable_periodic_backup_decoder_dword() {
+        let d = CATALOG.by_id("enable_periodic_backup").unwrap();
+        assert!(
+            matches!(d.decoder, Decoder::DwordLe),
+            "EnablePeriodicBackup is a REG_DWORD (1 = enabled); got: {:?}",
+            d.decoder
+        );
+    }
+
+    #[test]
+    fn enable_periodic_backup_os_scope_win10plus() {
+        let d = CATALOG.by_id("enable_periodic_backup").unwrap();
+        // Win10 1803 disabled RegBack by default; the override value is documented for Win10+.
+        assert!(
+            matches!(d.os_scope, OsScope::Win10Plus | OsScope::Win7Plus),
+            "EnablePeriodicBackup override applies to Win10 1803+ where RegBack was disabled; \
+             got: {:?}",
+            d.os_scope
+        );
+    }
+
+    #[test]
+    fn enable_periodic_backup_meaning_mentions_regback() {
+        let d = CATALOG.by_id("enable_periodic_backup").unwrap();
+        let m = d.meaning.to_lowercase();
+        assert!(
+            m.contains("regback"),
+            "meaning must reference RegBack hive backup directory; got: {}",
+            d.meaning
+        );
+    }
+
+    #[test]
+    fn enable_periodic_backup_meaning_mentions_time_stomping() {
+        let d = CATALOG.by_id("enable_periodic_backup").unwrap();
+        let m = d.meaning.to_lowercase();
+        assert!(
+            m.contains("time stomp") || m.contains("timestomp"),
+            "meaning must reference time stomping detection (Carvey 2023-10); got: {}",
+            d.meaning
+        );
+    }
+
+    #[test]
+    fn enable_periodic_backup_triage_low() {
+        let d = CATALOG.by_id("enable_periodic_backup").unwrap();
+        // Configuration toggle, not volatile evidence — low priority unless investigating time stomping.
+        assert_eq!(
+            d.triage_priority,
+            TriagePriority::Low,
+            "configuration value, low triage priority"
+        );
+    }
+
+    #[test]
+    fn enable_periodic_backup_cites_microsoft_kb() {
+        let d = CATALOG.by_id("enable_periodic_backup").unwrap();
+        assert!(
+            d.sources
+                .iter()
+                .any(|s| s.contains("learn.microsoft.com") && s.contains("regback")),
+            "must cite the Microsoft KB documenting EnablePeriodicBackup; got: {:?}",
+            d.sources
+        );
+    }
+
+    #[test]
+    fn enable_periodic_backup_cites_carvey_time_stomping() {
+        let d = CATALOG.by_id("enable_periodic_backup").unwrap();
+        assert!(
+            d.sources
+                .iter()
+                .any(|s| s.contains("windowsir.blogspot.com") && s.contains("time-stomping")),
+            "must cite Carvey 2023-10 'Investigating Time Stomping' EndNote that recommends \
+             this value as a time-stomping detection enabler; got: {:?}",
+            d.sources
+        );
+    }
+
+    #[test]
+    fn enable_periodic_backup_related_to_regback_hive() {
+        let d = CATALOG.by_id("enable_periodic_backup").unwrap();
+        assert!(
+            d.related_artifacts
+                .iter()
+                .any(|r| r.contains("regback")),
+            "must relate to a RegBack hive artifact (the backup destination this value enables); \
+             got: {:?}",
+            d.related_artifacts
+        );
+    }
+
+    #[test]
+    fn enable_periodic_backup_related_to_shell_core_evtx() {
+        let d = CATALOG.by_id("enable_periodic_backup").unwrap();
+        assert!(
+            d.related_artifacts
+                .contains(&"evtx_microsoft_windows_shell_core_operational"),
+            "must relate to Microsoft-Windows-Shell-Core/Operational evtx (Run-key time-stomp \
+             cross-correlation per Carvey 2023-10)"
+        );
+    }
+
+    #[test]
+    fn catalog_count_after_enable_periodic_backup() {
+        assert_eq!(
+            CATALOG.list().len(),
+            6640,
+            "catalog count after enable_periodic_backup (+1)"
+        );
+    }
+}
+
 mod tests_dns_policy_config_nrpt {
     use super::*;
 

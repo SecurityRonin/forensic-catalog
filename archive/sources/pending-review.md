@@ -28,20 +28,20 @@ Mark `[x]` when reviewed, `[→]` when artifact tasks were created.
 - [x] [Mac Live Imaging: Functionality Versus Speed](https://az4n6.blogspot.com/2016/09/mac-live-imaging-functionality-versus.html) — Another Forensics Blog
 - [x] [KAPE 0.9.2.0 released!](https://binaryforay.blogspot.com/2020/05/kape-0920-released.html) — binary foray
 - [x] [KAPE 0.8.7.0 released!](https://binaryforay.blogspot.com/2019/08/kape-0870-released.html) — binary foray
-- [ ] [KAPE 0.8.6.1 released](https://binaryforay.blogspot.com/2019/08/kape-0861-released.html) — binary foray
-- [ ] [Introducing EvtxECmd!!](https://binaryforay.blogspot.com/2019/04/introducing-evtxecmd.html) — binary foray
-- [ ] [KAPE 0.8.3.0 released](https://binaryforay.blogspot.com/2019/03/kape-0830-released.html) — binary foray
-- [ ] [KAPE v0.8.2.0 released!](https://binaryforay.blogspot.com/2019/03/kape-v0820-released.html) — binary foray
-- [ ] [KAPE v0.8.1.0 released!](https://binaryforay.blogspot.com/2019/02/kape-v0810-released.html) — binary foray
-- [ ] [Introducing KAPE!](https://binaryforay.blogspot.com/2019/02/introducing-kape.html) — binary foray
-- [ ] [Locked file support added to AmcacheParser, AppCompatCacheParser, MFTECmd, ShellBags Explorer (and SBECmd), and Registry Explorer (and RECmd)](https://binaryforay.blogspot.com/2019/01/locked-file-support-added-to.html) — binary foray
-- [ ] [Registry Explorer and RECmd 1.2.0.0 released!](https://binaryforay.blogspot.com/2019/01/registry-explorer-and-recmd-1200.html) — binary foray
+- [x] [KAPE 0.8.6.1 released](https://binaryforay.blogspot.com/2019/08/kape-0861-released.html) — binary foray
+- [x] [Introducing EvtxECmd!!](https://binaryforay.blogspot.com/2019/04/introducing-evtxecmd.html) — binary foray <!-- tool release; EVTX artifacts (evtx_dir, evtx_security, evtx_system, evtx_powershell, evtx_sysmon) already covered -->
+- [x] [KAPE 0.8.3.0 released](https://binaryforay.blogspot.com/2019/03/kape-0830-released.html) — binary foray
+- [x] [KAPE v0.8.2.0 released!](https://binaryforay.blogspot.com/2019/03/kape-v0820-released.html) — binary foray
+- [x] [KAPE v0.8.1.0 released!](https://binaryforay.blogspot.com/2019/02/kape-v0810-released.html) — binary foray
+- [x] [Introducing KAPE!](https://binaryforay.blogspot.com/2019/02/introducing-kape.html) — binary foray <!-- tool intro; all targeted artifacts (amcache, shimcache, prefetch, srum, shellbags, mft) covered -->
+- [x] [Locked file support added to AmcacheParser, AppCompatCacheParser, MFTECmd, ShellBags Explorer (and SBECmd), and Registry Explorer (and RECmd)](https://binaryforay.blogspot.com/2019/01/locked-file-support-added-to.html) — binary foray <!-- tooling update only; all named artifacts covered -->
+- [x] [Registry Explorer and RECmd 1.2.0.0 released!](https://binaryforay.blogspot.com/2019/01/registry-explorer-and-recmd-1200.html) — binary foray <!-- tool release, no new artifact types -->
 - [x] [Monkey Attempts To Digest Some Google Takeout (DetectedActivitys)](https://cheeky4n6monkey.blogspot.com/2022/02/monkey-attempts-to-digest-some-google.html) — Cheeky4n6Monkey
 - [x] [Mike & the Monkey Dumpster Dive Into Samsung Gallery3d App Trash](https://cheeky4n6monkey.blogspot.com/2022/01/mike-monkey-dumpster-dive-into-samsung.html) — Cheeky4n6Monkey
 - [x] [Monkey Test Drives a Honda Accord](https://cheeky4n6monkey.blogspot.com/2021/03/monkey-test-drives-honda-accord.html) — Cheeky4n6Monkey
 - [x] [iOS14 Maps History BLOB Script](https://cheeky4n6monkey.blogspot.com/2020/11/ios14-maps-history-blob-script.html) — Cheeky4n6Monkey
 - [x] [Recovering and Replaying Garmin Voice Instructions](https://cheeky4n6monkey.blogspot.com/2020/05/recovering-and-replaying-garmin-voice.html) — Cheeky4n6Monkey
-- [ ] [A Monkey Forays Into USB Flashdrives](https://cheeky4n6monkey.blogspot.com/2020/03/a-monkey-forays-into-usb-flashdrives.html) — Cheeky4n6Monkey
+- [x] [A Monkey Forays Into USB Flashdrives](https://cheeky4n6monkey.blogspot.com/2020/03/a-monkey-forays-into-usb-flashdrives.html) — Cheeky4n6Monkey <!-- physical hardware repair post; no new software forensic artifacts -->
 - [x] [Monkey takes a .heic](https://cheeky4n6monkey.blogspot.com/2017/10/monkey-takes-heic.html) — Cheeky4n6Monkey
 - [x] [Monkey Unpacks Some Python](https://cheeky4n6monkey.blogspot.com/2017/08/monkey-unpacks-some-python.html) — Cheeky4n6Monkey
 - [x] [Monkey Plays (LAN) Turtle](https://cheeky4n6monkey.blogspot.com/2017/01/monkey-plays-lan-turtle.html) — Cheeky4n6Monkey
@@ -56,7 +56,7 @@ Mark `[x]` when reviewed, `[→]` when artifact tasks were created.
 - [x] [Daily Blog #808: Testing AWS Log latency - ConsoleLogin](https://www.hecfblog.com/2025/04/daily-blog-808-testing-aws-log-latency.html) — HECF / Hacking Exposed Computer Forensics Blog
 - [x] [Daily Blog #807: Sunday Funday 4/13/25](https://www.hecfblog.com/2025/04/daily-blog-807-sunday-funday-41325.html) — HECF / Hacking Exposed Computer Forensics Blog
 - [x] [Daily Blog #806: Solution Saturday 4/12/25](https://www.hecfblog.com/2025/04/daily-blog-806-solution-saturday-41225.html) — HECF / Hacking Exposed Computer Forensics Blog
-- [ ] [Extraction, Processing, & Querying Apple Unified Logs from an iOS Device](https://abrignoni.blogspot.com/2025/05/extraction-processing-querying-apple.html) — Initialization Vectors
+- [→] [Extraction, Processing, & Querying Apple Unified Logs from an iOS Device](https://abrignoni.blogspot.com/2025/05/extraction-processing-querying-apple.html) — Initialization Vectors <!-- task #19: ios_unified_log descriptor — iOS on-device AUL at /private/var/db/diagnostics/ + /private/var/db/uuidtext/; distinct from macos_unified_log (OsScope::IOS); extraction via sysdiagnose or jailbreak; source: https://abrignoni.blogspot.com/2025/05/extraction-processing-querying-apple.html + https://ios-unifiedlogs.com -->
 - [ ] [Full File System extractions in Zip - MAC times](https://abrignoni.blogspot.com/2024/05/full-file-system-extractions-in-zip-mac.html) — Initialization Vectors
 - [ ] [New parser for Uber app geo-locatios in iOS using iLEAPP](https://abrignoni.blogspot.com/2024/04/new-parser-for-uber-app-geo-locatios-in.html) — Initialization Vectors
 - [ ] [New VLEAPP parser](https://abrignoni.blogspot.com/2024/04/new-vleapp-parser.html) — Initialization Vectors

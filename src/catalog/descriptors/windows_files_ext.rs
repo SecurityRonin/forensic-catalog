@@ -547,6 +547,114 @@ pub(crate) static ONEDRIVE_METADATA: ArtifactDescriptor = ArtifactDescriptor {
     ],
 };
 
+// ── OneDrive ODL (Obfuscated Diagnostic Logs) ───────────────────────────────
+
+/// OneDrive ODL binary diagnostic log files — records sync client activity
+/// with obfuscated/encrypted personal strings.
+///
+/// Binary format with 256-byte header and data blocks. Found in user profile
+/// at `\AppData\Local\Microsoft\OneDrive\logs\{Common,Business1,Personal}\`.
+/// Active log is `.odl`; rotated logs are `.odlgz` (gzip-compressed).
+/// Also `.odlsent` and `.aodl` variants.
+///
+/// Before April 2022: personal strings obfuscated via 3-word keys in
+/// `ObfuscationStringMap.txt` (plaintext lookup table).
+/// After April 2022: strings encrypted with AES-128-CBC using key from
+/// `general.keystore` (JSON file with base64-encoded key). Encrypted blobs
+/// are base64-encoded with `/` and `+` replaced by `_` and `-`.
+///
+/// macOS equivalent at `/Users/<USER>/Library/Logs/OneDrive/`.
+///
+/// Source: http://www.swiftforensics.com/2022/02/reading-onedrive-logs.html
+/// Source: http://www.swiftforensics.com/2022/11/reading-onedrive-logs-part-2.html
+pub(crate) static ONEDRIVE_ODL_LOGS: ArtifactDescriptor = ArtifactDescriptor {
+    id: "onedrive_odl_logs",
+    name: "OneDrive ODL Diagnostic Logs",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    // Source: http://www.swiftforensics.com/2022/02/reading-onedrive-logs.html
+    file_path: Some(r"C:\Users\*\AppData\Local\Microsoft\OneDrive\logs\*\*.odl"),
+    scope: DataScope::User,
+    os_scope: OsScope::Win10Plus,
+    decoder: Decoder::Identity,
+    meaning:
+        "OneDrive sync client binary diagnostic logs (ODL format). 256-byte header \
+        followed by data blocks containing sync operations, file upload/download events, \
+        error codes, and file paths. Personal strings (file names, folder paths, credentials) \
+        are obfuscated: pre-April 2022 via ObfuscationStringMap.txt (3-word key lookup table), \
+        post-April 2022 via AES-128-CBC encryption using key from general.keystore JSON file. \
+        The general.keystore holds a base64-encoded AES key; encrypted blobs use modified \
+        base64 (/ and + replaced with _ and -). Rotated logs compressed as .odlgz. Also \
+        present on macOS at /Users/<USER>/Library/Logs/OneDrive/. Cross-reference with \
+        SyncEngineDatabase.db for file-level sync metadata. Critical for data exfiltration \
+        investigations — logs record every file synced to cloud even when local copies are deleted.",
+    mitre_techniques: &[
+        "T1567.002", // Exfiltration Over Web Service: Exfiltration to Cloud Storage
+        "T1530",     // Data from Cloud Storage
+    ],
+    fields: ONEDRIVE_ODL_FIELDS,
+    retention: Some(
+        "Active .odl rotates frequently; .odlgz retained until manually deleted or \
+OneDrive reinstall; general.keystore persists alongside logs",
+    ),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["onedrive_metadata"],
+    sources: &[
+        // Source: http://www.swiftforensics.com/2022/02/reading-onedrive-logs.html
+        // (Yogesh Khatri Part 1: ODL binary format, 256-byte header, file paths on Windows/macOS,
+        // ObfuscationStringMap.txt deobfuscation scheme)
+        "http://www.swiftforensics.com/2022/02/reading-onedrive-logs.html",
+        // Source: http://www.swiftforensics.com/2022/11/reading-onedrive-logs-part-2.html
+        // (Part 2: April 2022 encryption change, general.keystore JSON, AES-128-CBC via
+        // BCrypt APIs in LoggingPlatform.dll, modified base64 encoding)
+        "http://www.swiftforensics.com/2022/11/reading-onedrive-logs-part-2.html",
+        // Source: https://github.com/ydkhatri/OneDrive (Yogesh Khatri's ODL parser)
+        "https://github.com/ydkhatri/OneDrive",
+    ],
+};
+
+pub(crate) static ONEDRIVE_ODL_FIELDS: &[FieldSchema] = &[
+    FieldSchema {
+        name: "timestamp",
+        value_type: ValueType::Timestamp,
+        description: "Timestamp of the log entry",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "code_file",
+        value_type: ValueType::Text,
+        description: "Source code file name that generated the log entry",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "code_function",
+        value_type: ValueType::Text,
+        description: "Source function name that generated the log entry",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "log_level",
+        value_type: ValueType::Text,
+        description: "Log severity level (Info, Warning, Error, etc.)",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "message",
+        value_type: ValueType::Text,
+        description: "Log message text, may contain obfuscated/encrypted personal strings",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "obfuscation_method",
+        value_type: ValueType::Text,
+        description: "Obfuscation method: 'string_map' (pre-Apr 2022, ObfuscationStringMap.txt) \
+            or 'aes_keystore' (post-Apr 2022, general.keystore AES-128-CBC)",
+        is_uid_component: false,
+    },
+];
+
 pub(crate) static GOOGLE_DRIVE_FS_METADATA: ArtifactDescriptor = ArtifactDescriptor {
     id: "google_drive_fs_metadata",
     name: "Google Drive for Desktop Metadata",

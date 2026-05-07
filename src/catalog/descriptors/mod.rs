@@ -13979,6 +13979,7 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     macos_ext::UBER_IOS_LEVELDB,
     macos_ext::IOS_GOOGLE_CHAT_CACHEV0,
     macos_ext::MACOS_BTM_BACKGROUND_TASKS,
+    windows_files_ext::ONEDRIVE_ODL_LOGS,
     // ── Android ─────────────────────────────────────────────────────────────
     android_ext::SAMSUNG_GALLERY3D_TRASH,
     android_ext::SAMSUNG_GALLERY3D_LOG,

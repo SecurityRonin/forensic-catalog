@@ -4901,6 +4901,20 @@ mod tests_batch_i_presence {
         );
     }
 
+    /// Event ID 5379 (Credential Manager credential read) is a key detection
+    /// for credential harvesting tools like CredentialsFileView. Observed in
+    /// DFIR Report RansomHub case (2025-06-30).
+    #[test]
+    fn evtx_security_mentions_event_5379() {
+        let d = CATALOG
+            .by_id("evtx_security")
+            .expect("evtx_security missing");
+        assert!(
+            d.meaning.contains("5379"),
+            "evtx_security meaning should mention Event ID 5379 (credential read)"
+        );
+    }
+
     #[test]
     fn catalog_has_linux_kern_log() {
         assert!(

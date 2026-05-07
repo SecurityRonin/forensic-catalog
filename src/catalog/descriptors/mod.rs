@@ -12,6 +12,7 @@ mod cloud_ext;
 mod generated;
 mod linux_ext;
 mod macos_ext;
+mod vehicle_ext;
 mod windows_evtx_ext;
 mod windows_files_ext;
 mod windows_logs_ext;
@@ -13978,4 +13979,9 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     // ── Cloud services (Google Takeout) ─────────────────────────────────────
     cloud_ext::GOOGLE_TAKEOUT_LOCATION_RECORDS,
     cloud_ext::GOOGLE_TAKEOUT_SEMANTIC_LOCATION_HISTORY,
+    // ── Vehicle infotainment (Honda Accord 2016) ─────────────────────────────
+    vehicle_ext::HONDA_ACCORD_RECENTSTOPS,
+    vehicle_ext::HONDA_ACCORD_CRM_ECO_LOGS,
+    vehicle_ext::HONDA_ACCORD_PHONEDB,
+    vehicle_ext::HONDA_ACCORD_BLUETOOTH,
 ];

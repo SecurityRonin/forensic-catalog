@@ -264,7 +264,7 @@ mod decode_tests {
     #[test]
     fn catalog_has_entries() {
         assert!(!CATALOG.list().is_empty());
-        assert_eq!(CATALOG.list().len(), 6628);
+        assert_eq!(CATALOG.list().len(), 6630);
     }
 
     #[test]
@@ -2597,7 +2597,7 @@ mod tests_batch_d {
     #[test]
     fn catalog_count_after_srum_network_connections() {
         // +1 from srum_network_connections
-        assert_eq!(CATALOG.list().len(), 6628);
+        assert_eq!(CATALOG.list().len(), 6630);
     }
 
     // ── EVTX channels ─────────────────────────────────────────────────────
@@ -3498,7 +3498,7 @@ mod phase2_registry_tests {
     #[test]
     fn catalog_count_includes_phase2() {
         // Updated to 354 after phase-2b file artifact additions
-        assert_eq!(CATALOG.list().len(), 6628);
+        assert_eq!(CATALOG.list().len(), 6630);
     }
 
     #[test]
@@ -3643,7 +3643,7 @@ mod phase2b_files_tests {
     fn catalog_count_includes_phase2b() {
         // phase2a adds 30 registry artifacts (284→314), phase2b adds 40 file artifacts (314→354)
         // Note: chrome_login_data was already present from Phase 1; not duplicated here.
-        assert_eq!(CATALOG.list().len(), 6628);
+        assert_eq!(CATALOG.list().len(), 6630);
     }
 
     #[test]
@@ -3946,7 +3946,7 @@ mod phase3_persistence_tests {
         // phase3 adds 7 net-new artifacts not already in catalog (354 → 361)
         // Note: winlogon_shell, winlogon_userinit, appinit_dlls, boot_execute,
         //       ifeo_debugger, netsh_helper_dlls, mountpoints2 were already present.
-        assert_eq!(CATALOG.list().len(), 6628);
+        assert_eq!(CATALOG.list().len(), 6630);
     }
 
     // ── Pre-existing artifacts verified present ───────────────────────────────
@@ -7491,6 +7491,179 @@ mod tests_uber_ios_leveldb {
     #[test]
     fn scope_is_user() {
         let d = CATALOG.by_id("uber_ios_leveldb").unwrap();
+        assert_eq!(d.scope, DataScope::User);
+    }
+}
+
+// ── iOS Google Chat cacheV0.db ──────────────────────────────────────────────
+
+#[cfg(test)]
+mod tests_ios_google_chat_cachev0 {
+    use super::*;
+
+    #[test]
+    fn exists_in_catalog() {
+        assert!(
+            CATALOG.by_id("ios_google_chat_cachev0").is_some(),
+            "ios_google_chat_cachev0 descriptor must exist"
+        );
+    }
+
+    #[test]
+    fn has_correct_os_scope() {
+        let d = CATALOG.by_id("ios_google_chat_cachev0").unwrap();
+        assert_eq!(d.os_scope, OsScope::IOS);
+    }
+
+    #[test]
+    fn has_correct_artifact_type() {
+        let d = CATALOG.by_id("ios_google_chat_cachev0").unwrap();
+        assert_eq!(d.artifact_type, ArtifactType::DatabaseEntry);
+    }
+
+    #[test]
+    fn has_correct_file_path() {
+        let d = CATALOG.by_id("ios_google_chat_cachev0").unwrap();
+        assert!(
+            d.file_path
+                .unwrap()
+                .contains("com.google.Dynamite/ImageFetcherCache/cacheV0.db"),
+            "file_path must reference cacheV0.db in Google Chat ImageFetcherCache"
+        );
+    }
+
+    #[test]
+    fn has_cache_table_fields() {
+        let d = CATALOG.by_id("ios_google_chat_cachev0").unwrap();
+        let field_names: Vec<&str> = d.fields.iter().map(|f| f.name).collect();
+        assert!(field_names.contains(&"id"), "must have id field");
+        assert!(field_names.contains(&"data"), "must have data (blob) field");
+    }
+
+    #[test]
+    fn meaning_mentions_deleted_images() {
+        let d = CATALOG.by_id("ios_google_chat_cachev0").unwrap();
+        let m = d.meaning.to_ascii_lowercase();
+        assert!(
+            m.contains("deleted"),
+            "meaning must mention deleted chat images surviving in cache"
+        );
+    }
+
+    #[test]
+    fn has_sources() {
+        let d = CATALOG.by_id("ios_google_chat_cachev0").unwrap();
+        assert!(
+            d.sources
+                .iter()
+                .any(|s| s.contains("abrignoni.blogspot.com")),
+            "sources must include Brignoni blog post"
+        );
+    }
+
+    #[test]
+    fn triage_priority_is_medium() {
+        let d = CATALOG.by_id("ios_google_chat_cachev0").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::Medium);
+    }
+
+    #[test]
+    fn scope_is_user() {
+        let d = CATALOG.by_id("ios_google_chat_cachev0").unwrap();
+        assert_eq!(d.scope, DataScope::User);
+    }
+}
+
+// ── Android Tor Browser Thumbnails ──────────────────────────────────────────
+
+#[cfg(test)]
+mod tests_android_tor_browser_thumbnails {
+    use super::*;
+
+    #[test]
+    fn exists_in_catalog() {
+        assert!(
+            CATALOG.by_id("android_tor_browser_thumbnails").is_some(),
+            "android_tor_browser_thumbnails descriptor must exist"
+        );
+    }
+
+    #[test]
+    fn has_correct_os_scope() {
+        let d = CATALOG.by_id("android_tor_browser_thumbnails").unwrap();
+        assert_eq!(d.os_scope, OsScope::Android);
+    }
+
+    #[test]
+    fn has_correct_artifact_type() {
+        let d = CATALOG.by_id("android_tor_browser_thumbnails").unwrap();
+        assert_eq!(d.artifact_type, ArtifactType::Directory);
+    }
+
+    #[test]
+    fn has_correct_file_path() {
+        let d = CATALOG.by_id("android_tor_browser_thumbnails").unwrap();
+        assert!(
+            d.file_path
+                .unwrap()
+                .contains("org.torproject.torbrowser/cache/mozac_browser_thumbnails"),
+            "file_path must reference Tor Browser thumbnail cache directory"
+        );
+    }
+
+    #[test]
+    fn has_thumbnail_fields() {
+        let d = CATALOG.by_id("android_tor_browser_thumbnails").unwrap();
+        let field_names: Vec<&str> = d.fields.iter().map(|f| f.name).collect();
+        assert!(
+            field_names.contains(&"filename"),
+            "must have filename field"
+        );
+        assert!(
+            field_names.contains(&"modified_time"),
+            "must have modified_time field"
+        );
+    }
+
+    #[test]
+    fn meaning_mentions_tor_tabs() {
+        let d = CATALOG.by_id("android_tor_browser_thumbnails").unwrap();
+        let m = d.meaning.to_ascii_lowercase();
+        assert!(
+            m.contains("tab"),
+            "meaning must mention opened tabs"
+        );
+    }
+
+    #[test]
+    fn has_mitre_techniques() {
+        let d = CATALOG.by_id("android_tor_browser_thumbnails").unwrap();
+        assert!(
+            !d.mitre_techniques.is_empty(),
+            "should have at least one MITRE technique"
+        );
+    }
+
+    #[test]
+    fn has_sources() {
+        let d = CATALOG.by_id("android_tor_browser_thumbnails").unwrap();
+        assert!(
+            d.sources
+                .iter()
+                .any(|s| s.contains("abrignoni.blogspot.com")),
+            "sources must include Brignoni blog post"
+        );
+    }
+
+    #[test]
+    fn triage_priority_is_medium() {
+        let d = CATALOG.by_id("android_tor_browser_thumbnails").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::Medium);
+    }
+
+    #[test]
+    fn scope_is_user() {
+        let d = CATALOG.by_id("android_tor_browser_thumbnails").unwrap();
         assert_eq!(d.scope, DataScope::User);
     }
 }

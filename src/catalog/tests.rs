@@ -8039,3 +8039,108 @@ mod tests_android_gboard_trainingcache {
         assert_eq!(CATALOG.list().len(), 6634);
     }
 }
+
+// ── Hyper-V Guest Parameters (from DFIR Report — Lynx Ransomware 2025-12) ──
+
+#[cfg(test)]
+mod tests_hyperv_guest_params {
+    use super::*;
+
+    #[test]
+    fn hyperv_guest_params_exists() {
+        assert!(CATALOG.by_id("hyperv_guest_params").is_some());
+    }
+
+    #[test]
+    fn hyperv_guest_params_is_registry_key() {
+        let d = CATALOG.by_id("hyperv_guest_params").unwrap();
+        assert_eq!(d.artifact_type, ArtifactType::RegistryKey);
+    }
+
+    #[test]
+    fn hyperv_guest_params_hive_system() {
+        let d = CATALOG.by_id("hyperv_guest_params").unwrap();
+        assert_eq!(d.hive, Some(HiveTarget::HklmSoftware));
+    }
+
+    #[test]
+    fn hyperv_guest_params_scope_system() {
+        let d = CATALOG.by_id("hyperv_guest_params").unwrap();
+        assert_eq!(d.scope, DataScope::System);
+    }
+
+    #[test]
+    fn hyperv_guest_params_os_scope() {
+        let d = CATALOG.by_id("hyperv_guest_params").unwrap();
+        assert_eq!(d.os_scope, OsScope::Win7Plus);
+    }
+
+    #[test]
+    fn hyperv_guest_params_key_path() {
+        let d = CATALOG.by_id("hyperv_guest_params").unwrap();
+        assert!(
+            d.key_path.contains("Virtual Machine\\Guest\\Parameters"),
+            "key_path must reference Virtual Machine\\Guest\\Parameters"
+        );
+    }
+
+    #[test]
+    fn hyperv_guest_params_has_hostname_field() {
+        let d = CATALOG.by_id("hyperv_guest_params").unwrap();
+        assert!(
+            d.fields.iter().any(|f| f.name == "physical_host_name"),
+            "must have 'physical_host_name' field"
+        );
+    }
+
+    #[test]
+    fn hyperv_guest_params_mitre_t1082() {
+        let d = CATALOG.by_id("hyperv_guest_params").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1082"),
+            "must map to T1082 (System Information Discovery)"
+        );
+    }
+
+    #[test]
+    fn hyperv_guest_params_mitre_t1012() {
+        let d = CATALOG.by_id("hyperv_guest_params").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1012"),
+            "must map to T1012 (Query Registry)"
+        );
+    }
+
+    #[test]
+    fn hyperv_guest_params_triage_medium() {
+        let d = CATALOG.by_id("hyperv_guest_params").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::Medium);
+    }
+
+    #[test]
+    fn hyperv_guest_params_cites_dfir_report() {
+        let d = CATALOG.by_id("hyperv_guest_params").unwrap();
+        assert!(
+            d.sources.iter().any(|s| s.contains("thedfirreport.com")),
+            "must cite thedfirreport.com as source"
+        );
+    }
+
+    #[test]
+    fn hyperv_guest_params_cites_microsoft() {
+        let d = CATALOG.by_id("hyperv_guest_params").unwrap();
+        assert!(
+            d.sources.iter().any(|s| s.contains("microsoft.com")),
+            "must cite microsoft.com as source"
+        );
+    }
+
+    #[test]
+    fn catalog_count_after_hyperv_guest_params() {
+        assert_eq!(
+            CATALOG.list().len(),
+            6635,
+            "catalog count after hyperv_guest_params"
+        );
+    }
+}

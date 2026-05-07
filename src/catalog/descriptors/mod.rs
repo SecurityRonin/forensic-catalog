@@ -13985,4 +13985,6 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     vehicle_ext::HONDA_ACCORD_CRM_ECO_LOGS,
     vehicle_ext::HONDA_ACCORD_PHONEDB,
     vehicle_ext::HONDA_ACCORD_BLUETOOTH,
+    // ── GPS devices (Garmin) ─────────────────────────────────────────────────
+    vehicle_ext::GARMIN_NUVI_VOICE_LOG,
 ];

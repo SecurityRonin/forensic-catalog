@@ -359,3 +359,83 @@ pub(crate) static HONDA_ACCORD_BLUETOOTH: ArtifactDescriptor = ArtifactDescripto
         "honda_accord_crm_eco_logs",
     ],
 };
+
+// ── Garmin nuvi Voice Log (TTS navigation instructions) ─────────────────────
+
+/// Field schema for parsed lines from vpm_log_all.log on Garmin nuvi devices.
+/// Each log line follows the format:
+///   D[YYYY/MM/DD HH:MM:SS] {hex_id} [source_file:function:line] Message
+/// Source: https://cheeky4n6monkey.blogspot.com/2020/05/recovering-and-replaying-garmin-voice.html
+pub(crate) static GARMIN_NUVI_VOICE_LOG_FIELDS: &[FieldSchema] = &[
+    FieldSchema {
+        name: "timestamp",
+        value_type: ValueType::Timestamp,
+        description: "Log entry timestamp in D[YYYY/MM/DD HH:MM:SS] format. Uses Garmin \
+            epoch (seconds since 31 Dec 1989). Add 631065600 to convert to UNIX epoch",
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "hex_id",
+        value_type: ValueType::Text,
+        description: "4-byte hex identifier (possibly process or thread ID)",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "source_function",
+        value_type: ValueType::Text,
+        description: "Source code reference indicating which TTS subsystem generated the entry \
+            (e.g. vpm_tts_parse.c:vpm_tts_parse:3770 for navigation phrases, \
+            vpm_tts_log.c:vpm_tts_log_phonetics:277 for phonetic output)",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "voice_string",
+        value_type: ValueType::Text,
+        description: "The spoken navigation instruction text or phonetic representation. \
+            Navigation phrases contain template variables like $USR_TO_NEXT_ROAD. \
+            Phonetic entries use IPA-like notation for text-to-speech synthesis. \
+            Both types together reconstruct the turn-by-turn directions given to the driver",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "mdb_lang",
+        value_type: ValueType::Integer,
+        description: "Language identifier from the map database (e.g. 23 observed in test data). \
+            Indicates which language pack was used for voice synthesis",
+        is_uid_component: false,
+    },
+];
+
+pub(crate) static GARMIN_NUVI_VOICE_LOG: ArtifactDescriptor = ArtifactDescriptor {
+    id: "garmin_nuvi_voice_log",
+    name: "Garmin nuvi GPS Voice Instruction Log (vpm_log_all)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    // Source: https://cheeky4n6monkey.blogspot.com/2020/05/recovering-and-replaying-garmin-voice.html
+    file_path: Some("Voice/logs/vpm_log_all.log"),
+    scope: DataScope::System,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    retention: None,
+    meaning: "Garmin nuvi GPS text-to-speech voice instruction log found on the FAT32 partition \
+        at Voice/logs/vpm_log_all.log. Contains chronologically ordered, timestamped spoken \
+        navigation instructions. Each line records either a navigation phrase (e.g. 'Keep right', \
+        'Turn left') with template variables, or the corresponding phonetic representation used \
+        for TTS synthesis. Tested on Garmin nuvi 56LM but may apply to other Garmin models. \
+        The device typically has two partitions: FAT16 (128 MB) and FAT32 (main storage with \
+        GPX tracklogs under Garmin/ and voice logs under Voice/). Timestamps use Garmin epoch \
+        (seconds since 31 Dec 1989; add 631065600 for UNIX epoch). High forensic value for \
+        reconstructing routes and navigation history from damaged or recovered GPS devices. \
+        Voice strings can be converted to audio using espeak-ng for audible playback of the \
+        navigation instructions.",
+    mitre_techniques: &[],
+    fields: GARMIN_NUVI_VOICE_LOG_FIELDS,
+    triage_priority: TriagePriority::High,
+    sources: &[
+        "https://cheeky4n6monkey.blogspot.com/2020/05/recovering-and-replaying-garmin-voice.html",
+        "https://github.com/cheeky4n6monkey/4n6-scripts",
+    ],
+    related_artifacts: &[],
+};

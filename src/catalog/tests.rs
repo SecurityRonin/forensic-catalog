@@ -4985,8 +4985,8 @@ mod tests_batch_i_presence {
     fn catalog_count_includes_batch_i() {
         assert_eq!(
             CATALOG.list().len(),
-            6623,
-            "catalog must have 6623 entries after batch I + quicklook_thumbnails + windows_install_date + winscp_ini + macos_wifi_intelligence + windows_clipboard_history + ios_unified_log + apfs_container + samsung_gallery3d + honda_accord + ios14_maps"
+            6624,
+            "catalog count after batch I + quicklook + install_date + winscp + wifi + clipboard + unified_log + apfs + samsung + honda + ios14_maps + garmin"
         );
     }
 }
@@ -5244,8 +5244,8 @@ mod tests_quicklook_install_date {
     fn catalog_count_includes_quicklook_and_install_date() {
         assert_eq!(
             CATALOG.list().len(),
-            6623,
-            "catalog must have 6623 entries after adding quicklook_thumbnails + windows_install_date + winscp_ini + macos_wifi_intelligence + windows_clipboard_history + ios_unified_log + apfs_container + samsung_gallery3d + honda_accord + ios14_maps"
+            6624,
+            "catalog count after quicklook + install_date + winscp + wifi + clipboard + unified_log + apfs + samsung + honda + ios14_maps + garmin"
         );
     }
 }
@@ -5402,8 +5402,8 @@ mod tests_winscp_ini {
     fn catalog_count_includes_winscp_ini() {
         assert_eq!(
             CATALOG.list().len(),
-            6623,
-            "catalog must have 6623 entries after adding winscp_ini + macos_wifi_intelligence + windows_clipboard_history + apfs_container + samsung_gallery3d + honda_accord + ios14_maps"
+            6624,
+            "catalog count after winscp + wifi + clipboard + apfs + samsung + honda + ios14_maps + garmin"
         );
     }
 }
@@ -5658,8 +5658,8 @@ mod tests_windows_clipboard_history {
     fn catalog_count_includes_clipboard_history() {
         assert_eq!(
             CATALOG.list().len(),
-            6623,
-            "catalog must have 6623 entries after adding valley_rat_registry and ntuser_man_persistence + apfs_container + samsung_gallery3d + honda_accord + ios14_maps"
+            6624,
+            "catalog count after valley_rat + ntuser_man + apfs + samsung + honda + ios14_maps + garmin"
         );
     }
 }

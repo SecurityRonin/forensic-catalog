@@ -5906,8 +5906,9 @@ pub static EVTX_SECURITY: ArtifactDescriptor = ArtifactDescriptor {
     meaning: "Primary security audit log. Key event IDs: 4624/4625 (logon success/fail), \
               4634/4647 (logoff), 4648 (explicit-cred logon), 4688/4689 (process create/exit), \
               4698/4702 (scheduled task create/modify), 4720/4732 (account create/group add), \
+              5379 (Credential Manager credential read — detects tools like CredentialsFileView harvesting stored passwords), \
               1102 (audit log cleared — high-priority anti-forensics indicator).",
-    mitre_techniques: &["T1070.001", "T1059", "T1078"],
+    mitre_techniques: &["T1070.001", "T1059", "T1078", "T1555"],
     fields: EVTX_FIELDS,
     retention: Some("configurable; default ~20MB rolling per channel"),
     triage_priority: TriagePriority::Critical,

@@ -13950,4 +13950,6 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     browser_ext::BROWSER_FIREFOX_COOKIES,
     browser_ext::BROWSER_FIREFOX_DOWNLOADS,
     browser_ext::BROWSER_SAFARI_HISTORY,
+    // ── iOS ─────────────────────────────────────────────────────────────────
+    macos_ext::IOS_UNIFIED_LOG,
 ];

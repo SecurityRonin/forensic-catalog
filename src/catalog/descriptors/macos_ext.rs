@@ -635,3 +635,115 @@ pub(crate) static MACOS_WIFI_INTELLIGENCE: ArtifactDescriptor = ArtifactDescript
         "https://www.swiftforensics.com/2025/01/new-wifi-database-from-apple.html",
     ],
 };
+
+// ── iOS artifacts ─────────────────────────────────────────────────────────────
+
+/// iOS Apple Unified Log — on-device AUL at `/private/var/db/diagnostics/`
+/// and `/private/var/db/uuidtext/`.
+///
+/// The Apple Unified Logging system on iOS stores structured, timestamped log
+/// entries in `.tracev3` binary files under `/private/var/db/diagnostics/`.
+/// Supporting format-string tables live in `/private/var/db/uuidtext/` and
+/// shared-cache DSC files. Together they form a `.logarchive` when combined
+/// with a `timesync/` directory and an `Info.plist` containing
+/// `OSArchiveVersion`.
+///
+/// This is distinct from `macos_unified_log` — same underlying format but
+/// different OS scope, extraction workflow, and forensic context:
+/// - **Extraction methods**: `sudo log collect --device` from connected Mac,
+///   UFADE (github.com/prosch88/UFADE), iOS Logs Acquisition Tool
+///   (ios-unifiedlogs.com), or direct pull from full file system extraction
+/// - **Processing**: iLEAPP logarchive module → `_lava_artifacts.db` SQLite;
+///   or `nfstream`/`log show` on macOS after reconstructing `.logarchive`
+/// - **Forensic value**: device orientation, screen lock/unlock with biometrics,
+///   navigation start with destination address, power on/off, app opening,
+///   apps in focus, horizontal scrolling — all timestamped
+///
+/// The `.ini` file at session close → Prefetch correlation that works on
+/// Windows has no analogue here; instead correlate with iOS `knowledgeC.db`
+/// and `screentime` artifacts for usage timeline cross-validation.
+///
+/// # Sources
+/// - <https://abrignoni.blogspot.com/2025/05/extraction-processing-querying-apple.html>
+///   Complete extraction → processing → querying workflow for iOS AUL
+/// - <https://www.ios-unifiedlogs.com>
+///   Lionel Notari's aggregated iOS unified log artifact research
+pub(crate) static IOS_UNIFIED_LOG_FIELDS: &[FieldSchema] = &[
+    FieldSchema {
+        name: "timestamp",
+        value_type: ValueType::Timestamp,
+        description: "Log entry timestamp from .tracev3 record; nanosecond precision; \
+            continuous time clock anchored via timesync/ calibration files",
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "process_id",
+        value_type: ValueType::Integer,
+        description: "PID of the process that generated the log entry",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "subsystem",
+        value_type: ValueType::Text,
+        description: "Logging subsystem identifier (e.g. com.apple.locationd, \
+            com.apple.springboard); primary filter for artifact-specific queries",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "category",
+        value_type: ValueType::Text,
+        description: "Category within the subsystem; narrows queries beyond subsystem alone",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "event_message",
+        value_type: ValueType::Text,
+        description: "Formatted log message after resolving format strings from uuidtext/DSC; \
+            contains the human-readable event detail",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "trace_id",
+        value_type: ValueType::UnsignedInt,
+        description: "Activity trace identifier; correlates related log entries across \
+            subsystems within a single user action or system event",
+        is_uid_component: false,
+    },
+];
+
+pub(crate) static IOS_UNIFIED_LOG: ArtifactDescriptor = ArtifactDescriptor {
+    id: "ios_unified_log",
+    name: "iOS Apple Unified Log",
+    artifact_type: ArtifactType::Directory,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some("/private/var/db/diagnostics/"),
+    scope: DataScope::System,
+    os_scope: OsScope::IOS,
+    decoder: Decoder::Identity,
+    meaning: "Apple Unified Logging on iOS. Binary .tracev3 files under \
+        /private/var/db/diagnostics/ with format-string support files in \
+        /private/var/db/uuidtext/. Contains timestamped structured log entries \
+        for all system and application activity: device orientation, screen \
+        lock/unlock with biometrics, navigation with destination addresses, \
+        power events, app launches and focus changes. Extraction via \
+        'log collect --device', UFADE, iOS Logs Acquisition Tool, or full \
+        file system pull. Process with iLEAPP logarchive module into \
+        _lava_artifacts.db for querying. Primary timeline source on iOS — \
+        equivalent to macos_unified_log but with iOS-specific subsystems \
+        and extraction workflow.",
+    mitre_techniques: &["T1070.001", "T1059"],
+    fields: IOS_UNIFIED_LOG_FIELDS,
+    retention: Some("Rotated by OS; typically days to weeks depending on device activity"),
+    triage_priority: TriagePriority::Critical,
+    related_artifacts: &["macos_unified_log"],
+    sources: &[
+        // Source: Abrignoni — complete iOS AUL extraction/processing/querying workflow
+        "https://abrignoni.blogspot.com/2025/05/extraction-processing-querying-apple.html",
+        // Source: Lionel Notari — aggregated iOS unified log artifact research
+        "https://www.ios-unifiedlogs.com",
+        // Source: Apple developer documentation — os/logging framework reference
+        "https://developer.apple.com/documentation/os/logging",
+    ],
+};

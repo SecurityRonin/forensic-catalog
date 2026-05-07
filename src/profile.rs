@@ -1968,6 +1968,17 @@ pub static ARTIFACT_PROFILES: &[ArtifactProfile] = &[
         volatility: VolatilityClass::Persistent,
         volatility_rationale: "File persists on disk until manually deleted; survives reboots by design",
     },
+    ArtifactProfile {
+        id: "ios_unified_log",
+        evidence_strength: EvidenceStrength::Definitive,
+        evidence_caveats: &[
+            "Requires full file system extraction, sysdiagnose, or log collect --device for acquisition",
+            "Log rotation on iOS is aggressive — days to weeks depending on device activity",
+            "Format strings in uuidtext/ required for human-readable messages; without them, raw hex only",
+        ],
+        volatility: VolatilityClass::RotatingBuffer,
+        volatility_rationale: "iOS aggressively rotates .tracev3 files; high-activity devices may retain only days of history",
+    },
 ];
 
 /// Returns the combined profile for a given artifact ID, or `None` if unknown.

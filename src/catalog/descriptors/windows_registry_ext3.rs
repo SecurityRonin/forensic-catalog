@@ -511,3 +511,75 @@ pub(crate) static VALLEY_RAT_REGISTRY: ArtifactDescriptor = ArtifactDescriptor {
         "https://windowsir.blogspot.com/2026/01/grab-bag.html",
     ],
 };
+
+// ── Hyper-V Guest Parameters ────────────────────────────────────────────────
+
+/// Hyper-V Guest Parameters — hypervisor host discovery via registry query.
+///
+/// On any Windows VM running under Hyper-V, the Integration Services (vmickvpexchange)
+/// populate this key with metadata about the physical host. The most forensically
+/// relevant value is `PhysicalHostName` (REG_SZ), which contains the hostname of the
+/// Hyper-V server. `PhysicalHostNameFullyQualified` provides the FQDN.
+///
+/// Threat actors query this key (`reg query HKLM\SOFTWARE\Microsoft\Virtual Machine\
+/// Guest\Parameters`) during discovery to identify hypervisor infrastructure for
+/// lateral movement to virtualization hosts. This was observed in the DFIR Report
+/// Lynx Ransomware case (2025-12-17), where the threat actor used this key to
+/// locate Hyper-V servers before deploying ransomware to backup infrastructure.
+///
+/// Also useful defensively: if this key exists on a host, the host is a Hyper-V guest,
+/// which itself is useful context during triage.
+///
+// Source: https://learn.microsoft.com/en-us/windows-server/virtualization/hyper-v/manage/manage-hyper-v-integration-services
+// Source: https://thedfirreport.com/2025/12/17/cats-got-your-files-lynx-ransomware/
+pub(crate) static HYPERV_GUEST_PARAMS: ArtifactDescriptor = ArtifactDescriptor {
+    id: "hyperv_guest_params",
+    name: "Hyper-V Guest Parameters",
+    artifact_type: ArtifactType::RegistryKey,
+    hive: Some(HiveTarget::HklmSoftware),
+    // Source: https://learn.microsoft.com/en-us/windows-server/virtualization/hyper-v/manage/manage-hyper-v-integration-services
+    key_path: r"Microsoft\Virtual Machine\Guest\Parameters",
+    value_name: None,
+    file_path: None,
+    scope: DataScope::System,
+    os_scope: OsScope::Win7Plus,
+    decoder: Decoder::Identity,
+    meaning: "Hyper-V Integration Services populate this key on guest VMs with metadata \
+              about the physical host. PhysicalHostName reveals the hypervisor hostname; \
+              PhysicalHostNameFullyQualified provides the FQDN. Threat actors query this \
+              key during discovery to identify virtualization infrastructure for lateral \
+              movement. Key existence confirms the host is a Hyper-V guest VM.",
+    mitre_techniques: &[
+        "T1082", // System Information Discovery
+        "T1012", // Query Registry
+    ],
+    fields: &[
+        FieldSchema {
+            name: "physical_host_name",
+            value_type: ValueType::Text,
+            description: "Hostname of the Hyper-V physical host running this guest VM",
+            is_uid_component: false,
+        },
+        FieldSchema {
+            name: "physical_host_name_fqdn",
+            value_type: ValueType::Text,
+            description: "Fully qualified domain name of the Hyper-V physical host",
+            is_uid_component: false,
+        },
+        FieldSchema {
+            name: "virtual_machine_name",
+            value_type: ValueType::Text,
+            description: "Name assigned to this VM in Hyper-V Manager",
+            is_uid_component: true,
+        },
+    ],
+    retention: Some("Persistent while VM runs under Hyper-V; updated on boot by Integration Services"),
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &[],
+    sources: &[
+        // Source: Microsoft Hyper-V Integration Services documentation
+        "https://learn.microsoft.com/en-us/windows-server/virtualization/hyper-v/manage/manage-hyper-v-integration-services",
+        // Source: DFIR Report — Lynx Ransomware case, threat actor queries this key for hypervisor discovery
+        "https://thedfirreport.com/2025/12/17/cats-got-your-files-lynx-ransomware/",
+    ],
+};

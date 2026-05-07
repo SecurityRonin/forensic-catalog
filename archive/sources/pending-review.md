@@ -214,40 +214,40 @@ Mark `[x]` when reviewed, `[→]` when artifact tasks were created.
 - [x] [What We Value](https://windowsir.blogspot.com/2025/11/what-we-value.html) — Windows Incident Response <!-- editorial on values in DFIR community; no artifact paths -->
 - [x] [Analysis Playbooks: USB](https://windowsir.blogspot.com/2025/11/analysis-playbooks-usb.html) — Windows Incident Response <!-- USB tracking playbook references Morad Rawashdeh series; all artifacts (USBSTOR, setupapi.dev.log, MountPoints2, USB enum) already covered in catalog (usb_stor_enum, setupapi_dev_log, etc.) -->
 - [x] [Registry Analysis](https://windowsir.blogspot.com/2025/10/registry-analysis.html) — Windows Incident Response <!-- methodology essay on registry analysis approach; no new artifact paths -->
-- [ ] [Analyzing Ransomware](https://windowsir.blogspot.com/2025/10/analyzing-ransomware.html) — Windows Incident Response
-- [ ] [Ransomware artifacts](https://windowsir.blogspot.com/2025/09/ransomware-artifacts.html) — Windows Incident Response
-- [ ] [RegRipper](https://windowsir.blogspot.com/2025/07/regripper.html) — Windows Incident Response
-- [ ] [Hunting Fileless Malware](https://windowsir.blogspot.com/2025/06/hunting-fileless-malware.html) — Windows Incident Response
-- [ ] [Program Execution, follow-up pt II](https://windowsir.blogspot.com/2025/06/program-execution-follow-up-pt-ii.html) — Windows Incident Response
-- [ ] [Program Execution, follow-up](https://windowsir.blogspot.com/2025/06/program-execution-follow-up.html) — Windows Incident Response
-- [ ] [I've Seen Things, pt II](https://windowsir.blogspot.com/2025/06/ive-seen-things-pt-ii.html) — Windows Incident Response
-- [ ] [I've Seen Things](https://windowsir.blogspot.com/2025/05/ive-seen-things.html) — Windows Incident Response
-- [ ] [Know Your Tools](https://windowsir.blogspot.com/2025/03/know-your-tools.html) — Windows Incident Response
-- [ ] [WMI](https://windowsir.blogspot.com/2025/03/wmi.html) — Windows Incident Response
-- [ ] [The Problem with the Modern Security Stack](https://windowsir.blogspot.com/2025/03/the-problem-with-modern-security-stack.html) — Windows Incident Response
-- [ ] [Lina's Write-up](https://windowsir.blogspot.com/2025/02/linas-write-up.html) — Windows Incident Response
-- [ ] [The Role of AI in DFIR](https://windowsir.blogspot.com/2025/02/the-role-of-ai-in-dfir.html) — Windows Incident Response
-- [ ] [Artifacts: Jump Lists](https://windowsir.blogspot.com/2025/01/artifacts-jump-lists.html) — Windows Incident Response
-- [ ] [Carving](https://windowsir.blogspot.com/2025/01/carving.html) — Windows Incident Response
-- [ ] [UEPOTB, LNK edition](https://windowsir.blogspot.com/2024/12/uepotb-lnk-edition.html) — Windows Incident Response
-- [ ] [Program Execution: The ShimCache/AmCache Myth](https://windowsir.blogspot.com/2024/11/program-execution-shimcacheamcache-myth.html) — Windows Incident Response
-- [ ] [FTSCon](https://windowsir.blogspot.com/2024/10/ftscon.html) — Windows Incident Response
-- [ ] [Artifact Tracking: Workstation Names](https://windowsir.blogspot.com/2024/10/artifact-tracking-workstation-names.html) — Windows Incident Response
-- [ ] [Analysis Process](https://windowsir.blogspot.com/2024/10/analysis-process.html) — Windows Incident Response
-- [ ] [Rundown](https://windowsir.blogspot.com/2024/10/rundown.html) — Windows Incident Response
-- [ ] [Exploiting LNK Metadata](https://windowsir.blogspot.com/2024/10/exploiting-lnk-metadata.html) — Windows Incident Response
-- [ ] [Shell Items](https://windowsir.blogspot.com/2024/10/shell-items.html) — Windows Incident Response
-- [ ] [RegRipper Educational Materials](https://windowsir.blogspot.com/2024/10/regripper-educational-materials.html) — Windows Incident Response
-- [ ] [What is "Events Ripper"?](https://windowsir.blogspot.com/2024/07/what-is-events-ripper.html) — Windows Incident Response
-- [ ] [The Myth of "Fileless" Malware](https://windowsir.blogspot.com/2024/06/the-myth-of-fileless-malware.html) — Windows Incident Response
-- [ ] [A Look At Threat Intel Through The Lens Of Kimsuky](https://windowsir.blogspot.com/2024/03/a-look-at-threat-intel-through-lens-of.html) — Windows Incident Response
-- [ ] [Threat Actors Dropping Multiple Ransomware Variants](https://windowsir.blogspot.com/2024/03/threat-actors-dropping-multiple.html) — Windows Incident Response
-- [ ] [Uptycs Cybersecurity Standup](https://windowsir.blogspot.com/2024/03/uptycs-cybersecurity-standup.html) — Windows Incident Response
-- [ ] [Investigative Scenario, 2024-03-12](https://windowsir.blogspot.com/2024/03/investigative-scenario-2024-03-12.html) — Windows Incident Response
-- [ ] [PCAParse](https://windowsir.blogspot.com/2024/02/pcaparse.html) — Windows Incident Response
-- [ ] [A Look At Threat Intel, Through The Lens Of The r77 Rootkit](https://windowsir.blogspot.com/2024/02/a-look-at-threat-intel-through-lens-of.html) — Windows Incident Response
-- [ ] [Lists of Images](https://windowsir.blogspot.com/2024/01/lists-of-images.html) — Windows Incident Response
-- [ ] [EDRSilencer](https://windowsir.blogspot.com/2024/01/edrsilencer.html) — Windows Incident Response
+- [x] [Analyzing Ransomware](https://windowsir.blogspot.com/2025/10/analyzing-ransomware.html) — Windows Incident Response <!-- ransomware-binary RE methodology + LinkedIn discussion; no new artifact paths/fields -->
+- [x] [Ransomware artifacts](https://windowsir.blogspot.com/2025/09/ransomware-artifacts.html) — Windows Incident Response <!-- Qilin LNK metadata commentary on FalconFeeds article; LNK fields & Qilin "endpoint name change" claim refuted via existing lnk_files; no new descriptors -->
+- [x] [RegRipper](https://windowsir.blogspot.com/2025/07/regripper.html) — Windows Incident Response <!-- editorial on CyberTriage's 2025 Registry Forensic Tools roundup; no new artifact paths -->
+- [x] [Hunting Fileless Malware](https://windowsir.blogspot.com/2025/06/hunting-fileless-malware.html) — Windows Incident Response <!-- discussion of Manuel Arrieta's article + RegRipper findexes.pl Yara plugin; methodology, no new specific artifact paths beyond generic Run/RunOnce already covered -->
+- [x] [Program Execution, follow-up pt II](https://windowsir.blogspot.com/2025/06/program-execution-follow-up-pt-ii.html) — Windows Incident Response <!-- continued ShimCache/AmCache myth commentary; reiterates that these are not pure execution evidence; reinforces existing shimcache/amcache_app_file caveat coverage -->
+- [x] [Program Execution, follow-up](https://windowsir.blogspot.com/2025/06/program-execution-follow-up.html) — Windows Incident Response <!-- ShimCache/AmCache myth follow-up; same caveats already documented in existing descriptors -->
+- [x] [I've Seen Things, pt II](https://windowsir.blogspot.com/2025/06/ive-seen-things-pt-ii.html) — Windows Incident Response <!-- DFIR war stories series; no new artifact paths -->
+- [x] [I've Seen Things](https://windowsir.blogspot.com/2025/05/ive-seen-things.html) — Windows Incident Response <!-- DFIR war stories; methodology, no new artifact paths -->
+- [x] [Know Your Tools](https://windowsir.blogspot.com/2025/03/know-your-tools.html) — Windows Incident Response <!-- editorial on tooling depth/understanding; no artifact paths -->
+- [x] [WMI](https://windowsir.blogspot.com/2025/03/wmi.html) — Windows Incident Response <!-- WMI persistence editorial referencing CyberTriage; existing wmi_subscriptions and wmi_mof_dir already cover OBJECTS.DATA / FilterToConsumerBinding paths -->
+- [x] [The Problem with the Modern Security Stack](https://windowsir.blogspot.com/2025/03/the-problem-with-modern-security-stack.html) — Windows Incident Response <!-- editorial on security-product sales/marketing; no artifacts -->
+- [x] [Lina's Write-up](https://windowsir.blogspot.com/2025/02/linas-write-up.html) — Windows Incident Response <!-- commentary on Lina Lau's investigation write-up; methodology, no new artifact paths -->
+- [x] [The Role of AI in DFIR](https://windowsir.blogspot.com/2025/02/the-role-of-ai-in-dfir.html) — Windows Incident Response <!-- editorial on AI in DFIR workflows; no artifacts -->
+- [x] [Artifacts: Jump Lists](https://windowsir.blogspot.com/2025/01/artifacts-jump-lists.html) — Windows Incident Response <!-- discusses Brian Carrier's CyberTriage Jump List article; DestList/structured-storage already covered by jump_list_auto/jump_list_custom/jump_list_appid_registry/jump_list_system -->
+- [x] [Carving](https://windowsir.blogspot.com/2025/01/carving.html) — Windows Incident Response <!-- methodology on file/data carving; no specific artifact paths -->
+- [x] [UEPOTB, LNK edition](https://windowsir.blogspot.com/2024/12/uepotb-lnk-edition.html) — Windows Incident Response <!-- LNK metadata "use every part of the buffalo" methodology; LNK structure already covered by lnk_files/lnk_files_office -->
+- [x] [Program Execution: The ShimCache/AmCache Myth](https://windowsir.blogspot.com/2024/11/program-execution-shimcacheamcache-myth.html) — Windows Incident Response <!-- shimcache/amcache_app_file already document the "not pure execution evidence" caveat with Mandiant whitepaper sources -->
+- [x] [FTSCon](https://windowsir.blogspot.com/2024/10/ftscon.html) — Windows Incident Response <!-- conference announcement; no artifacts -->
+- [x] [Artifact Tracking: Workstation Names](https://windowsir.blogspot.com/2024/10/artifact-tracking-workstation-names.html) — Windows Incident Response <!-- workstation/NetBIOS name tracking via LNK machine ID; lnk_files descriptor already documents machine_id field; methodology only, no new path -->
+- [x] [Analysis Process](https://windowsir.blogspot.com/2024/10/analysis-process.html) — Windows Incident Response <!-- methodology essay on analysis process; no artifact paths -->
+- [x] [Rundown](https://windowsir.blogspot.com/2024/10/rundown.html) — Windows Incident Response <!-- monthly link/news roundup; no artifact paths -->
+- [x] [Exploiting LNK Metadata](https://windowsir.blogspot.com/2024/10/exploiting-lnk-metadata.html) — Windows Incident Response <!-- LNK CTI/forensics methodology referencing Splunk + JPCERT + Mandiant; LNK fields already covered by lnk_files including TrackerDataBlock + machine ID + volume serial -->
+- [x] [Shell Items](https://windowsir.blogspot.com/2024/10/shell-items.html) — Windows Incident Response <!-- discussion of Cyber5W shell-item analysis article; existing shellbags_user descriptor covers shell-item types -->
+- [x] [RegRipper Educational Materials](https://windowsir.blogspot.com/2024/10/regripper-educational-materials.html) — Windows Incident Response <!-- announcement of RegRipper educational content; no artifacts -->
+- [x] [What is "Events Ripper"?](https://windowsir.blogspot.com/2024/07/what-is-events-ripper.html) — Windows Incident Response <!-- description of Events Ripper tool capabilities; no new artifact paths -->
+- [x] [The Myth of "Fileless" Malware](https://windowsir.blogspot.com/2024/06/the-myth-of-fileless-malware.html) — Windows Incident Response <!-- DarkWatchman registry-resident-payload write-up commentary; existing run_key_hkcu/hklm + RegRipper findexes coverage suffices -->
+- [x] [A Look At Threat Intel Through The Lens Of Kimsuky](https://windowsir.blogspot.com/2024/03/a-look-at-threat-intel-through-lens-of.html) — Windows Incident Response <!-- CTI commentary on Rapid7 Kimsuky write-up; no new artifact paths -->
+- [x] [Threat Actors Dropping Multiple Ransomware Variants](https://windowsir.blogspot.com/2024/03/threat-actors-dropping-multiple.html) — Windows Incident Response <!-- multi-variant ransomware deployment commentary; no new artifact paths -->
+- [x] [Uptycs Cybersecurity Standup](https://windowsir.blogspot.com/2024/03/uptycs-cybersecurity-standup.html) — Windows Incident Response <!-- conference standup announcement; no artifacts -->
+- [x] [Investigative Scenario, 2024-03-12](https://windowsir.blogspot.com/2024/03/investigative-scenario-2024-03-12.html) — Windows Incident Response <!-- pedagogical investigative scenario; methodology, no new artifact paths -->
+- [x] [PCAParse](https://windowsir.blogspot.com/2024/02/pcaparse.html) — Windows Incident Response <!-- implemented: pca_general_db descriptor (C:\Windows\appcompat\pca\PcaGeneralDb0.txt) for abnormal-exit log records (exe_path, exit_code, timestamp); sibling to existing pca_applaunch_dic; OsScope::Win11_22H2 -->
+- [x] [A Look At Threat Intel, Through The Lens Of The r77 Rootkit](https://windowsir.blogspot.com/2024/02/a-look-at-threat-intel-through-lens-of.html) — Windows Incident Response <!-- CTI commentary on r77 rootkit; r77's $77 process/file hiding via NtQuerySystemInformation hooks is runtime behaviour, not a static-on-disk artifact path -->
+- [x] [Lists of Images](https://windowsir.blogspot.com/2024/01/lists-of-images.html) — Windows Incident Response <!-- DFIR practice/lab images discussion; no new artifact paths -->
+- [x] [EDRSilencer](https://windowsir.blogspot.com/2024/01/edrsilencer.html) — Windows Incident Response <!-- implemented: windows_hosts_file (C:\Windows\System32\drivers\etc\hosts T1562.001/T1565.001) + dns_policy_config_nrpt (HKLM\SYSTEM\CCS\Services\Dnscache\Parameters\DnsPolicyConfig\{UUID} with Name MULTI_SZ + GenericDNSServers + Comment fields T1562.001/T1562.006); WFP-filter alternatives doc by Carvey 2024-01 + 18 Dec addendum + Cloudbrothers 2024-12 -->
 - [ ] [Human Behavior In Digital Forensics, pt III](https://windowsir.blogspot.com/2024/01/human-behavior-in-digital-forensics-pt_10.html) — Windows Incident Response
 - [ ] [Human Behavior In Digital Forensics, pt II](https://windowsir.blogspot.com/2024/01/human-behavior-in-digital-forensics-pt.html) — Windows Incident Response
 - [ ] [Human Behavior In Digital Forensics](https://windowsir.blogspot.com/2024/01/human-behavior-in-digital-forensics.html) — Windows Incident Response

@@ -583,3 +583,125 @@ pub(crate) static HYPERV_GUEST_PARAMS: ArtifactDescriptor = ArtifactDescriptor {
         "https://thedfirreport.com/2025/12/17/cats-got-your-files-lynx-ransomware/",
     ],
 };
+
+// ── Registry: FeatureUsage (Win10 1903+ taskbar telemetry) ────────────────────
+
+/// `HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage`
+///
+/// FeatureUsage is a per-user registry key introduced in Windows 10 version 1903
+/// that records taskbar interaction counters for GUI applications. The key only
+/// exists if the account has logged on **interactively** (console or RDP) — pure
+/// non-interactive sessions (network logons, services running as the user) leave
+/// no trace here.
+///
+/// # Subkeys
+///
+/// Each subkey contains REG_DWORD values keyed by application path or AppID,
+/// where the data is a monotonic counter incremented by `explorer.exe`:
+///
+/// - **AppSwitched** — Number of times the app was left-clicked on the taskbar
+///   to switch focus (minimize/maximize cycles).
+/// - **AppLaunch** — Number of times an app pinned to the taskbar was launched.
+/// - **ShowJumpView** — Number of times the app was right-clicked on the taskbar
+///   (Jump List opened).
+/// - **AppBadgeUpdated** — Number of times a running app's taskbar badge icon was
+///   updated (notification count, unread badge, etc.). Useful for inferring usage
+///   of messaging or mail apps that have since been wiped.
+/// - **TrayButtonClicked** — Number of times the user clicked notification-area
+///   buttons (clock, action centre, etc.).
+///
+/// `KeyCreationTime` (REG_QWORD, FILETIME) at the root records when the key was
+/// first created — i.e. the timestamp of the user's first interactive logon on
+/// the system. This is a strong artefact for proving an account's first
+/// interactive presence on a host.
+///
+/// # Forensic value
+///
+/// Complements UserAssist (which only records desktop/start-menu launches) and
+/// RecentApps. Because increments persist even after binaries are deleted, the
+/// values can corroborate execution of malware that was wiped post-incident.
+///
+/// Sources:
+/// - <https://www.crowdstrike.com/en-us/blog/how-to-employ-featureusage-for-windows-10-taskbar-forensics/>
+///   (Jai Minton, 2020 — original publication of all 5 subkeys + KeyCreationTime)
+/// - <https://windowsir.blogspot.com/2025/11/registry-featureusage.html>
+///   (H. Carvey, 2025-11 — refresher prompted by Maurice Fielenbach LinkedIn post
+///   on infostealer hunting via AppSwitched)
+/// - <https://github.com/keydet89/RegRipper3.0/blob/master/plugins/featureusage.pl>
+///   (RegRipper plugin — confirms NTUSER.DAT hive + key path + parser semantics)
+pub static REGISTRY_FEATUREUSAGE: ArtifactDescriptor = ArtifactDescriptor {
+    id: "registry_featureusage",
+    name: "FeatureUsage (Taskbar Telemetry)",
+    artifact_type: ArtifactType::RegistryKey,
+    hive: Some(HiveTarget::NtUser),
+    // Source: https://www.crowdstrike.com/en-us/blog/how-to-employ-featureusage-for-windows-10-taskbar-forensics/
+    // Source: https://github.com/keydet89/RegRipper3.0/blob/master/plugins/featureusage.pl
+    key_path: r"Software\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage",
+    value_name: None,
+    file_path: None,
+    scope: DataScope::User,
+    // Source: CrowdStrike post — "found in builds of Windows 10 version 1903 and later"
+    os_scope: OsScope::Win10Plus,
+    decoder: Decoder::Identity,
+    meaning: "Per-user taskbar interaction counters populated by explorer.exe on Windows 10 1903+. \
+              The key is created only after the user logs on interactively (console or RDP), so its \
+              KeyCreationTime (REG_QWORD FILETIME) is a reliable artefact for first interactive \
+              logon. Five subkeys (AppSwitched, AppLaunch, ShowJumpView, AppBadgeUpdated, \
+              TrayButtonClicked) record monotonic REG_DWORD click/launch counts keyed by executable \
+              path or AppID — counters survive uninstall and binary deletion, so they corroborate \
+              GUI execution of wiped malware. Complements UserAssist for taskbar-pinned apps that \
+              UserAssist does not capture.",
+    mitre_techniques: &[
+        "T1204.002", // User Execution: Malicious File
+        "T1012",     // Query Registry (defender pivot)
+    ],
+    fields: &[
+        FieldSchema {
+            name: "KeyCreationTime",
+            value_type: ValueType::Timestamp,
+            description: "REG_QWORD FILETIME — timestamp of the user's first interactive logon on this system",
+            is_uid_component: false,
+        },
+        FieldSchema {
+            name: "AppSwitched",
+            value_type: ValueType::UnsignedInt,
+            description: "Subkey of REG_DWORD counters: number of times each application was left-clicked on the taskbar to switch focus",
+            is_uid_component: false,
+        },
+        FieldSchema {
+            name: "AppLaunch",
+            value_type: ValueType::UnsignedInt,
+            description: "Subkey of REG_DWORD counters: number of times each taskbar-pinned application was launched",
+            is_uid_component: false,
+        },
+        FieldSchema {
+            name: "ShowJumpView",
+            value_type: ValueType::UnsignedInt,
+            description: "Subkey of REG_DWORD counters: number of times each application was right-clicked on the taskbar (Jump List opened)",
+            is_uid_component: false,
+        },
+        FieldSchema {
+            name: "AppBadgeUpdated",
+            value_type: ValueType::UnsignedInt,
+            description: "Subkey of REG_DWORD counters: number of times a running application's taskbar badge icon was updated (notification counts)",
+            is_uid_component: false,
+        },
+        FieldSchema {
+            name: "TrayButtonClicked",
+            value_type: ValueType::UnsignedInt,
+            description: "Subkey of REG_DWORD counters: number of times the user clicked notification-area / system-tray buttons (clock, action centre)",
+            is_uid_component: false,
+        },
+    ],
+    retention: Some("Persistent for the lifetime of the user profile; counters monotonically increment and are not cleared by uninstall"),
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &["userassist_exe", "shimcache", "amcache_app_file"],
+    sources: &[
+        // Source: CrowdStrike — Jai Minton's 2020 publication of all 5 subkeys + KeyCreationTime
+        "https://www.crowdstrike.com/en-us/blog/how-to-employ-featureusage-for-windows-10-taskbar-forensics/",
+        // Source: WindowsIR — Carvey 2025-11 refresher on AppSwitched for infostealer hunting
+        "https://windowsir.blogspot.com/2025/11/registry-featureusage.html",
+        // Source: RegRipper plugin — confirms NTUSER.DAT hive + key path + traversal logic
+        "https://github.com/keydet89/RegRipper3.0/blob/master/plugins/featureusage.pl",
+    ],
+};

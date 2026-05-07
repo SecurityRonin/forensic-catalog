@@ -7763,6 +7763,7 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     windows_registry_ext3::WINDOWS_CLIPBOARD_HISTORY,
     windows_registry_ext3::VALLEY_RAT_REGISTRY,
     windows_registry_ext3::HYPERV_GUEST_PARAMS,
+    windows_registry_ext3::REGISTRY_FEATUREUSAGE,
     windows_files_ext::NTUSER_MAN_PERSISTENCE,
     // ── Generated artifact descriptors (mass-import pipeline) ────────────────
     // Total: 6187 generated entries

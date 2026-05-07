@@ -1401,17 +1401,25 @@ pub static SERVICES_IMAGEPATH: ArtifactDescriptor = ArtifactDescriptor {
     scope: DataScope::System,
     os_scope: OsScope::All,
     decoder: Decoder::Identity,
-    meaning: "Executable path of a Windows service; auto-started services persist across reboots",
-    mitre_techniques: &["T1543.003"],
+    meaning: "Executable path of a Windows service; auto-started services persist across reboots. \
+              Attackers use sc.exe to set binPath to %COMSPEC% /c powershell.exe -nop -w hidden \
+              -encodedcommand <base64>, embedding obfuscated PowerShell payloads (base64-encoded \
+              UTF-16LE, sometimes gzip/deflate-compressed then base64-wrapped) directly in the \
+              registry. Look for -EncodedCommand, -WindowStyle Hidden, FromBase64String, \
+              GzipStream, and [IO.Compression.CompressionMode]::Decompress in ImagePath values.",
+    mitre_techniques: &["T1543.003", "T1059.001", "T1027"],
     fields: PERSIST_CMD_FIELDS,
     retention: None,
     triage_priority: TriagePriority::High,
-    related_artifacts: &[],
+    related_artifacts: &["evtx_system"],
     sources: &[
         "https://learn.microsoft.com/en-us/windows/win32/services/service-control-manager",
         "https://redcanary.com/threat-detection-report/techniques/t1543/",
         "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/01_Hunting_Cheatsheets/1.5_Forensics_Artifacts_Map.csv",
         "https://raw.githubusercontent.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/main/06_Tool_Command_Vault/6.02_Windows_DFIR_Master_Notes.md",
+        // Source: https://az4n6.blogspot.com/2017/10/finding-and-decoding-malicious.html
+        // — PowerShell encoded command abuse via sc.exe binPath, base64+gzip obfuscation
+        "https://az4n6.blogspot.com/2017/10/finding-and-decoding-malicious.html",
     ],
 };
 
@@ -5931,8 +5939,13 @@ pub static EVTX_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
         "System-level events. Key IDs: 7045 (service installed), 7036 (service state change), \
               6005/6006 (event log start/stop — boot/shutdown boundary), \
               104 (System log cleared). Service installation (7045) is a primary \
-              lateral-movement and persistence indicator.",
-    mitre_techniques: &["T1543.003", "T1070.001"],
+              lateral-movement and persistence indicator. Attackers abuse sc.exe to create services \
+              whose binPath uses %COMSPEC% to launch powershell.exe with -encodedcommand and \
+              -w hidden flags, embedding base64-encoded (often UTF-16LE or gzip-compressed) \
+              payloads directly in the event log entry. Subsequent Event IDs 7000 and 7009 \
+              (service timeout/failure) are misleading — the PowerShell payload still executes \
+              successfully even when Windows reports the service failed to start.",
+    mitre_techniques: &["T1543.003", "T1070.001", "T1059.001"],
     fields: EVTX_FIELDS,
     retention: Some("configurable; default ~20MB rolling per channel"),
     triage_priority: TriagePriority::High,
@@ -5941,6 +5954,10 @@ pub static EVTX_SYSTEM: ArtifactDescriptor = ArtifactDescriptor {
         "https://www.sans.org/posters/windows-forensic-analysis/",
         "https://learn.microsoft.com/en-us/windows/win32/eventlog/event-logging",
         "https://github.com/EricZimmerman/evtx",
+        // Source: https://az4n6.blogspot.com/2017/10/finding-and-decoding-malicious.html
+        // — PowerShell-as-service abuse via 7045, misleading 7000/7009 errors,
+        //   base64+gzip deobfuscation chain
+        "https://az4n6.blogspot.com/2017/10/finding-and-decoding-malicious.html",
     ],
 };
 

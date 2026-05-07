@@ -6112,7 +6112,8 @@ mod tests_services_imagepath_ps_enrichment {
     fn services_imagepath_meaning_mentions_encodedcommand() {
         let d = CATALOG.by_id("services_imagepath").unwrap();
         assert!(
-            d.meaning.contains("encodedcommand") || d.meaning.contains("-EncodedCommand")
+            d.meaning.contains("encodedcommand")
+                || d.meaning.contains("-EncodedCommand")
                 || d.meaning.contains("base64"),
             "services_imagepath meaning should mention encoded PowerShell abuse in binPath"
         );

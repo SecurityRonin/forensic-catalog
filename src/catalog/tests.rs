@@ -4915,6 +4915,31 @@ mod tests_batch_i_presence {
         );
     }
 
+    /// MsiInstaller provider records in Application.evtx are the key host-based
+    /// artifact for MSI-based malware execution (Raspberry Robin, USB-borne MSI
+    /// droppers). Per Carvey's "State of Windows Digital Analysis, pt II"
+    /// (windowsir.blogspot.com, 2023-09-19), open reports on Raspberry Robin
+    /// routinely omit these records even though `msiexec.exe /i` and the
+    /// Microsoft Installer service write them on every install attempt. Key
+    /// IDs: 1033 (install completed), 1034 (uninstall completed),
+    /// 1035 (reconfigure), 1036 (configure), 1040/1042 (transaction
+    /// start/end), 11707 (success), 11708 (failure).
+    #[test]
+    fn catalog_has_evtx_application_msiinstaller() {
+        let d = CATALOG
+            .by_id("evtx_application_msiinstaller")
+            .expect("evtx_application_msiinstaller missing from catalog");
+        assert!(
+            d.meaning.contains("1033") && d.meaning.contains("11707"),
+            "evtx_application_msiinstaller meaning should mention key MsiInstaller event IDs (1033, 11707)"
+        );
+        assert!(
+            d.meaning.to_ascii_lowercase().contains("msiexec")
+                || d.meaning.to_ascii_lowercase().contains("msi"),
+            "evtx_application_msiinstaller meaning should mention MSI/msiexec"
+        );
+    }
+
     #[test]
     fn catalog_has_linux_kern_log() {
         assert!(

@@ -264,7 +264,7 @@ mod decode_tests {
     #[test]
     fn catalog_has_entries() {
         assert!(!CATALOG.list().is_empty());
-        assert_eq!(CATALOG.list().len(), 6641);
+        assert_eq!(CATALOG.list().len(), 6642);
     }
 
     #[test]
@@ -2597,7 +2597,7 @@ mod tests_batch_d {
     #[test]
     fn catalog_count_after_srum_network_connections() {
         // +1 from srum_network_connections, +1 from evtx_application_msiinstaller
-        assert_eq!(CATALOG.list().len(), 6641);
+        assert_eq!(CATALOG.list().len(), 6642);
     }
 
     // ── EVTX channels ─────────────────────────────────────────────────────
@@ -3498,7 +3498,7 @@ mod phase2_registry_tests {
     #[test]
     fn catalog_count_includes_phase2() {
         // Updated to 354 after phase-2b file artifact additions
-        assert_eq!(CATALOG.list().len(), 6641);
+        assert_eq!(CATALOG.list().len(), 6642);
     }
 
     #[test]
@@ -3643,7 +3643,7 @@ mod phase2b_files_tests {
     fn catalog_count_includes_phase2b() {
         // phase2a adds 30 registry artifacts (284→314), phase2b adds 40 file artifacts (314→354)
         // Note: chrome_login_data was already present from Phase 1; not duplicated here.
-        assert_eq!(CATALOG.list().len(), 6641);
+        assert_eq!(CATALOG.list().len(), 6642);
     }
 
     #[test]
@@ -3946,7 +3946,7 @@ mod phase3_persistence_tests {
         // phase3 adds 7 net-new artifacts not already in catalog (354 → 361)
         // Note: winlogon_shell, winlogon_userinit, appinit_dlls, boot_execute,
         //       ifeo_debugger, netsh_helper_dlls, mountpoints2 were already present.
-        assert_eq!(CATALOG.list().len(), 6641);
+        assert_eq!(CATALOG.list().len(), 6642);
     }
 
     // ── Pre-existing artifacts verified present ───────────────────────────────
@@ -4940,6 +4940,60 @@ mod tests_batch_i_presence {
         );
     }
 
+    /// Per Carvey's "Events Ripper Updates" (windowsir.blogspot.com, 2023-08-02),
+    /// Event ID 5152 in Security.evtx records WFP-blocked packets and is a
+    /// pivot for detecting EDR-silencing / firewall-block tampering and
+    /// inbound recon attempts. Carvey added a `filter.pl` plugin specifically
+    /// for this in his Events Ripper toolset.
+    #[test]
+    fn evtx_security_mentions_event_5152() {
+        let d = CATALOG
+            .by_id("evtx_security")
+            .expect("evtx_security missing");
+        assert!(
+            d.meaning.contains("5152"),
+            "evtx_security meaning should mention Event ID 5152 (WFP packet block)"
+        );
+    }
+
+    /// Per Carvey's "Events Ripper Updates" (windowsir.blogspot.com, 2023-08-02),
+    /// Service Control Manager Event ID 7031 (service crash) in System.evtx
+    /// is an analyst pivot point: services that crash unexpectedly often
+    /// correlate with attempts to tamper with EDR / AV agents or with
+    /// failed persistence-via-service installs. Carvey added an `scm.pl`
+    /// check for 7031.
+    #[test]
+    fn evtx_system_mentions_event_7031() {
+        let d = CATALOG.by_id("evtx_system").expect("evtx_system missing");
+        assert!(
+            d.meaning.contains("7031"),
+            "evtx_system meaning should mention Event ID 7031 (SCM service crash)"
+        );
+    }
+
+    /// Per Carvey's "Events Ripper Updates" (windowsir.blogspot.com, 2023-08-02),
+    /// the Microsoft-Windows-Windows Defender/Operational channel records
+    /// Event IDs 2050/2051 (sample uploaded / cannot upload) plus the
+    /// canonical 1116/1117 (malware detected/blocked) and 5007 (config
+    /// changed). The `defender.pl` Events Ripper plugin pivots on 2050
+    /// because it fingerprints exactly which file path + hash Defender
+    /// shipped to the cloud — a high-value DFIR pivot when the original
+    /// dropped binary has been deleted.
+    #[test]
+    fn catalog_has_evtx_defender_operational() {
+        let d = CATALOG
+            .by_id("evtx_defender_operational")
+            .expect("evtx_defender_operational missing from catalog");
+        assert!(
+            d.meaning.contains("2050") && d.meaning.contains("2051"),
+            "evtx_defender_operational meaning should mention 2050/2051 (Defender sample upload)"
+        );
+        assert!(
+            d.meaning.contains("1116") && d.meaning.contains("1117"),
+            "evtx_defender_operational meaning should mention 1116/1117 (malware detected/blocked)"
+        );
+    }
+
     #[test]
     fn catalog_has_linux_kern_log() {
         assert!(
@@ -5024,7 +5078,7 @@ mod tests_batch_i_presence {
     fn catalog_count_includes_batch_i() {
         assert_eq!(
             CATALOG.list().len(),
-            6641,
+            6642,
             "catalog count after batch I + quicklook + install_date + winscp + wifi + clipboard + unified_log + apfs + samsung + honda + ios14_maps + garmin + aws_cloudtrail + btm"
         );
     }
@@ -5283,7 +5337,7 @@ mod tests_quicklook_install_date {
     fn catalog_count_includes_quicklook_and_install_date() {
         assert_eq!(
             CATALOG.list().len(),
-            6641,
+            6642,
             "catalog count after quicklook + install_date + winscp + wifi + clipboard + unified_log + apfs + samsung + honda + ios14_maps + garmin + aws_cloudtrail + btm"
         );
     }
@@ -5441,7 +5495,7 @@ mod tests_winscp_ini {
     fn catalog_count_includes_winscp_ini() {
         assert_eq!(
             CATALOG.list().len(),
-            6641,
+            6642,
             "catalog count after winscp + wifi + clipboard + apfs + samsung + honda + ios14_maps + garmin + aws_cloudtrail + btm"
         );
     }
@@ -5697,7 +5751,7 @@ mod tests_windows_clipboard_history {
     fn catalog_count_includes_clipboard_history() {
         assert_eq!(
             CATALOG.list().len(),
-            6641,
+            6642,
             "catalog count after valley_rat + ntuser_man + apfs + samsung + honda + ios14_maps + garmin + aws_cloudtrail + btm"
         );
     }
@@ -8075,7 +8129,7 @@ mod tests_android_gboard_trainingcache {
 
     #[test]
     fn catalog_count_updated() {
-        assert_eq!(CATALOG.list().len(), 6641);
+        assert_eq!(CATALOG.list().len(), 6642);
     }
 }
 
@@ -8178,7 +8232,7 @@ mod tests_hyperv_guest_params {
     fn catalog_count_after_hyperv_guest_params() {
         assert_eq!(
             CATALOG.list().len(),
-            6641,
+            6642,
             "catalog count after hyperv_guest_params"
         );
     }
@@ -8371,7 +8425,7 @@ mod tests_registry_featureusage {
     fn catalog_count_after_registry_featureusage() {
         assert_eq!(
             CATALOG.list().len(),
-            6641,
+            6642,
             "catalog count after registry_featureusage"
         );
     }
@@ -8517,7 +8571,7 @@ mod tests_pca_general_db {
     fn catalog_count_after_pca_general_db() {
         assert_eq!(
             CATALOG.list().len(),
-            6641,
+            6642,
             "catalog count after pca_general_db"
         );
     }
@@ -8638,7 +8692,7 @@ mod tests_windows_hosts_file {
     fn catalog_count_after_windows_hosts_file() {
         assert_eq!(
             CATALOG.list().len(),
-            6641,
+            6642,
             "catalog count after windows_hosts_file"
         );
     }
@@ -8794,7 +8848,7 @@ mod tests_enable_periodic_backup {
     fn catalog_count_after_enable_periodic_backup() {
         assert_eq!(
             CATALOG.list().len(),
-            6641,
+            6642,
             "catalog count after enable_periodic_backup (+1)"
         );
     }
@@ -8950,7 +9004,7 @@ mod tests_dns_policy_config_nrpt {
     fn catalog_count_after_dns_policy_config_nrpt() {
         assert_eq!(
             CATALOG.list().len(),
-            6641,
+            6642,
             "catalog count after dns_policy_config_nrpt"
         );
     }

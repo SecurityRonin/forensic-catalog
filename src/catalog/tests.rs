@@ -9008,4 +9008,49 @@ mod tests_dns_policy_config_nrpt {
             "catalog count after dns_policy_config_nrpt"
         );
     }
+
+    /// Per Carvey's "Events Ripper Update" (windowsir.blogspot.com,
+    /// 2023-06-01), Security-Auditing Event ID 4616 (system time change)
+    /// in Security.evtx is the primary host-based artifact for detecting
+    /// timestomping / clock manipulation. Carvey added a `timechange.pl`
+    /// plugin specifically because back-dated Security Event Log records
+    /// (logons in 2020 on a 2024 image, negative session durations) are
+    /// otherwise easy for junior analysts to miss. The 4616 event records
+    /// the user, the previous time, the new time, and the process that
+    /// changed the clock.
+    #[test]
+    fn evtx_security_mentions_event_4616() {
+        let d = CATALOG
+            .by_id("evtx_security")
+            .expect("evtx_security missing");
+        assert!(
+            d.meaning.contains("4616"),
+            "evtx_security meaning should mention Event ID 4616 (system time change / timestomping)"
+        );
+    }
+
+    /// Per Carvey's "Events Ripper Update" (windowsir.blogspot.com,
+    /// 2023-06-05), Microsoft-Windows-Application-Experience/Program-Telemetry
+    /// Event ID 875 records when the OS blocks a driver from loading
+    /// (Driver Block List / vulnerable-driver enforcement). Carvey added an
+    /// `appissue.pl` plugin to surface this, calling out that EDR
+    /// telemetry alone shows commands launched but not whether the
+    /// driver-loading step succeeded — 875 is the validation pivot.
+    /// Without this enrichment, analysts only get the generic
+    /// auto-generated `Program-Telemetry` channel descriptor with no
+    /// event-ID-level context.
+    #[test]
+    fn evtx_application_experience_telemetry_mentions_event_875() {
+        let d = CATALOG
+            .by_id("evtx_application_experience_telemetry")
+            .expect("evtx_application_experience_telemetry missing from catalog");
+        assert!(
+            d.meaning.contains("875"),
+            "evtx_application_experience_telemetry meaning should mention Event ID 875 (driver block)"
+        );
+        assert!(
+            d.meaning.to_ascii_lowercase().contains("driver"),
+            "evtx_application_experience_telemetry meaning should mention driver (block list / blocked driver)"
+        );
+    }
 }

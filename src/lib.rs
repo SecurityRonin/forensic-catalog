@@ -139,6 +139,7 @@ pub mod plugin;
 pub mod profile;
 pub mod sigma;
 pub mod sqlite;
+pub mod srum;
 pub mod stix;
 pub mod temporal;
 pub mod toolchain;
@@ -156,6 +157,8 @@ pub use lolbins::{
     UC_DEFENSE_EVASION, UC_DOWNLOAD, UC_EXECUTE, UC_NETWORK, UC_PERSIST, UC_PROXY, UC_RECON,
     UC_UPLOAD,
 };
+pub mod heuristics;
+pub mod journald;
 pub mod no_std_compat;
 pub mod paths;
 pub mod pca;
@@ -166,5 +169,3 @@ pub mod references;
 pub mod remote_access;
 pub mod rootkit;
 pub mod third_party;
-pub mod journald;
-pub mod heuristics;

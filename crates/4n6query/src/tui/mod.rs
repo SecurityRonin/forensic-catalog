@@ -64,16 +64,24 @@ mod tests {
     fn build_render_data_search_filters_catalog() {
         let a = make_app(0, "prefetch", 0);
         let rd = build_render_data(&a);
+        let full = build_render_data(&make_app(0, "", 0)).list_items.len();
         assert!(
             !rd.list_items.is_empty(),
             "search 'prefetch' must match something"
         );
-        for item in &rd.list_items {
-            assert!(
-                item.to_lowercase().contains("prefetch"),
-                "filtered item must contain query: {item}"
-            );
-        }
+        assert!(
+            rd.list_items.len() < full,
+            "search must reduce results: {} vs full {}",
+            rd.list_items.len(),
+            full
+        );
+        // Display strings show the artifact id — prefetch artifacts have
+        // "prefetch" in their id, so this check holds for the primary matches.
+        // (Meaning-only matches may appear too, which is correct behaviour.)
+        assert!(
+            rd.list_items.iter().any(|s| s.to_lowercase().contains("prefetch")),
+            "at least one result must be a prefetch artifact"
+        );
     }
 
     #[test]
@@ -246,7 +254,7 @@ use crossterm::{
 
 use forensicnomicon::{
     abusable_sites::ABUSABLE_SITES,
-    catalog::{OsScope, Platform, CATALOG},
+    catalog::{ArtifactDescriptor, OsScope, Platform, CATALOG},
     lolbins::{
         LOLBAS_LINUX, LOLBAS_MACOS, LOLBAS_WINDOWS, LOLBAS_WINDOWS_CMDLETS, LOLBAS_WINDOWS_MMC,
         LOLBAS_WINDOWS_WMI,
@@ -262,6 +270,32 @@ pub struct RenderData {
     pub detail_lines: Vec<String>,
 }
 
+/// Catalog filter predicate — factored out so the same logic can be used
+/// for both display-list construction and rich search-index construction.
+fn catalog_passes(app: &app::App, preset: &presets::Preset, d: &ArtifactDescriptor) -> bool {
+    let platform_ok = if !app.platform_mask.is_empty() {
+        if app.platform_mask.contains(Platform::Windows)
+            && d.os_scope.platform() == Platform::Windows
+        {
+            match app.win_version {
+                WinVersionFilter::All => true,
+                WinVersionFilter::Win10Plus => matches!(
+                    d.os_scope,
+                    OsScope::Win10Plus | OsScope::Win11Plus | OsScope::Win11_22H2
+                ),
+                WinVersionFilter::Win11Plus => {
+                    matches!(d.os_scope, OsScope::Win11Plus | OsScope::Win11_22H2)
+                }
+            }
+        } else {
+            app.platform_mask.matches(d.os_scope.platform())
+        }
+    } else {
+        preset.os.map_or(true, |os| os.platform() == d.os_scope.platform())
+    };
+    platform_ok && (preset.priorities.is_empty() || preset.priorities.contains(&d.triage_priority))
+}
+
 fn build_render_data(app: &app::App) -> RenderData {
     let preset = presets::active(app.preset_idx);
 
@@ -270,34 +304,7 @@ fn build_render_data(app: &app::App) -> RenderData {
         0 => CATALOG
             .list()
             .iter()
-            .filter(|d| {
-                let platform_ok = if !app.platform_mask.is_empty() {
-                    use forensicnomicon::catalog::Platform;
-                    if app.platform_mask.contains(Platform::Windows)
-                        && d.os_scope.platform() == Platform::Windows
-                    {
-                        match app.win_version {
-                            WinVersionFilter::All => true,
-                            WinVersionFilter::Win10Plus => matches!(
-                                d.os_scope,
-                                OsScope::Win10Plus | OsScope::Win11Plus | OsScope::Win11_22H2
-                            ),
-                            WinVersionFilter::Win11Plus => {
-                                matches!(d.os_scope, OsScope::Win11Plus | OsScope::Win11_22H2)
-                            }
-                        }
-                    } else {
-                        app.platform_mask.matches(d.os_scope.platform())
-                    }
-                } else {
-                    preset
-                        .os
-                        .map_or(true, |os| os.platform() == d.os_scope.platform())
-                };
-                platform_ok
-                    && (preset.priorities.is_empty()
-                        || preset.priorities.contains(&d.triage_priority))
-            })
+            .filter(|d| catalog_passes(app, preset, d))
             .map(|d| format!("{:<36} [{:?}]", d.id, d.triage_priority))
             .collect(),
         1 => LOLBAS_WINDOWS.iter().map(|e| e.name.to_string()).collect(),
@@ -327,11 +334,32 @@ fn build_render_data(app: &app::App) -> RenderData {
     let list_items = if app.search_query.is_empty() {
         all_display
     } else {
-        let entries: Vec<search::SearchEntry> = all_display
-            .iter()
-            .enumerate()
-            .map(|(i, s)| search::SearchEntry::new(s.clone(), i))
-            .collect();
+        let entries: Vec<search::SearchEntry> = if app.dataset_idx == 0 {
+            // Catalog: rich multi-field index (id + name + meaning + file_path + key_path).
+            // Re-iterate with the same filter — all 'static data, no I/O.
+            CATALOG
+                .list()
+                .iter()
+                .filter(|d| catalog_passes(app, preset, d))
+                .enumerate()
+                .map(|(i, d)| {
+                    let mut parts: Vec<&str> = vec![d.id, d.name, d.meaning];
+                    if let Some(fp) = d.file_path {
+                        parts.push(fp);
+                    }
+                    if !d.key_path.is_empty() {
+                        parts.push(d.key_path);
+                    }
+                    search::SearchEntry::new(parts.join(" ").to_ascii_lowercase(), i)
+                })
+                .collect()
+        } else {
+            all_display
+                .iter()
+                .enumerate()
+                .map(|(i, s)| search::SearchEntry::new(s.to_ascii_lowercase(), i))
+                .collect()
+        };
         let matched_indices = search::filter(&app.search_query, &entries);
         matched_indices
             .into_iter()

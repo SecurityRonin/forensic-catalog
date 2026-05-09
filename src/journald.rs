@@ -18,7 +18,16 @@ pub mod object_type {
     pub const ENTRY_ARRAY: u8 = 6;
     pub const TAG: u8 = 7;
     /// All valid object type bytes.
-    pub const ALL: &[u8] = &[UNUSED, DATA, FIELD, ENTRY, DATA_HASH_TABLE, FIELD_HASH_TABLE, ENTRY_ARRAY, TAG];
+    pub const ALL: &[u8] = &[
+        UNUSED,
+        DATA,
+        FIELD,
+        ENTRY,
+        DATA_HASH_TABLE,
+        FIELD_HASH_TABLE,
+        ENTRY_ARRAY,
+        TAG,
+    ];
 }
 
 /// Object compression flag values (ObjectHeader.flags field).
@@ -31,9 +40,9 @@ pub mod compression {
 
 /// Journal file state values (Header.state field).
 pub mod state {
-    pub const OFFLINE: u8 = 0;   // clean shutdown
-    pub const ONLINE: u8 = 1;    // currently open (or dirty)
-    pub const ARCHIVED: u8 = 2;  // rotated, read-only
+    pub const OFFLINE: u8 = 0; // clean shutdown
+    pub const ONLINE: u8 = 1; // currently open (or dirty)
+    pub const ARCHIVED: u8 = 2; // rotated, read-only
 }
 
 /// Known journal field names (the KEY in KEY=VALUE journal entries).
@@ -177,7 +186,10 @@ pub fn is_valid_object_type(b: u8) -> bool {
 /// Returns true if the compression flags byte is a known value.
 #[must_use]
 pub fn is_valid_compression_flags(b: u8) -> bool {
-    matches!(b, compression::NONE | compression::XZ | compression::LZ4 | compression::ZSTD)
+    matches!(
+        b,
+        compression::NONE | compression::XZ | compression::LZ4 | compression::ZSTD
+    )
 }
 
 /// Returns true if the state byte is a known journal state.

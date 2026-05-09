@@ -246,9 +246,7 @@ pub fn is_regular_interval(intervals_ns: &[i64]) -> bool {
         (sorted[n / 2 - 1] / 2) + (sorted[n / 2] / 2)
     };
 
-    let tolerance = (median as u64)
-        .saturating_mul(BEACON_JITTER_PPT)
-        / 1000;
+    let tolerance = (median as u64).saturating_mul(BEACON_JITTER_PPT) / 1000;
     let lo = median - tolerance as i64;
     let hi = median + tolerance as i64;
 
@@ -586,7 +584,13 @@ mod tests {
 
     #[test]
     fn irregular_intervals_not_detected_as_beacon() {
-        let iv = [60_000_000_000i64, 120_000_000_000, 30_000_000_000, 90_000_000_000, 60_000_000_000];
+        let iv = [
+            60_000_000_000i64,
+            120_000_000_000,
+            30_000_000_000,
+            90_000_000_000,
+            60_000_000_000,
+        ];
         assert!(!is_regular_interval(&iv));
     }
 
@@ -602,7 +606,11 @@ mod tests {
 
     #[test]
     fn negative_interval_returns_false() {
-        assert!(!is_regular_interval(&[60_000_000_000i64, -1, 60_000_000_000]));
+        assert!(!is_regular_interval(&[
+            60_000_000_000i64,
+            -1,
+            60_000_000_000
+        ]));
     }
 
     // ── File size heuristics (group 7) ───────────────────────────────────────

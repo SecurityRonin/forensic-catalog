@@ -58,8 +58,8 @@ pub mod types;
 pub use types::{
     ArtifactDescriptor, ArtifactParsingProfile, ArtifactQuery, ArtifactRecord, ArtifactType,
     ArtifactValue, BinaryField, BinaryFieldType, ContainerProfile, ContainerSignature, DataScope,
-    DecodeError, Decoder, FieldSchema, ForensicCatalog, HiveTarget, OsScope, RecordSignature,
-    TriagePriority, ValueType,
+    DecodeError, Decoder, FieldSchema, ForensicCatalog, HiveTarget, OsScope, Platform,
+    PlatformMask, RecordSignature, TriagePriority, ValueType,
 };
 
 pub use containers_parsing::{

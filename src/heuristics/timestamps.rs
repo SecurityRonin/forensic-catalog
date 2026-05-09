@@ -203,14 +203,14 @@ mod tests {
     fn foreign_file_born_after_modified_is_foreign() {
         // born = 2023-06-01, modified = 2020-01-01 (came from elsewhere)
         let modified_ns = 1_577_836_800_000_000_000i64; // 2020-01-01 UTC
-        let born_ns = 1_685_577_600_000_000_000i64;     // 2023-06-01 UTC
+        let born_ns = 1_685_577_600_000_000_000i64; // 2023-06-01 UTC
         assert!(is_foreign_file(born_ns, modified_ns));
     }
 
     #[test]
     fn foreign_file_born_before_modified_is_normal() {
         // born = 2020-01-01, modified = 2023-06-01 (created here, then edited)
-        let born_ns = 1_577_836_800_000_000_000i64;     // 2020-01-01 UTC
+        let born_ns = 1_577_836_800_000_000_000i64; // 2020-01-01 UTC
         let modified_ns = 1_685_577_600_000_000_000i64; // 2023-06-01 UTC
         assert!(!is_foreign_file(born_ns, modified_ns));
     }

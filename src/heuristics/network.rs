@@ -43,7 +43,10 @@ pub fn is_multicast_ipv4(ip: [u8; 4]) -> bool {
 /// Public IPv4 addresses reaching external infrastructure indicate potential C2/exfil.
 #[must_use]
 pub fn is_public_ipv4(ip: [u8; 4]) -> bool {
-    !is_private_ipv4(ip) && !is_loopback_ipv4(ip) && !is_link_local_ipv4(ip) && !is_multicast_ipv4(ip)
+    !is_private_ipv4(ip)
+        && !is_loopback_ipv4(ip)
+        && !is_link_local_ipv4(ip)
+        && !is_multicast_ipv4(ip)
 }
 
 // ── IPv6 classification ───────────────────────────────────────────────────────

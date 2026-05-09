@@ -199,6 +199,199 @@ pub const EID_SPECIAL_LOGON: u32 = 4672;
 pub const EID_PROCESS_CREATE: u32 = 4688;
 /// Security EID 4689: Process exit.
 pub const EID_PROCESS_EXIT: u32 = 4689;
+/// Security EID 4697: Service installed (Security channel).
+pub const EID_SERVICE_INSTALLED_SECURITY: u32 = 4697;
+/// Security EID 4662: Directory service object access (DCSync uses this).
+pub const EID_DIRECTORY_SERVICE_ACCESS: u32 = 4662;
+/// Security EID 4768: Kerberos TGT request (AS-REP Roasting target).
+pub const EID_KERBEROS_TGT_REQUEST: u32 = 4768;
+/// Security EID 4769: Kerberos TGS request (Kerberoasting target).
+pub const EID_KERBEROS_TGS_REQUEST: u32 = 4769;
+/// Security EID 1102: Security audit log cleared.
+pub const EID_LOG_CLEARED: u32 = 1102;
+/// Security EID 5140: Network share object accessed.
+pub const EID_SMB_SHARE_ACCESS: u32 = 5140;
+/// Security EID 5145: Network share object check (file-level SMB access).
+pub const EID_SMB_OBJECT_ACCESS: u32 = 5145;
+
+// ── System / Service EID constants ───────────────────────────────────────────
+
+/// System EID 7045: New service installed (System channel).
+pub const EID_SERVICE_INSTALLED: u32 = 7045;
+/// System / Application EID 104: Application log cleared.
+pub const EID_LOG_CLEARED_SYSTEM: u32 = 104;
+/// System EID 105: Channel log cleared or disabled.
+pub const EID_CHANNEL_LOG_CLEARED: u32 = 105;
+
+// ── Task Scheduler EID constants (Microsoft-Windows-TaskScheduler/Operational)
+
+/// TaskScheduler EID 106: Task registered (created or updated).
+pub const EID_TASK_REGISTERED: u32 = 106;
+/// TaskScheduler EID 140: Task updated.
+pub const EID_TASK_UPDATED: u32 = 140;
+/// TaskScheduler EID 141: Task deleted.
+pub const EID_TASK_DELETED: u32 = 141;
+/// TaskScheduler EID 200: Task action started.
+pub const EID_TASK_LAUNCHED: u32 = 200;
+/// TaskScheduler EID 201: Task action completed.
+pub const EID_TASK_COMPLETED: u32 = 201;
+
+// ── WMI-Activity EID constants (Microsoft-Windows-WMI-Activity/Operational) ──
+
+/// WMI-Activity EID 5860: WMI filter subscribed.
+pub const EID_WMI_FILTER_SUBSCRIBED: u32 = 5860;
+/// WMI-Activity EID 5861: WMI filter triggered (subscription fired).
+pub const EID_WMI_FILTER_TRIGGERED: u32 = 5861;
+
+// ── BITS-Client EID constants (Microsoft-Windows-Bits-Client/Operational) ────
+
+/// BITS-Client EID 59: Job transfer initiated.
+pub const EID_BITS_TRANSFER_START: u32 = 59;
+/// BITS-Client EID 60: Job transfer completed.
+pub const EID_BITS_TRANSFER_COMPLETE: u32 = 60;
+
+// ── PowerShell EID constants (Microsoft-Windows-PowerShell/Operational) ──────
+
+/// PowerShell EID 4104: Script block logging — full script text captured.
+pub const EID_PS_SCRIPT_BLOCK: u32 = 4104;
+
+// ── Microsoft Defender EID constants ─────────────────────────────────────────
+
+/// Microsoft Defender EID 1116: Malware detected.
+pub const EID_DEFENDER_MALWARE_DETECTED: u32 = 1116;
+/// Microsoft Defender EID 5001: Real-time protection disabled.
+pub const EID_DEFENDER_REALTIME_DISABLED: u32 = 5001;
+/// Microsoft Defender EID 5007: Antimalware configuration changed.
+pub const EID_DEFENDER_CONFIG_CHANGED: u32 = 5007;
+
+// ── W32Time EID constants (System channel) ───────────────────────────────────
+
+/// W32Time EID 37: NtpClient could not find a domain controller.
+pub const EID_W32TIME_NTP_FAILED: u32 = 37;
+/// W32Time EID 158: System clock synchronized.
+pub const EID_W32TIME_SYNC: u32 = 158;
+
+// ── Additional Sysmon EID constants ─────────────────────────────────────────
+
+/// Sysmon EID 10: ProcessAccess — one process opened a handle to another.
+pub const EID_SYSMON_PROCESS_ACCESS: u32 = 10;
+/// Sysmon EID 16: Sysmon configuration changed.
+pub const EID_SYSMON_CONFIG_CHANGE: u32 = 16;
+/// Sysmon EID 255: Sysmon error / driver unload.
+pub const EID_SYSMON_DRIVER_UNLOAD: u32 = 255;
+
+// ── Additional Sysmon field name constants ───────────────────────────────────
+
+/// `data` key for DNS query name in Sysmon EID 22.
+pub const SYSMON_FIELD_QUERY_NAME: &str = "QueryName";
+/// `data` key for the access mask in Sysmon EID 10 (ProcessAccess).
+pub const SYSMON_FIELD_GRANTED_ACCESS: &str = "GrantedAccess";
+/// `data` key for the target process image in Sysmon EID 10.
+pub const SYSMON_FIELD_TARGET_IMAGE: &str = "TargetImage";
+/// `data` key for the source IP in Sysmon EID 3 (NetworkConnect).
+pub const SYSMON_FIELD_SOURCE_IP: &str = "SourceIp";
+/// `data` key for the destination IP in Sysmon EID 3.
+pub const SYSMON_FIELD_DEST_IP: &str = "DestinationIp";
+/// `data` key for the destination port in Sysmon EID 3.
+pub const SYSMON_FIELD_DEST_PORT: &str = "DestinationPort";
+
+// ── DCSync replication GUIDs ─────────────────────────────────────────────────
+// These appear in the Properties field of Security EID 4662 during DCSync.
+// Source: MS-ADTS §3.1.1.3.3 — Active Directory replication access rights.
+
+/// Active Directory DS-Replication-Get-Changes right (required for DCSync).
+pub const GUID_DS_REPLICATION_GET_CHANGES: &str = "{1131f6aa-9c07-11d1-f79f-00c04fc2dcd2}";
+/// Active Directory DS-Replication-Get-Changes-All (full DCSync, incl. secrets).
+pub const GUID_DS_REPLICATION_GET_CHANGES_ALL: &str = "{1131f6ad-9c07-11d1-f79f-00c04fc2dcd2}";
+/// DS-Replication-Get-Changes-In-Filtered-Set (partial DC sync).
+pub const GUID_DS_REPLICATION_FILTERED: &str = "{89e95b76-444d-4c62-991a-0facbeda640c}";
+
+// ── AMSI bypass indicator strings ────────────────────────────────────────────
+// These appear in PowerShell 4104 ScriptBlockText when AMSI is patched
+// in-memory. Each string is a known-bad substring, case-insensitive.
+
+/// Known AMSI bypass indicator strings found in PowerShell 4104 script blocks.
+pub const AMSI_BYPASS_PATTERNS: &[&str] = &[
+    "amsiInitFailed",
+    "amsiContext",
+    "amsiSession",
+    "AmsiUtils",
+    "PatchAmsi",
+    "amsi.dll",
+    "AmsiScanBuffer",
+    "AmsiScanString",
+    "[Runtime.InteropServices.Marshal]::Copy",
+];
+
+// ── Archiver process names (Compression/Staging detection) ───────────────────
+
+/// Archiver process basenames that indicate compression/staging activity.
+pub const ARCHIVER_PROCESS_NAMES: &[&str] = &[
+    "7z.exe",
+    "7za.exe",
+    "winrar.exe",
+    "rar.exe",
+    "pkzip.exe",
+    "winzip.exe",
+    "compress.exe",
+    "compact.exe",
+    "xcopy.exe",
+];
+
+/// Compressed archive extensions indicative of staging in temp directories.
+pub const STAGING_ARCHIVE_EXTENSIONS: &[&str] = &[
+    ".zip", ".7z", ".rar", ".tar", ".gz", ".bz2", ".xz", ".cab",
+];
+
+// ── LSASS process name ────────────────────────────────────────────────────────
+
+/// LSASS process image name — target of credential dumping (EID 10).
+pub const LSASS_IMAGE_NAME: &str = "lsass.exe";
+
+/// Known GrantedAccess masks used for LSASS credential dumping.
+pub const LSASS_DUMP_ACCESS_MASKS: &[u32] = &[
+    0x0010, // PROCESS_VM_READ
+    0x1010, // PROCESS_VM_READ | PROCESS_QUERY_LIMITED_INFORMATION
+    0x1410, // PROCESS_VM_READ | PROCESS_QUERY_INFORMATION | ...
+    0x1fffff, // PROCESS_ALL_ACCESS
+];
+
+// ── PsExec / service-execution indicators ────────────────────────────────────
+
+/// Service name patterns written by PsExec and compatible tools.
+pub const PSEXEC_SERVICE_PATTERNS: &[&str] = &[
+    "PSEXESVC",
+    "psexesvc",
+    "PAExec",
+    "paexec",
+    "remcom",
+    "RemComSvc",
+];
+
+// ── Defender tampering PowerShell patterns ────────────────────────────────────
+
+/// PowerShell patterns that appear when Defender is being tampered with.
+pub const DEFENDER_TAMPER_PATTERNS: &[&str] = &[
+    "Set-MpPreference",
+    "Add-MpPreference",
+    "DisableRealtimeMonitoring",
+    "ExclusionPath",
+    "ExclusionProcess",
+    "ExclusionExtension",
+    "DisableAntiSpyware",
+    "DisableAntiVirus",
+];
+
+// ── Channel constants ─────────────────────────────────────────────────────────
+
+/// WMI-Activity operational channel.
+pub const WMI_ACTIVITY_CHANNEL: &str = "Microsoft-Windows-WMI-Activity/Operational";
+/// TaskScheduler operational channel.
+pub const TASKSCHEDULER_CHANNEL: &str = "Microsoft-Windows-TaskScheduler/Operational";
+/// BITS-Client operational channel.
+pub const BITS_CLIENT_CHANNEL: &str = "Microsoft-Windows-Bits-Client/Operational";
+/// Windows Defender operational channel.
+pub const DEFENDER_CHANNEL: &str = "Microsoft-Windows-Windows Defender/Operational";
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 #[cfg(test)]

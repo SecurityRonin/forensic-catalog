@@ -40,7 +40,9 @@ pub fn combine_all_confidence(confidences: &[u8]) -> u8 {
     match confidences {
         [] => 0,
         [single] => *single,
-        [first, rest @ ..] => rest.iter().fold(*first, |acc, &c| combine_confidence(acc, c)),
+        [first, rest @ ..] => rest
+            .iter()
+            .fold(*first, |acc, &c| combine_confidence(acc, c)),
     }
 }
 
@@ -114,6 +116,9 @@ mod tests {
         // combine(50, 50) = 75, combine(75, 50) = 87 (rounded)
         // 1 - (1-0.5)(1-0.5)(1-0.5) = 1 - 0.125 = 0.875 → 87 or 88
         let result = combine_all_confidence(&[50, 50, 50]);
-        assert!(result == 87 || result == 88, "expected 87 or 88, got {result}");
+        assert!(
+            result == 87 || result == 88,
+            "expected 87 or 88, got {result}"
+        );
     }
 }

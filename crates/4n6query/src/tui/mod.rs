@@ -79,7 +79,9 @@ mod tests {
         // "prefetch" in their id, so this check holds for the primary matches.
         // (Meaning-only matches may appear too, which is correct behaviour.)
         assert!(
-            rd.list_items.iter().any(|s| s.to_lowercase().contains("prefetch")),
+            rd.list_items
+                .iter()
+                .any(|s| s.to_lowercase().contains("prefetch")),
             "at least one result must be a prefetch artifact"
         );
     }
@@ -291,7 +293,9 @@ fn catalog_passes(app: &app::App, preset: &presets::Preset, d: &ArtifactDescript
             app.platform_mask.matches(d.os_scope.platform())
         }
     } else {
-        preset.os.map_or(true, |os| os.platform() == d.os_scope.platform())
+        preset
+            .os
+            .map_or(true, |os| os.platform() == d.os_scope.platform())
     };
     platform_ok && (preset.priorities.is_empty() || preset.priorities.contains(&d.triage_priority))
 }

@@ -22,13 +22,14 @@ pub fn is_background_cpu_dominant(background_cycles: u64, foreground_cycles: u64
 /// Zero bytes-received returns `true` when bytes-sent is non-zero.
 #[must_use]
 pub fn is_exfil_ratio(bytes_sent: u64, bytes_received: u64) -> bool {
-    bytes_sent > 0
-        && (bytes_received == 0 || bytes_sent / bytes_received >= EXFIL_BYTES_RATIO)
+    bytes_sent > 0 && (bytes_received == 0 || bytes_sent / bytes_received >= EXFIL_BYTES_RATIO)
 }
 
 /// Returns `true` if total outbound bytes exceed the exfiltration volume threshold.
 #[must_use]
-pub fn is_exfil_volume(bytes_sent: u64) -> bool { bytes_sent >= EXFIL_VOLUME_BYTES }
+pub fn is_exfil_volume(bytes_sent: u64) -> bool {
+    bytes_sent >= EXFIL_VOLUME_BYTES
+}
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 #[cfg(test)]

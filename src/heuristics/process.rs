@@ -317,4 +317,83 @@ mod tests {
     fn winscp_ssh_logon_wrong_process_not_flagged() {
         assert!(!is_winscp_ssh_service_logon(5, "VIRTUAL USERS", "lsass.exe"));
     }
+
+    // ── is_run_key_powershell_stager ──────────────────────────────────────────
+
+    #[test]
+    fn run_key_get_item_property_stager_detected() {
+        // Typical two-stage: powershell reads payload from another registry key.
+        let cmd = r"powershell.exe -WindowStyle Hidden -NoProfile -NonInteractive -enc (Get-ItemProperty HKLM:\Software\hztGpoWa).hztGpoWa";
+        assert!(is_run_key_powershell_stager(cmd));
+    }
+
+    #[test]
+    fn run_key_gp_shorthand_stager_detected() {
+        // (gp ...) is common shorthand for Get-ItemProperty.
+        let cmd = r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -nop -w hidden -enc (gp HKLM:\software\payload).data";
+        assert!(is_run_key_powershell_stager(cmd));
+    }
+
+    #[test]
+    fn run_key_powershell_encoded_command_detected() {
+        // Direct -EncodedCommand stager (no Get-ItemProperty — still a PS stager).
+        let cmd = "powershell -EncodedCommand JABjAG0AZAAgAD0AIAB7AHsAaQBuAHYAbwBrAGUALQBtAGkAbQBpAGsAYQB0AHoAfQB9";
+        assert!(is_run_key_powershell_stager(cmd));
+    }
+
+    #[test]
+    fn run_key_powershell_enc_short_flag_detected() {
+        let cmd = "powershell.exe -nop -w hidden -enc SQBFAFgA";
+        assert!(is_run_key_powershell_stager(cmd));
+    }
+
+    #[test]
+    fn run_key_normal_powershell_not_stager() {
+        // Legitimate-looking PS invocation without obfuscation or payload read.
+        let cmd = r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -File C:\scripts\backup.ps1";
+        assert!(!is_run_key_powershell_stager(cmd));
+    }
+
+    #[test]
+    fn run_key_non_powershell_not_stager() {
+        let cmd = r"C:\Program Files\SomeApp\app.exe --start";
+        assert!(!is_run_key_powershell_stager(cmd));
+    }
+
+    #[test]
+    fn run_key_empty_value_not_stager() {
+        assert!(!is_run_key_powershell_stager(""));
+    }
+
+    // ── is_comspec_in_registry_value ─────────────────────────────────────────
+
+    #[test]
+    fn comspec_uppercase_detected() {
+        let value = r"%COMSPEC% /b /c start /b /min powershell.exe -nop -w hidden -enc SQBFAFgA";
+        assert!(is_comspec_in_registry_value(value));
+    }
+
+    #[test]
+    fn comspec_lowercase_detected() {
+        // Registry string comparison should be case-insensitive.
+        let value = r"%comspec% /c powershell -enc SQBFAFgA";
+        assert!(is_comspec_in_registry_value(value));
+    }
+
+    #[test]
+    fn comspec_mixed_case_detected() {
+        let value = r"%ComSpec% /c cmd /c start";
+        assert!(is_comspec_in_registry_value(value));
+    }
+
+    #[test]
+    fn value_without_comspec_not_flagged() {
+        let value = r"C:\Windows\system32\cmd.exe /c start";
+        assert!(!is_comspec_in_registry_value(value));
+    }
+
+    #[test]
+    fn empty_value_not_flagged_comspec() {
+        assert!(!is_comspec_in_registry_value(""));
+    }
 }

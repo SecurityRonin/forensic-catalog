@@ -14,6 +14,7 @@
 //! `serde`, or I/O belongs in a higher layer (e.g., `rt-correlation`).
 
 pub mod entropy;
+pub mod evtx;
 pub mod memory;
 pub mod network;
 pub mod paths;

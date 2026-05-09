@@ -63,6 +63,16 @@ mod tests {
     }
 
     #[test]
+    fn background_not_dominant_both_zero() {
+        assert!(!is_background_cpu_dominant(0, 0));
+    }
+
+    #[test]
+    fn background_not_dominant_background_zero_foreground_nonzero() {
+        assert!(!is_background_cpu_dominant(0, 500));
+    }
+
+    #[test]
     fn exfil_ratio_ten_to_one() {
         assert!(is_exfil_ratio(1000, 100));
     }

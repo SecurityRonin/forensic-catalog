@@ -5,7 +5,9 @@
 /// Returns `true` if the PID is a valid Windows process ID.
 /// Windows PIDs are always multiples of 4 and non-zero.
 #[must_use]
-pub fn is_valid_windows_pid(pid: u32) -> bool { pid != 0 && pid % 4 == 0 }
+pub fn is_valid_windows_pid(pid: u32) -> bool {
+    pid != 0 && pid % 4 == 0
+}
 
 /// Returns `true` if the child process appears to have been created before its parent.
 /// This is impossible under normal conditions and indicates PPID spoofing (T1134.004).
@@ -16,36 +18,46 @@ pub fn is_child_born_before_parent(child_create_ns: i64, parent_create_ns: i64) 
 
 // ── Windows logon type constants (Event ID 4624) ──────────────────────────
 
-pub const LOGON_INTERACTIVE: u32       = 2;
-pub const LOGON_NETWORK: u32           = 3;
-pub const LOGON_BATCH: u32             = 4;
-pub const LOGON_SERVICE: u32           = 5;
+pub const LOGON_INTERACTIVE: u32 = 2;
+pub const LOGON_NETWORK: u32 = 3;
+pub const LOGON_BATCH: u32 = 4;
+pub const LOGON_SERVICE: u32 = 5;
 pub const LOGON_NETWORK_CLEARTEXT: u32 = 8;
-pub const LOGON_NEW_CREDENTIALS: u32   = 9;  // pass-the-hash / pass-the-ticket
+pub const LOGON_NEW_CREDENTIALS: u32 = 9; // pass-the-hash / pass-the-ticket
 pub const LOGON_REMOTE_INTERACTIVE: u32 = 10; // RDP
 
 /// Returns `true` for network-originating logon types (lateral movement candidates).
 #[must_use]
 pub fn is_remote_logon(logon_type: u32) -> bool {
-    matches!(logon_type, LOGON_NETWORK | LOGON_REMOTE_INTERACTIVE | LOGON_NETWORK_CLEARTEXT)
+    matches!(
+        logon_type,
+        LOGON_NETWORK | LOGON_REMOTE_INTERACTIVE | LOGON_NETWORK_CLEARTEXT
+    )
 }
 
 /// Returns `true` for logon types commonly used in lateral movement / credential abuse.
 #[must_use]
 pub fn is_lateral_movement_logon(logon_type: u32) -> bool {
-    matches!(logon_type, LOGON_NEW_CREDENTIALS | LOGON_NETWORK | LOGON_NETWORK_CLEARTEXT)
+    matches!(
+        logon_type,
+        LOGON_NEW_CREDENTIALS | LOGON_NETWORK | LOGON_NETWORK_CLEARTEXT
+    )
 }
 
 /// Returns `true` if the Windows session ID indicates Session 0 (system/service, non-interactive).
 #[must_use]
-pub fn is_system_session(session_id: u32) -> bool { session_id == 0 }
+pub fn is_system_session(session_id: u32) -> bool {
+    session_id == 0
+}
 
 /// Token elevation type 3 = full admin token (UAC bypassed or already elevated).
 pub const TOKEN_ELEVATION_FULL: u32 = 3;
 
 /// Returns `true` if the token elevation type indicates a fully elevated (admin) token.
 #[must_use]
-pub fn is_elevated_token(elevation_type: u32) -> bool { elevation_type == TOKEN_ELEVATION_FULL }
+pub fn is_elevated_token(elevation_type: u32) -> bool {
+    elevation_type == TOKEN_ELEVATION_FULL
+}
 
 // ── Linux process heuristics ────────────────────────────────────────────────
 
@@ -57,21 +69,25 @@ pub const SUSPICIOUS_PID_GAP: u32 = 50;
 /// A gap in consecutive /proc entries means processes were hidden.
 #[must_use]
 pub fn has_pid_gap(sorted_pids: &[u32], max_gap: u32) -> bool {
-    sorted_pids.windows(2).any(|w| w[1].saturating_sub(w[0]) > max_gap)
+    sorted_pids
+        .windows(2)
+        .any(|w| w[1].saturating_sub(w[0]) > max_gap)
 }
 
 // Linux POSIX capability numbers (from linux/capability.h)
-pub const CAP_DAC_OVERRIDE: u32 = 1;  // bypass file permission checks
-pub const CAP_NET_RAW: u32      = 13; // raw sockets / packet capture
-pub const CAP_SYS_PTRACE: u32   = 19; // ptrace any process
-pub const CAP_SYS_ADMIN: u32    = 21; // broad system administration
+pub const CAP_DAC_OVERRIDE: u32 = 1; // bypass file permission checks
+pub const CAP_NET_RAW: u32 = 13; // raw sockets / packet capture
+pub const CAP_SYS_PTRACE: u32 = 19; // ptrace any process
+pub const CAP_SYS_ADMIN: u32 = 21; // broad system administration
 
 /// Capabilities that grant near-root privileges or forensic evasion ability.
 pub const DANGEROUS_CAPS: &[u32] = &[CAP_DAC_OVERRIDE, CAP_NET_RAW, CAP_SYS_PTRACE, CAP_SYS_ADMIN];
 
 /// Returns `true` if `cap` is in the dangerous capabilities list.
 #[must_use]
-pub fn is_dangerous_capability(cap: u32) -> bool { DANGEROUS_CAPS.contains(&cap) }
+pub fn is_dangerous_capability(cap: u32) -> bool {
+    DANGEROUS_CAPS.contains(&cap)
+}
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 #[cfg(test)]
@@ -198,5 +214,62 @@ mod tests {
     fn non_dangerous_cap_chown() {
         // CAP_CHOWN = 0
         assert!(!is_dangerous_capability(0));
+    }
+
+    // ── is_openssh_virtual_users_domain ──────────────────────────────────────
+
+    #[test]
+    fn virtual_users_domain_matches() {
+        // Per az4n6.blogspot.com/2020/02/detecting-laterial-movment-with-winscp.html:
+        // Windows OpenSSH server emits 4624 events with domain "VIRTUAL USERS".
+        assert!(is_openssh_virtual_users_domain("VIRTUAL USERS"));
+    }
+
+    #[test]
+    fn virtual_users_domain_case_insensitive() {
+        assert!(is_openssh_virtual_users_domain("virtual users"));
+        assert!(is_openssh_virtual_users_domain("Virtual Users"));
+    }
+
+    #[test]
+    fn normal_domain_not_virtual_users() {
+        assert!(!is_openssh_virtual_users_domain("WORKGROUP"));
+        assert!(!is_openssh_virtual_users_domain("CORP"));
+        assert!(!is_openssh_virtual_users_domain("NT AUTHORITY"));
+    }
+
+    #[test]
+    fn empty_domain_not_virtual_users() {
+        assert!(!is_openssh_virtual_users_domain(""));
+    }
+
+    // ── is_winscp_ssh_service_logon ───────────────────────────────────────────
+
+    #[test]
+    fn winscp_ssh_logon_type5_virtual_users_sshd() {
+        // The exact combination the blog describes: 4624 type 5, VIRTUAL USERS, sshd.exe.
+        assert!(is_winscp_ssh_service_logon(5, "VIRTUAL USERS", "sshd.exe"));
+    }
+
+    #[test]
+    fn winscp_ssh_logon_process_case_insensitive() {
+        assert!(is_winscp_ssh_service_logon(5, "VIRTUAL USERS", "SSHD.EXE"));
+        assert!(is_winscp_ssh_service_logon(5, "VIRTUAL USERS", "Sshd.Exe"));
+    }
+
+    #[test]
+    fn winscp_ssh_logon_wrong_type_not_flagged() {
+        // Type 3 (network) with same domain/process is NOT the OpenSSH service pattern.
+        assert!(!is_winscp_ssh_service_logon(3, "VIRTUAL USERS", "sshd.exe"));
+    }
+
+    #[test]
+    fn winscp_ssh_logon_wrong_domain_not_flagged() {
+        assert!(!is_winscp_ssh_service_logon(5, "CORP", "sshd.exe"));
+    }
+
+    #[test]
+    fn winscp_ssh_logon_wrong_process_not_flagged() {
+        assert!(!is_winscp_ssh_service_logon(5, "VIRTUAL USERS", "lsass.exe"));
     }
 }

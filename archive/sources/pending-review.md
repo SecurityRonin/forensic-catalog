@@ -6,7 +6,7 @@ Mark `[x]` when reviewed, `[→]` when artifact tasks were created.
 
 ## 2026-05-03
 
-- [ ] [LNK Files](https://windowsir.blogspot.com/2026/03/lnk-files.html) — Windows Incident Response <!-- editorial commentary linking to Wietze Beukema's LNK post; no new artifact paths/fields; lnk_files already fully covered -->
+- [x] [LNK Files](https://windowsir.blogspot.com/2026/03/lnk-files.html) — Windows Incident Response <!-- re-reviewed under full standard (artifacts + heuristics): editorial commentary recommending Wietze Beukema's external blog and lnk-it-up tool; post itself contains zero specific artifact paths, GUIDs, field offsets, binary layouts, anomaly thresholds, or detection predicates — only high-level "use Yara rules" guidance. Existing coverage: lnk_files + lnk_files_office descriptors plus 32+ KAPE shortcut entries and velociraptor_file_lnk. No artifact or heuristic to implement from THIS post. -->
 - [ ] [Links](https://windowsir.blogspot.com/2026/03/links.html) — Windows Incident Response <!-- links roundup post; references DOCX RSIDs (external source), USB forensics, PCA files — all covered or external; no new artifact data in this post -->
 - [ ] [Devices](https://windowsir.blogspot.com/2026/02/devices.html) — Windows Incident Response <!-- general USB/device forensics discussion; mentions USBSTOR, DriverFrameworks-UserMode, ShellBags, MsiInstaller — all covered or discussed editorially without new field schemas -->
 - [ ] [Views on AI & the Anthropic Report](https://windowsir.blogspot.com/2026/01/views-on-ai-anthropic-report.html) — Windows Incident Response <!-- editorial/opinion on AI in cybersecurity and Anthropic cyber espionage report; no forensic artifacts -->

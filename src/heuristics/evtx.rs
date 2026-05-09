@@ -117,6 +117,89 @@ pub fn is_overlooked_channel(channel_name: &str) -> bool {
     !is_big_three_channel(channel_name)
 }
 
+// ── Super-timeline channels ───────────────────────────────────────────────────
+
+/// The five Windows EVTX channels merged into a unified forensic super-timeline.
+///
+/// Combining Security, System, Sysmon, PowerShell, and TaskScheduler gives
+/// comprehensive coverage of authentication, process execution, file activity,
+/// network connections, and scheduled task abuse in a single chronological stream.
+pub const SUPER_TIMELINE_CHANNELS: &[&str] = &[
+    "Security",
+    "System",
+    SYSMON_CHANNEL,
+    POWERSHELL_OPERATIONAL_CHANNEL,
+    TASKSCHEDULER_OPERATIONAL_CHANNEL,
+];
+
+/// Canonical channel name for Microsoft Sysmon.
+pub const SYSMON_CHANNEL: &str = "Microsoft-Windows-Sysmon/Operational";
+
+/// Canonical channel name for PowerShell operational logging.
+pub const POWERSHELL_OPERATIONAL_CHANNEL: &str = "Microsoft-Windows-PowerShell/Operational";
+
+/// Canonical channel name for the Task Scheduler operational log.
+pub const TASKSCHEDULER_OPERATIONAL_CHANNEL: &str =
+    "Microsoft-Windows-TaskScheduler/Operational";
+
+// ── Sysmon Event IDs ──────────────────────────────────────────────────────────
+
+/// Sysmon EID 1: Process Create — captures ProcessGuid chains for tree reconstruction.
+pub const EID_SYSMON_PROCESS_CREATE: u32 = 1;
+/// Sysmon EID 3: Network Connection.
+pub const EID_SYSMON_NETWORK_CONNECT: u32 = 3;
+/// Sysmon EID 7: Image Loaded.
+pub const EID_SYSMON_IMAGE_LOAD: u32 = 7;
+/// Sysmon EID 11: File Created — primary source for MFT/USN correlation.
+pub const EID_SYSMON_FILE_CREATE: u32 = 11;
+/// Sysmon EID 15: FileCreateStreamHash — alternate-data-stream detection.
+pub const EID_SYSMON_FILE_CREATE_STREAM_HASH: u32 = 15;
+/// Sysmon EID 22: DNS Query.
+pub const EID_SYSMON_DNS_QUERY: u32 = 22;
+
+// ── Boot / shutdown Event IDs (System channel) ────────────────────────────────
+
+/// System EID 6005: EventLog service started — marks a clean boot boundary.
+pub const EID_BOOT: u32 = 6005;
+/// System EID 6006: EventLog service stopped — marks a clean shutdown boundary.
+pub const EID_SHUTDOWN: u32 = 6006;
+/// System EID 6008: Unexpected shutdown — dirty-shutdown / crash boundary.
+pub const EID_UNEXPECTED_SHUTDOWN: u32 = 6008;
+
+// ── Sysmon field name constants ───────────────────────────────────────────────
+
+/// `data` key for the Sysmon process GUID (all Sysmon process events).
+pub const SYSMON_FIELD_PROCESS_GUID: &str = "ProcessGuid";
+/// `data` key for the Sysmon parent process GUID (EID 1).
+pub const SYSMON_FIELD_PARENT_PROCESS_GUID: &str = "ParentProcessGuid";
+/// `data` key for the file path in Sysmon file events (EID 11, 15).
+pub const SYSMON_FIELD_TARGET_FILENAME: &str = "TargetFilename";
+/// `data` key for the process image path (EID 1, 3, 7, 11, 15).
+pub const SYSMON_FIELD_IMAGE: &str = "Image";
+/// `data` key for the parent image path (EID 1).
+pub const SYSMON_FIELD_PARENT_IMAGE: &str = "ParentImage";
+/// `data` key for the command line (EID 1).
+pub const SYSMON_FIELD_COMMAND_LINE: &str = "CommandLine";
+/// `data` key for the parent command line (EID 1).
+pub const SYSMON_FIELD_PARENT_COMMAND_LINE: &str = "ParentCommandLine";
+
+// ── Security channel EID constants (commonly referenced in orchestration) ─────
+
+/// Security EID 4624: Successful logon.
+pub const EID_LOGON: u32 = 4624;
+/// Security EID 4625: Failed logon.
+pub const EID_LOGON_FAILURE: u32 = 4625;
+/// Security EID 4634: Logoff.
+pub const EID_LOGOFF: u32 = 4634;
+/// Security EID 4647: User-initiated logoff.
+pub const EID_LOGOFF_USER: u32 = 4647;
+/// Security EID 4672: Special privileges assigned to new logon.
+pub const EID_SPECIAL_LOGON: u32 = 4672;
+/// Security EID 4688: Process creation.
+pub const EID_PROCESS_CREATE: u32 = 4688;
+/// Security EID 4689: Process exit.
+pub const EID_PROCESS_EXIT: u32 = 4689;
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 #[cfg(test)]
 mod tests {
@@ -269,5 +352,97 @@ mod tests {
     fn empty_channel_name_is_overlooked() {
         // Defensive: empty string is not in the Big Three.
         assert!(is_overlooked_channel(""));
+    }
+
+    // ── Super-timeline channels ───────────────────────────────────────────────
+
+    #[test]
+    fn super_timeline_channels_has_five_entries() {
+        assert_eq!(SUPER_TIMELINE_CHANNELS.len(), 5);
+    }
+
+    #[test]
+    fn super_timeline_channels_includes_security_and_system() {
+        assert!(SUPER_TIMELINE_CHANNELS.contains(&"Security"));
+        assert!(SUPER_TIMELINE_CHANNELS.contains(&"System"));
+    }
+
+    #[test]
+    fn super_timeline_channels_includes_sysmon() {
+        assert!(SUPER_TIMELINE_CHANNELS.contains(&SYSMON_CHANNEL));
+    }
+
+    #[test]
+    fn super_timeline_channels_includes_powershell_and_taskscheduler() {
+        assert!(SUPER_TIMELINE_CHANNELS.contains(&POWERSHELL_OPERATIONAL_CHANNEL));
+        assert!(SUPER_TIMELINE_CHANNELS.contains(&TASKSCHEDULER_OPERATIONAL_CHANNEL));
+    }
+
+    #[test]
+    fn sysmon_channel_name_is_correct() {
+        assert_eq!(SYSMON_CHANNEL, "Microsoft-Windows-Sysmon/Operational");
+    }
+
+    // ── Sysmon EIDs ──────────────────────────────────────────────────────────
+
+    #[test]
+    fn sysmon_process_create_is_eid_1() {
+        assert_eq!(EID_SYSMON_PROCESS_CREATE, 1);
+    }
+
+    #[test]
+    fn sysmon_file_create_is_eid_11() {
+        assert_eq!(EID_SYSMON_FILE_CREATE, 11);
+    }
+
+    #[test]
+    fn sysmon_file_create_stream_hash_is_eid_15() {
+        assert_eq!(EID_SYSMON_FILE_CREATE_STREAM_HASH, 15);
+    }
+
+    // ── Boot / shutdown EIDs ─────────────────────────────────────────────────
+
+    #[test]
+    fn eid_boot_is_6005() {
+        assert_eq!(EID_BOOT, 6005);
+    }
+
+    #[test]
+    fn eid_shutdown_is_6006() {
+        assert_eq!(EID_SHUTDOWN, 6006);
+    }
+
+    #[test]
+    fn eid_unexpected_shutdown_is_6008() {
+        assert_eq!(EID_UNEXPECTED_SHUTDOWN, 6008);
+    }
+
+    // ── Sysmon field names ────────────────────────────────────────────────────
+
+    #[test]
+    fn sysmon_field_process_guid_is_correct() {
+        assert_eq!(SYSMON_FIELD_PROCESS_GUID, "ProcessGuid");
+    }
+
+    #[test]
+    fn sysmon_field_target_filename_is_correct() {
+        assert_eq!(SYSMON_FIELD_TARGET_FILENAME, "TargetFilename");
+    }
+
+    // ── Security EID constants ────────────────────────────────────────────────
+
+    #[test]
+    fn eid_logon_is_4624() {
+        assert_eq!(EID_LOGON, 4624);
+    }
+
+    #[test]
+    fn eid_special_logon_is_4672() {
+        assert_eq!(EID_SPECIAL_LOGON, 4672);
+    }
+
+    #[test]
+    fn eid_process_create_is_4688() {
+        assert_eq!(EID_PROCESS_CREATE, 4688);
     }
 }

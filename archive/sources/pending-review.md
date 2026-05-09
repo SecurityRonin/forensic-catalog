@@ -13303,3 +13303,25 @@ Mark `[x]` when reviewed, `[→]` when artifact tasks were created.
 - [ ] [Instructure Breach Exposes Schools' Vendor Dependence](https://www.darkreading.com/cyberattacks-data-breaches/instructure-breach-exposes-schools-vendor-dependence) — Dark Reading
 - [ ] [From Stuxnet to ChatGPT: 20 News Events That Shaped Cyber](https://www.darkreading.com/threat-intelligence/stuxnet-chatgpt-20-news-events-cyber) — Dark Reading
 - [ ] [Attacks Abuse Windows Phone Link to Steal Texts &amp; Bypass 2FA](https://www.darkreading.com/cyberattacks-data-breaches/attacks-abuse-windows-phone-link-texts-bypass-2fa) — Dark Reading
+
+## 2026-05-09
+
+- [ ] [Culture fit is a trap for innovation](https://andreafortuna.org/2026/05/08/the-culture-fit-trap/) — Andrea Fortuna
+- [ ] [Forensic Focus Digest, May 08 2026](https://www.forensicfocus.com/news/forensic-focus-digest-may-08-2026/) — Forensic Focus
+- [ ] [AI in enterprise DFIR: Moving fast, staying defensible](https://www.magnetforensics.com/blog/ai-in-enterprise-dfir-moving-fast-staying-defensible/) — Magnet Forensics
+- [ ] [Another Universal Linux Local Privilege Escalation (LPE) Vulnerability: Dirty Frag, (Fri, May 8th)](https://isc.sans.edu/diary/rss/32968) — SANS Internet Storm Center
+- [ ] [InfoSec News Nuggets 05/08/2026](https://aboutdfir.com/infosec-news-nuggets-05-08-2026/) — AboutDFIR
+- [ ] [Naturalists: Into the 20th century](https://eclecticlight.co/2026/05/08/naturalists-into-the-20th-century/) — The Eclectic Light Company
+- [ ] [How to check whether Spotlight is getting the right metadata](https://eclecticlight.co/2026/05/08/how-to-check-whether-spotlight-is-getting-the-right-metadata/) — The Eclectic Light Company
+- [ ] [The Next Shift in Investigations: Preparing for an AI-Powered Reality](https://cellebrite.com/en/resources/webinars/the-next-shift-in-investigations-preparing-for-an-ai-powered-reality/) — Cellebrite Blog
+- [ ] [Cellebrite Announces Participation in Upcoming Investor Conferences](https://cellebrite.com/en/resources/press-releases/cellebrite-announces-participation-in-upcoming-investor-conferences-4/) — Cellebrite Blog
+- [ ] [Microsoft says Edge’s plaintext password behavior is “by design”](https://www.malwarebytes.com/blog/news/2026/05/microsoft-says-edges-plaintext-password-behavior-is-by-design) — Malwarebytes Labs
+- [ ] [ShinyHunters escalates Canvas attacks with school login defacements](https://www.malwarebytes.com/blog/news/2026/05/shinyhunters-escalates-canvas-attacks-with-school-login-defacements) — Malwarebytes Labs
+- [ ] [NVIDIA confirms GeForce NOW data breach affecting Armenian users](https://www.bleepingcomputer.com/news/security/nvidia-confirms-geforce-now-data-breach-affecting-armenian-users/) — BleepingComputer
+- [ ] [Why More Analysts Won’t Solve Your SOC’s Alert Problem](https://www.bleepingcomputer.com/news/security/why-more-analysts-wont-solve-your-socs-alert-problem/) — BleepingComputer
+- [ ] [Trellix source code breach claimed by RansomHouse hackers](https://www.bleepingcomputer.com/news/security/trellix-source-code-breach-claimed-by-ransomhouse-hackers/) — BleepingComputer
+- [ ] [CISA gives feds four days to patch Ivanti flaw exploited as zero-day](https://www.bleepingcomputer.com/news/security/cisa-gives-feds-four-days-to-patch-ivanti-flaw-exploited-as-zero-day/) — BleepingComputer
+- [ ] [Zara data breach exposed personal information of 197,000 people](https://www.bleepingcomputer.com/news/security/zara-data-breach-exposed-personal-information-of-197-000-people/) — BleepingComputer
+- [ ] [Former govt contractor convicted for wiping dozens of federal databases](https://www.bleepingcomputer.com/news/security/former-govt-contractor-convicted-for-wiping-dozens-of-federal-databases/) — BleepingComputer
+- [ ] [New Linux 'Dirty Frag' zero-day gives root on all major distros](https://www.bleepingcomputer.com/news/security/new-linux-dirty-frag-zero-day-with-poc-exploit-gives-root-privileges/) — BleepingComputer
+- [ ] [ShinyHunters Claims Second Attack Against Instructure](https://www.darkreading.com/cyberattacks-data-breaches/shinyhunters-second-attack-instructure) — Dark Reading

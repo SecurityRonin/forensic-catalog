@@ -797,3 +797,151 @@ pub(crate) static ENABLE_PERIODIC_BACKUP: ArtifactDescriptor = ArtifactDescripto
         "https://www.inversecos.com/2022/04/malicious-registry-timestamp.html",
     ],
 };
+
+// ── T1021.001 / T1112 — fDenyTSConnections (RDP Enable) ──────────────────────
+
+/// `HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server`
+/// value: `fDenyTSConnections` (REG_DWORD)
+///
+/// Controls whether inbound Remote Desktop Protocol connections are accepted.
+/// 0 = RDP enabled (connections permitted); 1 = RDP disabled (default on
+/// workstation SKUs). Carvey (2023-05) documents threat actors setting this
+/// value to 0 — typically via batch file or reg.exe — as a standard first step
+/// in lateral-movement playbooks observed on Win10/11 endpoints.
+///
+/// The last-write timestamp on the parent Terminal Server key reveals when RDP
+/// was toggled. Correlate with prefetch for reg.exe/sc.exe and Security.evtx
+/// Event ID 4624 logon type 10 (RemoteInteractive) to confirm exploitation.
+pub(crate) static RDP_ENABLE_REGISTRY: ArtifactDescriptor = ArtifactDescriptor {
+    id: "rdp_enable_registry",
+    name: "fDenyTSConnections (RDP Enable)",
+    artifact_type: ArtifactType::RegistryValue,
+    hive: Some(HiveTarget::HklmSystem),
+    key_path: r"CurrentControlSet\Control\Terminal Server",
+    value_name: Some("fDenyTSConnections"),
+    file_path: None,
+    scope: DataScope::System,
+    os_scope: OsScope::All,
+    decoder: Decoder::DwordLe,
+    meaning: "REG_DWORD controlling Remote Desktop Protocol access. \
+        0 = RDP enabled (connections permitted); 1 = RDP disabled (workstation default). \
+        Threat actors set this to 0 — via batch file, reg.exe, or sc.exe — to enable \
+        inbound RDP for lateral movement. Carvey (2023-05) documents this as a common \
+        threat-actor pattern on Win10/11. The Terminal Server key last-write timestamp \
+        reveals when RDP was toggled; correlate with prefetch for reg.exe/sc.exe and \
+        Security.evtx EID 4624 logon type 10 (RemoteInteractive).",
+    mitre_techniques: &["T1021.001", "T1112"],
+    fields: &[FieldSchema {
+        name: "fDenyTSConnections",
+        value_type: ValueType::UnsignedInt,
+        description: "0 = RDP enabled (deny=false); 1 = RDP disabled (deny=true, workstation default). \
+            Threat-actor-modified systems show 0.",
+        is_uid_component: false,
+    }],
+    retention: None,
+    triage_priority: TriagePriority::High,
+    related_artifacts: &[
+        "special_accounts_userlist",
+        "logontype_winlogon",
+    ],
+    sources: &[
+        "https://windowsir.blogspot.com/2023/05/the-windows-registry.html",
+        "https://learn.microsoft.com/en-us/troubleshoot/windows-server/remote/enable-remote-desktop-remotely",
+    ],
+};
+
+// ── T1564.002 / T1136.001 — SpecialAccounts\UserList (Hidden Users) ──────────
+
+/// `HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList`
+///
+/// Any user account name added as a REG_DWORD value (data=0) under this key is
+/// hidden from the Windows Welcome Screen / logon UI. The account still exists
+/// and can be used for interactive or remote logons — it simply does not appear
+/// in the user-picker.
+///
+/// Carvey (2023-05) documents threat actors routinely pairing this with RDP
+/// enablement: they create a new local account, add it to Remote Desktop Users,
+/// then hide it here to reduce visibility. Absence of this key is normal;
+/// any value under it on a managed endpoint warrants immediate investigation.
+pub(crate) static SPECIAL_ACCOUNTS_USERLIST: ArtifactDescriptor = ArtifactDescriptor {
+    id: "special_accounts_userlist",
+    name: "SpecialAccounts\\UserList (Hidden Users)",
+    artifact_type: ArtifactType::RegistryKey,
+    hive: Some(HiveTarget::HklmSoftware),
+    key_path: r"Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList",
+    value_name: None,
+    file_path: None,
+    scope: DataScope::System,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "Registry key whose value names are local account names hidden from the \
+        Windows Welcome Screen. Each value is REG_DWORD with data 0 to suppress display. \
+        The hidden account remains fully functional for interactive, network, and RDP logons. \
+        Carvey (2023-05) documents this as a standard step in threat-actor RDP-enablement \
+        batch scripts. Any value under this key on a managed endpoint is high-confidence \
+        malicious activity. Cross-correlate with Security.evtx EID 4720 (account created) \
+        and EID 4732 (added to Remote Desktop Users group).",
+    mitre_techniques: &["T1564.002", "T1136.001"],
+    fields: &[FieldSchema {
+        name: "username",
+        value_type: ValueType::Text,
+        description: "Value name is the local account name being hidden. \
+            Data REG_DWORD 0 = suppressed from Welcome Screen.",
+        is_uid_component: false,
+    }],
+    retention: None,
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["rdp_enable_registry", "logontype_winlogon"],
+    sources: &["https://windowsir.blogspot.com/2023/05/the-windows-registry.html"],
+};
+
+// ── T1112 — LogonType (Winlogon, XP-era value planted by threat-actor scripts) ─
+
+/// `HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon`
+/// value: `LogonType` (REG_DWORD)
+///
+/// A legacy Windows XP–era value that controlled the logon UI style (0=classic
+/// dialog, 1=Welcome Screen). On Vista+ it has no functional effect.
+///
+/// Carvey (2023-05) documents threat actors creating this value on Win10 endpoints
+/// as part of batch-file RDP-enablement scripts. Its presence on a modern Windows
+/// system has no legitimate administrative purpose. The consistent position of this
+/// value within batch-file write sequences across unrelated victim organisations
+/// indicates a shared pre-packaged script (likely developed against XP-era targets
+/// and reused unchanged). Presence alongside `fDenyTSConnections=0` and a new
+/// SpecialAccounts\UserList entry is a strong indicator of the full playbook.
+pub(crate) static LOGONTYPE_WINLOGON: ArtifactDescriptor = ArtifactDescriptor {
+    id: "logontype_winlogon",
+    name: "LogonType (Winlogon, XP-era value)",
+    artifact_type: ArtifactType::RegistryValue,
+    hive: Some(HiveTarget::HklmSoftware),
+    key_path: r"Microsoft\Windows NT\CurrentVersion\Winlogon",
+    value_name: Some("LogonType"),
+    file_path: None,
+    scope: DataScope::System,
+    os_scope: OsScope::All,
+    decoder: Decoder::DwordLe,
+    meaning: "Legacy XP-era REG_DWORD controlling logon UI style (0=classic, 1=Welcome Screen). \
+        On Vista+ has no functional effect. Carvey (2023-05) documents threat actors creating \
+        this value on Win10 endpoints via batch file as part of an RDP-enablement script carried \
+        forward from XP-era tooling. Presence on Win10/11 with no admin justification is anomalous. \
+        Correlate Winlogon key last-write timestamp with nearby writes to fDenyTSConnections and \
+        SpecialAccounts\\UserList to reconstruct the full RDP-enablement batch execution window.",
+    mitre_techniques: &["T1112"],
+    fields: &[FieldSchema {
+        name: "LogonType",
+        value_type: ValueType::UnsignedInt,
+        description: "0 = classic logon dialog (XP); 1 = Welcome Screen (XP). \
+            On Vista+ ignored by OS. Presence on Win10/11 is anomalous.",
+        is_uid_component: false,
+    }],
+    retention: None,
+    triage_priority: TriagePriority::Medium,
+    related_artifacts: &[
+        "rdp_enable_registry",
+        "special_accounts_userlist",
+    ],
+    sources: &[
+        "https://windowsir.blogspot.com/2023/05/the-windows-registry.html",
+    ],
+};

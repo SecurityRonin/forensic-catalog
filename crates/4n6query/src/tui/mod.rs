@@ -398,11 +398,15 @@ use crossterm::{
 };
 
 use forensicnomicon::{
-    abusable_sites::ABUSABLE_SITES,
+    abusable_sites::{
+        ABUSABLE_SITES, TAG_C2, TAG_DOWNLOAD, TAG_EXFIL, TAG_EXPLOIT, TAG_PHISHING,
+    },
     catalog::{ArtifactDescriptor, OsScope, Platform, CATALOG},
     lolbins::{
-        LOLBAS_LINUX, LOLBAS_MACOS, LOLBAS_WINDOWS, LOLBAS_WINDOWS_CMDLETS, LOLBAS_WINDOWS_MMC,
-        LOLBAS_WINDOWS_WMI,
+        lolbas_entry, LolbasEntry, LOLBAS_LINUX, LOLBAS_MACOS, LOLBAS_WINDOWS,
+        LOLBAS_WINDOWS_CMDLETS, LOLBAS_WINDOWS_MMC, LOLBAS_WINDOWS_WMI, UC_ARCHIVE, UC_BYPASS,
+        UC_CREDENTIALS, UC_DECODE, UC_DEFENSE_EVASION, UC_DOWNLOAD, UC_EXECUTE, UC_NETWORK,
+        UC_PERSIST, UC_PROXY, UC_RECON, UC_UPLOAD,
     },
     playbooks::PLAYBOOKS,
 };
@@ -413,6 +417,51 @@ use std::io;
 pub struct RenderData {
     pub list_items: Vec<String>,
     pub detail_lines: Vec<String>,
+}
+
+fn use_cases_str(uc: u16) -> String {
+    let mut tags: Vec<&str> = Vec::new();
+    if uc & UC_EXECUTE != 0 { tags.push("Execute"); }
+    if uc & UC_DOWNLOAD != 0 { tags.push("Download"); }
+    if uc & UC_UPLOAD != 0 { tags.push("Upload"); }
+    if uc & UC_BYPASS != 0 { tags.push("Bypass"); }
+    if uc & UC_PERSIST != 0 { tags.push("Persist"); }
+    if uc & UC_RECON != 0 { tags.push("Recon"); }
+    if uc & UC_PROXY != 0 { tags.push("Proxy"); }
+    if uc & UC_DECODE != 0 { tags.push("Decode"); }
+    if uc & UC_ARCHIVE != 0 { tags.push("Archive"); }
+    if uc & UC_CREDENTIALS != 0 { tags.push("Credentials"); }
+    if uc & UC_NETWORK != 0 { tags.push("Network"); }
+    if uc & UC_DEFENSE_EVASION != 0 { tags.push("DefEvasion"); }
+    tags.join("  ")
+}
+
+fn lolbas_detail_lines(entry: &LolbasEntry) -> Vec<String> {
+    let mut lines = vec![
+        entry.name.to_string(),
+        "─".repeat(40),
+        entry.description.to_string(),
+    ];
+    if !entry.mitre_techniques.is_empty() {
+        lines.push(String::new());
+        lines.push(format!("MITRE: {}", entry.mitre_techniques.join("  ")));
+    }
+    let uc = use_cases_str(entry.use_cases);
+    if !uc.is_empty() {
+        lines.push(String::new());
+        lines.push(format!("Use cases: {uc}"));
+    }
+    lines
+}
+
+fn abuse_tags_str(tags: u8) -> String {
+    let mut v: Vec<&str> = Vec::new();
+    if tags & TAG_PHISHING != 0 { v.push("Phishing"); }
+    if tags & TAG_C2 != 0 { v.push("C2"); }
+    if tags & TAG_DOWNLOAD != 0 { v.push("Download"); }
+    if tags & TAG_EXFIL != 0 { v.push("Exfil"); }
+    if tags & TAG_EXPLOIT != 0 { v.push("Exploit"); }
+    v.join("  ")
 }
 
 /// Catalog filter predicate — platform mask + criticality filter.
@@ -525,54 +574,130 @@ fn build_render_data(app: &app::App) -> RenderData {
             .collect()
     };
 
-    // Build detail pane for catalog dataset.
-    let detail_lines = if app.dataset_idx == 0 {
-        let selected_descriptor = list_items
-            .get(app.selected)
-            .and_then(|s| s.split_whitespace().next())
-            .and_then(|id| CATALOG.by_id(id));
+    let selected_name = list_items.get(app.selected).map(|s| s.trim());
 
-        match selected_descriptor {
-            Some(d) => {
-                let mut lines = vec![
-                    d.name.to_string(),
-                    "─".repeat(40),
-                    format!("Type:     {:?}", d.artifact_type),
-                    format!("OS:       {:?}", d.os_scope),
-                    format!("Priority: {:?}", d.triage_priority),
-                ];
-                if let Some(fp) = d.file_path {
-                    lines.push(format!("Path: {fp}"));
-                }
-                if !d.key_path.is_empty() {
-                    lines.push(format!("Key:  {}", d.key_path));
-                }
-                lines.push(String::new());
-                lines.push(d.meaning.to_string());
-                if !d.mitre_techniques.is_empty() {
-                    lines.push(String::new());
-                    lines.push(format!("MITRE: {}", d.mitre_techniques.join("  ")));
-                }
-                if !d.fields.is_empty() {
-                    lines.push(String::new());
-                    lines.push("Fields:".into());
-                    for f in d.fields {
-                        lines.push(format!("  {}  — {}", f.name, f.description));
+    let detail_lines: Vec<String> = match app.dataset_idx {
+        0 => {
+            let desc = selected_name
+                .and_then(|s| s.split_whitespace().next())
+                .and_then(|id| CATALOG.by_id(id));
+            match desc {
+                Some(d) => {
+                    let mut lines = vec![
+                        d.name.to_string(),
+                        "─".repeat(40),
+                        format!("Type:     {:?}", d.artifact_type),
+                        format!("OS:       {:?}", d.os_scope),
+                        format!("Priority: {:?}", d.triage_priority),
+                    ];
+                    if let Some(fp) = d.file_path {
+                        lines.push(format!("Path: {fp}"));
                     }
-                }
-                if !d.sources.is_empty() {
-                    lines.push(String::new());
-                    lines.push("Sources:".into());
-                    for s in d.sources {
-                        lines.push(format!("  {s}"));
+                    if !d.key_path.is_empty() {
+                        lines.push(format!("Key:  {}", d.key_path));
                     }
+                    lines.push(String::new());
+                    lines.push(d.meaning.to_string());
+                    if !d.mitre_techniques.is_empty() {
+                        lines.push(String::new());
+                        lines.push(format!("MITRE: {}", d.mitre_techniques.join("  ")));
+                    }
+                    if !d.fields.is_empty() {
+                        lines.push(String::new());
+                        lines.push("Fields:".into());
+                        for f in d.fields {
+                            lines.push(format!("  {}  — {}", f.name, f.description));
+                        }
+                    }
+                    if !d.sources.is_empty() {
+                        lines.push(String::new());
+                        lines.push("Sources:".into());
+                        for s in d.sources {
+                            lines.push(format!("  {s}"));
+                        }
+                    }
+                    lines
                 }
-                lines
+                None => vec!["Select an item to see details.".into()],
             }
-            None => vec!["Select an item to see details.".into()],
         }
-    } else {
-        vec!["Select an item to see details.".into()]
+        // Lolbas: search platform-appropriate source(s).
+        1 => {
+            let entry = selected_name.and_then(|name| {
+                if app.platform_mask.contains(Platform::MacOS) {
+                    lolbas_entry(LOLBAS_MACOS, name)
+                } else if app.platform_mask.contains(Platform::Linux) {
+                    lolbas_entry(LOLBAS_LINUX, name)
+                } else if !app.platform_mask.is_empty() {
+                    lolbas_entry(LOLBAS_WINDOWS, name)
+                } else {
+                    lolbas_entry(LOLBAS_WINDOWS, name)
+                        .or_else(|| lolbas_entry(LOLBAS_LINUX, name))
+                        .or_else(|| lolbas_entry(LOLBAS_MACOS, name))
+                }
+            });
+            entry.map(lolbas_detail_lines).unwrap_or_else(|| vec!["Select an item.".into()])
+        }
+        2 => selected_name
+            .and_then(|n| lolbas_entry(LOLBAS_WINDOWS_CMDLETS, n))
+            .map(lolbas_detail_lines)
+            .unwrap_or_else(|| vec!["Select an item.".into()]),
+        3 => selected_name
+            .and_then(|n| lolbas_entry(LOLBAS_WINDOWS_MMC, n))
+            .map(lolbas_detail_lines)
+            .unwrap_or_else(|| vec!["Select an item.".into()]),
+        4 => selected_name
+            .and_then(|n| lolbas_entry(LOLBAS_WINDOWS_WMI, n))
+            .map(lolbas_detail_lines)
+            .unwrap_or_else(|| vec!["Select an item.".into()]),
+        5 => {
+            let site = selected_name.and_then(|name| {
+                ABUSABLE_SITES.iter().find(|s| s.domain.eq_ignore_ascii_case(name))
+            });
+            match site {
+                Some(s) => {
+                    let mut lines = vec![
+                        s.domain.to_string(),
+                        "─".repeat(40),
+                        format!("Provider:  {}", s.provider),
+                        format!("Category:  {:?}", s.legitimate_category),
+                        format!("Block risk: {:?}", s.blocking_risk),
+                    ];
+                    let tags = abuse_tags_str(s.abuse_tags);
+                    if !tags.is_empty() {
+                        lines.push(format!("Abuse:     {tags}"));
+                    }
+                    if !s.mitre_techniques.is_empty() {
+                        lines.push(String::new());
+                        lines.push(format!("MITRE: {}", s.mitre_techniques.join("  ")));
+                    }
+                    lines
+                }
+                None => vec!["Select an item.".into()],
+            }
+        }
+        6 => {
+            let pb = selected_name.and_then(|id| PLAYBOOKS.iter().find(|p| p.id == id));
+            match pb {
+                Some(p) => {
+                    let mut lines = vec![
+                        p.name.to_string(),
+                        "─".repeat(40),
+                        p.description.to_string(),
+                        String::new(),
+                        format!("Steps: {}", p.steps.len()),
+                    ];
+                    for (i, step) in p.steps.iter().enumerate() {
+                        lines.push(String::new());
+                        lines.push(format!("  {}. {} — {}", i + 1, step.artifact_id, step.tactic));
+                        lines.push(format!("     {}", step.rationale));
+                    }
+                    lines
+                }
+                None => vec!["Select an item.".into()],
+            }
+        }
+        _ => vec!["Select an item to see details.".into()],
     };
 
     RenderData {

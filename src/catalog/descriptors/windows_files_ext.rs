@@ -1599,3 +1599,79 @@ pub(crate) static NTUSER_MAN_PERSISTENCE: ArtifactDescriptor = ArtifactDescripto
         "https://learn.microsoft.com/en-us/windows/client-management/client-tools/mandatory-user-profile",
     ],
 };
+
+// ── T1115 — Windows Clipboard History Data Files ─────────────────────────────
+
+/// `%LOCALAPPDATA%\Microsoft\Windows\Clipboard\`
+///
+/// On-disk persisted clipboard history (Win10 1809+, when the user has enabled
+/// clipboard history via Win+V or Settings → System → Clipboard). The folder
+/// contains two subfolders:
+///
+/// - `HistoryData\<GUID>\` — recent clipboard items (populated only when
+///   cross-device sync is enabled via a Microsoft account)
+/// - `Pinned\<GUID>\<item-GUID>\` — pinned items; one subfolder per pinned
+///   item; the subfolder's *created* timestamp records when the item was pinned
+///
+/// Inside each item folder:
+/// - A binary payload file (encrypted at rest — content is not directly readable)
+/// - `metadata.json` — plaintext JSON with a `"timestamp"` field showing when
+///   the item was copied and its format type (text, image, etc.)
+///
+/// Targeted by ClipboardHistoryThief (github.com/netero1010/ClipboardHistoryThief)
+/// which calls the cbdhsvc service's COM interface to dump the full history.
+/// The registry toggle `HKCU\...\ClipboardHistory` (Enable = 1) controls
+/// whether this folder is created; see `windows_clipboard_history`.
+///
+/// Carvey (2026-01) documents this as an expanding IR collection target
+/// given threat actor automation of clipboard enablement + periodic exfil.
+pub(crate) static WINDOWS_CLIPBOARD_DATA_FILES: ArtifactDescriptor = ArtifactDescriptor {
+    id: "windows_clipboard_data_files",
+    name: "Windows Clipboard History Data Files",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some(r"C:\Users\*\AppData\Local\Microsoft\Windows\Clipboard"),
+    scope: DataScope::User,
+    os_scope: OsScope::Win10Plus,
+    decoder: Decoder::Identity,
+    meaning: "On-disk persisted clipboard history under %LOCALAPPDATA%\\Microsoft\\Windows\\Clipboard. \
+        Requires clipboard history enabled (Win10 1809+). Contains HistoryData and Pinned subfolders, \
+        each with GUID-named item folders. Each pinned item folder contains an encrypted binary payload \
+        and a plaintext metadata.json with copy timestamp and format type. Payload files are encrypted \
+        at rest — metadata.json is the primary plaintext forensic anchor. Folder creation timestamp \
+        and item-folder created timestamps establish timeline. Targeted by ClipboardHistoryThief \
+        (T1115) for automated clipboard exfiltration. Threat actors can silently enable clipboard \
+        history if disabled, then periodically dump and clear the history. Correlate with \
+        windows_clipboard_history registry key (enable toggle), windows_timeline \
+        (ActivitiesCache.db CopyPaste activity type), and cbdhsvc service process memory.",
+    mitre_techniques: &["T1115"],
+    fields: &[
+        FieldSchema {
+            name: "metadata_json",
+            value_type: ValueType::Json,
+            description: "Plaintext JSON per item: timestamp (copy time), formatId (data type). \
+                Located at Pinned\\<GUID>\\<item-GUID>\\metadata.json.",
+            is_uid_component: false,
+        },
+        FieldSchema {
+            name: "encrypted_payload",
+            value_type: ValueType::Bytes,
+            description: "Encrypted binary payload file inside each item GUID folder. \
+                Not directly readable; requires cbdhsvc COM interface or memory extraction.",
+            is_uid_component: false,
+        },
+    ],
+    retention: Some("Persists until clipboard history cleared or feature disabled"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["windows_clipboard_history", "windows_timeline"],
+    sources: &[
+        // Source: Carvey 2026-01 — primary IR reference documenting clipboard as expanding attack surface
+        "https://windowsir.blogspot.com/2026/01/whats-on-your-clipboard.html",
+        // Source: ThinkDFIR 2018-10 — original folder layout research (Pinned/HistoryData structure)
+        "https://thinkdfir.com/2018/10/14/clippy-history/",
+        // Source: ClipboardHistoryThief — attack tool targeting cbdhsvc COM interface
+        "https://github.com/netero1010/ClipboardHistoryThief",
+    ],
+};

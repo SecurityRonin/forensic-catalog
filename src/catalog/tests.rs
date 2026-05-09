@@ -9053,4 +9053,158 @@ mod tests_dns_policy_config_nrpt {
             "evtx_application_experience_telemetry meaning should mention driver (block list / blocked driver)"
         );
     }
+
+    // ── Tests from: Harlan Carvey, "The Windows Registry"
+    // ── https://windowsir.blogspot.com/2023/05/the-windows-registry.html
+    // ── (2023-05-16) — three new registry artifacts: rdp_enable_registry,
+    // ── special_accounts_userlist, logontype_winlogon
+
+    #[test]
+    fn rdp_enable_registry_exists() {
+        CATALOG
+            .by_id("rdp_enable_registry")
+            .expect("rdp_enable_registry missing from catalog");
+    }
+
+    #[test]
+    fn rdp_enable_registry_key_path() {
+        let d = CATALOG.by_id("rdp_enable_registry").unwrap();
+        assert!(
+            d.key_path.contains("Terminal Server"),
+            "key_path must include Terminal Server"
+        );
+        assert!(
+            d.value_name == Some("fDenyTSConnections"),
+            "value_name must be fDenyTSConnections"
+        );
+    }
+
+    #[test]
+    fn rdp_enable_registry_mitre_t1021_001() {
+        let d = CATALOG.by_id("rdp_enable_registry").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1021.001"),
+            "must map to T1021.001 (Remote Services: Remote Desktop Protocol)"
+        );
+    }
+
+    #[test]
+    fn rdp_enable_registry_triage_high() {
+        let d = CATALOG.by_id("rdp_enable_registry").unwrap();
+        assert_eq!(
+            d.triage_priority,
+            TriagePriority::High,
+            "enabling RDP on a workstation is a high-signal lateral movement indicator"
+        );
+    }
+
+    #[test]
+    fn rdp_enable_registry_cites_carvey_windows_registry() {
+        let d = CATALOG.by_id("rdp_enable_registry").unwrap();
+        assert!(
+            d.sources
+                .iter()
+                .any(|s| s.contains("windowsir.blogspot.com") && s.contains("the-windows-registry")),
+            "must cite Carvey 2023-05 'The Windows Registry' post"
+        );
+    }
+
+    #[test]
+    fn special_accounts_userlist_exists() {
+        CATALOG
+            .by_id("special_accounts_userlist")
+            .expect("special_accounts_userlist missing from catalog");
+    }
+
+    #[test]
+    fn special_accounts_userlist_key_path() {
+        let d = CATALOG.by_id("special_accounts_userlist").unwrap();
+        assert!(
+            d.key_path.contains("SpecialAccounts"),
+            "key_path must include SpecialAccounts"
+        );
+        assert!(
+            d.key_path.contains("UserList"),
+            "key_path must include UserList"
+        );
+    }
+
+    #[test]
+    fn special_accounts_userlist_mitre_t1564_002() {
+        let d = CATALOG.by_id("special_accounts_userlist").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1564.002"),
+            "must map to T1564.002 (Hide Artifacts: Hidden Users)"
+        );
+    }
+
+    #[test]
+    fn special_accounts_userlist_triage_high() {
+        let d = CATALOG.by_id("special_accounts_userlist").unwrap();
+        assert_eq!(
+            d.triage_priority,
+            TriagePriority::High,
+            "hidden user accounts are a high-signal defense evasion indicator"
+        );
+    }
+
+    #[test]
+    fn special_accounts_userlist_cites_carvey_windows_registry() {
+        let d = CATALOG.by_id("special_accounts_userlist").unwrap();
+        assert!(
+            d.sources
+                .iter()
+                .any(|s| s.contains("windowsir.blogspot.com") && s.contains("the-windows-registry")),
+            "must cite Carvey 2023-05 'The Windows Registry' post"
+        );
+    }
+
+    #[test]
+    fn logontype_winlogon_exists() {
+        CATALOG
+            .by_id("logontype_winlogon")
+            .expect("logontype_winlogon missing from catalog");
+    }
+
+    #[test]
+    fn logontype_winlogon_key_path() {
+        let d = CATALOG.by_id("logontype_winlogon").unwrap();
+        assert!(
+            d.key_path.contains("Winlogon"),
+            "key_path must include Winlogon"
+        );
+        assert!(
+            d.value_name == Some("LogonType"),
+            "value_name must be LogonType"
+        );
+    }
+
+    #[test]
+    fn logontype_winlogon_meaning_mentions_batch() {
+        let d = CATALOG.by_id("logontype_winlogon").unwrap();
+        assert!(
+            d.meaning.to_ascii_lowercase().contains("batch"),
+            "meaning must note that this value is typically created by batch scripts"
+        );
+    }
+
+    #[test]
+    fn logontype_winlogon_cites_carvey_windows_registry() {
+        let d = CATALOG.by_id("logontype_winlogon").unwrap();
+        assert!(
+            d.sources
+                .iter()
+                .any(|s| s.contains("windowsir.blogspot.com") && s.contains("the-windows-registry")),
+            "must cite Carvey 2023-05 'The Windows Registry' post"
+        );
+    }
+
+    #[test]
+    fn catalog_count_after_carvey_windows_registry_post() {
+        assert_eq!(
+            CATALOG.list().len(),
+            6646,
+            "catalog count after adding rdp_enable_registry, special_accounts_userlist, logontype_winlogon"
+        );
+    }
 }

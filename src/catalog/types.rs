@@ -60,11 +60,17 @@ pub enum DataScope {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum OsScope {
     // ── Windows ──────────────────────────────────────────────────────────
+    /// All Windows versions (XP and later). Windows-only — not cross-platform.
     All,
+    /// Windows 7 and later.
     Win7Plus,
+    /// Windows 8 and later.
     Win8Plus,
+    /// Windows 10 and later.
     Win10Plus,
+    /// Windows 11 and later.
     Win11Plus,
+    /// Windows 11 22H2 and later.
     Win11_22H2,
     // ── Linux ────────────────────────────────────────────────────────────
     /// All Linux distributions (kernel + standard POSIX userland).

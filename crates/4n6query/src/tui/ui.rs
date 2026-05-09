@@ -787,4 +787,51 @@ mod tests {
         let has_yellow_bg = line.spans.iter().any(|s| s.style.bg == Some(Color::Yellow));
         assert!(has_yellow_bg, "highlight must be case-insensitive");
     }
+
+    // ── about dialog attribution ──────────────────────────────────────────
+
+    fn about_lines() -> Vec<String> {
+        // Render the about modal and collect all span text per line.
+        // We drive draw_about directly by inspecting the paragraph content
+        // through the public draw fn with about mode open.
+        use ratatui::{Terminal, backend::TestBackend};
+        let backend = TestBackend::new(80, 30);
+        let mut term = Terminal::new(backend).unwrap();
+        let mut app = App::new();
+        app.open_about();
+        term.draw(|f| draw(f, &app, default_theme(), &[], &[])).unwrap();
+        let buf = term.backend().buffer().clone();
+        let mut lines: Vec<String> = Vec::new();
+        for row in 0..buf.area.height {
+            let mut s = String::new();
+            for col in 0..buf.area.width {
+                s.push(buf.cell((col, row)).unwrap().symbol().chars().next().unwrap_or(' '));
+            }
+            lines.push(s.trim_end().to_string());
+        }
+        lines
+    }
+
+    #[test]
+    fn about_attribution_uses_at_separator() {
+        let lines = about_lines();
+        let joined = lines.join("\n");
+        assert!(
+            joined.contains("4n6h4x0r @ Security Ronin"),
+            "attribution must use '@' separator; got:\n{joined}"
+        );
+    }
+
+    #[test]
+    fn about_attribution_is_near_bottom() {
+        let lines = about_lines();
+        let attr_row = lines.iter().position(|l| l.contains("4n6h4x0r @ Security Ronin"))
+            .expect("attribution line not found");
+        let mouse_row = lines.iter().position(|l| l.contains("Mouse"))
+            .expect("Mouse section not found");
+        assert!(
+            attr_row > mouse_row,
+            "attribution (row {attr_row}) must appear after Mouse section (row {mouse_row})"
+        );
+    }
 }

@@ -77,6 +77,51 @@ mod tests {
     }
 
     #[test]
+    fn build_render_data_search_matches_human_name_with_space() {
+        // "Prefetch File" (space) is NOT in the id "prefetch_file" (underscore).
+        // Only works when d.name is in the search index.
+        let a = make_app(0, "Prefetch File", 0);
+        let rd = build_render_data(&a);
+        assert!(
+            !rd.list_items.is_empty(),
+            "search 'Prefetch File' must match via d.name; got 0 results"
+        );
+    }
+
+    #[test]
+    fn build_render_data_search_matches_file_path_fragment() {
+        // "AppData" appears in d.file_path of several artifacts, not in their ids.
+        let a = make_app(0, "AppData", 0);
+        let rd = build_render_data(&a);
+        assert!(
+            !rd.list_items.is_empty(),
+            "search 'AppData' must match via d.file_path; got 0 results"
+        );
+    }
+
+    #[test]
+    fn build_render_data_search_matches_meaning_text() {
+        // "lateral" appears in d.meaning of several artifacts, not in their ids.
+        let a = make_app(0, "lateral", 0);
+        let rd = build_render_data(&a);
+        assert!(
+            !rd.list_items.is_empty(),
+            "search 'lateral' must match via d.meaning; got 0 results"
+        );
+    }
+
+    #[test]
+    fn build_render_data_search_matches_registry_key_path() {
+        // "HKEY_LOCAL_MACHINE" appears in d.key_path, not in artifact ids.
+        let a = make_app(0, "HKEY_LOCAL_MACHINE", 0);
+        let rd = build_render_data(&a);
+        assert!(
+            !rd.list_items.is_empty(),
+            "search 'HKEY_LOCAL_MACHINE' must match via d.key_path; got 0 results"
+        );
+    }
+
+    #[test]
     fn build_render_data_empty_query_returns_all() {
         let a = make_app(0, "", 0);
         let rd = build_render_data(&a);
@@ -192,12 +237,12 @@ mod tests {
     }
 }
 
+use crate::tui::app::WinVersionFilter;
 use crossterm::{
     event::{self, Event},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use crate::tui::app::WinVersionFilter;
 
 use forensicnomicon::{
     abusable_sites::ABUSABLE_SITES,
@@ -245,7 +290,9 @@ fn build_render_data(app: &app::App) -> RenderData {
                         app.platform_mask.matches(d.os_scope.platform())
                     }
                 } else {
-                    preset.os.map_or(true, |os| os.platform() == d.os_scope.platform())
+                    preset
+                        .os
+                        .map_or(true, |os| os.platform() == d.os_scope.platform())
                 };
                 platform_ok
                     && (preset.priorities.is_empty()

@@ -889,6 +889,15 @@ pub const LOLBAS_WINDOWS: &[LolbasEntry] = &[
         use_cases: UC_EXECUTE | UC_BYPASS,
         description: "WinGet DCOM out-of-process broker (Microsoft-signed); spawned by ConfigurationRemotingServer.exe during DSCourier COM activation — provides the full WinGet package install surface under a Microsoft-signed process tree (svchost → WindowsPackageManagerServer) with no winget.exe parent.",
     },
+    // ── DFIR Report: Apache ActiveMQ → LockBit (feed review 2026-05-09) ──────
+    // Source: https://thedfirreport.com/2026/02/23/apache-activemq-exploit-leads-to-lockbit-ransomware/
+    // Sigma rule 47a69e6a-7829-4014-817b-148846e51f55: Antivirus Disabling via SystemSettingsAdminFlows
+    LolbasEntry {
+        name: "SystemSettingsAdminFlows.exe",
+        mitre_techniques: &["T1562.001"],
+        use_cases: UC_DEFENSE_EVASION,
+        description: "Legitimate Windows system-settings binary; abused by LockBit-affiliated threat actors to disable Windows Defender settings on target hosts without triggering standard AV-disable alerts.",
+    },
     // ── Batch 2: LOLBAS Project gaps (feed review 2026-05-03) ─────────────────
     // Source: https://lolbas-project.github.io/api/lolbas.json
     LolbasEntry {

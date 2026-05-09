@@ -570,6 +570,35 @@ mod tests {
     }
 
     #[test]
+    fn mouse_left_click_dataset_area_cycles_dataset() {
+        use crossterm::event::{MouseButton, MouseEvent, MouseEventKind};
+        let mut a = app();
+        assert_eq!(a.dataset_idx, 0);
+        // Column 25 = dataset label area (cols 19–34)
+        handle_mouse(
+            &mut a,
+            MouseEvent { kind: MouseEventKind::Down(MouseButton::Left), column: 25, row: 0, modifiers: KeyModifiers::NONE },
+            10,
+        );
+        assert_eq!(a.dataset_idx, 1, "click on dataset area must cycle dataset");
+    }
+
+    #[test]
+    fn mouse_left_click_title_area_is_ignored() {
+        use crossterm::event::{MouseButton, MouseEvent, MouseEventKind};
+        let mut a = app();
+        // Column 5 = title area (cols 0–18) — must not change anything
+        handle_mouse(
+            &mut a,
+            MouseEvent { kind: MouseEventKind::Down(MouseButton::Left), column: 5, row: 0, modifiers: KeyModifiers::NONE },
+            10,
+        );
+        assert_eq!(a.dataset_idx, 0, "click on title must not change dataset");
+        assert!(a.platform_mask.is_empty(), "click on title must not change platform");
+        assert_eq!(a.crit_filter, crate::tui::app::CritFilter::All, "click on title must not change crit");
+    }
+
+    #[test]
     fn mouse_left_click_out_of_bounds_does_not_panic() {
         use crossterm::event::{MouseButton, MouseEvent, MouseEventKind};
         let mut a = app();

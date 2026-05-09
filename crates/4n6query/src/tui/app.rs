@@ -567,6 +567,29 @@ mod tests {
         assert_eq!(a.dataset_idx, 0);
     }
 
+    #[test]
+    fn cycle_dataset_advances_idx() {
+        let mut a = app();
+        a.cycle_dataset();
+        assert_eq!(a.dataset_idx, 1);
+    }
+
+    #[test]
+    fn cycle_dataset_wraps_around() {
+        let mut a = app();
+        a.dataset_idx = App::DATASET_COUNT - 1;
+        a.cycle_dataset();
+        assert_eq!(a.dataset_idx, 0);
+    }
+
+    #[test]
+    fn cycle_dataset_resets_selection() {
+        let mut a = app();
+        a.selected = 42;
+        a.cycle_dataset();
+        assert_eq!(a.selected, 0);
+    }
+
     // ── Alt-N jump ────────────────────────────────────────────────────────
 
     #[test]

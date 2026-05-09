@@ -33,6 +33,25 @@ pub fn is_exfil_volume(bytes_sent: u64) -> bool {
     bytes_sent >= EXFIL_VOLUME_BYTES
 }
 
+/// Minimum foreground cycles to consider a phantom-foreground anomaly meaningful.
+/// Avoids flagging processes with trivially brief (sub-quantization) foreground time.
+pub const PHANTOM_FOREGROUND_MIN_CYCLES: u64 = 1_000;
+
+/// Returns `true` if a process had foreground CPU cycles but zero focus time.
+///
+/// A process charged foreground cycles but with no Application Timeline focus
+/// is anomalous: the scheduler considered it "in front" but the user never
+/// directed input to it. Possible causes: `SetForegroundWindow` abuse, or
+/// a window briefly flashing to the top without user interaction.
+///
+/// Only meaningful when focus data is present (i.e., Application Timeline was
+/// successfully merged into the record). The caller is responsible for ensuring
+/// `focus_time_ms` came from a real measurement, not a missing-data default.
+#[must_use]
+pub fn is_phantom_foreground(foreground_cycles: u64, focus_time_ms: u64) -> bool {
+    foreground_cycles >= PHANTOM_FOREGROUND_MIN_CYCLES && focus_time_ms == 0
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 #[cfg(test)]
 mod tests {

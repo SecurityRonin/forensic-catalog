@@ -107,7 +107,7 @@ pub fn hint_text<'a>(app: &'a App, theme: &'a Theme) -> Line<'a> {
         Mode::Search => " Esc: finish  ↑↓: navigate  Enter: confirm",
         Mode::About => " Esc/q: close  ↑↓/jk: scroll",
         Mode::Normal => {
-            " /: search  j/k: navigate  Tab: focus  p: platform  c: criticality  ?: about  q: quit"
+            " /: search  j/k: navigate  Tab: focus  d: dataset  p: platform  c: criticality  ?: about  q: quit"
         }
     };
     Line::from(Span::styled(mode_hint, Style::default().fg(theme.hint_fg)))
@@ -138,7 +138,7 @@ pub fn styled_line_for_item<'a>(s: &'a str, query: &str, theme: &Theme) -> Line<
 
     let lower_s = s.to_ascii_lowercase();
     let lower_q = query.to_ascii_lowercase();
-    let hl_style = Style::default().bg(Color::Yellow).fg(Color::Black);
+    let hl_style = Style::default().bg(theme.match_hl).fg(Color::Black);
 
     if let Some(pos) = lower_s.find(lower_q.as_str()) {
         let end = pos + lower_q.len();
@@ -152,13 +152,128 @@ pub fn styled_line_for_item<'a>(s: &'a str, query: &str, theme: &Theme) -> Line<
     }
 }
 
+/// Returns the position of the label-ending `:` in a label-value line.
+///
+/// Returns `None` for separators, section headers, indented lines, or URLs.
+fn label_colon_pos(s: &str) -> Option<usize> {
+    if s.starts_with(' ') {
+        return None;
+    }
+    let pos = s.find(':')?;
+    let after = s.get(pos + 1..)?;
+    // `: ` (space after colon) → label-value; `://` → URL; `` (end) → header
+    if after.starts_with(' ') || after.starts_with('\t') {
+        Some(pos)
+    } else {
+        None
+    }
+}
+
+/// Split highlight-overlay over already-styled spans (owned, for lifetime freedom).
+fn apply_search_highlight(spans: Vec<Span<'static>>, query: &str, hl: Style) -> Vec<Span<'static>> {
+    if query.is_empty() {
+        return spans;
+    }
+    let lower_q = query.to_ascii_lowercase();
+    let mut result = Vec::new();
+    for span in spans {
+        let text = span.content.into_owned();
+        let lower_t = text.to_ascii_lowercase();
+        let base = span.style;
+        if let Some(pos) = lower_t.find(lower_q.as_str()) {
+            let end = pos + lower_q.len();
+            if pos > 0 {
+                result.push(Span::styled(text[..pos].to_string(), base));
+            }
+            result.push(Span::styled(text[pos..end].to_string(), hl));
+            if end < text.len() {
+                result.push(Span::styled(text[end..].to_string(), base));
+            }
+        } else {
+            result.push(Span::styled(text, base));
+        }
+    }
+    result
+}
+
 /// Semantic colorization for a single detail-pane line.
 ///
-/// Applies pre-attentive color cues (dim labels, priority colors, MITRE cyan,
-/// bold section headers) plus search-term highlighting.
-fn colorize_detail_line(s: &str, _query: &str, _theme: &Theme) -> Line<'static> {
-    // Stub — plain text. GREEN replaces this.
-    Line::from(s.to_string())
+/// Pre-attentive hierarchy: red = critical, gold = high, cyan = reference/MITRE,
+/// bold = scannable header, dim = scaffolding. Search query overlaid on top.
+fn colorize_detail_line(s: &str, query: &str, theme: &Theme) -> Line<'static> {
+    let dim = Style::default().fg(theme.hint_fg);
+    let bold = Style::default().add_modifier(Modifier::BOLD);
+    let crit = Style::default().fg(theme.crit_fg);
+    let high = Style::default().fg(theme.high_fg);
+    let med = Style::default().fg(theme.med_fg);
+    let low = Style::default().fg(theme.low_fg);
+    let url_style = Style::default()
+        .fg(Color::Cyan)
+        .add_modifier(Modifier::UNDERLINED);
+
+    let spans: Vec<Span<'static>> = if !s.is_empty() && s.chars().all(|c| c == '─') {
+        vec![Span::styled(s.to_string(), dim)]
+    } else if !s.starts_with(' ') && s.ends_with(':') && !s.contains("://") {
+        // Section headers: "Fields:", "Sources:", "Use cases:", "Steps:"
+        vec![Span::styled(s.to_string(), bold)]
+    } else if s.starts_with("     ") {
+        // Deep-indented rationale text (5+ spaces) → dim
+        vec![Span::styled(s.to_string(), dim)]
+    } else if let Some(colon) = label_colon_pos(s) {
+        // Label: value — dim the label, semantically color the value
+        let label_end = colon + 1;
+        let rest = &s[label_end..];
+        let spacer = rest.len() - rest.trim_start().len();
+        let value_start = label_end + spacer;
+        let label_part = s[..value_start].to_string();
+        let value = &s[value_start..];
+
+        let mut sp: Vec<Span<'static>> = vec![Span::styled(label_part, dim)];
+
+        if s.starts_with("MITRE") {
+            for (i, id) in value.split_whitespace().enumerate() {
+                if i > 0 {
+                    sp.push(Span::raw("  "));
+                }
+                sp.push(Span::styled(id.to_string(), med));
+            }
+        } else if s.starts_with("Use cases") || s.starts_with("Abuse") {
+            for (i, tag) in value.split_whitespace().enumerate() {
+                if i > 0 {
+                    sp.push(Span::raw("  "));
+                }
+                sp.push(Span::styled(tag.to_string(), high));
+            }
+        } else {
+            let val_style = match value.trim() {
+                "Critical" => crit,
+                "High" => high,
+                "Medium" => med,
+                "Low" => low,
+                v if v.starts_with("https://") || v.starts_with("http://") => url_style,
+                _ => Style::default(),
+            };
+            sp.push(Span::styled(value.to_string(), val_style));
+        }
+        sp
+    } else if s.starts_with("  ") && s.contains(" — ") {
+        // Indented field / step entry: "  name  — description"
+        let arrow = " — ";
+        if let Some(pos) = s.find(arrow) {
+            vec![
+                Span::styled(s[..pos].to_string(), bold),
+                Span::styled(arrow.to_string(), dim),
+                Span::raw(s[pos + arrow.len()..].to_string()),
+            ]
+        } else {
+            vec![Span::raw(s.to_string())]
+        }
+    } else {
+        vec![Span::raw(s.to_string())]
+    };
+
+    let hl = Style::default().bg(theme.match_hl).fg(Color::Black);
+    Line::from(apply_search_highlight(spans, query, hl))
 }
 
 /// Render a 14-char ATT&CK tactic heatmap bar from a slice of technique IDs.
@@ -274,7 +389,7 @@ fn draw_detail_pane(f: &mut Frame, app: &App, theme: &Theme, lines: &[String], a
     let text: Vec<Line> = lines
         .iter()
         .skip(app.detail_scroll.into())
-        .map(|s| Line::from(s.as_str()))
+        .map(|s| colorize_detail_line(s, &app.search_query, theme))
         .collect();
 
     let para = Paragraph::new(text).block(block).wrap(Wrap { trim: false });
@@ -285,7 +400,7 @@ fn draw_detail_pane(f: &mut Frame, app: &App, theme: &Theme, lines: &[String], a
 fn draw_about(f: &mut Frame, theme: &Theme, area: Rect) {
     // Centre a 60×18 modal
     let modal_w = 60u16.min(area.width.saturating_sub(4));
-    let modal_h = 28u16.min(area.height.saturating_sub(4));
+    let modal_h = 32u16.min(area.height.saturating_sub(4));
     let x = (area.width.saturating_sub(modal_w)) / 2;
     let y = (area.height.saturating_sub(modal_h)) / 2;
     let modal_area = Rect::new(x, y, modal_w, modal_h);
@@ -314,6 +429,7 @@ fn draw_about(f: &mut Frame, theme: &Theme, area: Rect) {
         Line::from("  j/k ↑↓   navigate list"),
         Line::from("  Tab      toggle list / detail focus"),
         Line::from("  h/l ←→   move focus left / right"),
+        Line::from("  d        cycle dataset  (catalog/lolbas/sites/…)"),
         Line::from("  p        cycle platform  (Win/W10/W11/Mac/Lin)"),
         Line::from("  c        cycle criticality  (Crit/High/Med/All)"),
         Line::from("  Alt-1…9  jump to Nth result"),
@@ -731,15 +847,15 @@ mod tests {
     }
 
     #[test]
-    fn styled_line_highlights_query_match_with_yellow_bg() {
+    fn styled_line_highlights_query_match_with_theme_hl_bg() {
         let theme = default_theme();
         let line = styled_line_for_item(
             "prefetch_file                        [Critical]",
             "prefetch",
             theme,
         );
-        let has_yellow_bg = line.spans.iter().any(|s| s.style.bg == Some(Color::Yellow));
-        assert!(has_yellow_bg, "matching query must produce yellow-bg highlight span");
+        let has_hl_bg = line.spans.iter().any(|s| s.style.bg == Some(theme.match_hl));
+        assert!(has_hl_bg, "matching query must produce theme.match_hl highlight span");
     }
 
     #[test]
@@ -753,7 +869,7 @@ mod tests {
         let hl = line
             .spans
             .iter()
-            .find(|s| s.style.bg == Some(Color::Yellow));
+            .find(|s| s.style.bg == Some(theme.match_hl));
         assert!(hl.is_some(), "must have a highlighted span");
         assert_eq!(
             hl.unwrap().content.as_ref(),
@@ -894,7 +1010,7 @@ mod tests {
         // We drive draw_about directly by inspecting the paragraph content
         // through the public draw fn with about mode open.
         use ratatui::{Terminal, backend::TestBackend};
-        let backend = TestBackend::new(80, 30);
+        let backend = TestBackend::new(80, 40);
         let mut term = Terminal::new(backend).unwrap();
         let mut app = App::new();
         app.open_about();

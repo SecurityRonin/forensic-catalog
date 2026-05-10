@@ -66,7 +66,7 @@ pub fn header_text<'a>(app: &'a App, theme: &'a Theme) -> Line<'a> {
             ""
         };
         if !label.is_empty() {
-            spans.push(Span::styled(label, Style::default().fg(theme.header_fg)));
+            spans.push(Span::styled(label, Style::default().fg(theme.dataset_fg)));
         }
     }
 
@@ -1068,6 +1068,21 @@ mod tests {
         let line = header_text(&app, default_theme());
         let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
         assert!(text.contains("Type: catalog"), "header must show 'Type: catalog'; got: {text}");
+    }
+
+    #[test]
+    fn header_platform_badge_uses_dataset_fg_color() {
+        use forensicnomicon::catalog::{Platform, PlatformMask};
+        let mut app = App::new();
+        app.platform_mask = PlatformMask::NONE.with(Platform::Windows);
+        let theme = default_theme();
+        let line = header_text(&app, theme);
+        let badge_span = line.spans.iter().find(|s| s.content.contains("Platform: Win"));
+        assert_eq!(
+            badge_span.and_then(|s| s.style.fg),
+            Some(theme.dataset_fg),
+            "[Platform: Win] badge must use dataset_fg (same as type label)"
+        );
     }
 
     #[test]

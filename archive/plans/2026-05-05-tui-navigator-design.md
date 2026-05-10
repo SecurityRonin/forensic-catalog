@@ -79,7 +79,6 @@ Below 100 cols: right pane collapses; `Enter` toggles it full-screen.
 | `Enter` | toggle detail full-screen | HasResults |
 | `1`–`9` | switch dataset | NotInSearchMode |
 | `Ctrl-R` | cycle triage preset | — |
-| `Alt-1`–`Alt-9` | jump to Nth result | HasResults |
 | `?`/`F1` | about modal | — |
 | `q`/`Ctrl-C` | quit | — |
 
@@ -90,7 +89,6 @@ Below 100 cols: right pane collapses; `Enter` toggles it full-screen.
 | printable | append to query, live filter |
 | `Backspace` | delete last char |
 | `↑`/`↓` | navigate without leaving search |
-| `Alt-1`–`Alt-9` | select Nth result immediately |
 | `Esc`/`Enter` | exit, keep filter |
 | `Ctrl-C` | exit, clear filter |
 
@@ -131,15 +129,7 @@ Each preset sets OS filter + priority filter atomically. Header shows active pre
 
 ---
 
-## Feature 3: Alt-1–Alt-9 Nth Result Jump (atuin-inspired)
-
-`Alt-1` selects the 1st visible (filtered) result, `Alt-2` the 2nd, etc.  
-If N > result count, selects the last result.  
-Works in both Normal and Search mode.
-
----
-
-## Feature 4: Guard-Aware Keybindings
+## Feature 3: Guard-Aware Keybindings
 
 Guards defined per keybinding:
 

@@ -30,8 +30,107 @@ mod tests {
     }
 
     #[test]
-    fn dataset_count_is_9() {
-        assert_eq!(app::App::DATASET_COUNT, 9, "9 datasets: catalog, lolbas, abusable sites, cmdlets, mmc, wmi, playbooks, malware profiles, attack flows");
+    fn dataset_count_is_13() {
+        assert_eq!(app::App::DATASET_COUNT, 13,
+            "13 datasets: catalog, lolbas, abusable sites, cmdlets, mmc, wmi, playbooks, \
+             malware profiles, attack flows, event ids, sigma, persistence, remote access");
+    }
+
+    #[test]
+    fn event_ids_is_at_idx_9() {
+        use forensicnomicon::eventids::EVENT_ID_TABLE;
+        let rd = build_render_data(&make_app(9, "", 0));
+        assert!(!rd.list_items.is_empty(), "dataset idx 9 must be event ids (non-empty)");
+        let first_id = EVENT_ID_TABLE[0].event_id;
+        assert!(
+            rd.list_items.iter().any(|s| s.contains(&first_id.to_string())),
+            "event ids list must contain event id {}; got: {:?}",
+            first_id, &rd.list_items[..rd.list_items.len().min(3)]
+        );
+    }
+
+    #[test]
+    fn event_id_detail_contains_channel_and_mitre() {
+        let rd = build_render_data(&make_app(9, "", 0));
+        assert!(!rd.detail_lines.is_empty(), "event id detail must be non-empty");
+        let combined = rd.detail_lines.join("\n").to_lowercase();
+        assert!(
+            combined.contains("security") || combined.contains("system"),
+            "event id detail must contain channel (Security/System); got: {combined}"
+        );
+        assert!(
+            combined.contains("t1") || combined.contains("mitre"),
+            "event id detail must contain MITRE technique; got: {combined}"
+        );
+    }
+
+    #[test]
+    fn sigma_is_at_idx_10() {
+        use forensicnomicon::sigma::SIGMA_TABLE;
+        let rd = build_render_data(&make_app(10, "", 0));
+        assert!(!rd.list_items.is_empty(), "dataset idx 10 must be sigma rules (non-empty)");
+        let first_title = SIGMA_TABLE[0].title;
+        assert!(
+            rd.list_items.iter().any(|s| s.contains(first_title)),
+            "sigma list must contain '{}'; got: {:?}",
+            first_title, &rd.list_items[..rd.list_items.len().min(3)]
+        );
+    }
+
+    #[test]
+    fn sigma_detail_contains_artifact_and_logsource() {
+        let rd = build_render_data(&make_app(10, "", 0));
+        assert!(!rd.detail_lines.is_empty(), "sigma detail must be non-empty");
+        let combined = rd.detail_lines.join("\n").to_lowercase();
+        assert!(
+            combined.contains("artifact") || combined.contains("logsource") || combined.contains("process"),
+            "sigma detail must contain artifact/logsource info; got: {combined}"
+        );
+    }
+
+    #[test]
+    fn persistence_is_at_idx_11() {
+        let rd = build_render_data(&make_app(11, "", 0));
+        assert!(!rd.list_items.is_empty(), "dataset idx 11 must be persistence mechanisms (non-empty)");
+        assert!(
+            rd.list_items.iter().any(|s| s.to_lowercase().contains("run")),
+            "persistence list must contain Windows Run Keys entry; got: {:?}",
+            &rd.list_items[..rd.list_items.len().min(5)]
+        );
+    }
+
+    #[test]
+    fn persistence_detail_contains_registry_or_path() {
+        let rd = build_render_data(&make_app(11, "", 0));
+        assert!(!rd.detail_lines.is_empty(), "persistence detail must be non-empty");
+        let combined = rd.detail_lines.join("\n");
+        assert!(
+            combined.contains('\\') || combined.contains('/'),
+            "persistence detail must contain registry or filesystem paths; got: {combined}"
+        );
+    }
+
+    #[test]
+    fn remote_access_is_at_idx_12() {
+        let rd = build_render_data(&make_app(12, "", 0));
+        assert!(!rd.list_items.is_empty(), "dataset idx 12 must be remote access tools (non-empty)");
+        assert!(
+            rd.list_items.iter().any(|s| s.to_lowercase().contains("teamviewer")
+                || s.to_lowercase().contains("anydesk")),
+            "remote access list must contain known RMM tools; got: {:?}",
+            &rd.list_items[..rd.list_items.len().min(5)]
+        );
+    }
+
+    #[test]
+    fn remote_access_detail_contains_registry_paths() {
+        let rd = build_render_data(&make_app(12, "", 0));
+        assert!(!rd.detail_lines.is_empty(), "remote access detail must be non-empty");
+        let combined = rd.detail_lines.join("\n");
+        assert!(
+            combined.contains('\\') || combined.contains("RAT"),
+            "remote access detail must contain registry paths or RAT names; got: {combined}"
+        );
     }
 
     #[test]

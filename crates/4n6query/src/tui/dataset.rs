@@ -10,6 +10,10 @@ pub enum Dataset {
     Playbooks = 6,
     MalwareProfiles = 7,
     AttackFlow = 8,
+    EventIds = 9,
+    Sigma = 10,
+    Persistence = 11,
+    RemoteAccess = 12,
 }
 
 impl Dataset {
@@ -24,6 +28,10 @@ impl Dataset {
             6 => Some(Self::Playbooks),
             7 => Some(Self::MalwareProfiles),
             8 => Some(Self::AttackFlow),
+            9 => Some(Self::EventIds),
+            10 => Some(Self::Sigma),
+            11 => Some(Self::Persistence),
+            12 => Some(Self::RemoteAccess),
             _ => None,
         }
     }
@@ -39,6 +47,10 @@ impl Dataset {
             Self::Playbooks => "playbooks",
             Self::MalwareProfiles => "malware profiles",
             Self::AttackFlow => "attack flows",
+            Self::EventIds => "event ids",
+            Self::Sigma => "sigma",
+            Self::Persistence => "persistence",
+            Self::RemoteAccess => "remote access",
         }
     }
 }

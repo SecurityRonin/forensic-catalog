@@ -8,7 +8,8 @@
       <!-- Harlan Carvey — Windows registry/timeline forensics; one of the longest-running DFIR blogs -->
       <outline type="rss" text="Windows Incident Response" title="Windows Incident Response" xmlUrl="https://windowsir.blogspot.com/feeds/posts/default" htmlUrl="https://windowsir.blogspot.com/"/>
       <!-- Ghost-hosted; Windows artifact deep dives (Prefetch, SRUM, ShimCache) -->
-      <outline type="rss" text="dfir.blog" title="dfir.blog" xmlUrl="https://dfir.blog/rss/" htmlUrl="https://dfir.blog/"/>
+      <!-- dfir.blog/rss/ returns malformed XML (invalid token line 437); try Ghost's JSON feed as fallback HTML monitor -->
+      <outline type="web" text="dfir.blog" title="dfir.blog" htmlUrl="https://dfir.blog/"/>
       <!-- Corey Harrell — Windows artifacts, threat hunting, malware triage -->
       <outline type="rss" text="Another Forensics Blog" title="Another Forensics Blog" xmlUrl="https://az4n6.blogspot.com/feeds/posts/default" htmlUrl="https://az4n6.blogspot.com/"/>
       <!-- DFIR community resource hub — tool lists, blog directory, training links -->
@@ -109,6 +110,8 @@
       <outline type="rss" text="Cisco Talos Blog" title="Cisco Talos Blog" xmlUrl="https://blog.talosintelligence.com/rss/" htmlUrl="https://blog.talosintelligence.com/"/>
       <!-- SANS blog — no RSS; Remix SSR embeds JSON in page (949 posts, 80 pages). Scraped via parse_sans_blog_html(). -->
       <outline type="web" text="SANS Blog" title="SANS Blog" htmlUrl="https://www.sans.org/blog"/>
+      <!-- Elastic Security Labs — threat research, detection engineering, malware analysis; no RSS endpoint (404); HTML monitor -->
+      <outline type="web" text="Elastic Security Labs" title="Elastic Security Labs" htmlUrl="https://www.elastic.co/security-labs/"/>
     </outline>
     <outline text="Vendor DFIR Blogs" title="Vendor DFIR Blogs">
       <!-- Binalyze — DFIR platform vendor; acquisition techniques, triage workflows -->
@@ -116,7 +119,8 @@
       <!-- Belkasoft's main site (belkasoft.com) has no feed; their WordPress blog does -->
       <outline type="rss" text="Belkasoft Blog" title="Belkasoft Blog" xmlUrl="https://belkasoft.wordpress.com/feed/" htmlUrl="https://belkasoft.wordpress.com/"/>
       <!-- Forensafe / ArtiFast — Windows artifact parser vendor; artifact coverage notes -->
-      <outline type="rss" text="Forensafe (ArtiFast) Blog" title="Forensafe (ArtiFast) Blog" xmlUrl="https://www.forensafe.com/rss.xml" htmlUrl="https://www.forensafe.com/"/>
+      <!-- forensafe.com/rss.xml returns malformed XML; monitoring main page directly -->
+      <outline type="web" text="Forensafe (ArtiFast) Blog" title="Forensafe (ArtiFast) Blog" htmlUrl="https://www.forensafe.com/blogs.html"/>
       <!-- Cellebrite — mobile forensics vendor; device support updates, acquisition research -->
       <outline type="rss" text="Cellebrite Blog" title="Cellebrite Blog" xmlUrl="https://cellebrite.com/en/feed/" htmlUrl="https://cellebrite.com/en/blog/"/>
       <!-- Dr. Joshua James — academic DFIR research; iLEAPP, mobile forensics methodology -->
@@ -134,6 +138,12 @@
       <outline type="rss" text="BleepingComputer" title="BleepingComputer" xmlUrl="https://www.bleepingcomputer.com/feed/" htmlUrl="https://www.bleepingcomputer.com/"/>
       <!-- Dark Reading — security industry news; attack trends, defense coverage; /rss/all.xml 404s, /rss.xml confirmed 200 -->
       <outline type="rss" text="Dark Reading" title="Dark Reading" xmlUrl="https://www.darkreading.com/rss.xml" htmlUrl="https://www.darkreading.com/"/>
+      <!-- Volexity — incident response, memory forensics, APT tracking; detailed case studies with artifact coverage -->
+      <outline type="rss" text="Volexity Blog" title="Volexity Blog" xmlUrl="https://www.volexity.com/blog/feed/" htmlUrl="https://www.volexity.com/blog/"/>
+      <!-- SentinelOne Labs — malware research, ransomware analysis, threat intelligence; detailed artifact/IOC coverage -->
+      <outline type="rss" text="SentinelOne Labs" title="SentinelOne Labs" xmlUrl="https://www.sentinelone.com/labs/feed/" htmlUrl="https://www.sentinelone.com/labs/"/>
+      <!-- Microsoft Security Blog — Windows security, threat intelligence, detection engineering; first-party artifact detail -->
+      <outline type="rss" text="Microsoft Security Blog" title="Microsoft Security Blog" xmlUrl="https://www.microsoft.com/en-us/security/blog/feed/" htmlUrl="https://www.microsoft.com/en-us/security/blog/"/>
     </outline>
     <outline text="Living Off the Land Datasets" title="Living Off the Land Datasets">
       <!-- GitHub commit atom feeds — one entry per new binary/driver/tool added to dataset -->
@@ -158,12 +168,51 @@
            each commit adds new Windows 10/11 forensic field details -->
       <outline type="rss" text="kacos2000_Win10" title="kacos2000/Win10 (Windows forensic field notes)" xmlUrl="https://github.com/kacos2000/Win10/commits/master.atom" htmlUrl="https://github.com/kacos2000/Win10"/>
     </outline>
+    <outline text="Eric Zimmerman Tool Releases" title="Eric Zimmerman Tool Releases">
+      <!-- Release feeds for EZ CLI tools — each release may add new artifact format support or field changes.
+           Use releases.atom (not commits) so only shipped versions appear, not WIP commits. -->
+      <outline type="rss" text="EZ RECmd releases" title="Eric Zimmerman RECmd releases" xmlUrl="https://github.com/EricZimmerman/RECmd/releases.atom" htmlUrl="https://github.com/EricZimmerman/RECmd"/>
+      <outline type="rss" text="EZ MFTECmd releases" title="Eric Zimmerman MFTECmd releases" xmlUrl="https://github.com/EricZimmerman/MFTECmd/releases.atom" htmlUrl="https://github.com/EricZimmerman/MFTECmd"/>
+      <outline type="rss" text="EZ AppCompatCacheParser releases" title="Eric Zimmerman AppCompatCacheParser releases" xmlUrl="https://github.com/EricZimmerman/AppCompatCacheParser/releases.atom" htmlUrl="https://github.com/EricZimmerman/AppCompatCacheParser"/>
+      <outline type="rss" text="EZ AmcacheParser releases" title="Eric Zimmerman AmcacheParser releases" xmlUrl="https://github.com/EricZimmerman/AmcacheParser/releases.atom" htmlUrl="https://github.com/EricZimmerman/AmcacheParser"/>
+      <outline type="rss" text="EZ SQLECmd releases" title="Eric Zimmerman SQLECmd releases" xmlUrl="https://github.com/EricZimmerman/SQLECmd/releases.atom" htmlUrl="https://github.com/EricZimmerman/SQLECmd"/>
+      <outline type="rss" text="EZ WxTCmd releases" title="Eric Zimmerman WxTCmd releases" xmlUrl="https://github.com/EricZimmerman/WxTCmd/releases.atom" htmlUrl="https://github.com/EricZimmerman/WxTCmd"/>
+      <outline type="rss" text="EZ JLECmd releases" title="Eric Zimmerman JLECmd releases" xmlUrl="https://github.com/EricZimmerman/JLECmd/releases.atom" htmlUrl="https://github.com/EricZimmerman/JLECmd"/>
+      <outline type="rss" text="EZ LECmd releases" title="Eric Zimmerman LECmd releases" xmlUrl="https://github.com/EricZimmerman/LECmd/releases.atom" htmlUrl="https://github.com/EricZimmerman/LECmd"/>
+      <outline type="rss" text="EZ PECmd releases" title="Eric Zimmerman PECmd releases" xmlUrl="https://github.com/EricZimmerman/PECmd/releases.atom" htmlUrl="https://github.com/EricZimmerman/PECmd"/>
+      <outline type="rss" text="EZ RBCmd releases" title="Eric Zimmerman RBCmd releases" xmlUrl="https://github.com/EricZimmerman/RBCmd/releases.atom" htmlUrl="https://github.com/EricZimmerman/RBCmd"/>
+      <outline type="rss" text="EZ evtx releases" title="Eric Zimmerman evtx releases" xmlUrl="https://github.com/EricZimmerman/evtx/releases.atom" htmlUrl="https://github.com/EricZimmerman/evtx"/>
+      <!-- Data/definition repos — commit feeds because each commit may add a new target, plugin, or GUID entry -->
+      <outline type="rss" text="EZ KapeFiles commits" title="Eric Zimmerman KapeFiles commits" xmlUrl="https://github.com/EricZimmerman/KapeFiles/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/KapeFiles"/>
+      <outline type="rss" text="EZ RegistryPlugins commits" title="Eric Zimmerman RegistryPlugins commits" xmlUrl="https://github.com/EricZimmerman/RegistryPlugins/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/RegistryPlugins"/>
+      <outline type="rss" text="EZ RegistryExplorerBookmarks commits" title="Eric Zimmerman RegistryExplorerBookmarks commits" xmlUrl="https://github.com/EricZimmerman/RegistryExplorerBookmarks/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/RegistryExplorerBookmarks"/>
+      <outline type="rss" text="EZ GuidMapping commits" title="Eric Zimmerman GuidMapping commits" xmlUrl="https://github.com/EricZimmerman/GuidMapping/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/GuidMapping"/>
+      <outline type="rss" text="EZ documentation commits" title="Eric Zimmerman documentation commits" xmlUrl="https://github.com/EricZimmerman/documentation/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/documentation"/>
+      <outline type="rss" text="EZ DFIR-SQL-Query-Repo commits" title="Eric Zimmerman DFIR-SQL-Query-Repo commits" xmlUrl="https://github.com/EricZimmerman/DFIR-SQL-Query-Repo/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/DFIR-SQL-Query-Repo"/>
+    </outline>
+    <outline text="Detection Rule Repositories" title="Detection Rule Repositories">
+      <!-- Rule corpus releases and commits — each new rule implies a detectable artifact pattern or TTP.
+           Reviewers should check release notes for new technique coverage. -->
+      <!-- SigmaHQ — generic SIEM detection rules; each release bundles new technique coverage -->
+      <outline type="rss" text="SigmaHQ sigma releases" title="SigmaHQ sigma releases" xmlUrl="https://github.com/SigmaHQ/sigma/releases.atom" htmlUrl="https://github.com/SigmaHQ/sigma"/>
+      <!-- Hayabusa rules — Windows event log detection; commit = new rule per event/technique -->
+      <outline type="rss" text="Hayabusa rules commits" title="Yamato-Security hayabusa-rules commits" xmlUrl="https://github.com/Yamato-Security/hayabusa-rules/commits/main.atom" htmlUrl="https://github.com/Yamato-Security/hayabusa-rules"/>
+      <!-- Hayabusa tool releases — Windows event log fast-forensics scanner -->
+      <outline type="rss" text="Hayabusa releases" title="Yamato-Security hayabusa releases" xmlUrl="https://github.com/Yamato-Security/hayabusa/releases.atom" htmlUrl="https://github.com/Yamato-Security/hayabusa"/>
+      <!-- Chainsaw — Windows event triage; release = new detection coverage -->
+      <outline type="rss" text="Chainsaw releases" title="WithSecureLabs chainsaw releases" xmlUrl="https://github.com/WithSecureLabs/chainsaw/releases.atom" htmlUrl="https://github.com/WithSecureLabs/chainsaw"/>
+      <!-- Elastic detection-rules — ATT&CK-mapped EQL/KQL rules; releases bundle new technique coverage -->
+      <outline type="rss" text="Elastic detection-rules releases" title="Elastic detection-rules releases" xmlUrl="https://github.com/elastic/detection-rules/releases.atom" htmlUrl="https://github.com/elastic/detection-rules"/>
+      <!-- regipy — offline Windows registry parser with artifact plugin corpus; release = new artifact support -->
+      <outline type="rss" text="regipy releases" title="mkorman90 regipy releases" xmlUrl="https://github.com/mkorman90/regipy/releases.atom" htmlUrl="https://github.com/mkorman90/regipy"/>
+    </outline>
     <outline text="Threat Intelligence Feeds" title="Threat Intelligence Feeds">
       <!-- abuse.ch suite — actively maintained, machine-readable threat intel -->
       <!-- URLhaus: daily CSV at https://urlhaus.abuse.ch/downloads/csv_recent/ -->
       <!-- synced via scripts/sync_urlhaus.py → archive/sources/urlhaus_domains.json -->
       <!-- abuse.ch blog — administrative/project news only; IOC data consumed via CSV downloads, not RSS -->
-      <outline type="rss" text="abuse.ch blog" title="abuse.ch blog" xmlUrl="https://abuse.ch/blog/feed/" htmlUrl="https://abuse.ch/"/>
+      <!-- abuse.ch/blog/feed/ returns HTTP 404; blog likely discontinued; removing RSS entry -->
+      <!-- IOC data consumed via CSV: urlhaus.abuse.ch/downloads/csv_recent/, bazaar.abuse.ch/export/, threatfox.abuse.ch/export/ -->
       <!-- URLhaus/MalwareBazaar/ThreatFox: IOC feeds (not blog posts) — RSS endpoints removed by abuse.ch;
            consume via CSV/API instead: https://urlhaus.abuse.ch/downloads/csv_recent/
                                         https://bazaar.abuse.ch/export/

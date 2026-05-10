@@ -8,26 +8,17 @@ use crate::tui::app::{App, Focus, Mode};
 pub enum Guard {
     /// Blocked while in Search mode.
     NotInSearchMode,
-    /// Blocked when the filtered result list is empty.
-    HasResults,
     /// Blocked when the detail pane does not have focus.
     DetailFocused,
 }
 
 impl Guard {
     /// Returns `None` if the guard passes, or `Some(reason)` if it fails.
-    pub fn check(self, app: &App, list_len: usize) -> Option<&'static str> {
+    pub fn check(self, app: &App, _list_len: usize) -> Option<&'static str> {
         match self {
             Self::NotInSearchMode => {
                 if app.mode == Mode::Search {
                     Some("finish search first (Esc), then switch dataset")
-                } else {
-                    None
-                }
-            }
-            Self::HasResults => {
-                if list_len == 0 {
-                    Some("no matches — refine your query")
                 } else {
                     None
                 }
@@ -92,20 +83,6 @@ mod tests {
         assert!(Guard::NotInSearchMode.check(&a, 10).is_none());
     }
 
-    // ── HasResults ────────────────────────────────────────────────────────
-
-    #[test]
-    fn has_results_passes_when_list_nonempty() {
-        assert!(Guard::HasResults.check(&normal_app(), 5).is_none());
-    }
-
-    #[test]
-    fn has_results_fails_when_list_empty() {
-        let reason = Guard::HasResults.check(&normal_app(), 0);
-        assert!(reason.is_some());
-        assert!(reason.unwrap().contains("no matches"));
-    }
-
     // ── DetailFocused ─────────────────────────────────────────────────────
 
     #[test]
@@ -124,17 +101,18 @@ mod tests {
 
     #[test]
     fn evaluate_returns_none_when_all_guards_pass() {
-        let guards = [Guard::HasResults];
+        let guards = [Guard::NotInSearchMode];
         assert!(evaluate(&guards, &normal_app(), 5).is_none());
     }
 
     #[test]
     fn evaluate_returns_first_failure() {
-        let guards = [Guard::HasResults, Guard::NotInSearchMode];
-        // list empty → HasResults fails first
-        let reason = evaluate(&guards, &normal_app(), 0);
+        let guards = [Guard::NotInSearchMode, Guard::DetailFocused];
+        let mut a = normal_app();
+        a.enter_search_mode();
+        let reason = evaluate(&guards, &a, 5);
         assert!(reason.is_some());
-        assert!(reason.unwrap().contains("no matches"));
+        assert!(reason.unwrap().contains("search"));
     }
 
     #[test]

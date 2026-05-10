@@ -17,8 +17,8 @@ const PAGE_SIZE: usize = 10;
 
 /// Process a single key event and mutate `app` accordingly.
 ///
-/// `list_len` is the number of filtered results currently visible — needed
-/// to evaluate `Guard::HasResults` without coupling to the render state.
+/// `list_len` is the number of filtered results currently visible — passed
+/// to guards that need it.
 ///
 /// Returns `true` if the application should quit.
 pub fn handle_key(app: &mut App, event: KeyEvent, list_len: usize) -> bool {
@@ -116,16 +116,6 @@ pub fn handle_key(app: &mut App, event: KeyEvent, list_len: usize) -> bool {
         }
         (KeyCode::Char('f'), KeyModifiers::NONE) => app.toggle_detail_fullscreen(),
 
-        // ── Alt-1…Alt-9 Nth result jump ───────────────────────────────────
-        (KeyCode::Char(c), KeyModifiers::ALT) if ('1'..='9').contains(&c) => {
-            let n = (c as usize) - ('0' as usize);
-            if let Some(r) = evaluate(&[Guard::HasResults], app, list_len) {
-                app.flash(r);
-            } else {
-                app.alt_jump(n, list_len);
-            }
-        }
-
         // ── Platform filter cycle (p) ─────────────────────────────────────
         // off → [Win] → [W10] → [W11] → [Mac] → [Lin] → off
         (KeyCode::Char('p'), KeyModifiers::NONE) => app.cycle_platform_filter(),
@@ -141,7 +131,7 @@ pub fn handle_key(app: &mut App, event: KeyEvent, list_len: usize) -> bool {
         }
 
         // ── Criticality filter cycle (c) ──────────────────────────────────
-        (KeyCode::Char('c'), KeyModifiers::NONE) => {
+        (KeyCode::Char('s'), KeyModifiers::NONE) => {
             if let Some(r) = evaluate(&[Guard::NotInSearchMode], app, list_len) {
                 app.flash(r);
             } else {
@@ -208,10 +198,6 @@ mod tests {
 
     fn key(code: KeyCode) -> KeyEvent {
         KeyEvent::new(code, KeyModifiers::NONE)
-    }
-
-    fn alt_key(c: char) -> KeyEvent {
-        KeyEvent::new(KeyCode::Char(c), KeyModifiers::ALT)
     }
 
     fn ctrl_key(c: char) -> KeyEvent {
@@ -351,22 +337,6 @@ mod tests {
         assert_eq!(a.selected, 19);
     }
 
-    // ── Guard: Alt-jump on empty list ─────────────────────────────────────
-
-    #[test]
-    fn alt_jump_on_empty_list_flashes_reason() {
-        let mut a = app();
-        handle_key(&mut a, alt_key('3'), 0); // list_len = 0 → HasResults guard fails
-        assert!(a.has_flash(), "should have flash message");
-    }
-
-    #[test]
-    fn alt_jump_with_results_moves_selection() {
-        let mut a = app();
-        handle_key(&mut a, alt_key('3'), 10); // guard passes
-        assert_eq!(a.selected, 2); // alt_jump(3, 10) → index 2
-    }
-
     // ── Guard: dataset switch in search mode ──────────────────────────────
 
     #[test]
@@ -501,36 +471,36 @@ mod tests {
         assert!(a.platform_mask.is_empty(), "sixth press must clear filter");
     }
 
-    // ── c key — criticality filter ────────────────────────────────────────
+    // ── s key — severity filter ───────────────────────────────────────────
 
     #[test]
-    fn c_key_cycles_crit_filter_from_all_to_critical() {
+    fn s_key_cycles_severity_filter_from_all_to_critical() {
         use crate::tui::app::CritFilter;
         let mut a = app();
         assert_eq!(a.crit_filter, CritFilter::All);
-        handle_key(&mut a, key(KeyCode::Char('c')), 10);
+        handle_key(&mut a, key(KeyCode::Char('s')), 10);
         assert_eq!(a.crit_filter, CritFilter::Critical);
     }
 
     #[test]
-    fn c_key_cycles_crit_filter_three_times() {
+    fn s_key_cycles_severity_filter_three_times() {
         use crate::tui::app::CritFilter;
         let mut a = app();
-        handle_key(&mut a, key(KeyCode::Char('c')), 10);
-        handle_key(&mut a, key(KeyCode::Char('c')), 10);
-        handle_key(&mut a, key(KeyCode::Char('c')), 10);
+        handle_key(&mut a, key(KeyCode::Char('s')), 10);
+        handle_key(&mut a, key(KeyCode::Char('s')), 10);
+        handle_key(&mut a, key(KeyCode::Char('s')), 10);
         assert_eq!(a.crit_filter, CritFilter::Medium);
     }
 
     #[test]
-    fn c_key_not_dispatched_in_search_mode() {
+    fn s_key_not_dispatched_in_search_mode() {
         use crate::tui::app::CritFilter;
         let mut a = app();
         a.enter_search_mode();
-        handle_key(&mut a, key(KeyCode::Char('c')), 10);
-        // In search mode 'c' pushes to query, does NOT cycle crit filter
-        assert_eq!(a.crit_filter, CritFilter::All, "crit filter must not change in search mode");
-        assert!(a.search_query.contains('c'), "c must be added to search query");
+        handle_key(&mut a, key(KeyCode::Char('s')), 10);
+        // In search mode 's' pushes to query, does NOT cycle severity filter
+        assert_eq!(a.crit_filter, CritFilter::All, "severity filter must not change in search mode");
+        assert!(a.search_query.contains('s'), "s must be added to search query");
     }
 
     // ── mouse events ──────────────────────────────────────────────────────

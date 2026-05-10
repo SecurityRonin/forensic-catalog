@@ -12,7 +12,7 @@ use ratatui::{
 
 use forensicnomicon::catalog::Platform;
 
-use crate::tui::app::{App, Focus, Mode, WinVersionFilter};
+use crate::tui::app::{App, CritFilter, Focus, Mode, WinVersionFilter};
 use crate::tui::heatmap::{render_bar, tactic_mask, BLOCK_HIT, BLOCK_MISS};
 use crate::tui::theme::Theme;
 
@@ -43,7 +43,10 @@ pub fn header_text<'a>(app: &'a App, theme: &'a Theme) -> Line<'a> {
             Style::default().add_modifier(Modifier::BOLD),
         ),
         Span::raw("│ "),
-        Span::styled(dataset_label, Style::default().fg(theme.dataset_fg)),
+        Span::styled(
+            format!("Type: {dataset_label}"),
+            Style::default().fg(theme.dataset_fg),
+        ),
         Span::raw(" │ "),
     ];
 
@@ -51,14 +54,14 @@ pub fn header_text<'a>(app: &'a App, theme: &'a Theme) -> Line<'a> {
     if !app.platform_mask.is_empty() {
         let label = if app.platform_mask.contains(Platform::Windows) {
             match app.win_version {
-                WinVersionFilter::All => "[Win]",
-                WinVersionFilter::Win10Plus => "[W10]",
-                WinVersionFilter::Win11Plus => "[W11]",
+                WinVersionFilter::All => "[Platform: Win]",
+                WinVersionFilter::Win10Plus => "[Platform: W10]",
+                WinVersionFilter::Win11Plus => "[Platform: W11]",
             }
         } else if app.platform_mask.contains(Platform::MacOS) {
-            "[Mac]"
+            "[Platform: Mac]"
         } else if app.platform_mask.contains(Platform::Linux) {
-            "[Lin]"
+            "[Platform: Lin]"
         } else {
             ""
         };
@@ -67,12 +70,27 @@ pub fn header_text<'a>(app: &'a App, theme: &'a Theme) -> Line<'a> {
         }
     }
 
-    // Criticality badge
-    if let Some(badge) = app.crit_filter.badge() {
+    // Severity badge with semantic color
+    let (sev_label, sev_style) = match app.crit_filter {
+        CritFilter::All => ("", None),
+        CritFilter::Critical => (
+            "[Severity: Crit]",
+            Some(Style::default().fg(theme.crit_fg)),
+        ),
+        CritFilter::High => (
+            "[Severity: High]",
+            Some(Style::default().fg(theme.high_fg)),
+        ),
+        CritFilter::Medium => (
+            "[Severity: Med]",
+            Some(Style::default().fg(theme.med_fg)),
+        ),
+    };
+    if let Some(style) = sev_style {
         if !app.platform_mask.is_empty() {
             spans.push(Span::raw(" "));
         }
-        spans.push(Span::styled(badge, Style::default().fg(theme.header_fg)));
+        spans.push(Span::styled(sev_label, style));
     }
 
     if !app.search_query.is_empty() || app.mode == Mode::Search {
@@ -103,14 +121,27 @@ pub fn hint_text<'a>(app: &'a App, theme: &'a Theme) -> Line<'a> {
         }
     }
 
-    let mode_hint = match app.mode {
-        Mode::Search => " Esc: finish  ↑↓: navigate  Enter: confirm",
-        Mode::About => " Esc/q: close  ↑↓/jk: scroll",
-        Mode::Normal => {
-            " /: search  j/k: navigate  Tab: focus  t: type  p: platform  c: criticality  ?: about  q: quit"
-        }
-    };
-    Line::from(Span::styled(mode_hint, Style::default().fg(theme.hint_fg)))
+    match app.mode {
+        Mode::Search => Line::from(Span::styled(
+            " Esc: finish  ↑↓: navigate  Enter: confirm",
+            Style::default().fg(theme.hint_fg),
+        )),
+        Mode::About => Line::from(Span::styled(
+            " Esc/q: close  ↑↓/jk: scroll",
+            Style::default().fg(theme.hint_fg),
+        )),
+        Mode::Normal => Line::from(vec![
+            Span::styled(
+                " /: search  j/k: navigate  Tab: focus  f: fullscreen  ?: about  q: quit",
+                Style::default().fg(theme.hint_fg),
+            ),
+            Span::styled("  │  ", Style::default().fg(theme.border_inactive)),
+            Span::styled(
+                "t: type  p: platform  s: severity",
+                Style::default().fg(theme.header_fg),
+            ),
+        ]),
+    }
 }
 
 /// Build a styled `Line` for one list-item display string.
@@ -332,11 +363,11 @@ pub fn draw(
         .constraints(constraints)
         .split(outer[1]);
 
-    draw_list_pane(f, app, theme, list_items, panes[0]);
-
     if app.detail_fullscreen {
+        f.render_widget(Clear, outer[1]);
         draw_detail_pane(f, app, theme, detail_lines, outer[1]);
     } else {
+        draw_list_pane(f, app, theme, list_items, panes[0]);
         draw_detail_pane(f, app, theme, detail_lines, panes[1]);
     }
 
@@ -431,8 +462,7 @@ fn draw_about(f: &mut Frame, theme: &Theme, area: Rect) {
         Line::from("  h/l ←→   move focus left / right"),
         Line::from("  t        cycle type  (catalog/lolbas/sites/…)"),
         Line::from("  p        cycle platform  (Win/W10/W11/Mac/Lin)"),
-        Line::from("  c        cycle criticality  (Crit/High/Med/All)"),
-        Line::from("  Alt-1…9  jump to Nth result"),
+        Line::from("  s        cycle severity  (Crit/High/Med/All)"),
         Line::from("  f        fullscreen detail pane"),
         Line::from("  q/Esc    quit / close modal"),
         Line::from(""),
@@ -540,6 +570,33 @@ mod tests {
     // ── hint_text ─────────────────────────────────────────────────────────
 
     #[test]
+    fn hint_normal_mode_has_separator_before_filter_keys() {
+        let app = App::new();
+        let line = hint_text(&app, default_theme());
+        let spans_text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
+        assert!(
+            spans_text.contains('│'),
+            "hint bar must have │ separator between nav and filter keys; got: {spans_text}"
+        );
+        let sep_pos = spans_text.find('│').unwrap();
+        let t_pos = spans_text.find("t:").unwrap();
+        assert!(sep_pos < t_pos, "│ must appear before t: filter key; got: {spans_text}");
+    }
+
+    #[test]
+    fn hint_filter_keys_use_distinct_style_from_nav_keys() {
+        let app = App::new();
+        let theme = default_theme();
+        let line = hint_text(&app, theme);
+        let distinct: std::collections::HashSet<_> =
+            line.spans.iter().map(|s| s.style.fg).collect();
+        assert!(
+            distinct.len() >= 2,
+            "hint bar must use ≥2 distinct fg styles to visually separate filter keys"
+        );
+    }
+
+    #[test]
     fn hint_shows_normal_mode_keys_by_default() {
         let app = App::new();
         let line = hint_text(&app, default_theme());
@@ -611,8 +668,8 @@ mod tests {
         let line = header_text(&app, default_theme());
         let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
         assert!(
-            text.contains("[Win]"),
-            "header must show [Win]; got: {text}"
+            text.contains("[Platform: Win]"),
+            "header must show [Platform: Win]; got: {text}"
         );
     }
 
@@ -626,12 +683,12 @@ mod tests {
         let line = header_text(&app, default_theme());
         let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
         assert!(
-            text.contains("[W10]"),
-            "header must show [W10]; got: {text}"
+            text.contains("[Platform: W10]"),
+            "header must show [Platform: W10]; got: {text}"
         );
         assert!(
-            !text.contains("[Win]"),
-            "must not show [Win] in W10 state; got: {text}"
+            !text.contains("[Platform: W11]"),
+            "must not show [Platform: W11] in W10 state; got: {text}"
         );
     }
 
@@ -645,8 +702,8 @@ mod tests {
         let line = header_text(&app, default_theme());
         let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
         assert!(
-            text.contains("[W11]"),
-            "header must show [W11]; got: {text}"
+            text.contains("[Platform: W11]"),
+            "header must show [Platform: W11]; got: {text}"
         );
     }
 
@@ -658,8 +715,8 @@ mod tests {
         let line = header_text(&app, default_theme());
         let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
         assert!(
-            text.contains("[Mac]"),
-            "header must show [Mac]; got: {text}"
+            text.contains("[Platform: Mac]"),
+            "header must show [Platform: Mac]; got: {text}"
         );
     }
 
@@ -672,7 +729,7 @@ mod tests {
         app.crit_filter = CritFilter::Critical;
         let line = header_text(&app, default_theme());
         let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
-        assert!(text.contains("[Crit]"), "header must show [Crit]; got: {text}");
+        assert!(text.contains("[Severity: Crit]"), "header must show [Severity: Crit]; got: {text}");
     }
 
     #[test]
@@ -682,7 +739,7 @@ mod tests {
         app.crit_filter = CritFilter::High;
         let line = header_text(&app, default_theme());
         let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
-        assert!(text.contains("[High]"), "header must show [High]; got: {text}");
+        assert!(text.contains("[Severity: High]"), "header must show [Severity: High]; got: {text}");
     }
 
     #[test]
@@ -692,7 +749,7 @@ mod tests {
         app.crit_filter = CritFilter::Medium;
         let line = header_text(&app, default_theme());
         let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
-        assert!(text.contains("[Med]"), "header must show [Med]; got: {text}");
+        assert!(text.contains("[Severity: Med]"), "header must show [Severity: Med]; got: {text}");
     }
 
     #[test]
@@ -701,8 +758,8 @@ mod tests {
         let line = header_text(&app, default_theme());
         let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
         assert!(
-            !text.contains("[Crit]") && !text.contains("[High]") && !text.contains("[Med]"),
-            "no crit badge when filter is All; got: {text}"
+            !text.contains("[Severity:"),
+            "no severity badge when filter is All; got: {text}"
         );
     }
 
@@ -712,8 +769,8 @@ mod tests {
         let line = header_text(&app, default_theme());
         let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
         assert!(
-            !text.contains("[Win]") && !text.contains("[Mac]") && !text.contains("[Lin]"),
-            "no platform brackets when mask is empty; got: {text}"
+            !text.contains("[Platform:"),
+            "no platform badge when mask is empty; got: {text}"
         );
     }
 
@@ -790,8 +847,8 @@ mod tests {
         let line = header_text(&app, default_theme());
         let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
         // No filter badges when everything is at default
-        assert!(!text.contains("[Win]"), "no platform badge; got: {text}");
-        assert!(!text.contains("[Crit]"), "no crit badge; got: {text}");
+        assert!(!text.contains("[Platform:"), "no platform badge; got: {text}");
+        assert!(!text.contains("[Severity:"), "no severity badge; got: {text}");
     }
 
     // ── styled_line_for_item ──────────────────────────────────────────────
@@ -1000,6 +1057,98 @@ mod tests {
             hl_span.and_then(|s| s.style.bg),
             Some(THEME_ONE_DARK.match_hl),
             "highlight bg must be theme.match_hl, not hardcoded Color::Yellow"
+        );
+    }
+
+    // ── header — Type prefix and severity coloring ────────────────────────
+
+    #[test]
+    fn header_shows_type_prefix_before_dataset_label() {
+        let app = App::new();
+        let line = header_text(&app, default_theme());
+        let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
+        assert!(text.contains("Type: catalog"), "header must show 'Type: catalog'; got: {text}");
+    }
+
+    #[test]
+    fn header_crit_badge_uses_crit_fg_color() {
+        use crate::tui::app::CritFilter;
+        let mut app = App::new();
+        app.crit_filter = CritFilter::Critical;
+        let theme = default_theme();
+        let line = header_text(&app, theme);
+        let sev_span = line.spans.iter().find(|s| s.content.contains("Severity: Crit"));
+        assert_eq!(
+            sev_span.and_then(|s| s.style.fg),
+            Some(theme.crit_fg),
+            "Critical severity badge must use crit_fg"
+        );
+    }
+
+    #[test]
+    fn header_high_badge_uses_high_fg_color() {
+        use crate::tui::app::CritFilter;
+        let mut app = App::new();
+        app.crit_filter = CritFilter::High;
+        let theme = default_theme();
+        let line = header_text(&app, theme);
+        let sev_span = line.spans.iter().find(|s| s.content.contains("Severity: High"));
+        assert_eq!(
+            sev_span.and_then(|s| s.style.fg),
+            Some(theme.high_fg),
+            "High severity badge must use high_fg"
+        );
+    }
+
+    #[test]
+    fn header_med_badge_uses_med_fg_color() {
+        use crate::tui::app::CritFilter;
+        let mut app = App::new();
+        app.crit_filter = CritFilter::Medium;
+        let theme = default_theme();
+        let line = header_text(&app, theme);
+        let sev_span = line.spans.iter().find(|s| s.content.contains("Severity: Med"));
+        assert_eq!(
+            sev_span.and_then(|s| s.style.fg),
+            Some(theme.med_fg),
+            "Med severity badge must use med_fg"
+        );
+    }
+
+    #[test]
+    fn hint_bar_shows_s_key_for_severity() {
+        let app = App::new();
+        let line = hint_text(&app, default_theme());
+        let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
+        assert!(text.contains("s:"), "hint bar must advertise s key for severity; got: {text}");
+    }
+
+    // ── fullscreen clears list area ───────────────────────────────────────
+
+    #[test]
+    fn fullscreen_does_not_show_list_content() {
+        // Use many list items but only 1 detail line so rows below the detail
+        // content would show list text if the Paragraph doesn't fill trailing rows.
+        let mut term = terminal(120, 30);
+        let mut app = App::new();
+        let items: Vec<String> = (0..25).map(|i| format!("xyzzy_item_{i:02} [Critical]")).collect();
+        let details = vec!["detail only line".to_string()];
+
+        // Frame 1: normal render (list + detail side-by-side)
+        term.draw(|f| draw(f, &app, default_theme(), &items, &details)).unwrap();
+
+        // Frame 2: fullscreen — list content must not bleed through
+        app.toggle_detail_fullscreen();
+        term.draw(|f| draw(f, &app, default_theme(), &items, &details)).unwrap();
+
+        let buf = term.backend().buffer().clone();
+        let rendered: String = (0..buf.area.height)
+            .flat_map(|row| (0..buf.area.width).map(move |col| (col, row)))
+            .map(|(col, row)| buf.cell((col, row)).unwrap().symbol().to_string())
+            .collect();
+        assert!(
+            !rendered.contains("xyzzy_item"),
+            "fullscreen must clear list area; list text still visible:\n{rendered}"
         );
     }
 

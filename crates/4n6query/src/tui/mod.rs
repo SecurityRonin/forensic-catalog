@@ -359,6 +359,44 @@ mod tests {
         );
     }
 
+    fn label_colon_positions(lines: &[String]) -> Vec<usize> {
+        // Only consider lines where the colon appears within the first 12 chars —
+        // that's where padded label fields live; body text colons are further right.
+        lines.iter()
+            .filter(|l| !l.starts_with(' ') && !l.contains("://"))
+            .filter_map(|l| {
+                let pos = l.find(": ")?;
+                if pos <= 12 { Some(pos) } else { None }
+            })
+            .collect()
+    }
+
+    #[test]
+    fn abusable_sites_detail_label_values_column_aligned() {
+        let rd = build_render_data(&make_app(2, "", 0));
+        let positions = label_colon_positions(&rd.detail_lines);
+        assert!(positions.len() >= 2, "need at least 2 label lines to check alignment");
+        let first = positions[0];
+        for pos in &positions {
+            assert_eq!(*pos, first,
+                "all label-value lines must have colon at same column; lines:\n{}",
+                rd.detail_lines.join("\n"));
+        }
+    }
+
+    #[test]
+    fn catalog_detail_label_values_column_aligned() {
+        let rd = build_render_data(&make_app(0, "", 0));
+        let positions = label_colon_positions(&rd.detail_lines);
+        assert!(positions.len() >= 2, "need at least 2 label lines to check alignment");
+        let first = positions[0];
+        for pos in &positions {
+            assert_eq!(*pos, first,
+                "all label-value lines must have colon at same column; lines:\n{}",
+                rd.detail_lines.join("\n"));
+        }
+    }
+
     #[test]
     fn abusable_sites_detail_not_placeholder() {
         let rd = build_render_data(&make_app(2, "", 0));
@@ -611,24 +649,25 @@ fn build_render_data(app: &app::App) -> RenderData {
                 .and_then(|id| CATALOG.by_id(id));
             match desc {
                 Some(d) => {
+                    const CW: usize = 8; // "Priority" = longest label
                     let mut lines = vec![
                         d.name.to_string(),
                         "─".repeat(40),
-                        format!("Type:     {:?}", d.artifact_type),
-                        format!("OS:       {:?}", d.os_scope),
-                        format!("Priority: {:?}", d.triage_priority),
+                        format!("{:<CW$}: {:?}", "Type", d.artifact_type),
+                        format!("{:<CW$}: {:?}", "OS", d.os_scope),
+                        format!("{:<CW$}: {:?}", "Priority", d.triage_priority),
                     ];
                     if let Some(fp) = d.file_path {
-                        lines.push(format!("Path: {fp}"));
+                        lines.push(format!("{:<CW$}: {fp}", "Path"));
                     }
                     if !d.key_path.is_empty() {
-                        lines.push(format!("Key:  {}", d.key_path));
+                        lines.push(format!("{:<CW$}: {}", "Key", d.key_path));
                     }
                     lines.push(String::new());
                     lines.push(d.meaning.to_string());
                     if !d.mitre_techniques.is_empty() {
                         lines.push(String::new());
-                        lines.push(format!("MITRE: {}", d.mitre_techniques.join("  ")));
+                        lines.push(format!("{:<CW$}: {}", "MITRE", d.mitre_techniques.join("  ")));
                     }
                     if !d.fields.is_empty() {
                         lines.push(String::new());
@@ -672,20 +711,21 @@ fn build_render_data(app: &app::App) -> RenderData {
             });
             match site {
                 Some(s) => {
+                    const CW: usize = 10; // "Block risk" = longest label
                     let mut lines = vec![
                         s.domain.to_string(),
                         "─".repeat(40),
-                        format!("Provider:  {}", s.provider),
-                        format!("Category:  {:?}", s.legitimate_category),
-                        format!("Block risk: {:?}", s.blocking_risk),
+                        format!("{:<CW$}: {}", "Provider", s.provider),
+                        format!("{:<CW$}: {:?}", "Category", s.legitimate_category),
+                        format!("{:<CW$}: {:?}", "Block risk", s.blocking_risk),
                     ];
                     let tags = abuse_tags_str(s.abuse_tags);
                     if !tags.is_empty() {
-                        lines.push(format!("Abuse:     {tags}"));
+                        lines.push(format!("{:<CW$}: {tags}", "Abuse"));
                     }
                     if !s.mitre_techniques.is_empty() {
                         lines.push(String::new());
-                        lines.push(format!("MITRE: {}", s.mitre_techniques.join("  ")));
+                        lines.push(format!("{:<CW$}: {}", "MITRE", s.mitre_techniques.join("  ")));
                     }
                     lines
                 }

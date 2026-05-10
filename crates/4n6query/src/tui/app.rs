@@ -37,14 +37,6 @@ impl CritFilter {
         }
     }
 
-    pub fn badge(self) -> Option<&'static str> {
-        match self {
-            Self::All => None,
-            Self::Critical => Some("[Crit]"),
-            Self::High => Some("[High]"),
-            Self::Medium => Some("[Med]"),
-        }
-    }
 }
 
 /// Windows version sub-filter — active only when `platform_mask` contains Windows.
@@ -268,10 +260,6 @@ impl App {
         self.selected = 0;
     }
 
-    pub fn has_search(&self) -> bool {
-        !self.search_query.is_empty()
-    }
-
     // ── Dataset ───────────────────────────────────────────────────────────
 
     pub const DATASET_COUNT: usize = 7;
@@ -296,17 +284,6 @@ impl App {
         self.detail_scroll = 0;
     }
 
-    // ── Alt-N jump ────────────────────────────────────────────────────────
-
-    /// Jump to the Nth result (1-based). Clamps to last result.
-    pub fn alt_jump(&mut self, n: usize, list_len: usize) {
-        if list_len == 0 {
-            return;
-        }
-        self.selected = (n - 1).min(list_len - 1);
-        self.detail_scroll = 0;
-    }
-
     // ── Flash ─────────────────────────────────────────────────────────────
 
     pub fn flash(&mut self, msg: impl Into<String>) {
@@ -321,6 +298,7 @@ impl App {
         }
     }
 
+    #[allow(dead_code)] // used in tests
     pub fn has_flash(&self) -> bool {
         self.flash.is_some()
     }
@@ -535,18 +513,6 @@ mod tests {
         assert_eq!(a.search_query, "pre");
     }
 
-    #[test]
-    fn has_search_false_when_empty() {
-        assert!(!app().has_search());
-    }
-
-    #[test]
-    fn has_search_true_when_nonempty() {
-        let mut a = app();
-        a.search_query = "x".into();
-        assert!(a.has_search());
-    }
-
     // ── Dataset switching ─────────────────────────────────────────────────
 
     #[test]
@@ -591,38 +557,6 @@ mod tests {
         let mut a = app();
         a.selected = 42;
         a.cycle_dataset();
-        assert_eq!(a.selected, 0);
-    }
-
-    // ── Alt-N jump ────────────────────────────────────────────────────────
-
-    #[test]
-    fn alt_jump_selects_nth_zero_based() {
-        let mut a = app();
-        a.alt_jump(3, 10);
-        assert_eq!(a.selected, 2);
-    }
-
-    #[test]
-    fn alt_jump_1_selects_first() {
-        let mut a = app();
-        a.selected = 7;
-        a.alt_jump(1, 10);
-        assert_eq!(a.selected, 0);
-    }
-
-    #[test]
-    fn alt_jump_clamps_to_last_when_n_exceeds_len() {
-        let mut a = app();
-        a.alt_jump(9, 3);
-        assert_eq!(a.selected, 2);
-    }
-
-    #[test]
-    fn alt_jump_on_empty_list_does_nothing() {
-        let mut a = app();
-        a.selected = 0;
-        a.alt_jump(1, 0);
         assert_eq!(a.selected, 0);
     }
 

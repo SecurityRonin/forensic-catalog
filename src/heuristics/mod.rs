@@ -15,6 +15,7 @@
 
 pub mod entropy;
 pub mod evtx;
+pub mod linux_rootkit;
 pub mod memory;
 pub mod network;
 pub mod paths;

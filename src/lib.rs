@@ -159,6 +159,7 @@ pub use lolbins::{
 };
 pub mod heuristics;
 pub mod journald;
+pub mod threat_intel;
 pub mod no_std_compat;
 pub mod paths;
 pub mod pca;

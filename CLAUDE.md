@@ -52,6 +52,25 @@ This project is a forensic catalog first, not a full DFIR parsing engine.
 - Do not keep pushing large or evolving formats such as `hiberfil.sys`, BITS job stores, or full WMI repository parsing into this crate's core decode engine.
 - If execution-grade parsers are needed later, put them in a separate parsing module or companion crate rather than turning the catalog itself into a full parser framework.
 
+### Feed review scope boundary
+
+When reviewing blog posts, vendor announcements, and podcast content from the pending queue, apply the same boundary:
+
+**In scope — implement into the catalog:**
+- Artifact location, format, field schema, or forensic interpretation (new or corrected)
+- Heuristic predicates: detection thresholds, anomaly patterns, behavioral signals derived from artifact values
+- ATT&CK technique mappings based on artifact evidence
+- Tool-to-artifact relationships where the *artifact* is the primary subject (e.g. "RECmd parses the MRU list at HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\OpenSavePidlMRU" — the MRU path is in scope, the tool name is not)
+
+**Out of scope — mark reviewed/0 artifacts, do not implement:**
+- Vendor acquisition method announcements ("Passware now decrypts Samsung S10") — the *device image* artifact is already in scope; the vendor's capability to extract it is not
+- Tool feature releases that don't name a new artifact or change its forensic interpretation
+- Vendor product comparisons, pricing, or partnership announcements
+- Conference schedules, job postings, award announcements
+- General incident response methodology without specific artifact detail
+
+The test: *Does this teach an analyst something new about what an artifact contains, where it lives, or what it proves?* If the answer is only "this tool can now collect X", it is out of scope.
+
 ---
 
 ## Accuracy Standards

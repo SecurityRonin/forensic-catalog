@@ -9575,16 +9575,17 @@ mod tests_profile_merge {
     }
 
     #[test]
-    fn unassessed_catalog_entries_have_none_profile() {
-        use crate::profile::ARTIFACT_PROFILES;
-        let assessed: std::collections::HashSet<&str> =
-            ARTIFACT_PROFILES.iter().map(|p| p.id).collect();
+    fn assessed_entries_have_complete_metadata() {
         for d in CATALOG.list() {
-            if !assessed.contains(d.id) {
-                assert!(d.evidence_strength.is_none(),
-                    "unassessed artifact '{}' has Some(evidence_strength)", d.id);
-                assert!(d.volatility.is_none(),
-                    "unassessed artifact '{}' has Some(volatility)", d.id);
+            if d.evidence_strength.is_some() {
+                assert!(d.volatility.is_some(),
+                    "artifact '{}' has evidence_strength but no volatility", d.id);
+                assert!(!d.volatility_rationale.is_empty(),
+                    "artifact '{}' has evidence_strength but empty volatility_rationale", d.id);
+            }
+            if d.volatility.is_some() {
+                assert!(d.evidence_strength.is_some(),
+                    "artifact '{}' has volatility but no evidence_strength", d.id);
             }
         }
     }

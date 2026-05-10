@@ -39,42 +39,75 @@ mod tests {
     };
 
     fn sigs(ids: &[&'static str]) -> Vec<DetectedSignal> {
-        ids.iter().map(|&id| DetectedSignal { id, confidence: 1.0, evidence: String::new() }).collect()
+        ids.iter()
+            .map(|&id| DetectedSignal {
+                id,
+                confidence: 1.0,
+                evidence: String::new(),
+            })
+            .collect()
     }
 
     #[test]
     fn diamorphine_required_signals_reach_class_threshold() {
         let s = sigs(&[SYSTEM_KERNEL_TAINT_OOT, SYSTEM_PROC_MODULES_SUSPECT]);
         let m = score_against_profile(&s, &DIAMORPHINE);
-        assert!(m.score >= DIAMORPHINE.class_threshold,
-            "score {} < class_threshold {}", m.score, DIAMORPHINE.class_threshold);
+        assert!(
+            m.score >= DIAMORPHINE.class_threshold,
+            "score {} < class_threshold {}",
+            m.score,
+            DIAMORPHINE.class_threshold
+        );
         assert!(m.classification >= Classification::ClassMatch);
     }
 
     #[test]
     fn diamorphine_with_process_hidden_reaches_probable() {
-        let s = sigs(&[SYSTEM_KERNEL_TAINT_OOT, SYSTEM_PROC_MODULES_SUSPECT, PROCESS_HIDDEN_FROM_PS]);
+        let s = sigs(&[
+            SYSTEM_KERNEL_TAINT_OOT,
+            SYSTEM_PROC_MODULES_SUSPECT,
+            PROCESS_HIDDEN_FROM_PS,
+        ]);
         let m = score_against_profile(&s, &DIAMORPHINE);
-        assert!(m.score >= DIAMORPHINE.probable_threshold,
-            "score {} < probable_threshold {}", m.score, DIAMORPHINE.probable_threshold);
+        assert!(
+            m.score >= DIAMORPHINE.probable_threshold,
+            "score {} < probable_threshold {}",
+            m.score,
+            DIAMORPHINE.probable_threshold
+        );
         assert!(m.classification >= Classification::Probable);
     }
 
     #[test]
     fn diamorphine_full_signals_reach_confirmed() {
-        let s = sigs(&[SYSTEM_KERNEL_TAINT_OOT, SYSTEM_PROC_MODULES_SUSPECT,
-                       PROCESS_HIDDEN_FROM_PS, TEMPORAL_ACTIVATION_SEQUENCE]);
+        let s = sigs(&[
+            SYSTEM_KERNEL_TAINT_OOT,
+            SYSTEM_PROC_MODULES_SUSPECT,
+            PROCESS_HIDDEN_FROM_PS,
+            TEMPORAL_ACTIVATION_SEQUENCE,
+        ]);
         let m = score_against_profile(&s, &DIAMORPHINE);
         assert_eq!(m.classification, Classification::Confirmed);
     }
 
     #[test]
     fn diamorphine_magic_packet_reduces_score() {
-        let base = sigs(&[SYSTEM_KERNEL_TAINT_OOT, SYSTEM_PROC_MODULES_SUSPECT, PROCESS_HIDDEN_FROM_PS]);
-        let with_knock = sigs(&[SYSTEM_KERNEL_TAINT_OOT, SYSTEM_PROC_MODULES_SUSPECT,
-                                 PROCESS_HIDDEN_FROM_PS, NETWORK_MAGIC_PACKET_KNOCK]);
-        let m_base  = score_against_profile(&base, &DIAMORPHINE);
+        let base = sigs(&[
+            SYSTEM_KERNEL_TAINT_OOT,
+            SYSTEM_PROC_MODULES_SUSPECT,
+            PROCESS_HIDDEN_FROM_PS,
+        ]);
+        let with_knock = sigs(&[
+            SYSTEM_KERNEL_TAINT_OOT,
+            SYSTEM_PROC_MODULES_SUSPECT,
+            PROCESS_HIDDEN_FROM_PS,
+            NETWORK_MAGIC_PACKET_KNOCK,
+        ]);
+        let m_base = score_against_profile(&base, &DIAMORPHINE);
         let m_knock = score_against_profile(&with_knock, &DIAMORPHINE);
-        assert!(m_knock.score < m_base.score, "magic packet should penalise Diamorphine (not its style)");
+        assert!(
+            m_knock.score < m_base.score,
+            "magic packet should penalise Diamorphine (not its style)"
+        );
     }
 }

@@ -13,21 +13,58 @@ pub static SYSLOGK: MalwareProfile = MalwareProfile {
     malware_class: MalwareClass::LkmRootkit,
     mitre_techniques: &["T1215", "T1014", "T1205.001", "T1059"],
     signals: &[
-        ProfileSignal { id: SYSTEM_KERNEL_TAINT_OOT,      weight: 30, required: true  },
-        ProfileSignal { id: SYSTEM_PROC_MODULES_SUSPECT,  weight: 30, required: true  },
-        ProfileSignal { id: PROCESS_HIDDEN_FROM_PS,       weight: 25, required: false },
-        ProfileSignal { id: NETWORK_MAGIC_PACKET_KNOCK,   weight: 40, required: false },
-        ProfileSignal { id: ELF_HOOKS_FILE_HIDING,        weight: 20, required: false },
-        ProfileSignal { id: SYSTEM_KERNEL_TAINT_FORCED,   weight: 10, required: false },
-        ProfileSignal { id: TEMPORAL_ACTIVATION_SEQUENCE, weight: 15, required: false },
+        ProfileSignal {
+            id: SYSTEM_KERNEL_TAINT_OOT,
+            weight: 30,
+            required: true,
+        },
+        ProfileSignal {
+            id: SYSTEM_PROC_MODULES_SUSPECT,
+            weight: 30,
+            required: true,
+        },
+        ProfileSignal {
+            id: PROCESS_HIDDEN_FROM_PS,
+            weight: 25,
+            required: false,
+        },
+        ProfileSignal {
+            id: NETWORK_MAGIC_PACKET_KNOCK,
+            weight: 40,
+            required: false,
+        },
+        ProfileSignal {
+            id: ELF_HOOKS_FILE_HIDING,
+            weight: 20,
+            required: false,
+        },
+        ProfileSignal {
+            id: SYSTEM_KERNEL_TAINT_FORCED,
+            weight: 10,
+            required: false,
+        },
+        ProfileSignal {
+            id: TEMPORAL_ACTIVATION_SEQUENCE,
+            weight: 15,
+            required: false,
+        },
     ],
     exclusions: &[
-        WeightedExclusion { id: ELF_GLOBALLY_LOADED,          penalty: 25 },
-        WeightedExclusion { id: ELF_HOOKS_PAM_CREDENTIAL,     penalty: 20 },
-        WeightedExclusion { id: ARTIFACT_LD_PRELOAD_FOREIGN,  penalty: 30 },
+        WeightedExclusion {
+            id: ELF_GLOBALLY_LOADED,
+            penalty: 25,
+        },
+        WeightedExclusion {
+            id: ELF_HOOKS_PAM_CREDENTIAL,
+            penalty: 20,
+        },
+        WeightedExclusion {
+            id: ARTIFACT_LD_PRELOAD_FOREIGN,
+            penalty: 30,
+        },
     ],
-    class_threshold:     60,
-    probable_threshold:  100,
+    class_threshold: 60,
+    probable_threshold: 100,
     confirmed_threshold: 125,
 };
 
@@ -41,46 +78,78 @@ mod tests {
     };
 
     fn sigs(ids: &[&'static str]) -> Vec<DetectedSignal> {
-        ids.iter().map(|&id| DetectedSignal { id, confidence: 1.0, evidence: String::new() }).collect()
+        ids.iter()
+            .map(|&id| DetectedSignal {
+                id,
+                confidence: 1.0,
+                evidence: String::new(),
+            })
+            .collect()
     }
 
     #[test]
     fn syslogk_required_signals_reach_class_threshold() {
         let s = sigs(&[SYSTEM_KERNEL_TAINT_OOT, SYSTEM_PROC_MODULES_SUSPECT]);
         let m = score_against_profile(&s, &SYSLOGK);
-        assert!(m.score >= SYSLOGK.class_threshold,
-            "score {} < class_threshold {}", m.score, SYSLOGK.class_threshold);
+        assert!(
+            m.score >= SYSLOGK.class_threshold,
+            "score {} < class_threshold {}",
+            m.score,
+            SYSLOGK.class_threshold
+        );
         assert!(m.classification >= Classification::ClassMatch);
     }
 
     #[test]
     fn syslogk_with_magic_packet_reaches_probable() {
-        let s = sigs(&[SYSTEM_KERNEL_TAINT_OOT, SYSTEM_PROC_MODULES_SUSPECT,
-                       NETWORK_MAGIC_PACKET_KNOCK]);
+        let s = sigs(&[
+            SYSTEM_KERNEL_TAINT_OOT,
+            SYSTEM_PROC_MODULES_SUSPECT,
+            NETWORK_MAGIC_PACKET_KNOCK,
+        ]);
         let m = score_against_profile(&s, &SYSLOGK);
-        assert!(m.score >= SYSLOGK.probable_threshold,
-            "score {} < probable_threshold {}", m.score, SYSLOGK.probable_threshold);
+        assert!(
+            m.score >= SYSLOGK.probable_threshold,
+            "score {} < probable_threshold {}",
+            m.score,
+            SYSLOGK.probable_threshold
+        );
         assert!(m.classification >= Classification::Probable);
     }
 
     #[test]
     fn syslogk_full_signals_reach_confirmed() {
-        let s = sigs(&[SYSTEM_KERNEL_TAINT_OOT, SYSTEM_PROC_MODULES_SUSPECT,
-                       PROCESS_HIDDEN_FROM_PS, NETWORK_MAGIC_PACKET_KNOCK,
-                       ELF_HOOKS_FILE_HIDING, TEMPORAL_ACTIVATION_SEQUENCE]);
+        let s = sigs(&[
+            SYSTEM_KERNEL_TAINT_OOT,
+            SYSTEM_PROC_MODULES_SUSPECT,
+            PROCESS_HIDDEN_FROM_PS,
+            NETWORK_MAGIC_PACKET_KNOCK,
+            ELF_HOOKS_FILE_HIDING,
+            TEMPORAL_ACTIVATION_SEQUENCE,
+        ]);
         let m = score_against_profile(&s, &SYSLOGK);
         assert_eq!(m.classification, Classification::Confirmed);
     }
 
     #[test]
     fn syslogk_ldpreload_foreign_reduces_score() {
-        let base = sigs(&[SYSTEM_KERNEL_TAINT_OOT, SYSTEM_PROC_MODULES_SUSPECT,
-                          NETWORK_MAGIC_PACKET_KNOCK]);
-        let with_preload = sigs(&[SYSTEM_KERNEL_TAINT_OOT, SYSTEM_PROC_MODULES_SUSPECT,
-                                   NETWORK_MAGIC_PACKET_KNOCK, ARTIFACT_LD_PRELOAD_FOREIGN]);
-        let m_base    = score_against_profile(&base, &SYSLOGK);
+        let base = sigs(&[
+            SYSTEM_KERNEL_TAINT_OOT,
+            SYSTEM_PROC_MODULES_SUSPECT,
+            NETWORK_MAGIC_PACKET_KNOCK,
+        ]);
+        let with_preload = sigs(&[
+            SYSTEM_KERNEL_TAINT_OOT,
+            SYSTEM_PROC_MODULES_SUSPECT,
+            NETWORK_MAGIC_PACKET_KNOCK,
+            ARTIFACT_LD_PRELOAD_FOREIGN,
+        ]);
+        let m_base = score_against_profile(&base, &SYSLOGK);
         let m_preload = score_against_profile(&with_preload, &SYSLOGK);
-        assert!(m_preload.score < m_base.score, "LD_PRELOAD should penalise SyslogK (pure LKM)");
+        assert!(
+            m_preload.score < m_base.score,
+            "LD_PRELOAD should penalise SyslogK (pure LKM)"
+        );
     }
 
     #[test]

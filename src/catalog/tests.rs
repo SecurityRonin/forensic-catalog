@@ -9637,14 +9637,23 @@ mod tests_profile_merge {
     fn assessed_entries_have_complete_metadata() {
         for d in CATALOG.list() {
             if d.evidence_strength.is_some() {
-                assert!(d.volatility.is_some(),
-                    "artifact '{}' has evidence_strength but no volatility", d.id);
-                assert!(!d.volatility_rationale.is_empty(),
-                    "artifact '{}' has evidence_strength but empty volatility_rationale", d.id);
+                assert!(
+                    d.volatility.is_some(),
+                    "artifact '{}' has evidence_strength but no volatility",
+                    d.id
+                );
+                assert!(
+                    !d.volatility_rationale.is_empty(),
+                    "artifact '{}' has evidence_strength but empty volatility_rationale",
+                    d.id
+                );
             }
             if d.volatility.is_some() {
-                assert!(d.evidence_strength.is_some(),
-                    "artifact '{}' has volatility but no evidence_strength", d.id);
+                assert!(
+                    d.evidence_strength.is_some(),
+                    "artifact '{}' has volatility but no evidence_strength",
+                    d.id
+                );
             }
         }
     }
@@ -9656,8 +9665,11 @@ mod tests_assessment_gap_api {
     #[test]
     fn unassessed_contains_only_none_entries() {
         for d in CATALOG.unassessed() {
-            assert!(d.evidence_strength.is_none(),
-                "unassessed() returned assessed artifact: {}", d.id);
+            assert!(
+                d.evidence_strength.is_none(),
+                "unassessed() returned assessed artifact: {}",
+                d.id
+            );
         }
     }
 
@@ -9665,9 +9677,14 @@ mod tests_assessment_gap_api {
     fn unassessed_sorted_critical_first() {
         let gaps = CATALOG.unassessed();
         for w in gaps.windows(2) {
-            assert!(w[0].triage_priority >= w[1].triage_priority,
+            assert!(
+                w[0].triage_priority >= w[1].triage_priority,
                 "{} ({:?}) came before {} ({:?}) in unassessed()",
-                w[0].id, w[0].triage_priority, w[1].id, w[1].triage_priority);
+                w[0].id,
+                w[0].triage_priority,
+                w[1].id,
+                w[1].triage_priority
+            );
         }
     }
 
@@ -9677,8 +9694,11 @@ mod tests_assessment_gap_api {
             CATALOG.unassessed().iter().map(|d| d.id).collect();
         for d in CATALOG.list() {
             if d.evidence_strength.is_some() {
-                assert!(!gap_ids.contains(d.id),
-                    "assessed artifact {} appeared in unassessed()", d.id);
+                assert!(
+                    !gap_ids.contains(d.id),
+                    "assessed artifact {} appeared in unassessed()",
+                    d.id
+                );
             }
         }
     }
@@ -9694,7 +9714,11 @@ mod tests_assessment_gap_api {
     fn assessment_coverage_shows_partial_progress() {
         let (assessed, total) = CATALOG.assessment_coverage();
         assert!(assessed > 0, "no artifacts assessed");
-        assert!(assessed < total, "all {} artifacts assessed — update this test", total);
+        assert!(
+            assessed < total,
+            "all {} artifacts assessed — update this test",
+            total
+        );
     }
 }
 
@@ -9739,7 +9763,9 @@ mod tests_scheduled_task_registry_cache {
     fn scheduled_task_registry_cache_cites_windowsir_regripper_post() {
         let d = CATALOG.by_id("scheduled_task_registry_cache").unwrap();
         assert!(
-            d.sources.iter().any(|s| s.contains("windowsir.blogspot.com")),
+            d.sources
+                .iter()
+                .any(|s| s.contains("windowsir.blogspot.com")),
             "scheduled_task_registry_cache must cite windowsir regripper post \
             (COM handler CLSID→DLL lookup technique); sources: {:?}",
             d.sources

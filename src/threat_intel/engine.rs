@@ -1,5 +1,5 @@
-use std::collections::HashSet;
 use super::profile::{Classification, FiredSignal, MalwareProfile, ProfileMatch};
+use std::collections::HashSet;
 
 #[derive(Debug)]
 pub struct DetectedSignal {
@@ -14,7 +14,9 @@ pub fn score_against_profile(
 ) -> ProfileMatch {
     let present: HashSet<&str> = signals.iter().map(|s| s.id).collect();
 
-    let missed_required: Vec<&'static str> = profile.signals.iter()
+    let missed_required: Vec<&'static str> = profile
+        .signals
+        .iter()
         .filter(|ps| ps.required && !present.contains(ps.id))
         .map(|ps| ps.id)
         .collect();
@@ -30,15 +32,22 @@ pub fn score_against_profile(
     }
 
     let mut fired = Vec::new();
-    let raw_score: u32 = profile.signals.iter()
+    let raw_score: u32 = profile
+        .signals
+        .iter()
         .filter(|ps| present.contains(ps.id))
         .map(|ps| {
-            fired.push(FiredSignal { id: ps.id, weight: ps.weight });
+            fired.push(FiredSignal {
+                id: ps.id,
+                weight: ps.weight,
+            });
             ps.weight
         })
         .sum();
 
-    let penalty: u32 = profile.exclusions.iter()
+    let penalty: u32 = profile
+        .exclusions
+        .iter()
         .filter(|ex| present.contains(ex.id))
         .map(|ex| ex.penalty)
         .sum();
@@ -57,12 +66,19 @@ pub fn score_against_profile(
         Classification::LowConfidence
     };
 
-    ProfileMatch { profile, score, classification, fired, missed_required: vec![] }
+    ProfileMatch {
+        profile,
+        score,
+        classification,
+        fired,
+        missed_required: vec![],
+    }
 }
 
 pub fn score_all_profiles(signals: &[DetectedSignal]) -> Vec<ProfileMatch> {
     use super::profiles::ALL_PROFILES;
-    let mut matches: Vec<ProfileMatch> = ALL_PROFILES.iter()
+    let mut matches: Vec<ProfileMatch> = ALL_PROFILES
+        .iter()
         .map(|p| score_against_profile(signals, p))
         .filter(|m| m.score > 0)
         .collect();
@@ -79,13 +95,14 @@ pub fn top_match(signals: &[DetectedSignal]) -> Option<ProfileMatch> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::threat_intel::{
-        profile::Classification,
-        signals::*,
-    };
+    use crate::threat_intel::{profile::Classification, signals::*};
 
     fn sig(id: &'static str) -> DetectedSignal {
-        DetectedSignal { id, confidence: 1.0, evidence: String::new() }
+        DetectedSignal {
+            id,
+            confidence: 1.0,
+            evidence: String::new(),
+        }
     }
 
     fn sigs(ids: &[&'static str]) -> Vec<DetectedSignal> {
@@ -134,9 +151,12 @@ mod tests {
             ELF_HOOKS_PAM_CREDENTIAL,
         ]);
         let m = score_against_profile(&signals, &JYNX);
-        assert!(m.classification < Classification::ClassMatch,
+        assert!(
+            m.classification < Classification::ClassMatch,
             "PAM signal should drop Jynx below class threshold, got {:?} (score {})",
-            m.classification, m.score);
+            m.classification,
+            m.score
+        );
     }
 
     #[test]
@@ -168,8 +188,12 @@ mod tests {
         let matches = score_all_profiles(&signals);
         assert!(!matches.is_empty());
         for w in matches.windows(2) {
-            assert!(w[0].score >= w[1].score,
-                "results not sorted: {} < {}", w[0].score, w[1].score);
+            assert!(
+                w[0].score >= w[1].score,
+                "results not sorted: {} < {}",
+                w[0].score,
+                w[1].score
+            );
         }
     }
 
@@ -209,16 +233,24 @@ mod tests {
     fn score_exclusion_reduces_score() {
         use crate::threat_intel::profiles::FATHER;
         let without_exclusion = sigs(&[ELF_HOOKS_PROCESS_HIDING, ELF_HOOKS_PAM_CREDENTIAL]);
-        let with_exclusion = sigs(&[ELF_HOOKS_PROCESS_HIDING, ELF_HOOKS_PAM_CREDENTIAL, ELF_HOOKS_NETWORK_HIDING]);
+        let with_exclusion = sigs(&[
+            ELF_HOOKS_PROCESS_HIDING,
+            ELF_HOOKS_PAM_CREDENTIAL,
+            ELF_HOOKS_NETWORK_HIDING,
+        ]);
         let m_no_ex = score_against_profile(&without_exclusion, &FATHER);
-        let m_ex    = score_against_profile(&with_exclusion, &FATHER);
+        let m_ex = score_against_profile(&with_exclusion, &FATHER);
         assert!(m_ex.score < m_no_ex.score, "exclusion should lower score");
     }
 
     #[test]
     fn score_exclusion_cannot_exceed_raw_score() {
         use crate::threat_intel::profiles::JYNX;
-        let signals = sigs(&[ELF_HOOKS_PROCESS_HIDING, ELF_HOOKS_FILE_HIDING, ELF_HOOKS_PAM_CREDENTIAL]);
+        let signals = sigs(&[
+            ELF_HOOKS_PROCESS_HIDING,
+            ELF_HOOKS_FILE_HIDING,
+            ELF_HOOKS_PAM_CREDENTIAL,
+        ]);
         let m = score_against_profile(&signals, &JYNX);
         let _ = m.score;
     }

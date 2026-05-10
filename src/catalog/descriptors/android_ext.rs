@@ -180,7 +180,8 @@ pub(crate) static SAMSUNG_GALLERY3D_TRASH: ArtifactDescriptor = ArtifactDescript
         "Entries auto-deleted after configurable retention period",
     ],
     volatility: Some(crate::volatility::VolatilityClass::ActivityDriven),
-    volatility_rationale: "Trash entries auto-purged after retention period; updated per delete action",
+    volatility_rationale:
+        "Trash entries auto-purged after retention period; updated per delete action",
 };
 
 // ── Samsung Gallery3d Log table ─────────────────────────────────────────────

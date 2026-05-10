@@ -290,7 +290,9 @@ pub(crate) static BROWSERS_FIREFOX_LOGINS: ArtifactDescriptor = ArtifactDescript
     related_artifacts: &[],
     sources: &["https://forensicswiki.xyz/wiki/index.php?title=Mozilla_Firefox"],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
-    evidence_caveats: &["Encrypted browser passwords; key in OS credential store; timestamp shows last use"],
+    evidence_caveats: &[
+        "Encrypted browser passwords; key in OS credential store; timestamp shows last use",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Credential store persists until browser profile deletion",
 };

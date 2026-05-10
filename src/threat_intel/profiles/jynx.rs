@@ -12,18 +12,44 @@ pub static JYNX: MalwareProfile = MalwareProfile {
     malware_class: MalwareClass::LdPreloadProcessHider,
     mitre_techniques: &["T1574.006", "T1014", "T1564.001"],
     signals: &[
-        ProfileSignal { id: ELF_HOOKS_PROCESS_HIDING, weight: 30, required: true  },
-        ProfileSignal { id: ELF_HOOKS_FILE_HIDING,    weight: 30, required: true  },
-        ProfileSignal { id: ELF_GLOBALLY_LOADED,      weight: 15, required: false },
-        ProfileSignal { id: ELF_NOT_IN_PKG_DB,        weight: 10, required: false },
-        ProfileSignal { id: ELF_LIBC_SHADOW_EXPORTS,  weight:  5, required: false },
+        ProfileSignal {
+            id: ELF_HOOKS_PROCESS_HIDING,
+            weight: 30,
+            required: true,
+        },
+        ProfileSignal {
+            id: ELF_HOOKS_FILE_HIDING,
+            weight: 30,
+            required: true,
+        },
+        ProfileSignal {
+            id: ELF_GLOBALLY_LOADED,
+            weight: 15,
+            required: false,
+        },
+        ProfileSignal {
+            id: ELF_NOT_IN_PKG_DB,
+            weight: 10,
+            required: false,
+        },
+        ProfileSignal {
+            id: ELF_LIBC_SHADOW_EXPORTS,
+            weight: 5,
+            required: false,
+        },
     ],
     exclusions: &[
-        WeightedExclusion { id: ELF_HOOKS_PAM_CREDENTIAL,       penalty: 40 },
-        WeightedExclusion { id: ARTIFACT_PAM_STAGING_STRUCTURAL, penalty: 30 },
+        WeightedExclusion {
+            id: ELF_HOOKS_PAM_CREDENTIAL,
+            penalty: 40,
+        },
+        WeightedExclusion {
+            id: ARTIFACT_PAM_STAGING_STRUCTURAL,
+            penalty: 30,
+        },
     ],
-    class_threshold:     45,
-    probable_threshold:  60,
+    class_threshold: 45,
+    probable_threshold: 60,
     confirmed_threshold: 75,
 };
 
@@ -37,25 +63,43 @@ mod tests {
     };
 
     fn sigs(ids: &[&'static str]) -> Vec<DetectedSignal> {
-        ids.iter().map(|&id| DetectedSignal { id, confidence: 1.0, evidence: String::new() }).collect()
+        ids.iter()
+            .map(|&id| DetectedSignal {
+                id,
+                confidence: 1.0,
+                evidence: String::new(),
+            })
+            .collect()
     }
 
     #[test]
     fn jynx_process_and_file_hiding_reaches_class_threshold() {
         let s = sigs(&[ELF_HOOKS_PROCESS_HIDING, ELF_HOOKS_FILE_HIDING]);
         let m = score_against_profile(&s, &JYNX);
-        assert!(m.score >= JYNX.class_threshold,
-            "score {} < class_threshold {}", m.score, JYNX.class_threshold);
+        assert!(
+            m.score >= JYNX.class_threshold,
+            "score {} < class_threshold {}",
+            m.score,
+            JYNX.class_threshold
+        );
         assert!(m.classification >= Classification::ClassMatch);
     }
 
     #[test]
     fn jynx_pam_signal_strongly_excluded() {
         // process (30) + file (30) + PAM penalty (40) → 20, below class_threshold 45
-        let s = sigs(&[ELF_HOOKS_PROCESS_HIDING, ELF_HOOKS_FILE_HIDING, ELF_HOOKS_PAM_CREDENTIAL]);
+        let s = sigs(&[
+            ELF_HOOKS_PROCESS_HIDING,
+            ELF_HOOKS_FILE_HIDING,
+            ELF_HOOKS_PAM_CREDENTIAL,
+        ]);
         let m = score_against_profile(&s, &JYNX);
-        assert!(m.classification < Classification::ClassMatch,
-            "PAM should drop below class threshold, got {:?} (score {})", m.classification, m.score);
+        assert!(
+            m.classification < Classification::ClassMatch,
+            "PAM should drop below class threshold, got {:?} (score {})",
+            m.classification,
+            m.score
+        );
     }
 
     #[test]

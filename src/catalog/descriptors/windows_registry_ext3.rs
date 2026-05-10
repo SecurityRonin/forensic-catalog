@@ -962,7 +962,9 @@ pub(crate) static SPECIAL_ACCOUNTS_USERLIST: ArtifactDescriptor = ArtifactDescri
     related_artifacts: &["rdp_enable_registry", "logontype_winlogon"],
     sources: &["https://windowsir.blogspot.com/2023/05/the-windows-registry.html"],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
-    evidence_caveats: &["Some enterprise SOEs legitimately hide service accounts from the welcome screen"],
+    evidence_caveats: &[
+        "Some enterprise SOEs legitimately hide service accounts from the welcome screen",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Registry key; persists until explicit deletion",
 };

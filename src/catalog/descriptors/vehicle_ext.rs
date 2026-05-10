@@ -380,7 +380,9 @@ pub(crate) static HONDA_ACCORD_BLUETOOTH: ArtifactDescriptor = ArtifactDescripto
         "honda_accord_crm_eco_logs",
     ],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
-    evidence_caveats: &["Records all paired devices regardless of recent connection — no last-connect timestamp"],
+    evidence_caveats: &[
+        "Records all paired devices regardless of recent connection — no last-connect timestamp",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Pairing database persists until user unpairs the device",
 };

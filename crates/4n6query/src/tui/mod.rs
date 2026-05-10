@@ -31,28 +31,40 @@ mod tests {
 
     #[test]
     fn dataset_count_is_13() {
-        assert_eq!(app::App::DATASET_COUNT, 13,
+        assert_eq!(
+            app::App::DATASET_COUNT,
+            13,
             "13 datasets: catalog, lolbas, abusable sites, cmdlets, mmc, wmi, playbooks, \
-             malware profiles, attack flows, event ids, sigma, persistence, remote access");
+             malware profiles, attack flows, event ids, sigma, persistence, remote access"
+        );
     }
 
     #[test]
     fn event_ids_is_at_idx_9() {
         use forensicnomicon::eventids::EVENT_ID_TABLE;
         let rd = build_render_data(&make_app(9, "", 0));
-        assert!(!rd.list_items.is_empty(), "dataset idx 9 must be event ids (non-empty)");
+        assert!(
+            !rd.list_items.is_empty(),
+            "dataset idx 9 must be event ids (non-empty)"
+        );
         let first_id = EVENT_ID_TABLE[0].event_id;
         assert!(
-            rd.list_items.iter().any(|s| s.contains(&first_id.to_string())),
+            rd.list_items
+                .iter()
+                .any(|s| s.contains(&first_id.to_string())),
             "event ids list must contain event id {}; got: {:?}",
-            first_id, &rd.list_items[..rd.list_items.len().min(3)]
+            first_id,
+            &rd.list_items[..rd.list_items.len().min(3)]
         );
     }
 
     #[test]
     fn event_id_detail_contains_channel_and_mitre() {
         let rd = build_render_data(&make_app(9, "", 0));
-        assert!(!rd.detail_lines.is_empty(), "event id detail must be non-empty");
+        assert!(
+            !rd.detail_lines.is_empty(),
+            "event id detail must be non-empty"
+        );
         let combined = rd.detail_lines.join("\n").to_lowercase();
         assert!(
             combined.contains("security") || combined.contains("system"),
@@ -68,22 +80,31 @@ mod tests {
     fn sigma_is_at_idx_10() {
         use forensicnomicon::sigma::SIGMA_TABLE;
         let rd = build_render_data(&make_app(10, "", 0));
-        assert!(!rd.list_items.is_empty(), "dataset idx 10 must be sigma rules (non-empty)");
+        assert!(
+            !rd.list_items.is_empty(),
+            "dataset idx 10 must be sigma rules (non-empty)"
+        );
         let first_title = SIGMA_TABLE[0].title;
         assert!(
             rd.list_items.iter().any(|s| s.contains(first_title)),
             "sigma list must contain '{}'; got: {:?}",
-            first_title, &rd.list_items[..rd.list_items.len().min(3)]
+            first_title,
+            &rd.list_items[..rd.list_items.len().min(3)]
         );
     }
 
     #[test]
     fn sigma_detail_contains_artifact_and_logsource() {
         let rd = build_render_data(&make_app(10, "", 0));
-        assert!(!rd.detail_lines.is_empty(), "sigma detail must be non-empty");
+        assert!(
+            !rd.detail_lines.is_empty(),
+            "sigma detail must be non-empty"
+        );
         let combined = rd.detail_lines.join("\n").to_lowercase();
         assert!(
-            combined.contains("artifact") || combined.contains("logsource") || combined.contains("process"),
+            combined.contains("artifact")
+                || combined.contains("logsource")
+                || combined.contains("process"),
             "sigma detail must contain artifact/logsource info; got: {combined}"
         );
     }
@@ -91,9 +112,14 @@ mod tests {
     #[test]
     fn persistence_is_at_idx_11() {
         let rd = build_render_data(&make_app(11, "", 0));
-        assert!(!rd.list_items.is_empty(), "dataset idx 11 must be persistence mechanisms (non-empty)");
         assert!(
-            rd.list_items.iter().any(|s| s.to_lowercase().contains("run")),
+            !rd.list_items.is_empty(),
+            "dataset idx 11 must be persistence mechanisms (non-empty)"
+        );
+        assert!(
+            rd.list_items
+                .iter()
+                .any(|s| s.to_lowercase().contains("run")),
             "persistence list must contain Windows Run Keys entry; got: {:?}",
             &rd.list_items[..rd.list_items.len().min(5)]
         );
@@ -102,7 +128,10 @@ mod tests {
     #[test]
     fn persistence_detail_contains_registry_or_path() {
         let rd = build_render_data(&make_app(11, "", 0));
-        assert!(!rd.detail_lines.is_empty(), "persistence detail must be non-empty");
+        assert!(
+            !rd.detail_lines.is_empty(),
+            "persistence detail must be non-empty"
+        );
         let combined = rd.detail_lines.join("\n");
         assert!(
             combined.contains('\\') || combined.contains('/'),
@@ -113,10 +142,15 @@ mod tests {
     #[test]
     fn remote_access_is_at_idx_12() {
         let rd = build_render_data(&make_app(12, "", 0));
-        assert!(!rd.list_items.is_empty(), "dataset idx 12 must be remote access tools (non-empty)");
         assert!(
-            rd.list_items.iter().any(|s| s.to_lowercase().contains("teamviewer")
-                || s.to_lowercase().contains("anydesk")),
+            !rd.list_items.is_empty(),
+            "dataset idx 12 must be remote access tools (non-empty)"
+        );
+        assert!(
+            rd.list_items
+                .iter()
+                .any(|s| s.to_lowercase().contains("teamviewer")
+                    || s.to_lowercase().contains("anydesk")),
             "remote access list must contain known RMM tools; got: {:?}",
             &rd.list_items[..rd.list_items.len().min(5)]
         );
@@ -125,7 +159,10 @@ mod tests {
     #[test]
     fn remote_access_detail_contains_registry_paths() {
         let rd = build_render_data(&make_app(12, "", 0));
-        assert!(!rd.detail_lines.is_empty(), "remote access detail must be non-empty");
+        assert!(
+            !rd.detail_lines.is_empty(),
+            "remote access detail must be non-empty"
+        );
         let combined = rd.detail_lines.join("\n");
         assert!(
             combined.contains('\\') || combined.contains("RAT"),
@@ -180,7 +217,10 @@ mod tests {
     fn build_render_data_lolbas_dataset_is_non_empty() {
         let a = make_app(1, "", 0);
         let rd = build_render_data(&a);
-        assert!(!rd.list_items.is_empty(), "lolbas dataset must be non-empty");
+        assert!(
+            !rd.list_items.is_empty(),
+            "lolbas dataset must be non-empty"
+        );
     }
 
     #[test]
@@ -394,7 +434,10 @@ mod tests {
         let rd = build_render_data(&a);
         let full = build_render_data(&make_app(0, "", 0)).list_items.len();
         assert!(!rd.list_items.is_empty());
-        assert!(rd.list_items.len() < full, "high filter must reduce results");
+        assert!(
+            rd.list_items.len() < full,
+            "high filter must reduce results"
+        );
         for item in &rd.list_items {
             assert!(
                 item.contains("[Critical]") || item.contains("[High]"),
@@ -409,7 +452,11 @@ mod tests {
         a.crit_filter = app::CritFilter::All;
         let rd = build_render_data(&a);
         let expected = forensicnomicon::catalog::CATALOG.list().len();
-        assert_eq!(rd.list_items.len(), expected, "All filter must show full catalog");
+        assert_eq!(
+            rd.list_items.len(),
+            expected,
+            "All filter must show full catalog"
+        );
     }
 
     #[test]
@@ -461,11 +508,16 @@ mod tests {
     fn label_colon_positions(lines: &[String]) -> Vec<usize> {
         // Only consider lines where the colon appears within the first 12 chars —
         // that's where padded label fields live; body text colons are further right.
-        lines.iter()
+        lines
+            .iter()
             .filter(|l| !l.starts_with(' ') && !l.contains("://"))
             .filter_map(|l| {
                 let pos = l.find(": ")?;
-                if pos <= 12 { Some(pos) } else { None }
+                if pos <= 12 {
+                    Some(pos)
+                } else {
+                    None
+                }
             })
             .collect()
     }
@@ -474,12 +526,18 @@ mod tests {
     fn abusable_sites_detail_label_values_column_aligned() {
         let rd = build_render_data(&make_app(2, "", 0));
         let positions = label_colon_positions(&rd.detail_lines);
-        assert!(positions.len() >= 2, "need at least 2 label lines to check alignment");
+        assert!(
+            positions.len() >= 2,
+            "need at least 2 label lines to check alignment"
+        );
         let first = positions[0];
         for pos in &positions {
-            assert_eq!(*pos, first,
+            assert_eq!(
+                *pos,
+                first,
                 "all label-value lines must have colon at same column; lines:\n{}",
-                rd.detail_lines.join("\n"));
+                rd.detail_lines.join("\n")
+            );
         }
     }
 
@@ -487,12 +545,18 @@ mod tests {
     fn catalog_detail_label_values_column_aligned() {
         let rd = build_render_data(&make_app(0, "", 0));
         let positions = label_colon_positions(&rd.detail_lines);
-        assert!(positions.len() >= 2, "need at least 2 label lines to check alignment");
+        assert!(
+            positions.len() >= 2,
+            "need at least 2 label lines to check alignment"
+        );
         let first = positions[0];
         for pos in &positions {
-            assert_eq!(*pos, first,
+            assert_eq!(
+                *pos,
+                first,
                 "all label-value lines must have colon at same column; lines:\n{}",
-                rd.detail_lines.join("\n"));
+                rd.detail_lines.join("\n")
+            );
         }
     }
 
@@ -548,7 +612,10 @@ mod tests {
     #[test]
     fn malware_profile_detail_contains_family_info() {
         let rd = build_render_data(&make_app(7, "", 0));
-        assert!(!rd.detail_lines.is_empty(), "malware profile detail must be non-empty");
+        assert!(
+            !rd.detail_lines.is_empty(),
+            "malware profile detail must be non-empty"
+        );
         let combined = rd.detail_lines.join("\n").to_lowercase();
         assert!(
             combined.contains("class") || combined.contains("mitre") || combined.contains("family"),
@@ -576,10 +643,15 @@ mod tests {
     #[test]
     fn attack_flow_detail_contains_step_count() {
         let rd = build_render_data(&make_app(8, "", 0));
-        assert!(!rd.detail_lines.is_empty(), "attack flow detail must be non-empty");
+        assert!(
+            !rd.detail_lines.is_empty(),
+            "attack flow detail must be non-empty"
+        );
         let combined = rd.detail_lines.join("\n").to_lowercase();
         assert!(
-            combined.contains("step") || combined.contains("action") || combined.contains("technique"),
+            combined.contains("step")
+                || combined.contains("action")
+                || combined.contains("technique"),
             "attack flow detail must contain step/action/technique info; got: {combined}"
         );
     }
@@ -613,15 +685,13 @@ mod tests {
 
 use crate::tui::app::WinVersionFilter;
 use crossterm::{
-    event::{self, EnableMouseCapture, DisableMouseCapture, Event},
+    event::{self, DisableMouseCapture, EnableMouseCapture, Event},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
 
 use forensicnomicon::{
-    abusable_sites::{
-        ABUSABLE_SITES, TAG_C2, TAG_DOWNLOAD, TAG_EXFIL, TAG_EXPLOIT, TAG_PHISHING,
-    },
+    abusable_sites::{ABUSABLE_SITES, TAG_C2, TAG_DOWNLOAD, TAG_EXFIL, TAG_EXPLOIT, TAG_PHISHING},
     attack_flow::all_flows,
     catalog::{ArtifactDescriptor, OsScope, Platform, CATALOG},
     eventids::EVENT_ID_TABLE,
@@ -655,18 +725,42 @@ pub struct RenderData {
 
 fn use_cases_str(uc: u16) -> String {
     let mut tags: Vec<&str> = Vec::new();
-    if uc & UC_EXECUTE != 0 { tags.push("Execute"); }
-    if uc & UC_DOWNLOAD != 0 { tags.push("Download"); }
-    if uc & UC_UPLOAD != 0 { tags.push("Upload"); }
-    if uc & UC_BYPASS != 0 { tags.push("Bypass"); }
-    if uc & UC_PERSIST != 0 { tags.push("Persist"); }
-    if uc & UC_RECON != 0 { tags.push("Recon"); }
-    if uc & UC_PROXY != 0 { tags.push("Proxy"); }
-    if uc & UC_DECODE != 0 { tags.push("Decode"); }
-    if uc & UC_ARCHIVE != 0 { tags.push("Archive"); }
-    if uc & UC_CREDENTIALS != 0 { tags.push("Credentials"); }
-    if uc & UC_NETWORK != 0 { tags.push("Network"); }
-    if uc & UC_DEFENSE_EVASION != 0 { tags.push("DefEvasion"); }
+    if uc & UC_EXECUTE != 0 {
+        tags.push("Execute");
+    }
+    if uc & UC_DOWNLOAD != 0 {
+        tags.push("Download");
+    }
+    if uc & UC_UPLOAD != 0 {
+        tags.push("Upload");
+    }
+    if uc & UC_BYPASS != 0 {
+        tags.push("Bypass");
+    }
+    if uc & UC_PERSIST != 0 {
+        tags.push("Persist");
+    }
+    if uc & UC_RECON != 0 {
+        tags.push("Recon");
+    }
+    if uc & UC_PROXY != 0 {
+        tags.push("Proxy");
+    }
+    if uc & UC_DECODE != 0 {
+        tags.push("Decode");
+    }
+    if uc & UC_ARCHIVE != 0 {
+        tags.push("Archive");
+    }
+    if uc & UC_CREDENTIALS != 0 {
+        tags.push("Credentials");
+    }
+    if uc & UC_NETWORK != 0 {
+        tags.push("Network");
+    }
+    if uc & UC_DEFENSE_EVASION != 0 {
+        tags.push("DefEvasion");
+    }
     tags.join("  ")
 }
 
@@ -692,22 +786,32 @@ fn malware_class_label(class: forensicnomicon::threat_intel::MalwareClass) -> &'
     use forensicnomicon::threat_intel::MalwareClass;
     match class {
         MalwareClass::LdPreloadProcessHider => "LD_PRELOAD/process-hider",
-        MalwareClass::LdPreloadPamHooker    => "LD_PRELOAD/PAM-hooker",
+        MalwareClass::LdPreloadPamHooker => "LD_PRELOAD/PAM-hooker",
         MalwareClass::LdPreloadNetworkHider => "LD_PRELOAD/network-hider",
-        MalwareClass::LdPreloadFullRootkit  => "LD_PRELOAD/full-rootkit",
-        MalwareClass::LkmRootkit            => "LKM/rootkit",
-        MalwareClass::CryptoMiner           => "crypto-miner",
-        MalwareClass::GenericLdPreload      => "LD_PRELOAD/generic",
+        MalwareClass::LdPreloadFullRootkit => "LD_PRELOAD/full-rootkit",
+        MalwareClass::LkmRootkit => "LKM/rootkit",
+        MalwareClass::CryptoMiner => "crypto-miner",
+        MalwareClass::GenericLdPreload => "LD_PRELOAD/generic",
     }
 }
 
 fn abuse_tags_str(tags: u8) -> String {
     let mut v: Vec<&str> = Vec::new();
-    if tags & TAG_PHISHING != 0 { v.push("Phishing"); }
-    if tags & TAG_C2 != 0 { v.push("C2"); }
-    if tags & TAG_DOWNLOAD != 0 { v.push("Download"); }
-    if tags & TAG_EXFIL != 0 { v.push("Exfil"); }
-    if tags & TAG_EXPLOIT != 0 { v.push("Exploit"); }
+    if tags & TAG_PHISHING != 0 {
+        v.push("Phishing");
+    }
+    if tags & TAG_C2 != 0 {
+        v.push("C2");
+    }
+    if tags & TAG_DOWNLOAD != 0 {
+        v.push("Download");
+    }
+    if tags & TAG_EXFIL != 0 {
+        v.push("Exfil");
+    }
+    if tags & TAG_EXPLOIT != 0 {
+        v.push("Exploit");
+    }
     v.join("  ")
 }
 
@@ -793,34 +897,34 @@ fn build_render_data(app: &app::App) -> RenderData {
             .iter()
             .map(|e| format!("{:<6}  [{:<10}]  {}", e.event_id, e.channel, e.description))
             .collect(),
-        10 => SIGMA_TABLE
-            .iter()
-            .map(|r| format!("{}", r.title))
-            .collect(),
+        10 => SIGMA_TABLE.iter().map(|r| format!("{}", r.title)).collect(),
         11 => {
             const MECHANISMS: &[(&str, &[&str])] = &[
-                ("Windows Run Keys",       WINDOWS_RUN_KEYS),
-                ("Linux Persistence",      LINUX_PERSISTENCE_PATHS),
-                ("macOS Persistence",      MACOS_PERSISTENCE_PATHS),
-                ("IFEO Hijack",            IFEO_PATHS),
-                ("AppInit DLLs",           APPINIT_PATHS),
-                ("Session Manager",        SESSION_MANAGER_PATHS),
-                ("Active Setup",           ACTIVE_SETUP_PATHS),
-                ("Screensaver",            SCREENSAVER_PATHS),
-                ("Winlogon",               WINLOGON_PATHS),
-                ("COM/CLSID Hijack",       COM_HIJACK_PATHS),
+                ("Windows Run Keys", WINDOWS_RUN_KEYS),
+                ("Linux Persistence", LINUX_PERSISTENCE_PATHS),
+                ("macOS Persistence", MACOS_PERSISTENCE_PATHS),
+                ("IFEO Hijack", IFEO_PATHS),
+                ("AppInit DLLs", APPINIT_PATHS),
+                ("Session Manager", SESSION_MANAGER_PATHS),
+                ("Active Setup", ACTIVE_SETUP_PATHS),
+                ("Screensaver", SCREENSAVER_PATHS),
+                ("Winlogon", WINLOGON_PATHS),
+                ("COM/CLSID Hijack", COM_HIJACK_PATHS),
             ];
-            MECHANISMS.iter().map(|(name, _)| name.to_string()).collect()
+            MECHANISMS
+                .iter()
+                .map(|(name, _)| name.to_string())
+                .collect()
         }
         12 => {
             const RMM_TOOLS: &[(&str, &[&str])] = &[
-                ("TeamViewer  [RMM]",    TEAMVIEWER_PATHS),
-                ("AnyDesk     [RMM]",    ANYDESK_PATHS),
-                ("Splashtop   [RMM]",    SPLASHTOP_PATHS),
-                ("Atera       [RMM]",    ATERA_PATHS),
-                ("GoToAssist  [RMM]",    GOTOASSIST_PATHS),
-                ("Action1     [RMM]",    ACTION1_PATHS),
-                ("ManageEngine[RMM]",    MANAGEENGINE_PATHS),
+                ("TeamViewer  [RMM]", TEAMVIEWER_PATHS),
+                ("AnyDesk     [RMM]", ANYDESK_PATHS),
+                ("Splashtop   [RMM]", SPLASHTOP_PATHS),
+                ("Atera       [RMM]", ATERA_PATHS),
+                ("GoToAssist  [RMM]", GOTOASSIST_PATHS),
+                ("Action1     [RMM]", ACTION1_PATHS),
+                ("ManageEngine[RMM]", MANAGEENGINE_PATHS),
             ];
             let mut v: Vec<String> = RMM_TOOLS.iter().map(|(name, _)| name.to_string()).collect();
             v.push("Known RAT Names  [RAT]".to_string());
@@ -893,7 +997,11 @@ fn build_render_data(app: &app::App) -> RenderData {
                     lines.push(d.meaning.to_string());
                     if !d.mitre_techniques.is_empty() {
                         lines.push(String::new());
-                        lines.push(format!("{:<CW$}: {}", "MITRE", d.mitre_techniques.join("  ")));
+                        lines.push(format!(
+                            "{:<CW$}: {}",
+                            "MITRE",
+                            d.mitre_techniques.join("  ")
+                        ));
                     }
                     if !d.fields.is_empty() {
                         lines.push(String::new());
@@ -929,11 +1037,15 @@ fn build_render_data(app: &app::App) -> RenderData {
                         .or_else(|| lolbas_entry(LOLBAS_MACOS, name))
                 }
             });
-            entry.map(lolbas_detail_lines).unwrap_or_else(|| vec!["Select an item.".into()])
+            entry
+                .map(lolbas_detail_lines)
+                .unwrap_or_else(|| vec!["Select an item.".into()])
         }
         2 => {
             let site = selected_name.and_then(|name| {
-                ABUSABLE_SITES.iter().find(|s| s.domain.eq_ignore_ascii_case(name))
+                ABUSABLE_SITES
+                    .iter()
+                    .find(|s| s.domain.eq_ignore_ascii_case(name))
             });
             match site {
                 Some(s) => {
@@ -951,7 +1063,11 @@ fn build_render_data(app: &app::App) -> RenderData {
                     }
                     if !s.mitre_techniques.is_empty() {
                         lines.push(String::new());
-                        lines.push(format!("{:<CW$}: {}", "MITRE", s.mitre_techniques.join("  ")));
+                        lines.push(format!(
+                            "{:<CW$}: {}",
+                            "MITRE",
+                            s.mitre_techniques.join("  ")
+                        ));
                     }
                     lines
                 }
@@ -983,7 +1099,12 @@ fn build_render_data(app: &app::App) -> RenderData {
                     ];
                     for (i, step) in p.steps.iter().enumerate() {
                         lines.push(String::new());
-                        lines.push(format!("  {}. {} — {}", i + 1, step.artifact_id, step.tactic));
+                        lines.push(format!(
+                            "  {}. {} — {}",
+                            i + 1,
+                            step.artifact_id,
+                            step.tactic
+                        ));
                         lines.push(format!("     {}", step.rationale));
                     }
                     lines
@@ -1009,8 +1130,10 @@ fn build_render_data(app: &app::App) -> RenderData {
                         lines.push(format!("MITRE   : {}", p.mitre_techniques.join("  ")));
                     }
                     lines.push(String::new());
-                    lines.push(format!("Thresholds — class:{} probable:{} confirmed:{}",
-                        p.class_threshold, p.probable_threshold, p.confirmed_threshold));
+                    lines.push(format!(
+                        "Thresholds — class:{} probable:{} confirmed:{}",
+                        p.class_threshold, p.probable_threshold, p.confirmed_threshold
+                    ));
                     lines.push(String::new());
                     lines.push("Signals:".into());
                     for s in p.signals {
@@ -1045,7 +1168,13 @@ fn build_render_data(app: &app::App) -> RenderData {
                         "Steps:".into(),
                     ];
                     for (i, a) in f.actions.iter().enumerate() {
-                        lines.push(format!("  {:>2}. [{}] {} — {}", i + 1, a.technique_id, a.tactic, a.name));
+                        lines.push(format!(
+                            "  {:>2}. [{}] {} — {}",
+                            i + 1,
+                            a.technique_id,
+                            a.tactic,
+                            a.name
+                        ));
                         if !a.artifact_ids.is_empty() {
                             lines.push(format!("      Artifacts: {}", a.artifact_ids.join(", ")));
                         }
@@ -1083,8 +1212,8 @@ fn build_render_data(app: &app::App) -> RenderData {
             }
         }
         10 => {
-            let rule = selected_name
-                .and_then(|title| SIGMA_TABLE.iter().find(|r| r.title == title));
+            let rule =
+                selected_name.and_then(|title| SIGMA_TABLE.iter().find(|r| r.title == title));
             match rule {
                 Some(r) => {
                     let mut lines = vec![
@@ -1104,26 +1233,23 @@ fn build_render_data(app: &app::App) -> RenderData {
         }
         11 => {
             const MECHANISMS: &[(&str, &[&str])] = &[
-                ("Windows Run Keys",  WINDOWS_RUN_KEYS),
+                ("Windows Run Keys", WINDOWS_RUN_KEYS),
                 ("Linux Persistence", LINUX_PERSISTENCE_PATHS),
                 ("macOS Persistence", MACOS_PERSISTENCE_PATHS),
-                ("IFEO Hijack",       IFEO_PATHS),
-                ("AppInit DLLs",      APPINIT_PATHS),
-                ("Session Manager",   SESSION_MANAGER_PATHS),
-                ("Active Setup",      ACTIVE_SETUP_PATHS),
-                ("Screensaver",       SCREENSAVER_PATHS),
-                ("Winlogon",          WINLOGON_PATHS),
-                ("COM/CLSID Hijack",  COM_HIJACK_PATHS),
+                ("IFEO Hijack", IFEO_PATHS),
+                ("AppInit DLLs", APPINIT_PATHS),
+                ("Session Manager", SESSION_MANAGER_PATHS),
+                ("Active Setup", ACTIVE_SETUP_PATHS),
+                ("Screensaver", SCREENSAVER_PATHS),
+                ("Winlogon", WINLOGON_PATHS),
+                ("COM/CLSID Hijack", COM_HIJACK_PATHS),
             ];
             let paths = selected_name
                 .and_then(|name| MECHANISMS.iter().find(|(n, _)| *n == name))
                 .map(|(_, p)| *p);
             match paths {
                 Some(ps) => {
-                    let mut lines = vec![
-                        selected_name.unwrap_or("").to_string(),
-                        "─".repeat(40),
-                    ];
+                    let mut lines = vec![selected_name.unwrap_or("").to_string(), "─".repeat(40)];
                     for p in ps {
                         lines.push(p.to_string());
                     }
@@ -1134,20 +1260,17 @@ fn build_render_data(app: &app::App) -> RenderData {
         }
         12 => {
             const RMM_TOOLS: &[(&str, &[&str])] = &[
-                ("TeamViewer  [RMM]",  TEAMVIEWER_PATHS),
-                ("AnyDesk     [RMM]",  ANYDESK_PATHS),
-                ("Splashtop   [RMM]",  SPLASHTOP_PATHS),
-                ("Atera       [RMM]",  ATERA_PATHS),
-                ("GoToAssist  [RMM]",  GOTOASSIST_PATHS),
-                ("Action1     [RMM]",  ACTION1_PATHS),
-                ("ManageEngine[RMM]",  MANAGEENGINE_PATHS),
+                ("TeamViewer  [RMM]", TEAMVIEWER_PATHS),
+                ("AnyDesk     [RMM]", ANYDESK_PATHS),
+                ("Splashtop   [RMM]", SPLASHTOP_PATHS),
+                ("Atera       [RMM]", ATERA_PATHS),
+                ("GoToAssist  [RMM]", GOTOASSIST_PATHS),
+                ("Action1     [RMM]", ACTION1_PATHS),
+                ("ManageEngine[RMM]", MANAGEENGINE_PATHS),
             ];
             match selected_name {
                 Some("Known RAT Names  [RAT]") => {
-                    let mut lines = vec![
-                        "Known RAT / Backdoor Names".to_string(),
-                        "─".repeat(40),
-                    ];
+                    let mut lines = vec!["Known RAT / Backdoor Names".to_string(), "─".repeat(40)];
                     for name in KNOWN_RAT_NAMES {
                         lines.push(name.to_string());
                     }
@@ -1246,7 +1369,11 @@ fn run_inner() -> io::Result<()> {
 
     // Restore terminal
     disable_raw_mode()?;
-    execute!(terminal.backend_mut(), LeaveAlternateScreen, DisableMouseCapture)?;
+    execute!(
+        terminal.backend_mut(),
+        LeaveAlternateScreen,
+        DisableMouseCapture
+    )?;
     terminal.show_cursor()?;
 
     Ok(())

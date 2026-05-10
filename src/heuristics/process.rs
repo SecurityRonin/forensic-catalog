@@ -392,7 +392,11 @@ mod tests {
 
     #[test]
     fn winscp_ssh_logon_wrong_process_not_flagged() {
-        assert!(!is_winscp_ssh_service_logon(5, "VIRTUAL USERS", "lsass.exe"));
+        assert!(!is_winscp_ssh_service_logon(
+            5,
+            "VIRTUAL USERS",
+            "lsass.exe"
+        ));
     }
 
     // ── is_run_key_powershell_stager ──────────────────────────────────────────

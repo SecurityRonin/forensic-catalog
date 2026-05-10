@@ -35,8 +35,20 @@ pub use umbreon::UMBREON;
 pub use xmrig::XMRIG;
 
 pub const ALL_PROFILES: &[&MalwareProfile] = &[
-    &FATHER, &JYNX, &AZAZEL, &BDVL, &LIB_PROCESS_HIDER,
-    &XMRIG, &LKM_GENERIC, &LD_PRELOAD_GENERIC,
-    &UMBREON, &REPTILE, &DIAMORPHINE, &NECRO, &MEDUSA,
-    &SYSLOGK, &BEURK, &PRISM,
+    &FATHER,
+    &JYNX,
+    &AZAZEL,
+    &BDVL,
+    &LIB_PROCESS_HIDER,
+    &XMRIG,
+    &LKM_GENERIC,
+    &LD_PRELOAD_GENERIC,
+    &UMBREON,
+    &REPTILE,
+    &DIAMORPHINE,
+    &NECRO,
+    &MEDUSA,
+    &SYSLOGK,
+    &BEURK,
+    &PRISM,
 ];

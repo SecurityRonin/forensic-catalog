@@ -150,11 +150,7 @@ pub fn handle_key(app: &mut App, event: KeyEvent, list_len: usize) -> bool {
 /// - Scroll wheel: navigate up/down in the list.
 /// - Left click on a list row (row ≥ 2): select that item.
 /// - Left click on the header row (row 0): left half → cycle platform, right half → cycle crit.
-pub fn handle_mouse(
-    app: &mut App,
-    mouse: crossterm::event::MouseEvent,
-    list_len: usize,
-) {
+pub fn handle_mouse(app: &mut App, mouse: crossterm::event::MouseEvent, list_len: usize) {
     use crossterm::event::{MouseButton, MouseEventKind};
     match mouse.kind {
         MouseEventKind::ScrollDown => app.move_down(list_len),
@@ -499,8 +495,15 @@ mod tests {
         a.enter_search_mode();
         handle_key(&mut a, key(KeyCode::Char('s')), 10);
         // In search mode 's' pushes to query, does NOT cycle severity filter
-        assert_eq!(a.crit_filter, CritFilter::All, "severity filter must not change in search mode");
-        assert!(a.search_query.contains('s'), "s must be added to search query");
+        assert_eq!(
+            a.crit_filter,
+            CritFilter::All,
+            "severity filter must not change in search mode"
+        );
+        assert!(
+            a.search_query.contains('s'),
+            "s must be added to search query"
+        );
     }
 
     // ── mouse events ──────────────────────────────────────────────────────
@@ -511,7 +514,12 @@ mod tests {
         let mut a = app();
         handle_mouse(
             &mut a,
-            MouseEvent { kind: MouseEventKind::ScrollDown, column: 0, row: 5, modifiers: KeyModifiers::NONE },
+            MouseEvent {
+                kind: MouseEventKind::ScrollDown,
+                column: 0,
+                row: 5,
+                modifiers: KeyModifiers::NONE,
+            },
             10,
         );
         assert_eq!(a.selected, 1);
@@ -524,7 +532,12 @@ mod tests {
         a.selected = 5;
         handle_mouse(
             &mut a,
-            MouseEvent { kind: MouseEventKind::ScrollUp, column: 0, row: 5, modifiers: KeyModifiers::NONE },
+            MouseEvent {
+                kind: MouseEventKind::ScrollUp,
+                column: 0,
+                row: 5,
+                modifiers: KeyModifiers::NONE,
+            },
             10,
         );
         assert_eq!(a.selected, 4);
@@ -537,7 +550,12 @@ mod tests {
         // Row 0 = header, row 1 = top border, row 2 = item 0, row 4 = item 2
         handle_mouse(
             &mut a,
-            MouseEvent { kind: MouseEventKind::Down(MouseButton::Left), column: 10, row: 4, modifiers: KeyModifiers::NONE },
+            MouseEvent {
+                kind: MouseEventKind::Down(MouseButton::Left),
+                column: 10,
+                row: 4,
+                modifiers: KeyModifiers::NONE,
+            },
             10,
         );
         assert_eq!(a.selected, 2);
@@ -551,7 +569,12 @@ mod tests {
         // Column 25 = dataset label area (cols 19–34)
         handle_mouse(
             &mut a,
-            MouseEvent { kind: MouseEventKind::Down(MouseButton::Left), column: 25, row: 0, modifiers: KeyModifiers::NONE },
+            MouseEvent {
+                kind: MouseEventKind::Down(MouseButton::Left),
+                column: 25,
+                row: 0,
+                modifiers: KeyModifiers::NONE,
+            },
             10,
         );
         assert_eq!(a.dataset_idx, 1, "click on dataset area must cycle dataset");
@@ -564,12 +587,24 @@ mod tests {
         // Column 5 = title area (cols 0–18) — must not change anything
         handle_mouse(
             &mut a,
-            MouseEvent { kind: MouseEventKind::Down(MouseButton::Left), column: 5, row: 0, modifiers: KeyModifiers::NONE },
+            MouseEvent {
+                kind: MouseEventKind::Down(MouseButton::Left),
+                column: 5,
+                row: 0,
+                modifiers: KeyModifiers::NONE,
+            },
             10,
         );
         assert_eq!(a.dataset_idx, 0, "click on title must not change dataset");
-        assert!(a.platform_mask.is_empty(), "click on title must not change platform");
-        assert_eq!(a.crit_filter, crate::tui::app::CritFilter::All, "click on title must not change crit");
+        assert!(
+            a.platform_mask.is_empty(),
+            "click on title must not change platform"
+        );
+        assert_eq!(
+            a.crit_filter,
+            crate::tui::app::CritFilter::All,
+            "click on title must not change crit"
+        );
     }
 
     #[test]
@@ -578,7 +613,12 @@ mod tests {
         let mut a = app();
         handle_mouse(
             &mut a,
-            MouseEvent { kind: MouseEventKind::Down(MouseButton::Left), column: 10, row: 100, modifiers: KeyModifiers::NONE },
+            MouseEvent {
+                kind: MouseEventKind::Down(MouseButton::Left),
+                column: 10,
+                row: 100,
+                modifiers: KeyModifiers::NONE,
+            },
             5, // only 5 items
         );
         // Must not panic, selection unchanged

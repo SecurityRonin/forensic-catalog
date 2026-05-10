@@ -12,21 +12,58 @@ pub static FATHER: MalwareProfile = MalwareProfile {
     malware_class: MalwareClass::LdPreloadPamHooker,
     mitre_techniques: &["T1574.006", "T1014", "T1556.003", "T1074"],
     signals: &[
-        ProfileSignal { id: ELF_HOOKS_PROCESS_HIDING,         weight: 20, required: true  },
-        ProfileSignal { id: ELF_HOOKS_PAM_CREDENTIAL,         weight: 30, required: true  },
-        ProfileSignal { id: ARTIFACT_PAM_STAGING_STRUCTURAL,  weight: 25, required: false },
-        ProfileSignal { id: ARTIFACT_PAM_STAGING_FATHER,      weight: 15, required: false },
-        ProfileSignal { id: ELF_STRING_FATHER_FORMAT,          weight: 10, required: false },
-        ProfileSignal { id: ELF_STRING_STAGING_PATH,           weight:  5, required: false },
-        ProfileSignal { id: ELF_GLOBALLY_LOADED,               weight: 10, required: false },
-        ProfileSignal { id: ELF_NOT_IN_PKG_DB,                 weight: 10, required: false },
-        ProfileSignal { id: TEMPORAL_LDPRELOAD_SSHD_RESTART,   weight: 15, required: false },
+        ProfileSignal {
+            id: ELF_HOOKS_PROCESS_HIDING,
+            weight: 20,
+            required: true,
+        },
+        ProfileSignal {
+            id: ELF_HOOKS_PAM_CREDENTIAL,
+            weight: 30,
+            required: true,
+        },
+        ProfileSignal {
+            id: ARTIFACT_PAM_STAGING_STRUCTURAL,
+            weight: 25,
+            required: false,
+        },
+        ProfileSignal {
+            id: ARTIFACT_PAM_STAGING_FATHER,
+            weight: 15,
+            required: false,
+        },
+        ProfileSignal {
+            id: ELF_STRING_FATHER_FORMAT,
+            weight: 10,
+            required: false,
+        },
+        ProfileSignal {
+            id: ELF_STRING_STAGING_PATH,
+            weight: 5,
+            required: false,
+        },
+        ProfileSignal {
+            id: ELF_GLOBALLY_LOADED,
+            weight: 10,
+            required: false,
+        },
+        ProfileSignal {
+            id: ELF_NOT_IN_PKG_DB,
+            weight: 10,
+            required: false,
+        },
+        ProfileSignal {
+            id: TEMPORAL_LDPRELOAD_SSHD_RESTART,
+            weight: 15,
+            required: false,
+        },
     ],
-    exclusions: &[
-        WeightedExclusion { id: ELF_HOOKS_NETWORK_HIDING, penalty: 20 },
-    ],
-    class_threshold:     50,
-    probable_threshold:  75,
+    exclusions: &[WeightedExclusion {
+        id: ELF_HOOKS_NETWORK_HIDING,
+        penalty: 20,
+    }],
+    class_threshold: 50,
+    probable_threshold: 75,
     confirmed_threshold: 90,
 };
 
@@ -40,15 +77,25 @@ mod tests {
     };
 
     fn sigs(ids: &[&'static str]) -> Vec<DetectedSignal> {
-        ids.iter().map(|&id| DetectedSignal { id, confidence: 1.0, evidence: String::new() }).collect()
+        ids.iter()
+            .map(|&id| DetectedSignal {
+                id,
+                confidence: 1.0,
+                evidence: String::new(),
+            })
+            .collect()
     }
 
     #[test]
     fn father_process_hiding_plus_pam_reaches_class_threshold() {
         let s = sigs(&[ELF_HOOKS_PROCESS_HIDING, ELF_HOOKS_PAM_CREDENTIAL]);
         let m = score_against_profile(&s, &FATHER);
-        assert!(m.score >= FATHER.class_threshold,
-            "score {} < class_threshold {}", m.score, FATHER.class_threshold);
+        assert!(
+            m.score >= FATHER.class_threshold,
+            "score {} < class_threshold {}",
+            m.score,
+            FATHER.class_threshold
+        );
         assert!(m.classification >= Classification::ClassMatch);
     }
 
@@ -60,8 +107,12 @@ mod tests {
             ARTIFACT_PAM_STAGING_STRUCTURAL,
         ]);
         let m = score_against_profile(&s, &FATHER);
-        assert!(m.score >= FATHER.probable_threshold,
-            "score {} < probable_threshold {}", m.score, FATHER.probable_threshold);
+        assert!(
+            m.score >= FATHER.probable_threshold,
+            "score {} < probable_threshold {}",
+            m.score,
+            FATHER.probable_threshold
+        );
         assert!(m.classification >= Classification::Probable);
     }
 
@@ -85,10 +136,17 @@ mod tests {
     #[test]
     fn father_network_hiding_signal_reduces_score() {
         let base = sigs(&[ELF_HOOKS_PROCESS_HIDING, ELF_HOOKS_PAM_CREDENTIAL]);
-        let with_network = sigs(&[ELF_HOOKS_PROCESS_HIDING, ELF_HOOKS_PAM_CREDENTIAL, ELF_HOOKS_NETWORK_HIDING]);
+        let with_network = sigs(&[
+            ELF_HOOKS_PROCESS_HIDING,
+            ELF_HOOKS_PAM_CREDENTIAL,
+            ELF_HOOKS_NETWORK_HIDING,
+        ]);
         let m_base = score_against_profile(&base, &FATHER);
-        let m_net  = score_against_profile(&with_network, &FATHER);
-        assert!(m_net.score < m_base.score, "network hiding should penalise Father score");
+        let m_net = score_against_profile(&with_network, &FATHER);
+        assert!(
+            m_net.score < m_base.score,
+            "network hiding should penalise Father score"
+        );
     }
 
     #[test]

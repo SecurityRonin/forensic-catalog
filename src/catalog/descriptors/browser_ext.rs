@@ -31,7 +31,8 @@ pub(crate) static BROWSER_CHROME_HISTORY: ArtifactDescriptor = ArtifactDescripto
         "History can be cleared by user or extensions; absence is not evidence of non-visit",
     ],
     volatility: Some(crate::volatility::VolatilityClass::ActivityDriven),
-    volatility_rationale: "Overwritten by browser activity; no fixed size limit but old entries pruned",
+    volatility_rationale:
+        "Overwritten by browser activity; no fixed size limit but old entries pruned",
 };
 
 pub(crate) static BROWSER_CHROME_COOKIES: ArtifactDescriptor = ArtifactDescriptor {

@@ -13,18 +13,50 @@ pub static XMRIG: MalwareProfile = MalwareProfile {
     malware_class: MalwareClass::CryptoMiner,
     mitre_techniques: &["T1496", "T1036.005"],
     signals: &[
-        ProfileSignal { id: PROCESS_THREAD_MINER_XMRIG,    weight: 40, required: false },
-        ProfileSignal { id: PROCESS_THREAD_MINER_GENERIC,  weight: 20, required: false },
-        ProfileSignal { id: NETWORK_STRATUM_CONNECTION,    weight: 30, required: false },
-        ProfileSignal { id: NETWORK_STRATUM_LISTEN,        weight: 20, required: false },
-        ProfileSignal { id: SYSTEM_CPU_ANOMALY_HIGH,       weight: 15, required: false },
-        ProfileSignal { id: PROCESS_MASQUERADE,            weight: 10, required: false },
-        ProfileSignal { id: PROCESS_ANOMALOUS_THREAD_COUNT, weight: 15, required: false },
-        ProfileSignal { id: PROCESS_HIDDEN_FROM_PS,        weight: 20, required: false },
+        ProfileSignal {
+            id: PROCESS_THREAD_MINER_XMRIG,
+            weight: 40,
+            required: false,
+        },
+        ProfileSignal {
+            id: PROCESS_THREAD_MINER_GENERIC,
+            weight: 20,
+            required: false,
+        },
+        ProfileSignal {
+            id: NETWORK_STRATUM_CONNECTION,
+            weight: 30,
+            required: false,
+        },
+        ProfileSignal {
+            id: NETWORK_STRATUM_LISTEN,
+            weight: 20,
+            required: false,
+        },
+        ProfileSignal {
+            id: SYSTEM_CPU_ANOMALY_HIGH,
+            weight: 15,
+            required: false,
+        },
+        ProfileSignal {
+            id: PROCESS_MASQUERADE,
+            weight: 10,
+            required: false,
+        },
+        ProfileSignal {
+            id: PROCESS_ANOMALOUS_THREAD_COUNT,
+            weight: 15,
+            required: false,
+        },
+        ProfileSignal {
+            id: PROCESS_HIDDEN_FROM_PS,
+            weight: 20,
+            required: false,
+        },
     ],
     exclusions: &[],
-    class_threshold:     30,
-    probable_threshold:  55,
+    class_threshold: 30,
+    probable_threshold: 55,
     confirmed_threshold: 75,
 };
 
@@ -38,15 +70,25 @@ mod tests {
     };
 
     fn sigs(ids: &[&'static str]) -> Vec<DetectedSignal> {
-        ids.iter().map(|&id| DetectedSignal { id, confidence: 1.0, evidence: String::new() }).collect()
+        ids.iter()
+            .map(|&id| DetectedSignal {
+                id,
+                confidence: 1.0,
+                evidence: String::new(),
+            })
+            .collect()
     }
 
     #[test]
     fn xmrig_thread_signal_alone_reaches_class_threshold() {
         let s = sigs(&[PROCESS_THREAD_MINER_XMRIG]);
         let m = score_against_profile(&s, &XMRIG);
-        assert!(m.score >= XMRIG.class_threshold,
-            "score {} < class_threshold {}", m.score, XMRIG.class_threshold);
+        assert!(
+            m.score >= XMRIG.class_threshold,
+            "score {} < class_threshold {}",
+            m.score,
+            XMRIG.class_threshold
+        );
         assert!(m.classification >= Classification::ClassMatch);
     }
 
@@ -54,8 +96,12 @@ mod tests {
     fn xmrig_thread_plus_stratum_reaches_probable() {
         let s = sigs(&[PROCESS_THREAD_MINER_XMRIG, NETWORK_STRATUM_CONNECTION]);
         let m = score_against_profile(&s, &XMRIG);
-        assert!(m.score >= XMRIG.probable_threshold,
-            "score {} < probable_threshold {}", m.score, XMRIG.probable_threshold);
+        assert!(
+            m.score >= XMRIG.probable_threshold,
+            "score {} < probable_threshold {}",
+            m.score,
+            XMRIG.probable_threshold
+        );
         assert!(m.classification >= Classification::Probable);
     }
 }

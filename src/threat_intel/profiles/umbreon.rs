@@ -13,23 +13,68 @@ pub static UMBREON: MalwareProfile = MalwareProfile {
     malware_class: MalwareClass::LkmRootkit,
     mitre_techniques: &["T1574.006", "T1014", "T1215", "T1556.003"],
     signals: &[
-        ProfileSignal { id: ELF_HOOKS_PROCESS_HIDING,        weight: 20, required: true  },
-        ProfileSignal { id: ELF_HOOKS_PAM_CREDENTIAL,        weight: 30, required: true  },
-        ProfileSignal { id: SYSTEM_KERNEL_TAINT_OOT,         weight: 30, required: true  },
-        ProfileSignal { id: ELF_HOOKS_FILE_HIDING,           weight: 25, required: false },
-        ProfileSignal { id: ELF_HOOKS_NETWORK_HIDING,        weight: 20, required: false },
-        ProfileSignal { id: ELF_GLOBALLY_LOADED,             weight: 20, required: false },
-        ProfileSignal { id: ELF_NOT_IN_PKG_DB,               weight: 15, required: false },
-        ProfileSignal { id: SYSTEM_PROC_MODULES_SUSPECT,     weight: 30, required: false },
-        ProfileSignal { id: ARTIFACT_LD_PRELOAD_FOREIGN,     weight: 15, required: false },
-        ProfileSignal { id: TEMPORAL_LDPRELOAD_SSHD_RESTART, weight: 10, required: false },
-        ProfileSignal { id: ARTIFACT_PAM_STAGING_STRUCTURAL, weight: 15, required: false },
+        ProfileSignal {
+            id: ELF_HOOKS_PROCESS_HIDING,
+            weight: 20,
+            required: true,
+        },
+        ProfileSignal {
+            id: ELF_HOOKS_PAM_CREDENTIAL,
+            weight: 30,
+            required: true,
+        },
+        ProfileSignal {
+            id: SYSTEM_KERNEL_TAINT_OOT,
+            weight: 30,
+            required: true,
+        },
+        ProfileSignal {
+            id: ELF_HOOKS_FILE_HIDING,
+            weight: 25,
+            required: false,
+        },
+        ProfileSignal {
+            id: ELF_HOOKS_NETWORK_HIDING,
+            weight: 20,
+            required: false,
+        },
+        ProfileSignal {
+            id: ELF_GLOBALLY_LOADED,
+            weight: 20,
+            required: false,
+        },
+        ProfileSignal {
+            id: ELF_NOT_IN_PKG_DB,
+            weight: 15,
+            required: false,
+        },
+        ProfileSignal {
+            id: SYSTEM_PROC_MODULES_SUSPECT,
+            weight: 30,
+            required: false,
+        },
+        ProfileSignal {
+            id: ARTIFACT_LD_PRELOAD_FOREIGN,
+            weight: 15,
+            required: false,
+        },
+        ProfileSignal {
+            id: TEMPORAL_LDPRELOAD_SSHD_RESTART,
+            weight: 10,
+            required: false,
+        },
+        ProfileSignal {
+            id: ARTIFACT_PAM_STAGING_STRUCTURAL,
+            weight: 15,
+            required: false,
+        },
     ],
-    exclusions: &[
-        WeightedExclusion { id: PROCESS_THREAD_MINER_XMRIG, penalty: 25 },
-    ],
-    class_threshold:     80,
-    probable_threshold:  110,
+    exclusions: &[WeightedExclusion {
+        id: PROCESS_THREAD_MINER_XMRIG,
+        penalty: 25,
+    }],
+    class_threshold: 80,
+    probable_threshold: 110,
     confirmed_threshold: 140,
 };
 
@@ -43,34 +88,63 @@ mod tests {
     };
 
     fn sigs(ids: &[&'static str]) -> Vec<DetectedSignal> {
-        ids.iter().map(|&id| DetectedSignal { id, confidence: 1.0, evidence: String::new() }).collect()
+        ids.iter()
+            .map(|&id| DetectedSignal {
+                id,
+                confidence: 1.0,
+                evidence: String::new(),
+            })
+            .collect()
     }
 
     #[test]
     fn umbreon_required_signals_reach_class_threshold() {
-        let s = sigs(&[ELF_HOOKS_PROCESS_HIDING, ELF_HOOKS_PAM_CREDENTIAL, SYSTEM_KERNEL_TAINT_OOT]);
+        let s = sigs(&[
+            ELF_HOOKS_PROCESS_HIDING,
+            ELF_HOOKS_PAM_CREDENTIAL,
+            SYSTEM_KERNEL_TAINT_OOT,
+        ]);
         let m = score_against_profile(&s, &UMBREON);
-        assert!(m.score >= UMBREON.class_threshold,
-            "score {} < class_threshold {}", m.score, UMBREON.class_threshold);
+        assert!(
+            m.score >= UMBREON.class_threshold,
+            "score {} < class_threshold {}",
+            m.score,
+            UMBREON.class_threshold
+        );
         assert!(m.classification >= Classification::ClassMatch);
     }
 
     #[test]
     fn umbreon_with_proc_modules_reaches_probable() {
-        let s = sigs(&[ELF_HOOKS_PROCESS_HIDING, ELF_HOOKS_PAM_CREDENTIAL, SYSTEM_KERNEL_TAINT_OOT,
-                       SYSTEM_PROC_MODULES_SUSPECT]);
+        let s = sigs(&[
+            ELF_HOOKS_PROCESS_HIDING,
+            ELF_HOOKS_PAM_CREDENTIAL,
+            SYSTEM_KERNEL_TAINT_OOT,
+            SYSTEM_PROC_MODULES_SUSPECT,
+        ]);
         let m = score_against_profile(&s, &UMBREON);
-        assert!(m.score >= UMBREON.probable_threshold,
-            "score {} < probable_threshold {}", m.score, UMBREON.probable_threshold);
+        assert!(
+            m.score >= UMBREON.probable_threshold,
+            "score {} < probable_threshold {}",
+            m.score,
+            UMBREON.probable_threshold
+        );
         assert!(m.classification >= Classification::Probable);
     }
 
     #[test]
     fn umbreon_full_signals_reach_confirmed() {
-        let s = sigs(&[ELF_HOOKS_PROCESS_HIDING, ELF_HOOKS_PAM_CREDENTIAL, SYSTEM_KERNEL_TAINT_OOT,
-                       ELF_HOOKS_FILE_HIDING, ELF_HOOKS_NETWORK_HIDING, ELF_GLOBALLY_LOADED,
-                       SYSTEM_PROC_MODULES_SUSPECT, ARTIFACT_LD_PRELOAD_FOREIGN,
-                       TEMPORAL_LDPRELOAD_SSHD_RESTART]);
+        let s = sigs(&[
+            ELF_HOOKS_PROCESS_HIDING,
+            ELF_HOOKS_PAM_CREDENTIAL,
+            SYSTEM_KERNEL_TAINT_OOT,
+            ELF_HOOKS_FILE_HIDING,
+            ELF_HOOKS_NETWORK_HIDING,
+            ELF_GLOBALLY_LOADED,
+            SYSTEM_PROC_MODULES_SUSPECT,
+            ARTIFACT_LD_PRELOAD_FOREIGN,
+            TEMPORAL_LDPRELOAD_SSHD_RESTART,
+        ]);
         let m = score_against_profile(&s, &UMBREON);
         assert_eq!(m.classification, Classification::Confirmed);
     }
@@ -84,11 +158,22 @@ mod tests {
 
     #[test]
     fn umbreon_miner_signal_reduces_score() {
-        let base = sigs(&[ELF_HOOKS_PROCESS_HIDING, ELF_HOOKS_PAM_CREDENTIAL, SYSTEM_KERNEL_TAINT_OOT]);
-        let with_miner = sigs(&[ELF_HOOKS_PROCESS_HIDING, ELF_HOOKS_PAM_CREDENTIAL,
-                                 SYSTEM_KERNEL_TAINT_OOT, PROCESS_THREAD_MINER_XMRIG]);
-        let m_base  = score_against_profile(&base, &UMBREON);
+        let base = sigs(&[
+            ELF_HOOKS_PROCESS_HIDING,
+            ELF_HOOKS_PAM_CREDENTIAL,
+            SYSTEM_KERNEL_TAINT_OOT,
+        ]);
+        let with_miner = sigs(&[
+            ELF_HOOKS_PROCESS_HIDING,
+            ELF_HOOKS_PAM_CREDENTIAL,
+            SYSTEM_KERNEL_TAINT_OOT,
+            PROCESS_THREAD_MINER_XMRIG,
+        ]);
+        let m_base = score_against_profile(&base, &UMBREON);
         let m_miner = score_against_profile(&with_miner, &UMBREON);
-        assert!(m_miner.score < m_base.score, "miner signal should penalise Umbreon score");
+        assert!(
+            m_miner.score < m_base.score,
+            "miner signal should penalise Umbreon score"
+        );
     }
 }

@@ -41,43 +41,78 @@ mod tests {
     };
 
     fn sigs(ids: &[&'static str]) -> Vec<DetectedSignal> {
-        ids.iter().map(|&id| DetectedSignal { id, confidence: 1.0, evidence: String::new() }).collect()
+        ids.iter()
+            .map(|&id| DetectedSignal {
+                id,
+                confidence: 1.0,
+                evidence: String::new(),
+            })
+            .collect()
     }
 
     #[test]
     fn reptile_required_signals_reach_class_threshold() {
         let s = sigs(&[SYSTEM_KERNEL_TAINT_OOT, SYSTEM_PROC_MODULES_SUSPECT]);
         let m = score_against_profile(&s, &REPTILE);
-        assert!(m.score >= REPTILE.class_threshold,
-            "score {} < class_threshold {}", m.score, REPTILE.class_threshold);
+        assert!(
+            m.score >= REPTILE.class_threshold,
+            "score {} < class_threshold {}",
+            m.score,
+            REPTILE.class_threshold
+        );
         assert!(m.classification >= Classification::ClassMatch);
     }
 
     #[test]
     fn reptile_with_magic_packet_reaches_probable() {
-        let s = sigs(&[SYSTEM_KERNEL_TAINT_OOT, SYSTEM_PROC_MODULES_SUSPECT, NETWORK_MAGIC_PACKET_KNOCK]);
+        let s = sigs(&[
+            SYSTEM_KERNEL_TAINT_OOT,
+            SYSTEM_PROC_MODULES_SUSPECT,
+            NETWORK_MAGIC_PACKET_KNOCK,
+        ]);
         let m = score_against_profile(&s, &REPTILE);
-        assert!(m.score >= REPTILE.probable_threshold,
-            "score {} < probable_threshold {}", m.score, REPTILE.probable_threshold);
+        assert!(
+            m.score >= REPTILE.probable_threshold,
+            "score {} < probable_threshold {}",
+            m.score,
+            REPTILE.probable_threshold
+        );
         assert!(m.classification >= Classification::Probable);
     }
 
     #[test]
     fn reptile_full_signals_reach_confirmed() {
-        let s = sigs(&[SYSTEM_KERNEL_TAINT_OOT, SYSTEM_PROC_MODULES_SUSPECT,
-                       PROCESS_HIDDEN_FROM_PS, ELF_HOOKS_FILE_HIDING, ELF_HOOKS_NETWORK_HIDING,
-                       NETWORK_MAGIC_PACKET_KNOCK, TEMPORAL_ACTIVATION_SEQUENCE]);
+        let s = sigs(&[
+            SYSTEM_KERNEL_TAINT_OOT,
+            SYSTEM_PROC_MODULES_SUSPECT,
+            PROCESS_HIDDEN_FROM_PS,
+            ELF_HOOKS_FILE_HIDING,
+            ELF_HOOKS_NETWORK_HIDING,
+            NETWORK_MAGIC_PACKET_KNOCK,
+            TEMPORAL_ACTIVATION_SEQUENCE,
+        ]);
         let m = score_against_profile(&s, &REPTILE);
         assert_eq!(m.classification, Classification::Confirmed);
     }
 
     #[test]
     fn reptile_pam_signal_reduces_score() {
-        let base = sigs(&[SYSTEM_KERNEL_TAINT_OOT, SYSTEM_PROC_MODULES_SUSPECT, NETWORK_MAGIC_PACKET_KNOCK]);
-        let with_pam = sigs(&[SYSTEM_KERNEL_TAINT_OOT, SYSTEM_PROC_MODULES_SUSPECT,
-                               NETWORK_MAGIC_PACKET_KNOCK, ELF_HOOKS_PAM_CREDENTIAL]);
+        let base = sigs(&[
+            SYSTEM_KERNEL_TAINT_OOT,
+            SYSTEM_PROC_MODULES_SUSPECT,
+            NETWORK_MAGIC_PACKET_KNOCK,
+        ]);
+        let with_pam = sigs(&[
+            SYSTEM_KERNEL_TAINT_OOT,
+            SYSTEM_PROC_MODULES_SUSPECT,
+            NETWORK_MAGIC_PACKET_KNOCK,
+            ELF_HOOKS_PAM_CREDENTIAL,
+        ]);
         let m_base = score_against_profile(&base, &REPTILE);
-        let m_pam  = score_against_profile(&with_pam, &REPTILE);
-        assert!(m_pam.score < m_base.score, "PAM signal should penalise Reptile score");
+        let m_pam = score_against_profile(&with_pam, &REPTILE);
+        assert!(
+            m_pam.score < m_base.score,
+            "PAM signal should penalise Reptile score"
+        );
     }
 }

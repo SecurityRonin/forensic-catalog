@@ -11236,7 +11236,9 @@ username:password:uid:gid:full name:home directory:shell
     related_artifacts: &[],
     sources: &["https://github.com/forensicartifacts/artifacts"],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
-    evidence_caveats: &["Check for UID 0 accounts not root; compare shadow file for password hash presence"],
+    evidence_caveats: &[
+        "Check for UID 0 accounts not root; compare shadow file for password hash presence",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "User account file persists until system decommission",
 };
@@ -14850,7 +14852,9 @@ pub(crate) static FA_FILE_KERNEL_DMESG_RESTRICT: ArtifactDescriptor = ArtifactDe
     related_artifacts: &[],
     sources: &["https://www.kernel.org/doc/Documentation/sysctl/kernel.txt"],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
-    evidence_caveats: &["Tampered value (0=off) indicates attacker hardening-bypass; check sysctl.conf"],
+    evidence_caveats: &[
+        "Tampered value (0=off) indicates attacker hardening-bypass; check sysctl.conf",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Kernel sysctl setting persists across reboots when configured",
 };
@@ -14874,7 +14878,9 @@ pub(crate) static FA_FILE_KERNEL_KPTR_RESTRICT: ArtifactDescriptor = ArtifactDes
     related_artifacts: &[],
     sources: &["https://www.kernel.org/doc/Documentation/sysctl/kernel.txt"],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
-    evidence_caveats: &["Tampered value (0=off) indicates attacker hardening-bypass; check sysctl.conf"],
+    evidence_caveats: &[
+        "Tampered value (0=off) indicates attacker hardening-bypass; check sysctl.conf",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Kernel sysctl setting persists across reboots when configured",
 };
@@ -21001,7 +21007,9 @@ pub(crate) static FA_FILE_USERS_PLIST: ArtifactDescriptor = ArtifactDescriptor {
         "https://forensics.wiki/mac_os_x_10.9_artifacts_location#system-settings-and-informations",
     ],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
-    evidence_caveats: &["Check for UID 0 accounts not root; compare shadow file for password hash presence"],
+    evidence_caveats: &[
+        "Check for UID 0 accounts not root; compare shadow file for password hash presence",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "User account file persists until system decommission",
 };
@@ -21027,7 +21035,9 @@ pub(crate) static FA_FILE_USERS_PLIST_2: ArtifactDescriptor = ArtifactDescriptor
         "https://forensics.wiki/mac_os_x_10.9_artifacts_location#system-settings-and-informations",
     ],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
-    evidence_caveats: &["Check for UID 0 accounts not root; compare shadow file for password hash presence"],
+    evidence_caveats: &[
+        "Check for UID 0 accounts not root; compare shadow file for password hash presence",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "User account file persists until system decommission",
 };

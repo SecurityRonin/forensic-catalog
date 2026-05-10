@@ -826,7 +826,9 @@ exploit the weak password.",
     related_artifacts: &[],
     sources: &["https://github.com/Velocidex/velociraptor"],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
-    evidence_caveats: &["Authentication events; check for brute-force patterns and privilege escalation"],
+    evidence_caveats: &[
+        "Authentication events; check for brute-force patterns and privilege escalation",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::RotatingBuffer),
     volatility_rationale: "Linux log rotates on size/time schedule",
 };
@@ -2166,7 +2168,9 @@ serverless collections/queries as in the following example.
     related_artifacts: &[],
     sources: &["https://github.com/Velocidex/velociraptor"],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
-    evidence_caveats: &["Presence indicates active Velociraptor collection; metadata reveals scope"],
+    evidence_caveats: &[
+        "Presence indicates active Velociraptor collection; metadata reveals scope",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Volatile),
     volatility_rationale: "Temporary collection ZIP is volatile and deleted after upload",
 };
@@ -3500,7 +3504,9 @@ parse data in Windows.old or Regback folders, or VSS.",
         related_artifacts: &[],
         sources: &["https://github.com/Velocidex/velociraptor"],
         evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
-        evidence_caveats: &["Non-zero GlobalFlag with Debugger value indicates silent process exit / hijack"],
+        evidence_caveats: &[
+            "Non-zero GlobalFlag with Debugger value indicates silent process exit / hijack",
+        ],
         volatility: Some(crate::volatility::VolatilityClass::Persistent),
         volatility_rationale: "IFEO GlobalFlag registry persists until key deletion",
     };
@@ -3725,7 +3731,9 @@ added. The existence of the key is suspicious, if not expected.
     related_artifacts: &[],
     sources: &["https://github.com/Velocidex/velociraptor"],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
-    evidence_caveats: &["UseLogonCredential=1 enables plaintext credential caching in LSASS — critical IOC"],
+    evidence_caveats: &[
+        "UseLogonCredential=1 enables plaintext credential caching in LSASS — critical IOC",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "WDigest registry value persists across reboots",
 };
@@ -3918,7 +3926,9 @@ artifact.",
         related_artifacts: &[],
         sources: &["https://github.com/Velocidex/velociraptor"],
         evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
-        evidence_caveats: &["User SID enumeration; compare against expected user base for rogue accounts"],
+        evidence_caveats: &[
+            "User SID enumeration; compare against expected user base for rogue accounts",
+        ],
         volatility: Some(crate::volatility::VolatilityClass::Persistent),
         volatility_rationale: "ProfileList registry persists until profile deletion",
     };

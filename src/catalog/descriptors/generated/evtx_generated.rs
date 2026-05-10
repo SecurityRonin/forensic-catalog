@@ -16093,7 +16093,9 @@ pub(crate) static EVTX_MICROSOFT_WINDOWS_NETWORKSECURITY_DEBUG: ArtifactDescript
         related_artifacts: &[],
         sources: &["https://github.com/nasbench/EVTX-ETW-Resources"],
         evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
-        evidence_caveats: &["Windows Security audit log; check Policy log for channel disable events"],
+        evidence_caveats: &[
+            "Windows Security audit log; check Policy log for channel disable events",
+        ],
         volatility: Some(crate::volatility::VolatilityClass::RotatingBuffer),
         volatility_rationale: "Event log rotates on size limit; Security channel is high-value",
     };
@@ -19880,7 +19882,9 @@ pub(crate) static EVTX_MICROSOFT_WINDOWS_SMBCLIENT_SECURITY: ArtifactDescriptor 
         related_artifacts: &[],
         sources: &["https://github.com/nasbench/EVTX-ETW-Resources"],
         evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
-        evidence_caveats: &["Windows Security audit log; check Policy log for channel disable events"],
+        evidence_caveats: &[
+            "Windows Security audit log; check Policy log for channel disable events",
+        ],
         volatility: Some(crate::volatility::VolatilityClass::RotatingBuffer),
         volatility_rationale: "Event log rotates on size limit; Security channel is high-value",
     };
@@ -20120,7 +20124,9 @@ pub(crate) static EVTX_MICROSOFT_WINDOWS_SMBSERVER_SECURITY: ArtifactDescriptor 
         related_artifacts: &[],
         sources: &["https://github.com/nasbench/EVTX-ETW-Resources"],
         evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
-        evidence_caveats: &["Windows Security audit log; check Policy log for channel disable events"],
+        evidence_caveats: &[
+            "Windows Security audit log; check Policy log for channel disable events",
+        ],
         volatility: Some(crate::volatility::VolatilityClass::RotatingBuffer),
         volatility_rationale: "Event log rotates on size limit; Security channel is high-value",
     };
@@ -21049,7 +21055,9 @@ pub(crate) static EVTX_MICROSOFT_WINDOWS_SECURITY_SPP_PERF: ArtifactDescriptor =
         related_artifacts: &[],
         sources: &["https://github.com/nasbench/EVTX-ETW-Resources"],
         evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
-        evidence_caveats: &["Windows Security audit log; check Policy log for channel disable events"],
+        evidence_caveats: &[
+            "Windows Security audit log; check Policy log for channel disable events",
+        ],
         volatility: Some(crate::volatility::VolatilityClass::RotatingBuffer),
         volatility_rationale: "Event log rotates on size limit; Security channel is high-value",
     };

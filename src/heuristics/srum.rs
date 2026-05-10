@@ -383,22 +383,34 @@ mod tests {
 
     #[test]
     fn automated_execution_triggered_at_threshold_with_no_input() {
-        assert!(is_automated_execution(AUTOMATED_EXECUTION_FOCUS_THRESHOLD_MS, 0));
+        assert!(is_automated_execution(
+            AUTOMATED_EXECUTION_FOCUS_THRESHOLD_MS,
+            0
+        ));
     }
 
     #[test]
     fn automated_execution_triggered_above_threshold_with_no_input() {
-        assert!(is_automated_execution(AUTOMATED_EXECUTION_FOCUS_THRESHOLD_MS + 1, 0));
+        assert!(is_automated_execution(
+            AUTOMATED_EXECUTION_FOCUS_THRESHOLD_MS + 1,
+            0
+        ));
     }
 
     #[test]
     fn automated_execution_not_triggered_below_threshold() {
-        assert!(!is_automated_execution(AUTOMATED_EXECUTION_FOCUS_THRESHOLD_MS - 1, 0));
+        assert!(!is_automated_execution(
+            AUTOMATED_EXECUTION_FOCUS_THRESHOLD_MS - 1,
+            0
+        ));
     }
 
     #[test]
     fn automated_execution_not_triggered_when_input_present() {
-        assert!(!is_automated_execution(AUTOMATED_EXECUTION_FOCUS_THRESHOLD_MS, 1));
+        assert!(!is_automated_execution(
+            AUTOMATED_EXECUTION_FOCUS_THRESHOLD_MS,
+            1
+        ));
     }
 
     #[test]
@@ -437,7 +449,9 @@ mod tests {
 
     #[test]
     fn suspicious_path_temp_dir() {
-        assert!(is_suspicious_path(r"C:\Users\User\AppData\Local\Temp\abc.exe"));
+        assert!(is_suspicious_path(
+            r"C:\Users\User\AppData\Local\Temp\abc.exe"
+        ));
     }
 
     #[test]
@@ -472,7 +486,9 @@ mod tests {
 
     #[test]
     fn suspicious_path_appdata_local_not_flagged() {
-        assert!(!is_suspicious_path(r"C:\Users\User\AppData\Local\MyApp\app.exe"));
+        assert!(!is_suspicious_path(
+            r"C:\Users\User\AppData\Local\MyApp\app.exe"
+        ));
     }
 
     #[test]
@@ -484,7 +500,10 @@ mod tests {
 
     #[test]
     fn masquerade_svch0st_not_in_system32() {
-        assert!(is_process_masquerade("svch0st.exe", r"C:\Users\User\AppData\Local"));
+        assert!(is_process_masquerade(
+            "svch0st.exe",
+            r"C:\Users\User\AppData\Local"
+        ));
     }
 
     #[test]
@@ -499,7 +518,10 @@ mod tests {
 
     #[test]
     fn masquerade_legitimate_svchost_in_system32() {
-        assert!(!is_process_masquerade("svchost.exe", r"C:\Windows\System32"));
+        assert!(!is_process_masquerade(
+            "svchost.exe",
+            r"C:\Windows\System32"
+        ));
     }
 
     #[test]
@@ -509,7 +531,10 @@ mod tests {
 
     #[test]
     fn masquerade_unrelated_binary_not_flagged() {
-        assert!(!is_process_masquerade("myapp.exe", r"C:\Program Files\MyApp"));
+        assert!(!is_process_masquerade(
+            "myapp.exe",
+            r"C:\Program Files\MyApp"
+        ));
     }
 
     #[test]
@@ -553,7 +578,9 @@ mod tests {
 
     #[test]
     fn beaconing_not_detected_irregular() {
-        let ts = vec![0i64, 100, 5000, 50000, 55000, 200000, 205000, 600000, 601000, 900000];
+        let ts = vec![
+            0i64, 100, 5000, 50000, 55000, 200000, 205000, 600000, 601000, 900000,
+        ];
         assert!(!is_beaconing(&ts));
     }
 

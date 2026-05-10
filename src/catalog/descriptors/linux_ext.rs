@@ -1208,5 +1208,6 @@ pub(crate) static LAN_TURTLE_LOOT: ArtifactDescriptor = ArtifactDescriptor {
         "Credential type depends on victim OS — NTLMv2 for Windows 7+, may vary for others",
     ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
-    volatility_rationale: "Stored on 16 MB flash; persists until manually deleted or device is reflashed",
+    volatility_rationale:
+        "Stored on 16 MB flash; persists until manually deleted or device is reflashed",
 };

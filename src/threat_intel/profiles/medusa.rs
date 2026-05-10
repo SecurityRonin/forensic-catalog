@@ -42,35 +42,59 @@ mod tests {
     };
 
     fn sigs(ids: &[&'static str]) -> Vec<DetectedSignal> {
-        ids.iter().map(|&id| DetectedSignal { id, confidence: 1.0, evidence: String::new() }).collect()
+        ids.iter()
+            .map(|&id| DetectedSignal {
+                id,
+                confidence: 1.0,
+                evidence: String::new(),
+            })
+            .collect()
     }
 
     #[test]
     fn medusa_required_signals_reach_class_threshold() {
         let s = sigs(&[ELF_HOOKS_NETWORK_HIDING, ELF_HOOKS_PAM_CREDENTIAL]);
         let m = score_against_profile(&s, &MEDUSA);
-        assert!(m.score >= MEDUSA.class_threshold,
-            "score {} < class_threshold {}", m.score, MEDUSA.class_threshold);
+        assert!(
+            m.score >= MEDUSA.class_threshold,
+            "score {} < class_threshold {}",
+            m.score,
+            MEDUSA.class_threshold
+        );
         assert!(m.classification >= Classification::ClassMatch);
     }
 
     #[test]
     fn medusa_with_sshd_restart_and_foreign_reaches_probable() {
-        let s = sigs(&[ELF_HOOKS_NETWORK_HIDING, ELF_HOOKS_PAM_CREDENTIAL,
-                       ARTIFACT_LD_PRELOAD_FOREIGN, TEMPORAL_LDPRELOAD_SSHD_RESTART,
-                       ELF_GLOBALLY_LOADED]);
+        let s = sigs(&[
+            ELF_HOOKS_NETWORK_HIDING,
+            ELF_HOOKS_PAM_CREDENTIAL,
+            ARTIFACT_LD_PRELOAD_FOREIGN,
+            TEMPORAL_LDPRELOAD_SSHD_RESTART,
+            ELF_GLOBALLY_LOADED,
+        ]);
         let m = score_against_profile(&s, &MEDUSA);
-        assert!(m.score >= MEDUSA.probable_threshold,
-            "score {} < probable_threshold {}", m.score, MEDUSA.probable_threshold);
+        assert!(
+            m.score >= MEDUSA.probable_threshold,
+            "score {} < probable_threshold {}",
+            m.score,
+            MEDUSA.probable_threshold
+        );
         assert!(m.classification >= Classification::Probable);
     }
 
     #[test]
     fn medusa_full_signals_reach_confirmed() {
-        let s = sigs(&[ELF_HOOKS_NETWORK_HIDING, ELF_HOOKS_PAM_CREDENTIAL,
-                       ELF_HOOKS_PROCESS_HIDING, ELF_GLOBALLY_LOADED, ELF_NOT_IN_PKG_DB,
-                       ARTIFACT_LD_PRELOAD_FOREIGN, TEMPORAL_LDPRELOAD_SSHD_RESTART,
-                       ELF_LIBC_SHADOW_EXPORTS]);
+        let s = sigs(&[
+            ELF_HOOKS_NETWORK_HIDING,
+            ELF_HOOKS_PAM_CREDENTIAL,
+            ELF_HOOKS_PROCESS_HIDING,
+            ELF_GLOBALLY_LOADED,
+            ELF_NOT_IN_PKG_DB,
+            ARTIFACT_LD_PRELOAD_FOREIGN,
+            TEMPORAL_LDPRELOAD_SSHD_RESTART,
+            ELF_LIBC_SHADOW_EXPORTS,
+        ]);
         let m = score_against_profile(&s, &MEDUSA);
         assert_eq!(m.classification, Classification::Confirmed);
     }
@@ -84,13 +108,24 @@ mod tests {
 
     #[test]
     fn medusa_kernel_taint_reduces_score() {
-        let base = sigs(&[ELF_HOOKS_NETWORK_HIDING, ELF_HOOKS_PAM_CREDENTIAL,
-                          ARTIFACT_LD_PRELOAD_FOREIGN, TEMPORAL_LDPRELOAD_SSHD_RESTART]);
-        let with_lkm = sigs(&[ELF_HOOKS_NETWORK_HIDING, ELF_HOOKS_PAM_CREDENTIAL,
-                               ARTIFACT_LD_PRELOAD_FOREIGN, TEMPORAL_LDPRELOAD_SSHD_RESTART,
-                               SYSTEM_KERNEL_TAINT_OOT]);
+        let base = sigs(&[
+            ELF_HOOKS_NETWORK_HIDING,
+            ELF_HOOKS_PAM_CREDENTIAL,
+            ARTIFACT_LD_PRELOAD_FOREIGN,
+            TEMPORAL_LDPRELOAD_SSHD_RESTART,
+        ]);
+        let with_lkm = sigs(&[
+            ELF_HOOKS_NETWORK_HIDING,
+            ELF_HOOKS_PAM_CREDENTIAL,
+            ARTIFACT_LD_PRELOAD_FOREIGN,
+            TEMPORAL_LDPRELOAD_SSHD_RESTART,
+            SYSTEM_KERNEL_TAINT_OOT,
+        ]);
         let m_base = score_against_profile(&base, &MEDUSA);
-        let m_lkm  = score_against_profile(&with_lkm, &MEDUSA);
-        assert!(m_lkm.score < m_base.score, "kernel taint should penalise Medusa (no LKM)");
+        let m_lkm = score_against_profile(&with_lkm, &MEDUSA);
+        assert!(
+            m_lkm.score < m_base.score,
+            "kernel taint should penalise Medusa (no LKM)"
+        );
     }
 }

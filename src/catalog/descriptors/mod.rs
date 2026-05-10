@@ -1227,7 +1227,9 @@ pub static MRU_RECENT_DOCS: ArtifactDescriptor = ArtifactDescriptor {
         "https://forensics.wiki/opensavemru/",
     ],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Corroborative),
-    evidence_caveats: &["Only tracks files opened via common dialog; programmatic access not recorded"],
+    evidence_caveats: &[
+        "Only tracks files opened via common dialog; programmatic access not recorded",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::ActivityDriven),
     volatility_rationale: "Updated per file open; fixed max MRU depth",
 };
@@ -4313,7 +4315,9 @@ pub static LINUX_SUDOERS_D: ArtifactDescriptor = ArtifactDescriptor {
         "https://linux.die.net/man/5/sudoers",
     ],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
-    evidence_caveats: &["Presence of unexpected rules is high-confidence privilege escalation indicator"],
+    evidence_caveats: &[
+        "Presence of unexpected rules is high-confidence privilege escalation indicator",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Files in /etc/sudoers.d/; persist until explicitly removed",
 };
@@ -4970,7 +4974,9 @@ pub static JUMP_LIST_CUSTOM: ArtifactDescriptor = ArtifactDescriptor {
         "https://github.com/kacos2000/Jumplist-Browser/blob/master/CustomDestinations-ms.md",
     ],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Corroborative),
-    evidence_caveats: &["Pinned items reflect user intent; can be manually set without file access"],
+    evidence_caveats: &[
+        "Pinned items reflect user intent; can be manually set without file access",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::ActivityDriven),
     volatility_rationale: "Pinned by user; persists until app unpins",
 };

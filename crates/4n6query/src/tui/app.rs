@@ -36,7 +36,6 @@ impl CritFilter {
             Self::Medium => priority >= TriagePriority::Medium,
         }
     }
-
 }
 
 /// Windows version sub-filter — active only when `platform_mask` contains Windows.

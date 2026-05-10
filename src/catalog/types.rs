@@ -694,7 +694,11 @@ impl ForensicCatalog {
 
     /// Return `(assessed_count, total_count)` for coverage reporting.
     pub fn assessment_coverage(&self) -> (usize, usize) {
-        let assessed = self.entries.iter().filter(|d| d.evidence_strength.is_some()).count();
+        let assessed = self
+            .entries
+            .iter()
+            .filter(|d| d.evidence_strength.is_some())
+            .count();
         (assessed, self.entries.len())
     }
 

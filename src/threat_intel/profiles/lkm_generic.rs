@@ -13,13 +13,29 @@ pub static LKM_GENERIC: MalwareProfile = MalwareProfile {
     malware_class: MalwareClass::LkmRootkit,
     mitre_techniques: &["T1215", "T1014"],
     signals: &[
-        ProfileSignal { id: SYSTEM_KERNEL_TAINT_OOT,     weight: 30, required: true  },
-        ProfileSignal { id: SYSTEM_PROC_MODULES_SUSPECT, weight: 40, required: false },
-        ProfileSignal { id: PROCESS_HIDDEN_FROM_PS,      weight: 20, required: false },
-        ProfileSignal { id: SYSTEM_KERNEL_TAINT_FORCED,  weight: 15, required: false },
+        ProfileSignal {
+            id: SYSTEM_KERNEL_TAINT_OOT,
+            weight: 30,
+            required: true,
+        },
+        ProfileSignal {
+            id: SYSTEM_PROC_MODULES_SUSPECT,
+            weight: 40,
+            required: false,
+        },
+        ProfileSignal {
+            id: PROCESS_HIDDEN_FROM_PS,
+            weight: 20,
+            required: false,
+        },
+        ProfileSignal {
+            id: SYSTEM_KERNEL_TAINT_FORCED,
+            weight: 15,
+            required: false,
+        },
     ],
     exclusions: &[],
-    class_threshold:     30,
-    probable_threshold:  55,
+    class_threshold: 30,
+    probable_threshold: 55,
     confirmed_threshold: 75,
 };

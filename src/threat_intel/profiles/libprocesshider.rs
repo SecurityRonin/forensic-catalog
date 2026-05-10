@@ -13,16 +13,37 @@ pub static LIB_PROCESS_HIDER: MalwareProfile = MalwareProfile {
     malware_class: MalwareClass::LdPreloadProcessHider,
     mitre_techniques: &["T1574.006", "T1014"],
     signals: &[
-        ProfileSignal { id: ELF_HOOKS_PROCESS_HIDING, weight: 30, required: true  },
-        ProfileSignal { id: ELF_GLOBALLY_LOADED,       weight: 15, required: false },
-        ProfileSignal { id: ELF_NOT_IN_PKG_DB,         weight: 10, required: false },
+        ProfileSignal {
+            id: ELF_HOOKS_PROCESS_HIDING,
+            weight: 30,
+            required: true,
+        },
+        ProfileSignal {
+            id: ELF_GLOBALLY_LOADED,
+            weight: 15,
+            required: false,
+        },
+        ProfileSignal {
+            id: ELF_NOT_IN_PKG_DB,
+            weight: 10,
+            required: false,
+        },
     ],
     exclusions: &[
-        WeightedExclusion { id: ELF_HOOKS_PAM_CREDENTIAL, penalty: 50 },
-        WeightedExclusion { id: ELF_HOOKS_FILE_HIDING,    penalty: 30 },
-        WeightedExclusion { id: ELF_HOOKS_NETWORK_HIDING, penalty: 40 },
+        WeightedExclusion {
+            id: ELF_HOOKS_PAM_CREDENTIAL,
+            penalty: 50,
+        },
+        WeightedExclusion {
+            id: ELF_HOOKS_FILE_HIDING,
+            penalty: 30,
+        },
+        WeightedExclusion {
+            id: ELF_HOOKS_NETWORK_HIDING,
+            penalty: 40,
+        },
     ],
-    class_threshold:     30,
-    probable_threshold:  45,
+    class_threshold: 30,
+    probable_threshold: 45,
     confirmed_threshold: 55,
 };

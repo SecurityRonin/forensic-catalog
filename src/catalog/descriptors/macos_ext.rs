@@ -707,7 +707,8 @@ pub(crate) static MACOS_QUICKLOOK_THUMBNAILS: ArtifactDescriptor = ArtifactDescr
         "hit_count requires repeated previews to be meaningful",
     ],
     volatility: Some(crate::volatility::VolatilityClass::ActivityDriven),
-    volatility_rationale: "Updated on each Quick Look preview; entries persist until temp folder cleared",
+    volatility_rationale:
+        "Updated on each Quick Look preview; entries persist until temp folder cleared",
 };
 
 /// Apple Intelligence WiFi context events database.
@@ -1540,7 +1541,8 @@ pub(crate) static IOS_MOBILE_CONTAINER_MANAGER: ArtifactDescriptor = ArtifactDes
     evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
     evidence_caveats: &["Requires root/jailbreak or full filesystem extraction to access"],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
-    volatility_rationale: "iOS system database persists across reboots; updated on app install/uninstall",
+    volatility_rationale:
+        "iOS system database persists across reboots; updated on app install/uninstall",
 };
 
 pub(crate) static IOS_CONTAINER_MANAGER_FIELDS: &[FieldSchema] = &[
@@ -1628,7 +1630,8 @@ older versions remain on disk as forensic snapshots",
         "Many legitimate apps install login items — context required",
     ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
-    volatility_rationale: "BTM database persists; versioned snapshots preserve prior autostart state",
+    volatility_rationale:
+        "BTM database persists; versioned snapshots preserve prior autostart state",
 };
 
 pub(crate) static MACOS_BTM_FIELDS: &[FieldSchema] = &[

@@ -73,18 +73,9 @@ pub fn header_text<'a>(app: &'a App, theme: &'a Theme) -> Line<'a> {
     // Severity badge with semantic color
     let (sev_label, sev_style) = match app.crit_filter {
         CritFilter::All => ("", None),
-        CritFilter::Critical => (
-            "[Severity: Crit]",
-            Some(Style::default().fg(theme.crit_fg)),
-        ),
-        CritFilter::High => (
-            "[Severity: High]",
-            Some(Style::default().fg(theme.high_fg)),
-        ),
-        CritFilter::Medium => (
-            "[Severity: Med]",
-            Some(Style::default().fg(theme.med_fg)),
-        ),
+        CritFilter::Critical => ("[Severity: Crit]", Some(Style::default().fg(theme.crit_fg))),
+        CritFilter::High => ("[Severity: High]", Some(Style::default().fg(theme.high_fg))),
+        CritFilter::Medium => ("[Severity: Med]", Some(Style::default().fg(theme.med_fg))),
     };
     if let Some(style) = sev_style {
         if !app.platform_mask.is_empty() {
@@ -580,7 +571,10 @@ mod tests {
         );
         let sep_pos = spans_text.find('│').unwrap();
         let t_pos = spans_text.find("t:").unwrap();
-        assert!(sep_pos < t_pos, "│ must appear before t: filter key; got: {spans_text}");
+        assert!(
+            sep_pos < t_pos,
+            "│ must appear before t: filter key; got: {spans_text}"
+        );
     }
 
     #[test]
@@ -729,7 +723,10 @@ mod tests {
         app.crit_filter = CritFilter::Critical;
         let line = header_text(&app, default_theme());
         let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
-        assert!(text.contains("[Severity: Crit]"), "header must show [Severity: Crit]; got: {text}");
+        assert!(
+            text.contains("[Severity: Crit]"),
+            "header must show [Severity: Crit]; got: {text}"
+        );
     }
 
     #[test]
@@ -739,7 +736,10 @@ mod tests {
         app.crit_filter = CritFilter::High;
         let line = header_text(&app, default_theme());
         let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
-        assert!(text.contains("[Severity: High]"), "header must show [Severity: High]; got: {text}");
+        assert!(
+            text.contains("[Severity: High]"),
+            "header must show [Severity: High]; got: {text}"
+        );
     }
 
     #[test]
@@ -749,7 +749,10 @@ mod tests {
         app.crit_filter = CritFilter::Medium;
         let line = header_text(&app, default_theme());
         let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
-        assert!(text.contains("[Severity: Med]"), "header must show [Severity: Med]; got: {text}");
+        assert!(
+            text.contains("[Severity: Med]"),
+            "header must show [Severity: Med]; got: {text}"
+        );
     }
 
     #[test]
@@ -837,8 +840,14 @@ mod tests {
         let app = App::new();
         let line = header_text(&app, default_theme());
         let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
-        assert!(!text.contains("Windows · CRIT"), "no preset label; got: {text}");
-        assert!(!text.contains("Linux · CRIT"), "no preset label; got: {text}");
+        assert!(
+            !text.contains("Windows · CRIT"),
+            "no preset label; got: {text}"
+        );
+        assert!(
+            !text.contains("Linux · CRIT"),
+            "no preset label; got: {text}"
+        );
     }
 
     #[test]
@@ -847,8 +856,14 @@ mod tests {
         let line = header_text(&app, default_theme());
         let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
         // No filter badges when everything is at default
-        assert!(!text.contains("[Platform:"), "no platform badge; got: {text}");
-        assert!(!text.contains("[Severity:"), "no severity badge; got: {text}");
+        assert!(
+            !text.contains("[Platform:"),
+            "no platform badge; got: {text}"
+        );
+        assert!(
+            !text.contains("[Severity:"),
+            "no severity badge; got: {text}"
+        );
     }
 
     // ── styled_line_for_item ──────────────────────────────────────────────
@@ -856,11 +871,8 @@ mod tests {
     #[test]
     fn styled_line_critical_item_has_crit_fg() {
         let theme = default_theme();
-        let line = styled_line_for_item(
-            "prefetch_file                        [Critical]",
-            "",
-            theme,
-        );
+        let line =
+            styled_line_for_item("prefetch_file                        [Critical]", "", theme);
         let has_crit_fg = line.spans.iter().any(|s| s.style.fg == Some(theme.crit_fg));
         assert!(has_crit_fg, "critical item must apply crit_fg");
     }
@@ -911,8 +923,14 @@ mod tests {
             "prefetch",
             theme,
         );
-        let has_hl_bg = line.spans.iter().any(|s| s.style.bg == Some(theme.match_hl));
-        assert!(has_hl_bg, "matching query must produce theme.match_hl highlight span");
+        let has_hl_bg = line
+            .spans
+            .iter()
+            .any(|s| s.style.bg == Some(theme.match_hl));
+        assert!(
+            has_hl_bg,
+            "matching query must produce theme.match_hl highlight span"
+        );
     }
 
     #[test]
@@ -938,11 +956,8 @@ mod tests {
     #[test]
     fn styled_line_no_highlight_when_query_empty() {
         let theme = default_theme();
-        let line = styled_line_for_item(
-            "prefetch_file                        [Critical]",
-            "",
-            theme,
-        );
+        let line =
+            styled_line_for_item("prefetch_file                        [Critical]", "", theme);
         let has_yellow_bg = line.spans.iter().any(|s| s.style.bg == Some(Color::Yellow));
         assert!(!has_yellow_bg, "no yellow bg when query is empty");
     }
@@ -956,7 +971,10 @@ mod tests {
             theme,
         );
         let has_yellow_bg = line.spans.iter().any(|s| s.style.bg == Some(Color::Yellow));
-        assert!(!has_yellow_bg, "no yellow bg when query not in display string");
+        assert!(
+            !has_yellow_bg,
+            "no yellow bg when query not in display string"
+        );
     }
 
     #[test]
@@ -967,7 +985,10 @@ mod tests {
             "PREFETCH",
             theme,
         );
-        let has_match_hl_bg = line.spans.iter().any(|s| s.style.bg == Some(theme.match_hl));
+        let has_match_hl_bg = line
+            .spans
+            .iter()
+            .any(|s| s.style.bg == Some(theme.match_hl));
         assert!(has_match_hl_bg, "highlight must be case-insensitive");
     }
 
@@ -978,7 +999,10 @@ mod tests {
         let app = App::new();
         let line = hint_text(&app, default_theme());
         let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
-        assert!(text.contains("t:"), "hint bar must advertise t key; got: {text}");
+        assert!(
+            text.contains("t:"),
+            "hint bar must advertise t key; got: {text}"
+        );
     }
 
     // ── colorize_detail_line ──────────────────────────────────────────────
@@ -1027,10 +1051,14 @@ mod tests {
     fn colorize_search_match_highlighted_in_detail() {
         let theme = default_theme();
         let line = colorize_detail_line("Priority: Critical", "crit", theme);
-        let hl = line.spans.iter().find(|s| {
-            s.content.to_ascii_lowercase().contains("crit") && s.style.bg.is_some()
-        });
-        assert!(hl.is_some(), "query 'crit' must be highlighted in detail line");
+        let hl = line
+            .spans
+            .iter()
+            .find(|s| s.content.to_ascii_lowercase().contains("crit") && s.style.bg.is_some());
+        assert!(
+            hl.is_some(),
+            "query 'crit' must be highlighted in detail line"
+        );
     }
 
     #[test]
@@ -1067,7 +1095,10 @@ mod tests {
         let app = App::new();
         let line = header_text(&app, default_theme());
         let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
-        assert!(text.contains("Type: catalog"), "header must show 'Type: catalog'; got: {text}");
+        assert!(
+            text.contains("Type: catalog"),
+            "header must show 'Type: catalog'; got: {text}"
+        );
     }
 
     #[test]
@@ -1077,7 +1108,10 @@ mod tests {
         app.platform_mask = PlatformMask::NONE.with(Platform::Windows);
         let theme = default_theme();
         let line = header_text(&app, theme);
-        let badge_span = line.spans.iter().find(|s| s.content.contains("Platform: Win"));
+        let badge_span = line
+            .spans
+            .iter()
+            .find(|s| s.content.contains("Platform: Win"));
         assert_eq!(
             badge_span.and_then(|s| s.style.fg),
             Some(theme.dataset_fg),
@@ -1092,7 +1126,10 @@ mod tests {
         app.crit_filter = CritFilter::Critical;
         let theme = default_theme();
         let line = header_text(&app, theme);
-        let sev_span = line.spans.iter().find(|s| s.content.contains("Severity: Crit"));
+        let sev_span = line
+            .spans
+            .iter()
+            .find(|s| s.content.contains("Severity: Crit"));
         assert_eq!(
             sev_span.and_then(|s| s.style.fg),
             Some(theme.crit_fg),
@@ -1107,7 +1144,10 @@ mod tests {
         app.crit_filter = CritFilter::High;
         let theme = default_theme();
         let line = header_text(&app, theme);
-        let sev_span = line.spans.iter().find(|s| s.content.contains("Severity: High"));
+        let sev_span = line
+            .spans
+            .iter()
+            .find(|s| s.content.contains("Severity: High"));
         assert_eq!(
             sev_span.and_then(|s| s.style.fg),
             Some(theme.high_fg),
@@ -1122,7 +1162,10 @@ mod tests {
         app.crit_filter = CritFilter::Medium;
         let theme = default_theme();
         let line = header_text(&app, theme);
-        let sev_span = line.spans.iter().find(|s| s.content.contains("Severity: Med"));
+        let sev_span = line
+            .spans
+            .iter()
+            .find(|s| s.content.contains("Severity: Med"));
         assert_eq!(
             sev_span.and_then(|s| s.style.fg),
             Some(theme.med_fg),
@@ -1135,7 +1178,10 @@ mod tests {
         let app = App::new();
         let line = hint_text(&app, default_theme());
         let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
-        assert!(text.contains("s:"), "hint bar must advertise s key for severity; got: {text}");
+        assert!(
+            text.contains("s:"),
+            "hint bar must advertise s key for severity; got: {text}"
+        );
     }
 
     // ── fullscreen clears list area ───────────────────────────────────────
@@ -1146,15 +1192,19 @@ mod tests {
         // content would show list text if the Paragraph doesn't fill trailing rows.
         let mut term = terminal(120, 30);
         let mut app = App::new();
-        let items: Vec<String> = (0..25).map(|i| format!("xyzzy_item_{i:02} [Critical]")).collect();
+        let items: Vec<String> = (0..25)
+            .map(|i| format!("xyzzy_item_{i:02} [Critical]"))
+            .collect();
         let details = vec!["detail only line".to_string()];
 
         // Frame 1: normal render (list + detail side-by-side)
-        term.draw(|f| draw(f, &app, default_theme(), &items, &details)).unwrap();
+        term.draw(|f| draw(f, &app, default_theme(), &items, &details))
+            .unwrap();
 
         // Frame 2: fullscreen — list content must not bleed through
         app.toggle_detail_fullscreen();
-        term.draw(|f| draw(f, &app, default_theme(), &items, &details)).unwrap();
+        term.draw(|f| draw(f, &app, default_theme(), &items, &details))
+            .unwrap();
 
         let buf = term.backend().buffer().clone();
         let rendered: String = (0..buf.area.height)
@@ -1173,18 +1223,26 @@ mod tests {
         // Render the about modal and collect all span text per line.
         // We drive draw_about directly by inspecting the paragraph content
         // through the public draw fn with about mode open.
-        use ratatui::{Terminal, backend::TestBackend};
+        use ratatui::{backend::TestBackend, Terminal};
         let backend = TestBackend::new(80, 40);
         let mut term = Terminal::new(backend).unwrap();
         let mut app = App::new();
         app.open_about();
-        term.draw(|f| draw(f, &app, default_theme(), &[], &[])).unwrap();
+        term.draw(|f| draw(f, &app, default_theme(), &[], &[]))
+            .unwrap();
         let buf = term.backend().buffer().clone();
         let mut lines: Vec<String> = Vec::new();
         for row in 0..buf.area.height {
             let mut s = String::new();
             for col in 0..buf.area.width {
-                s.push(buf.cell((col, row)).unwrap().symbol().chars().next().unwrap_or(' '));
+                s.push(
+                    buf.cell((col, row))
+                        .unwrap()
+                        .symbol()
+                        .chars()
+                        .next()
+                        .unwrap_or(' '),
+                );
             }
             lines.push(s.trim_end().to_string());
         }
@@ -1204,9 +1262,13 @@ mod tests {
     #[test]
     fn about_attribution_is_near_bottom() {
         let lines = about_lines();
-        let attr_row = lines.iter().position(|l| l.contains("4n6h4x0r @ Security Ronin"))
+        let attr_row = lines
+            .iter()
+            .position(|l| l.contains("4n6h4x0r @ Security Ronin"))
             .expect("attribution line not found");
-        let mouse_row = lines.iter().position(|l| l.contains("Mouse"))
+        let mouse_row = lines
+            .iter()
+            .position(|l| l.contains("Mouse"))
             .expect("Mouse section not found");
         assert!(
             attr_row > mouse_row,

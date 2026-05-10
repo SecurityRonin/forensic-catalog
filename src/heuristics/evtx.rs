@@ -139,8 +139,7 @@ pub const SYSMON_CHANNEL: &str = "Microsoft-Windows-Sysmon/Operational";
 pub const POWERSHELL_OPERATIONAL_CHANNEL: &str = "Microsoft-Windows-PowerShell/Operational";
 
 /// Canonical channel name for the Task Scheduler operational log.
-pub const TASKSCHEDULER_OPERATIONAL_CHANNEL: &str =
-    "Microsoft-Windows-TaskScheduler/Operational";
+pub const TASKSCHEDULER_OPERATIONAL_CHANNEL: &str = "Microsoft-Windows-TaskScheduler/Operational";
 
 // ── Sysmon Event IDs ──────────────────────────────────────────────────────────
 
@@ -339,9 +338,8 @@ pub const ARCHIVER_PROCESS_NAMES: &[&str] = &[
 ];
 
 /// Compressed archive extensions indicative of staging in temp directories.
-pub const STAGING_ARCHIVE_EXTENSIONS: &[&str] = &[
-    ".zip", ".7z", ".rar", ".tar", ".gz", ".bz2", ".xz", ".cab",
-];
+pub const STAGING_ARCHIVE_EXTENSIONS: &[&str] =
+    &[".zip", ".7z", ".rar", ".tar", ".gz", ".bz2", ".xz", ".cab"];
 
 // ── LSASS process name ────────────────────────────────────────────────────────
 
@@ -350,9 +348,9 @@ pub const LSASS_IMAGE_NAME: &str = "lsass.exe";
 
 /// Known GrantedAccess masks used for LSASS credential dumping.
 pub const LSASS_DUMP_ACCESS_MASKS: &[u32] = &[
-    0x0010, // PROCESS_VM_READ
-    0x1010, // PROCESS_VM_READ | PROCESS_QUERY_LIMITED_INFORMATION
-    0x1410, // PROCESS_VM_READ | PROCESS_QUERY_INFORMATION | ...
+    0x0010,   // PROCESS_VM_READ
+    0x1010,   // PROCESS_VM_READ | PROCESS_QUERY_LIMITED_INFORMATION
+    0x1410,   // PROCESS_VM_READ | PROCESS_QUERY_INFORMATION | ...
     0x1fffff, // PROCESS_ALL_ACCESS
 ];
 

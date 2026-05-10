@@ -3064,7 +3064,9 @@ pub(crate) static KAPE_FILE_1PASSWORD_BACKUPS_1PASSWORD10_SQLITE: ArtifactDescri
             "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/1Password.tkape",
         ],
         evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
-        evidence_caveats: &["Encrypted browser passwords; key in OS credential store; timestamp shows last use"],
+        evidence_caveats: &[
+            "Encrypted browser passwords; key in OS credential store; timestamp shows last use",
+        ],
         volatility: Some(crate::volatility::VolatilityClass::Persistent),
         volatility_rationale: "Credential store persists until browser profile deletion",
     };
@@ -3089,7 +3091,9 @@ pub(crate) static KAPE_FILE_1PASSWORD_LOGS_LOG: ArtifactDescriptor = ArtifactDes
     related_artifacts: &[],
     sources: &["https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/1Password.tkape"],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
-    evidence_caveats: &["Encrypted browser passwords; key in OS credential store; timestamp shows last use"],
+    evidence_caveats: &[
+        "Encrypted browser passwords; key in OS credential store; timestamp shows last use",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Credential store persists until browser profile deletion",
 };
@@ -11484,7 +11488,9 @@ pub(crate) static KAPE_FILE_MY_CERTIFICATES: ArtifactDescriptor = ArtifactDescri
     related_artifacts: &[],
     sources: &["https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/RDCMan.tkape"],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
-    evidence_caveats: &["Personal certificates including private keys; check for self-signed or unexpected issuers"],
+    evidence_caveats: &[
+        "Personal certificates including private keys; check for self-signed or unexpected issuers",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Certificate store persists until certificate deletion",
 };
@@ -30390,7 +30396,9 @@ pub(crate) static KAPE_FILE_SIGNON: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &[],
     sources: &["https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Firefox.tkape"],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
-    evidence_caveats: &["Encrypted browser passwords; key in OS credential store; timestamp shows last use"],
+    evidence_caveats: &[
+        "Encrypted browser passwords; key in OS credential store; timestamp shows last use",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Credential store persists until browser profile deletion",
 };
@@ -30416,7 +30424,9 @@ pub(crate) static KAPE_FILE_LOGINS_JSON_2: ArtifactDescriptor = ArtifactDescript
     related_artifacts: &[],
     sources: &["https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Firefox.tkape"],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
-    evidence_caveats: &["Encrypted browser passwords; key in OS credential store; timestamp shows last use"],
+    evidence_caveats: &[
+        "Encrypted browser passwords; key in OS credential store; timestamp shows last use",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Credential store persists until browser profile deletion",
 };
@@ -47852,7 +47862,9 @@ pub(crate) static KAPE_FILE_WINDOWS_NTDS: ArtifactDescriptor = ArtifactDescripto
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/ActiveDirectoryNTDS.tkape",
     ],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
-    evidence_caveats: &["Domain credential store; offline cracking risk; compare hash count against user count"],
+    evidence_caveats: &[
+        "Domain credential store; offline cracking risk; compare hash count against user count",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Active Directory database persists until DC decommission",
 };
@@ -52519,7 +52531,9 @@ pub(crate) static KAPE_FILE_SAM_REGISTRY_TRANSAC: ArtifactDescriptor = ArtifactD
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/RegistryHivesSystem.tkape",
     ],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
-    evidence_caveats: &["Verify presence against incident timeline; correlate with other triage artifacts"],
+    evidence_caveats: &[
+        "Verify presence against incident timeline; correlate with other triage artifacts",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Artifact persists until explicit deletion",
 };
@@ -52961,7 +52975,9 @@ pub(crate) static KAPE_FILE_REGBACK_SAM: ArtifactDescriptor = ArtifactDescriptor
         "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/RegistryHivesSystem.tkape",
     ],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
-    evidence_caveats: &["Verify presence against incident timeline; correlate with other triage artifacts"],
+    evidence_caveats: &[
+        "Verify presence against incident timeline; correlate with other triage artifacts",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Artifact persists until explicit deletion",
 };

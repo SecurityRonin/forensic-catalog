@@ -84,17 +84,26 @@ mod tests {
 
     #[test]
     fn network_usage_guid_is_correct() {
-        assert_eq!(TABLE_NETWORK_USAGE, "{973F5D5C-1D90-4944-BE8E-24B22A728CF2}");
+        assert_eq!(
+            TABLE_NETWORK_USAGE,
+            "{973F5D5C-1D90-4944-BE8E-24B22A728CF2}"
+        );
     }
 
     #[test]
     fn app_resource_usage_guid_is_correct() {
-        assert_eq!(TABLE_APP_RESOURCE_USAGE, "{5C8CF1C7-7257-4F13-B223-970EF5939312}");
+        assert_eq!(
+            TABLE_APP_RESOURCE_USAGE,
+            "{5C8CF1C7-7257-4F13-B223-970EF5939312}"
+        );
     }
 
     #[test]
     fn network_connectivity_guid_is_correct() {
-        assert_eq!(TABLE_NETWORK_CONNECTIVITY, "{DD6636C4-8929-4683-974E-22C046A43763}");
+        assert_eq!(
+            TABLE_NETWORK_CONNECTIVITY,
+            "{DD6636C4-8929-4683-974E-22C046A43763}"
+        );
     }
 
     #[test]

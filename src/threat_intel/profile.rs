@@ -41,8 +41,8 @@ pub struct MalwareProfile {
     pub mitre_techniques: &'static [&'static str],
     pub signals: &'static [ProfileSignal],
     pub exclusions: &'static [WeightedExclusion],
-    pub class_threshold:     u32,
-    pub probable_threshold:  u32,
+    pub class_threshold: u32,
+    pub probable_threshold: u32,
     pub confirmed_threshold: u32,
 }
 

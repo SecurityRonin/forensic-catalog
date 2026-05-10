@@ -270,27 +270,72 @@ pub(crate) static IFEO_GLOBAL_FLAG: ArtifactDescriptor = ArtifactDescriptor {
     volatility_rationale: "Registry key; persists until explicit deletion",
 };
 
+pub(crate) static SCHEDULED_TASK_REGISTRY_CACHE_FIELDS: &[FieldSchema] = &[
+    FieldSchema {
+        name: "task_guid",
+        value_type: ValueType::Text,
+        description: "Task GUID subkey name; used to correlate with the XML file in \
+            \\Windows\\System32\\Tasks and the TaskCache\\Tree key",
+        is_uid_component: true,
+    },
+    FieldSchema {
+        name: "action_clsid",
+        value_type: ValueType::Text,
+        description: "COM handler CLSID embedded in the Actions binary blob for tasks \
+            whose action type is ComHandler. Look up via \
+            Software\\Classes\\CLSID\\{GUID}\\InprocServer32 to find the DLL. \
+            Abuse: TA505 replaced the legitimate RegIdleBackup CLSID \
+            {CA767AA8-9157-4604-B64B-40747123D5F2} (regidle.dll) with a malicious handler. \
+            Source: windowsir.blogspot.com/2022/12/why-i-love-regripper.html",
+        is_uid_component: false,
+    },
+    FieldSchema {
+        name: "action_dll",
+        value_type: ValueType::Text,
+        description: "DLL path resolved from Software\\Classes\\CLSID\\{GUID}\\InprocServer32 \
+            for the action_clsid value. Legitimate built-in COM handler DLLs reside in \
+            %SystemRoot%\\System32; a DLL path in a user-writable directory is a strong \
+            indicator of T1053.005 COM handler hijacking.",
+        is_uid_component: false,
+    },
+];
+
 pub(crate) static SCHEDULED_TASK_REGISTRY_CACHE: ArtifactDescriptor = ArtifactDescriptor {
     id: "scheduled_task_registry_cache",
     name: "Scheduled Task Registry Cache (TaskCache)",
     artifact_type: ArtifactType::RegistryKey,
     hive: Some(HiveTarget::HklmSoftware),
     key_path: "Microsoft\\Windows NT\\CurrentVersion\\Schedule\\TaskCache\\Tasks",
-    value_name: None,    file_path: None,
+    value_name: None,
+    file_path: None,
     scope: DataScope::System,
     os_scope: OsScope::Win10Plus,
     decoder: Decoder::BinaryRecord(&[]),
-    meaning: "Registry cache of scheduled task definitions, complementing the XML files in \\Windows\\System32\\Tasks. An attacker who creates a task via the Task Scheduler API populates this cache. Recovering this after XML deletion reveals ghost tasks.",
-    mitre_techniques: &["T1053.005"],
-    fields: &[FieldSchema { name: "task_guid", value_type: ValueType::Text, description: "Task GUID used to correlate with XML file", is_uid_component: true }],
+    meaning: "Registry cache of scheduled task definitions, complementing the XML files in \
+        \\Windows\\System32\\Tasks. An attacker who creates a task via the Task Scheduler API \
+        populates this cache; recovering it after XML deletion reveals ghost tasks. \
+        For ComHandler tasks, the Actions binary blob contains the CLSID of the COM object \
+        to invoke. Cross-reference that CLSID against Software\\Classes\\CLSID\\{GUID}\\\
+        InprocServer32 to find the actual DLL — a DLL path outside System32 is a strong \
+        indicator of COM handler hijacking (T1053.005). TA505 and GraceWire abused the \
+        built-in RegIdleBackup task ({CA767AA8-9157-4604-B64B-40747123D5F2} → regidle.dll) \
+        by replacing the task XML/registry entry with a malicious handler.",
+    mitre_techniques: &["T1053.005", "T1218"],
+    fields: SCHEDULED_TASK_REGISTRY_CACHE_FIELDS,
     retention: Some("Persists even if XML task file is deleted"),
     triage_priority: TriagePriority::Critical,
-    related_artifacts: &["scheduled_tasks_dir"],
+    related_artifacts: &["scheduled_tasks_dir", "com_hijack_clsid_hkcu"],
     sources: &[
         "https://blog.jpcert.or.jp/2023/06/task-scheduler.html",
+        // Source: RegIdleBackup COM handler abuse; CLSID→DLL cross-reference technique
+        "https://windowsir.blogspot.com/2022/12/why-i-love-regripper.html",
     ],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
-    evidence_caveats: &["Survives XML task file deletion; high-fidelity persistence evidence"],
+    evidence_caveats: &[
+        "Survives XML task file deletion; high-fidelity persistence evidence",
+        "COM handler CLSID lookup requires Software hive from same acquisition; \
+         cross-hive correlation needed to resolve action_dll",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Registry cache; survives XML task file deletion",
 };

@@ -218,8 +218,20 @@ pub fn is_ntuser_man_path(path: &str) -> bool {
 ///
 /// Source: <https://windowsir.blogspot.com/2022/12/why-i-love-regripper.html>
 #[must_use]
-pub fn is_task_com_handler_dll_suspicious(_dll_path: &str) -> bool {
-    false // stub — implementation in GREEN commit
+pub fn is_task_com_handler_dll_suspicious(dll_path: &str) -> bool {
+    if dll_path.is_empty() {
+        return false;
+    }
+    let lower = dll_path.to_ascii_lowercase();
+    let safe_prefixes = [
+        r"%systemroot%\system32",
+        r"%windir%\system32",
+        r"c:\windows\system32",
+        r"%systemroot%\syswow64",
+        r"%windir%\syswow64",
+        r"c:\windows\syswow64",
+    ];
+    !safe_prefixes.iter().any(|p| lower.starts_with(p))
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -489,7 +501,9 @@ mod tests {
 
     #[test]
     fn programdata_dll_is_suspicious() {
-        assert!(is_task_com_handler_dll_suspicious(r"C:\ProgramData\payload.dll"));
+        assert!(is_task_com_handler_dll_suspicious(
+            r"C:\ProgramData\payload.dll"
+        ));
     }
 
     #[test]

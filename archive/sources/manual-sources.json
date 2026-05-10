@@ -5,8 +5,8 @@
     "category": "primary-reference",
     "kind": "documentation",
     "html_url": "https://learn.microsoft.com/",
-    "update_strategy": "manual-review",
-    "notes": "Primary Windows platform and API documentation."
+    "update_strategy": "feed-monitored",
+    "notes": "Primary Windows platform and API documentation. Web monitor (Windows What's New) in Documentation and Reference Sources section of dfir-feeds.opml."
   },
   {
     "id": "apple-platform-security",
@@ -14,8 +14,8 @@
     "category": "primary-reference",
     "kind": "documentation",
     "html_url": "https://support.apple.com/guide/security/welcome/web",
-    "update_strategy": "manual-review",
-    "notes": "Primary Apple platform security documentation."
+    "update_strategy": "feed-monitored",
+    "notes": "Primary Apple platform security documentation. Web monitor in Documentation and Reference Sources section of dfir-feeds.opml."
   },
   {
     "id": "mitre-attack",
@@ -23,8 +23,8 @@
     "category": "primary-reference",
     "kind": "knowledge-base",
     "html_url": "https://attack.mitre.org/",
-    "update_strategy": "manual-review",
-    "notes": "ATT&CK technique and software reference."
+    "update_strategy": "feed-monitored",
+    "notes": "ATT&CK technique and software reference. GitHub releases.atom (ATT&CK version bumps) in Documentation and Reference Sources section of dfir-feeds.opml."
   },
   {
     "id": "lolbas",
@@ -32,8 +32,8 @@
     "category": "primary-reference",
     "kind": "knowledge-base",
     "html_url": "https://lolbas-project.github.io/",
-    "update_strategy": "manual-review",
-    "notes": "Windows LOLBAS reference."
+    "update_strategy": "feed-monitored",
+    "notes": "Windows LOLBAS reference. Commit feed (commits/master.atom) in Living Off the Land Datasets section of dfir-feeds.opml."
   },
   {
     "id": "gtfobins",
@@ -41,8 +41,8 @@
     "category": "primary-reference",
     "kind": "knowledge-base",
     "html_url": "https://gtfobins.github.io/",
-    "update_strategy": "manual-review",
-    "notes": "Unix GTFOBins reference."
+    "update_strategy": "feed-monitored",
+    "notes": "Unix GTFOBins reference. Commit feed (commits/master.atom) in Living Off the Land Datasets section of dfir-feeds.opml."
   },
   {
     "id": "sysinternals",
@@ -50,8 +50,8 @@
     "category": "primary-reference",
     "kind": "documentation",
     "html_url": "https://learn.microsoft.com/en-us/sysinternals/",
-    "update_strategy": "manual-review",
-    "notes": "Primary Sysinternals documentation and tool references."
+    "update_strategy": "feed-monitored",
+    "notes": "Primary Sysinternals documentation and tool references. Web monitor (downloads index) in Documentation and Reference Sources section of dfir-feeds.opml."
   },
   {
     "id": "eric-zimmerman",
@@ -68,8 +68,8 @@
     "category": "primary-reference",
     "kind": "documentation",
     "html_url": "https://docs.velociraptor.app/",
-    "update_strategy": "manual-review",
-    "notes": "Velociraptor artifact and VQL documentation."
+    "update_strategy": "feed-monitored",
+    "notes": "Velociraptor artifact and VQL documentation. GitHub releases.atom in Documentation and Reference Sources section of dfir-feeds.opml."
   },
   {
     "id": "tor-docs",
@@ -77,8 +77,8 @@
     "category": "primary-reference",
     "kind": "documentation",
     "html_url": "https://support.torproject.org/",
-    "update_strategy": "manual-review",
-    "notes": "Tor deployment and network usage documentation."
+    "update_strategy": "feed-monitored",
+    "notes": "Tor deployment and network usage documentation. Web monitors (tb-manual.torproject.org and spec.torproject.org) in Documentation and Reference Sources section of dfir-feeds.opml."
   },
   {
     "id": "dfir-report",
@@ -86,8 +86,8 @@
     "category": "practitioner-blog",
     "kind": "blog",
     "html_url": "https://thedfirreport.com/",
-    "update_strategy": "manual-review",
-    "notes": "Incident case studies and intrusion-analysis writeups."
+    "update_strategy": "feed-monitored",
+    "notes": "Incident case studies and intrusion-analysis writeups. RSS feed in DFIR Blogs section of dfir-feeds.opml."
   },
   {
     "id": "blue-team-hunting-field-notes",
@@ -140,8 +140,8 @@
     "category": "knowledge-base",
     "kind": "github-repository",
     "html_url": "https://github.com/EricZimmerman/Registry",
-    "update_strategy": "manual-review",
-    "notes": "Offline Windows Registry parsing library. Library dependency only; releases tracked via RECmd/AppCompatCacheParser."
+    "update_strategy": "feed-monitored",
+    "notes": "Offline Windows Registry parsing library. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml."
   },
   {
     "id": "ericzimmerman-mftecmd",
@@ -158,8 +158,8 @@
     "category": "knowledge-base",
     "kind": "github-repository",
     "html_url": "https://github.com/EricZimmerman/JumpList",
-    "update_strategy": "manual-review",
-    "notes": "Jump List parsing library. Library dependency; releases tracked via JLECmd."
+    "update_strategy": "feed-monitored",
+    "notes": "Jump List parsing library. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml."
   },
   {
     "id": "ericzimmerman-jlecmd",
@@ -185,8 +185,8 @@
     "category": "knowledge-base",
     "kind": "github-repository",
     "html_url": "https://github.com/EricZimmerman/Lnk",
-    "update_strategy": "manual-review",
-    "notes": "Shell link parsing library. Library dependency; releases tracked via LECmd."
+    "update_strategy": "feed-monitored",
+    "notes": "Shell link parsing library. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml."
   },
   {
     "id": "ericzimmerman-pecmd",
@@ -203,8 +203,8 @@
     "category": "knowledge-base",
     "kind": "github-repository",
     "html_url": "https://github.com/EricZimmerman/Prefetch",
-    "update_strategy": "manual-review",
-    "notes": "Windows Prefetch parsing library. Library dependency; releases tracked via PECmd."
+    "update_strategy": "feed-monitored",
+    "notes": "Windows Prefetch parsing library. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml."
   },
   {
     "id": "ericzimmerman-appcompatcacheparser",
@@ -230,8 +230,8 @@
     "category": "knowledge-base",
     "kind": "github-repository",
     "html_url": "https://github.com/EricZimmerman/Srum",
-    "update_strategy": "manual-review",
-    "notes": "SRUM parsing logic. Library dependency; releases tracked via SrumECmd (bundled in Get-ZimmermanTools)."
+    "update_strategy": "feed-monitored",
+    "notes": "SRUM parsing library. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml."
   },
   {
     "id": "ericzimmerman-rbcmd",
@@ -257,8 +257,8 @@
     "category": "knowledge-base",
     "kind": "github-repository",
     "html_url": "https://github.com/EricZimmerman/KapeDocs",
-    "update_strategy": "manual-review",
-    "notes": "KAPE documentation. Low-change-rate; reviewed manually when KapeFiles or tool releases indicate doc updates."
+    "update_strategy": "feed-monitored",
+    "notes": "KAPE documentation. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml."
   },
   {
     "id": "ericzimmerman-sqlecmd",
@@ -284,8 +284,8 @@
     "category": "knowledge-base",
     "kind": "github-repository",
     "html_url": "https://github.com/EricZimmerman/OleCf",
-    "update_strategy": "manual-review",
-    "notes": "OLE compound file parsing library. Library dependency; releases tracked via JLECmd."
+    "update_strategy": "feed-monitored",
+    "notes": "OLE compound file parsing library. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml."
   },
   {
     "id": "ericzimmerman-mft",
@@ -293,8 +293,8 @@
     "category": "knowledge-base",
     "kind": "github-repository",
     "html_url": "https://github.com/EricZimmerman/MFT",
-    "update_strategy": "manual-review",
-    "notes": "NTFS MFT parsing library. Library dependency; releases tracked via MFTECmd."
+    "update_strategy": "feed-monitored",
+    "notes": "NTFS MFT parsing library. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml."
   },
   {
     "id": "ericzimmerman-recentfilecacheparser",
@@ -302,8 +302,8 @@
     "category": "knowledge-base",
     "kind": "github-repository",
     "html_url": "https://github.com/EricZimmerman/RecentFileCacheParser",
-    "update_strategy": "manual-review",
-    "notes": "Parser for RecentFileCache.bcf. Low-frequency updates; manual-review only."
+    "update_strategy": "feed-monitored",
+    "notes": "Parser for RecentFileCache.bcf. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml."
   },
   {
     "id": "ericzimmerman-winsearchdbanalyzer",
@@ -311,8 +311,8 @@
     "category": "knowledge-base",
     "kind": "github-repository",
     "html_url": "https://github.com/EricZimmerman/WinSearchDBAnalyzer",
-    "update_strategy": "manual-review",
-    "notes": "Windows Search ESE database analysis utility. Low-frequency updates; manual-review only."
+    "update_strategy": "feed-monitored",
+    "notes": "Windows Search ESE database analysis utility. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml."
   },
   {
     "id": "ericzimmerman-usbdevices",
@@ -320,8 +320,8 @@
     "category": "knowledge-base",
     "kind": "github-repository",
     "html_url": "https://github.com/EricZimmerman/USBDevices",
-    "update_strategy": "manual-review",
-    "notes": "Registry-backed USB device extraction. Low-frequency updates; manual-review only."
+    "update_strategy": "feed-monitored",
+    "notes": "Registry-backed USB device extraction. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml."
   },
   {
     "id": "ericzimmerman-extensionblocks",
@@ -329,8 +329,8 @@
     "category": "knowledge-base",
     "kind": "github-repository",
     "html_url": "https://github.com/EricZimmerman/ExtensionBlocks",
-    "update_strategy": "manual-review",
-    "notes": "Extension block parsing library. Library dependency; releases tracked via LECmd/JLECmd."
+    "update_strategy": "feed-monitored",
+    "notes": "Extension block parsing library. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml."
   },
   {
     "id": "ericzimmerman-guidmapping",
@@ -365,8 +365,8 @@
     "category": "knowledge-base",
     "kind": "github-repository",
     "html_url": "https://github.com/EricZimmerman/TLEFilePlugins",
-    "update_strategy": "manual-review",
-    "notes": "Timeline Explorer file plugins. Low-frequency updates; manual-review only."
+    "update_strategy": "feed-monitored",
+    "notes": "Timeline Explorer file plugins. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml."
   },
   {
     "id": "ericzimmerman-documentation",
@@ -383,8 +383,8 @@
     "category": "knowledge-base",
     "kind": "github-repository",
     "html_url": "https://github.com/EricZimmerman/Get-ZimmermanTools",
-    "update_strategy": "manual-review",
-    "notes": "Tool-distribution helper for the Zimmerman suite. No artifact content; manual-review only."
+    "update_strategy": "feed-monitored",
+    "notes": "Tool-distribution helper for the Zimmerman suite. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml."
   },
   {
     "id": "sigmahq",

@@ -208,6 +208,43 @@
       <!-- regipy — offline Windows registry parser with artifact plugin corpus; release = new artifact support -->
       <outline type="rss" text="regipy releases" title="mkorman90 regipy releases" xmlUrl="https://github.com/mkorman90/regipy/releases.atom" htmlUrl="https://github.com/mkorman90/regipy"/>
     </outline>
+    <outline text="Eric Zimmerman Library Crates" title="Eric Zimmerman Library Crates">
+      <!-- Commit feeds for EZ parsing library crates — no tagged releases; commits signal format/field changes.
+           Each commit may add new field offsets, fix date decoding, or extend artifact schema coverage.
+           Use commits/master.atom (not releases) since none of these repos publish tagged releases. -->
+      <outline type="rss" text="EZ Registry commits" title="Eric Zimmerman Registry commits" xmlUrl="https://github.com/EricZimmerman/Registry/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/Registry"/>
+      <outline type="rss" text="EZ MFT commits" title="Eric Zimmerman MFT commits" xmlUrl="https://github.com/EricZimmerman/MFT/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/MFT"/>
+      <outline type="rss" text="EZ Lnk commits" title="Eric Zimmerman Lnk commits" xmlUrl="https://github.com/EricZimmerman/Lnk/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/Lnk"/>
+      <outline type="rss" text="EZ OleCf commits" title="Eric Zimmerman OleCf commits" xmlUrl="https://github.com/EricZimmerman/OleCf/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/OleCf"/>
+      <outline type="rss" text="EZ JumpList commits" title="Eric Zimmerman JumpList commits" xmlUrl="https://github.com/EricZimmerman/JumpList/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/JumpList"/>
+      <outline type="rss" text="EZ Prefetch commits" title="Eric Zimmerman Prefetch commits" xmlUrl="https://github.com/EricZimmerman/Prefetch/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/Prefetch"/>
+      <outline type="rss" text="EZ Srum commits" title="Eric Zimmerman Srum commits" xmlUrl="https://github.com/EricZimmerman/Srum/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/Srum"/>
+      <outline type="rss" text="EZ RecentFileCacheParser commits" title="Eric Zimmerman RecentFileCacheParser commits" xmlUrl="https://github.com/EricZimmerman/RecentFileCacheParser/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/RecentFileCacheParser"/>
+      <outline type="rss" text="EZ WinSearchDbAnalyzer commits" title="Eric Zimmerman WinSearchDbAnalyzer commits" xmlUrl="https://github.com/EricZimmerman/WinSearchDbAnalyzer/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/WinSearchDbAnalyzer"/>
+      <outline type="rss" text="EZ USBDevices commits" title="Eric Zimmerman USBDevices commits" xmlUrl="https://github.com/EricZimmerman/USBDevices/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/USBDevices"/>
+      <outline type="rss" text="EZ ExtensionBlocks commits" title="Eric Zimmerman ExtensionBlocks commits" xmlUrl="https://github.com/EricZimmerman/ExtensionBlocks/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/ExtensionBlocks"/>
+      <outline type="rss" text="EZ TLEFilePlugins commits" title="Eric Zimmerman TLEFilePlugins commits" xmlUrl="https://github.com/EricZimmerman/TLEFilePlugins/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/TLEFilePlugins"/>
+      <outline type="rss" text="EZ Get-ZimmermanTools commits" title="Eric Zimmerman Get-ZimmermanTools commits" xmlUrl="https://github.com/EricZimmerman/Get-ZimmermanTools/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/Get-ZimmermanTools"/>
+      <outline type="rss" text="EZ KapeDocs commits" title="Eric Zimmerman KapeDocs commits" xmlUrl="https://github.com/EricZimmerman/KapeDocs/commits/master.atom" htmlUrl="https://github.com/EricZimmerman/KapeDocs"/>
+    </outline>
+    <outline text="Documentation and Reference Sources" title="Documentation and Reference Sources">
+      <!-- Versioned releases for major reference corpora — each version signals technique/taxonomy updates -->
+      <!-- MITRE ATT&CK CTI — GitHub releases map to ATT&CK version bumps (v15, v16, …); each adds new techniques/sub-techniques -->
+      <outline type="rss" text="MITRE ATT&amp;CK CTI releases" title="MITRE ATT&amp;CK CTI releases" xmlUrl="https://github.com/mitre/cti/releases.atom" htmlUrl="https://attack.mitre.org/"/>
+      <!-- Velociraptor — open-source DFIR platform; each release adds new VQL artifacts and artifact schema changes -->
+      <outline type="rss" text="Velociraptor releases" title="Velociraptor releases" xmlUrl="https://github.com/Velocidex/velociraptor/releases.atom" htmlUrl="https://docs.velociraptor.app/"/>
+      <!-- Web monitors for documentation sites with no RSS — scraped for new/updated page links -->
+      <!-- Microsoft Learn What's New — each Windows build update adds new feature documentation -->
+      <outline type="web" text="Microsoft Learn Windows What's New" title="Microsoft Learn — Windows What's New" htmlUrl="https://learn.microsoft.com/en-us/windows/whats-new/"/>
+      <!-- Sysinternals downloads index — new tools or updated docs appear as new links on this page -->
+      <outline type="web" text="Sysinternals Downloads" title="Sysinternals Downloads" htmlUrl="https://learn.microsoft.com/en-us/sysinternals/downloads/"/>
+      <!-- Apple Platform Security Guide — HTML ToC; section links change with each annual update -->
+      <outline type="web" text="Apple Platform Security Guide" title="Apple Platform Security Guide" htmlUrl="https://support.apple.com/guide/security/welcome/web"/>
+      <!-- Tor Browser Manual — section links change when new capabilities are documented -->
+      <outline type="web" text="Tor Browser Manual" title="Tor Browser Manual" htmlUrl="https://tb-manual.torproject.org/"/>
+      <!-- Tor Protocol Specs — new spec documents signal new observable network-layer behavior -->
+      <outline type="web" text="Tor Protocol Specs" title="Tor Protocol Specs" htmlUrl="https://spec.torproject.org/"/>
+    </outline>
     <outline text="Threat Intelligence Feeds" title="Threat Intelligence Feeds">
       <!-- abuse.ch suite — actively maintained, machine-readable threat intel -->
       <!-- URLhaus: daily CSV at https://urlhaus.abuse.ch/downloads/csv_recent/ -->

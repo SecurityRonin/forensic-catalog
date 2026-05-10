@@ -130,6 +130,7 @@ pub mod catalog;
 pub mod chainsaw;
 pub mod dependencies;
 pub mod eventids;
+pub mod evtx;
 pub mod evidence;
 pub mod forensicartifacts;
 pub mod mitre;

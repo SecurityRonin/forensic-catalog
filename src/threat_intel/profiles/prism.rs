@@ -29,9 +29,9 @@ pub static PRISM: MalwareProfile = MalwareProfile {
         WeightedExclusion { id: SYSTEM_KERNEL_TAINT_OOT,         penalty: 35 },
         WeightedExclusion { id: ELF_HOOKS_FILE_HIDING,           penalty: 15 },
     ],
-    class_threshold:     999,
-    probable_threshold:  999,
-    confirmed_threshold: 999,
+    class_threshold:     45,
+    probable_threshold:  75,
+    confirmed_threshold: 100,
 };
 
 #[cfg(test)]

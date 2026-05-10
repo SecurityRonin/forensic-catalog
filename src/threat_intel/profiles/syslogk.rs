@@ -26,9 +26,9 @@ pub static SYSLOGK: MalwareProfile = MalwareProfile {
         WeightedExclusion { id: ELF_HOOKS_PAM_CREDENTIAL,     penalty: 20 },
         WeightedExclusion { id: ARTIFACT_LD_PRELOAD_FOREIGN,  penalty: 30 },
     ],
-    class_threshold:     999,
-    probable_threshold:  999,
-    confirmed_threshold: 999,
+    class_threshold:     60,
+    probable_threshold:  100,
+    confirmed_threshold: 125,
 };
 
 #[cfg(test)]

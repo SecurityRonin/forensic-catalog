@@ -31,9 +31,9 @@ pub static BEURK: MalwareProfile = MalwareProfile {
         WeightedExclusion { id: SYSTEM_KERNEL_TAINT_OOT,         penalty: 30 },
         WeightedExclusion { id: ELF_STRING_FATHER_FORMAT,        penalty: 25 },
     ],
-    class_threshold:     999,
-    probable_threshold:  999,
-    confirmed_threshold: 999,
+    class_threshold:     75,
+    probable_threshold:  110,
+    confirmed_threshold: 140,
 };
 
 #[cfg(test)]

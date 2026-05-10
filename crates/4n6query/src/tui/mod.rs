@@ -624,13 +624,24 @@ use forensicnomicon::{
     },
     attack_flow::all_flows,
     catalog::{ArtifactDescriptor, OsScope, Platform, CATALOG},
+    eventids::EVENT_ID_TABLE,
     lolbins::{
         lolbas_entry, LolbasEntry, LOLBAS_LINUX, LOLBAS_MACOS, LOLBAS_WINDOWS,
         LOLBAS_WINDOWS_CMDLETS, LOLBAS_WINDOWS_MMC, LOLBAS_WINDOWS_WMI, UC_ARCHIVE, UC_BYPASS,
         UC_CREDENTIALS, UC_DECODE, UC_DEFENSE_EVASION, UC_DOWNLOAD, UC_EXECUTE, UC_NETWORK,
         UC_PERSIST, UC_PROXY, UC_RECON, UC_UPLOAD,
     },
+    persistence::{
+        ACTIVE_SETUP_PATHS, APPINIT_PATHS, COM_HIJACK_PATHS, IFEO_PATHS, LINUX_PERSISTENCE_PATHS,
+        MACOS_PERSISTENCE_PATHS, SCREENSAVER_PATHS, SESSION_MANAGER_PATHS, WINDOWS_RUN_KEYS,
+        WINLOGON_PATHS,
+    },
     playbooks::PLAYBOOKS,
+    remote_access::{
+        ACTION1_PATHS, ANYDESK_PATHS, ATERA_PATHS, GOTOASSIST_PATHS, KNOWN_RAT_NAMES,
+        MANAGEENGINE_PATHS, SPLASHTOP_PATHS, TEAMVIEWER_PATHS,
+    },
+    sigma::SIGMA_TABLE,
     threat_intel::profiles::ALL_PROFILES,
 };
 use ratatui::{backend::CrosstermBackend, Terminal};
@@ -778,6 +789,43 @@ fn build_render_data(app: &app::App) -> RenderData {
             .iter()
             .map(|f| format!("{:<40}  {}", f.id, f.name))
             .collect(),
+        9 => EVENT_ID_TABLE
+            .iter()
+            .map(|e| format!("{:<6}  [{:<10}]  {}", e.event_id, e.channel, e.description))
+            .collect(),
+        10 => SIGMA_TABLE
+            .iter()
+            .map(|r| format!("{}", r.title))
+            .collect(),
+        11 => {
+            const MECHANISMS: &[(&str, &[&str])] = &[
+                ("Windows Run Keys",       WINDOWS_RUN_KEYS),
+                ("Linux Persistence",      LINUX_PERSISTENCE_PATHS),
+                ("macOS Persistence",      MACOS_PERSISTENCE_PATHS),
+                ("IFEO Hijack",            IFEO_PATHS),
+                ("AppInit DLLs",           APPINIT_PATHS),
+                ("Session Manager",        SESSION_MANAGER_PATHS),
+                ("Active Setup",           ACTIVE_SETUP_PATHS),
+                ("Screensaver",            SCREENSAVER_PATHS),
+                ("Winlogon",               WINLOGON_PATHS),
+                ("COM/CLSID Hijack",       COM_HIJACK_PATHS),
+            ];
+            MECHANISMS.iter().map(|(name, _)| name.to_string()).collect()
+        }
+        12 => {
+            const RMM_TOOLS: &[(&str, &[&str])] = &[
+                ("TeamViewer  [RMM]",    TEAMVIEWER_PATHS),
+                ("AnyDesk     [RMM]",    ANYDESK_PATHS),
+                ("Splashtop   [RMM]",    SPLASHTOP_PATHS),
+                ("Atera       [RMM]",    ATERA_PATHS),
+                ("GoToAssist  [RMM]",    GOTOASSIST_PATHS),
+                ("Action1     [RMM]",    ACTION1_PATHS),
+                ("ManageEngine[RMM]",    MANAGEENGINE_PATHS),
+            ];
+            let mut v: Vec<String> = RMM_TOOLS.iter().map(|(name, _)| name.to_string()).collect();
+            v.push("Known RAT Names  [RAT]".to_string());
+            v
+        }
         _ => vec![],
     };
 
@@ -1005,6 +1053,125 @@ fn build_render_data(app: &app::App) -> RenderData {
                     lines
                 }
                 None => vec!["Select a flow to see details.".into()],
+            }
+        }
+        9 => {
+            let entry = selected_name
+                .and_then(|s| s.split_whitespace().next())
+                .and_then(|id_str| id_str.parse::<u32>().ok())
+                .and_then(|id| EVENT_ID_TABLE.iter().find(|e| e.event_id == id));
+            match entry {
+                Some(e) => {
+                    let mut lines = vec![
+                        format!("Event ID {} — {}", e.event_id, e.channel),
+                        "─".repeat(40),
+                        e.description.to_string(),
+                        String::new(),
+                        format!("Channel : {}", e.channel),
+                        format!("High val: {}", if e.high_value { "yes" } else { "no" }),
+                    ];
+                    if !e.mitre_techniques.is_empty() {
+                        lines.push(format!("MITRE   : {}", e.mitre_techniques.join("  ")));
+                    }
+                    if !e.artifact_ids.is_empty() {
+                        lines.push(String::new());
+                        lines.push(format!("Artifacts: {}", e.artifact_ids.join(", ")));
+                    }
+                    lines
+                }
+                None => vec!["Select an event ID to see details.".into()],
+            }
+        }
+        10 => {
+            let rule = selected_name
+                .and_then(|title| SIGMA_TABLE.iter().find(|r| r.title == title));
+            match rule {
+                Some(r) => {
+                    let mut lines = vec![
+                        r.title.to_string(),
+                        "─".repeat(40),
+                        format!("Rule ID  : {}", r.rule_id),
+                        format!("Artifact : {}", r.artifact_id),
+                        format!("Logsource: {}", r.logsource_category),
+                    ];
+                    if !r.mitre_techniques.is_empty() {
+                        lines.push(format!("MITRE    : {}", r.mitre_techniques.join("  ")));
+                    }
+                    lines
+                }
+                None => vec!["Select a Sigma rule to see details.".into()],
+            }
+        }
+        11 => {
+            const MECHANISMS: &[(&str, &[&str])] = &[
+                ("Windows Run Keys",  WINDOWS_RUN_KEYS),
+                ("Linux Persistence", LINUX_PERSISTENCE_PATHS),
+                ("macOS Persistence", MACOS_PERSISTENCE_PATHS),
+                ("IFEO Hijack",       IFEO_PATHS),
+                ("AppInit DLLs",      APPINIT_PATHS),
+                ("Session Manager",   SESSION_MANAGER_PATHS),
+                ("Active Setup",      ACTIVE_SETUP_PATHS),
+                ("Screensaver",       SCREENSAVER_PATHS),
+                ("Winlogon",          WINLOGON_PATHS),
+                ("COM/CLSID Hijack",  COM_HIJACK_PATHS),
+            ];
+            let paths = selected_name
+                .and_then(|name| MECHANISMS.iter().find(|(n, _)| *n == name))
+                .map(|(_, p)| *p);
+            match paths {
+                Some(ps) => {
+                    let mut lines = vec![
+                        selected_name.unwrap_or("").to_string(),
+                        "─".repeat(40),
+                    ];
+                    for p in ps {
+                        lines.push(p.to_string());
+                    }
+                    lines
+                }
+                None => vec!["Select a persistence mechanism to see paths.".into()],
+            }
+        }
+        12 => {
+            const RMM_TOOLS: &[(&str, &[&str])] = &[
+                ("TeamViewer  [RMM]",  TEAMVIEWER_PATHS),
+                ("AnyDesk     [RMM]",  ANYDESK_PATHS),
+                ("Splashtop   [RMM]",  SPLASHTOP_PATHS),
+                ("Atera       [RMM]",  ATERA_PATHS),
+                ("GoToAssist  [RMM]",  GOTOASSIST_PATHS),
+                ("Action1     [RMM]",  ACTION1_PATHS),
+                ("ManageEngine[RMM]",  MANAGEENGINE_PATHS),
+            ];
+            match selected_name {
+                Some("Known RAT Names  [RAT]") => {
+                    let mut lines = vec![
+                        "Known RAT / Backdoor Names".to_string(),
+                        "─".repeat(40),
+                    ];
+                    for name in KNOWN_RAT_NAMES {
+                        lines.push(name.to_string());
+                    }
+                    lines
+                }
+                Some(name) => {
+                    let paths = RMM_TOOLS.iter().find(|(n, _)| *n == name).map(|(_, p)| *p);
+                    match paths {
+                        Some(ps) => {
+                            let mut lines = vec![
+                                name.to_string(),
+                                "─".repeat(40),
+                                "Registry indicators:".into(),
+                                String::new(),
+                            ];
+                            for p in ps {
+                                lines.push(p.to_string());
+                            }
+                            lines
+                        }
+                        None => vec!["Select a tool to see registry paths.".into()],
+                    }
+                }
+                None => vec!["Select a tool to see registry paths.".into()],
             }
         }
         _ => vec!["Select an item to see details.".into()],

@@ -1,5 +1,46 @@
 use crate::threat_intel::signals::*;
 
+/// A string pattern baked into Father-class rootkit binaries that survives stripping.
+pub struct ElfStringPattern {
+    /// Literal substring to search in ELF sections (.rodata, .data.rel.ro, etc.).
+    pub pattern: &'static str,
+    pub description: &'static str,
+    /// Relative suspicion weight; sum across matches for a quick pre-score.
+    pub weight: u32,
+}
+
+/// Strings characteristic of Father-class (and derived) LD_PRELOAD rootkits found
+/// in `.rodata` regardless of library name or strip state.
+///
+/// Sources: Father (github.com/mav8557/Father), Jynx2, Azazel source analysis.
+pub const FATHER_CLASS_ELF_PATTERNS: &[ElfStringPattern] = &[
+    ElfStringPattern {
+        pattern: "UID:%d:",
+        description: "Father PAM hook format string — logs credentials as 'UID:N:user:pass'",
+        weight: 90,
+    },
+    ElfStringPattern {
+        pattern: "silly.txt",
+        description: "Father default credential log filename baked into the binary",
+        weight: 85,
+    },
+    ElfStringPattern {
+        pattern: "/tmp/.ICE",
+        description: "Father/Jynx staging directory prefix in /tmp",
+        weight: 70,
+    },
+    ElfStringPattern {
+        pattern: "libprocesshider",
+        description: "Process-hider library self-identifier string",
+        weight: 80,
+    },
+    ElfStringPattern {
+        pattern: "MAGIC_GID",
+        description: "Jynx2 magic GID constant used to exclude root kit processes from hiding",
+        weight: 75,
+    },
+];
+
 pub struct HookSymbol {
     pub name: &'static str,
     /// Signal ID from `threat_intel/signals.rs` emitted when this symbol is found.

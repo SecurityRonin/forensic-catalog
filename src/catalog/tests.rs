@@ -5577,6 +5577,85 @@ mod tests_winscp_ini {
             "catalog count after winscp + wifi + clipboard + apfs + samsung + honda + ios14_maps + garmin + aws_cloudtrail + btm"
         );
     }
+
+    #[test]
+    fn winscp_ini_has_evidence_strength() {
+        let d = CATALOG.by_id("winscp_ini").unwrap();
+        assert!(
+            d.evidence_strength.is_some(),
+            "winscp_ini must have evidence_strength set (lateral movement primary indicator)"
+        );
+    }
+
+    #[test]
+    fn winscp_ini_evidence_strength_is_strong() {
+        use crate::evidence::EvidenceStrength;
+        let d = CATALOG.by_id("winscp_ini").unwrap();
+        assert_eq!(
+            d.evidence_strength,
+            Some(EvidenceStrength::Strong),
+            "winscp_ini evidence_strength must be Strong — \
+            CDCache records every host connected to, but file can be deleted \
+            and last-session state only; not Definitive"
+        );
+    }
+
+    #[test]
+    fn winscp_ini_has_evidence_caveats() {
+        let d = CATALOG.by_id("winscp_ini").unwrap();
+        assert!(
+            !d.evidence_caveats.is_empty(),
+            "winscp_ini must have evidence_caveats (file can be wiped; CDCache is last-session only)"
+        );
+    }
+
+    #[test]
+    fn winscp_ini_has_volatility() {
+        let d = CATALOG.by_id("winscp_ini").unwrap();
+        assert!(
+            d.volatility.is_some(),
+            "winscp_ini must have volatility set"
+        );
+    }
+
+    #[test]
+    fn winscp_ini_volatility_is_activity_driven() {
+        use crate::volatility::VolatilityClass;
+        let d = CATALOG.by_id("winscp_ini").unwrap();
+        assert_eq!(
+            d.volatility,
+            Some(VolatilityClass::ActivityDriven),
+            "winscp_ini volatility must be ActivityDriven — \
+            updated at WinSCP session close, persistent between reboots"
+        );
+    }
+
+    #[test]
+    fn winscp_ini_has_volatility_rationale() {
+        let d = CATALOG.by_id("winscp_ini").unwrap();
+        assert!(
+            !d.volatility_rationale.is_empty(),
+            "winscp_ini must have volatility_rationale"
+        );
+    }
+
+    #[test]
+    fn winscp_ini_appears_in_evidence_for() {
+        use crate::evidence::evidence_for;
+        assert!(
+            evidence_for("winscp_ini").is_some(),
+            "evidence_for('winscp_ini') must return Some once evidence_strength is set"
+        );
+    }
+
+    #[test]
+    fn winscp_ini_appears_in_acquisition_order() {
+        use crate::volatility::acquisition_order;
+        assert!(
+            acquisition_order().iter().any(|d| d.id == "winscp_ini"),
+            "winscp_ini must appear in acquisition_order() once volatility is set"
+        );
+    }
 }
 
 // ── Apple Intelligence WiFi database ──────────────────────────────────────────

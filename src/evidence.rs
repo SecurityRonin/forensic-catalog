@@ -1,11 +1,10 @@
 //! Evidence strength / confidence model for forensic artifacts.
 //!
-//! Maps each catalog artifact to an [`EvidenceStrength`] rating and known
-//! interpretation caveats, helping analysts assess the weight of evidence
-//! and communicate findings in reports.
+//! Ratings live directly in [`crate::catalog::ArtifactDescriptor::evidence_strength`]
+//! (populated for assessed entries; `None` for generated entries awaiting review).
 //!
-//! The authoritative data now lives in [`crate::profile::ARTIFACT_PROFILES`].
-//! [`evidence_for`] and [`artifacts_with_strength`] delegate to that table.
+//! Use [`evidence_for`] for point-lookups, [`artifacts_with_strength`] for bulk queries,
+//! and [`crate::catalog::CATALOG::unassessed`] to find gaps sorted by triage priority.
 
 /// How strongly an artifact proves a fact in isolation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -24,41 +23,26 @@ pub enum EvidenceStrength {
     Definitive = 4,
 }
 
-/// Returns the profile for a given artifact ID, or `None` if unknown.
+/// Returns the descriptor for a given artifact ID if it has been assessed.
 ///
-/// Delegates entirely to [`crate::profile::profile_for`].
-pub fn evidence_for(artifact_id: &str) -> Option<&'static crate::profile::ArtifactProfile> {
-    crate::profile::profile_for(artifact_id)
+/// Returns `None` when the artifact ID is unknown or has no evidence assessment yet.
+/// On `Some(d)`, callers may access `d.evidence_strength`, `d.evidence_caveats`,
+/// `d.volatility`, and `d.volatility_rationale` directly — all are guaranteed `Some`.
+pub fn evidence_for(artifact_id: &str) -> Option<&'static crate::catalog::ArtifactDescriptor> {
+    crate::catalog::CATALOG
+        .by_id(artifact_id)
+        .filter(|d| d.evidence_strength.is_some())
 }
 
-/// Returns all artifact profiles at or above the given strength threshold.
+/// Returns all assessed descriptors with evidence strength at or above `min_strength`.
 pub fn artifacts_with_strength(
     min_strength: EvidenceStrength,
-) -> Vec<&'static crate::profile::ArtifactProfile> {
-    crate::profile::ARTIFACT_PROFILES
+) -> Vec<&'static crate::catalog::ArtifactDescriptor> {
+    crate::catalog::CATALOG
+        .list()
         .iter()
-        .filter(|p| p.evidence_strength >= min_strength)
+        .filter(|d| d.evidence_strength.map_or(false, |s| s >= min_strength))
         .collect()
-}
-
-#[cfg(test)]
-mod delegation_tests {
-    use super::*;
-
-    #[test]
-    fn evidence_table_is_removed() {
-        // EVIDENCE_TABLE should not exist — use profile_for() instead
-        // This test passes when EVIDENCE_TABLE is gone and evidence_for delegates to profile
-        let p = crate::profile::profile_for("prefetch_file")
-            .expect("prefetch_file must have a profile");
-        assert_eq!(p.evidence_strength, EvidenceStrength::Definitive);
-    }
-
-    #[test]
-    fn evidence_for_returns_descriptor() {
-        let result: Option<&crate::catalog::ArtifactDescriptor> = evidence_for("shimcache");
-        assert!(result.is_some());
-    }
 }
 
 #[cfg(test)]
@@ -67,26 +51,31 @@ mod tests {
     use crate::catalog::{TriagePriority, CATALOG};
 
     #[test]
+    fn evidence_for_returns_descriptor() {
+        let result: Option<&crate::catalog::ArtifactDescriptor> = evidence_for("shimcache");
+        assert!(result.is_some());
+    }
+
+    #[test]
     fn prefetch_is_definitive() {
-        let e = evidence_for("prefetch_file").expect("prefetch_file must be in table");
-        assert_eq!(e.evidence_strength, EvidenceStrength::Definitive);
+        let e = evidence_for("prefetch_file").expect("prefetch_file must be assessed");
+        assert_eq!(e.evidence_strength, Some(EvidenceStrength::Definitive));
     }
 
     #[test]
     fn bash_history_is_circumstantial() {
-        let e = evidence_for("linux_bash_history").expect("linux_bash_history must be in table");
-        assert_eq!(e.evidence_strength, EvidenceStrength::Circumstantial);
+        let e = evidence_for("linux_bash_history").expect("linux_bash_history must be assessed");
+        assert_eq!(e.evidence_strength, Some(EvidenceStrength::Circumstantial));
     }
 
     #[test]
     fn definitive_entries_have_caveats() {
-        // Even definitive evidence should document its limitations
-        for entry in crate::profile::ARTIFACT_PROFILES {
-            if entry.evidence_strength == EvidenceStrength::Definitive {
+        for d in CATALOG.list() {
+            if d.evidence_strength == Some(EvidenceStrength::Definitive) {
                 assert!(
-                    !entry.evidence_caveats.is_empty(),
+                    !d.evidence_caveats.is_empty(),
                     "{} is Definitive but has no caveats documented",
-                    entry.id
+                    d.id
                 );
             }
         }
@@ -107,25 +96,12 @@ mod tests {
         assert!(definitive.len() < all.len());
         assert!(definitive
             .iter()
-            .all(|e| e.evidence_strength == EvidenceStrength::Definitive));
+            .all(|d| d.evidence_strength == Some(EvidenceStrength::Definitive)));
     }
 
     #[test]
     fn unknown_artifact_returns_none() {
         assert!(evidence_for("this_does_not_exist").is_none());
-    }
-
-    #[test]
-    fn all_table_ids_exist_in_catalog() {
-        let catalog_ids: std::collections::HashSet<&str> =
-            CATALOG.list().iter().map(|d| d.id).collect();
-        for entry in crate::profile::ARTIFACT_PROFILES {
-            assert!(
-                catalog_ids.contains(entry.id),
-                "profile table references unknown catalog id: {}",
-                entry.id
-            );
-        }
     }
 
     #[test]
@@ -141,34 +117,5 @@ mod tests {
             missing.is_empty(),
             "Critical-priority artifacts missing from evidence table: {missing:?}"
         );
-    }
-}
-
-#[cfg(test)]
-mod profile_tests {
-    #[test]
-    fn profile_for_mft_has_both_dimensions() {
-        // profile_for doesn't exist yet — this test should fail to compile
-        let p = crate::profile::profile_for("mft").expect("mft must have a profile");
-        assert_eq!(
-            p.evidence_strength,
-            crate::evidence::EvidenceStrength::Definitive
-        );
-        assert_eq!(p.volatility, crate::volatility::VolatilityClass::Persistent);
-        assert!(!p.evidence_caveats.is_empty());
-        assert!(!p.volatility_rationale.is_empty());
-    }
-
-    #[test]
-    fn profile_for_missing_returns_none() {
-        assert!(crate::profile::profile_for("this_does_not_exist").is_none());
-    }
-
-    #[test]
-    fn profiles_table_has_no_duplicate_ids() {
-        let mut seen = std::collections::HashSet::new();
-        for p in crate::profile::ARTIFACT_PROFILES {
-            assert!(seen.insert(p.id), "duplicate profile id: {}", p.id);
-        }
     }
 }

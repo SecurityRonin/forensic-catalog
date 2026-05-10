@@ -1,10 +1,10 @@
 //! Artifact volatility model — RFC 3227 Order of Volatility encoded as data.
 //!
-//! Maps each catalog artifact to a [`VolatilityClass`], enabling tools to
-//! sort collection order from most-volatile to least-volatile.
+//! Ratings live directly in [`crate::catalog::ArtifactDescriptor::volatility`]
+//! (populated for assessed entries; `None` for generated entries awaiting review).
 //!
-//! The authoritative data now lives in [`crate::profile::ARTIFACT_PROFILES`].
-//! [`volatility_for`] and [`acquisition_order`] delegate to that table.
+//! Use [`volatility_for`] for point-lookups and [`acquisition_order`] to get a
+//! live-response collection order (most ephemeral first).
 
 /// How quickly an artifact is overwritten or lost.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -23,37 +23,29 @@ pub enum VolatilityClass {
     Volatile = 4,
 }
 
-/// Returns the profile for a given artifact ID, or `None` if unknown.
+/// Returns the descriptor for a given artifact ID if it has been assessed.
 ///
-/// Delegates entirely to [`crate::profile::profile_for`].
-pub fn volatility_for(artifact_id: &str) -> Option<&'static crate::profile::ArtifactProfile> {
-    crate::profile::profile_for(artifact_id)
+/// Returns `None` when the artifact ID is unknown or has no volatility assessment.
+/// On `Some(d)`, `d.volatility` and `d.volatility_rationale` are guaranteed non-None/non-empty.
+pub fn volatility_for(artifact_id: &str) -> Option<&'static crate::catalog::ArtifactDescriptor> {
+    crate::catalog::CATALOG
+        .by_id(artifact_id)
+        .filter(|d| d.volatility.is_some())
 }
 
-/// Returns all artifact profiles sorted most-volatile-first (Volatile → Residual).
+/// Returns all assessed descriptors sorted most-volatile-first (Volatile → Residual).
 /// Ties broken by artifact ID for determinism.
-pub fn acquisition_order() -> Vec<&'static crate::profile::ArtifactProfile> {
-    let mut entries: Vec<&crate::profile::ArtifactProfile> =
-        crate::profile::ARTIFACT_PROFILES.iter().collect();
+///
+/// Use this for live-response triage: collect in the returned order to capture
+/// the most ephemeral evidence before it is lost (RFC 3227).
+pub fn acquisition_order() -> Vec<&'static crate::catalog::ArtifactDescriptor> {
+    let mut entries: Vec<&crate::catalog::ArtifactDescriptor> = crate::catalog::CATALOG
+        .list()
+        .iter()
+        .filter(|d| d.volatility.is_some())
+        .collect();
     entries.sort_by(|a, b| b.volatility.cmp(&a.volatility).then(a.id.cmp(b.id)));
     entries
-}
-
-#[cfg(test)]
-mod delegation_tests {
-    use super::*;
-
-    #[test]
-    fn volatility_table_is_removed() {
-        let p = crate::profile::profile_for("shimcache").expect("shimcache must have a profile");
-        assert_eq!(p.volatility, VolatilityClass::Volatile);
-    }
-
-    #[test]
-    fn volatility_for_returns_descriptor() {
-        let result: Option<&crate::catalog::ArtifactDescriptor> = volatility_for("shimcache");
-        assert!(result.is_some());
-    }
 }
 
 #[cfg(test)]
@@ -62,37 +54,41 @@ mod tests {
     use crate::catalog::CATALOG;
 
     #[test]
+    fn volatility_for_returns_descriptor() {
+        let result: Option<&crate::catalog::ArtifactDescriptor> = volatility_for("shimcache");
+        assert!(result.is_some());
+    }
+
+    #[test]
     fn shimcache_is_volatile() {
-        let entry = volatility_for("shimcache").expect("shimcache should be in table");
-        assert_eq!(entry.volatility, VolatilityClass::Volatile);
+        let entry = volatility_for("shimcache").expect("shimcache should be assessed");
+        assert_eq!(entry.volatility, Some(VolatilityClass::Volatile));
     }
 
     #[test]
     fn mft_is_residual() {
-        let entry = volatility_for("mft_file").expect("mft_file should be in table");
-        assert_eq!(entry.volatility, VolatilityClass::Residual);
+        let entry = volatility_for("mft_file").expect("mft_file should be assessed");
+        assert_eq!(entry.volatility, Some(VolatilityClass::Residual));
     }
 
     #[test]
     fn evtx_security_is_rotating_buffer() {
-        let entry = volatility_for("evtx_security").expect("evtx_security should be in table");
-        assert_eq!(entry.volatility, VolatilityClass::RotatingBuffer);
+        let entry = volatility_for("evtx_security").expect("evtx_security should be assessed");
+        assert_eq!(entry.volatility, Some(VolatilityClass::RotatingBuffer));
     }
 
     #[test]
     fn acquisition_order_volatile_first() {
         let order = acquisition_order();
         assert!(!order.is_empty());
-        // First entry must be the most volatile
         assert_eq!(
             order[0].volatility,
-            VolatilityClass::Volatile,
+            Some(VolatilityClass::Volatile),
             "acquisition_order should start with Volatile class"
         );
-        // Last entry must be Residual
         assert_eq!(
             order.last().unwrap().volatility,
-            VolatilityClass::Residual,
+            Some(VolatilityClass::Residual),
             "acquisition_order should end with Residual class"
         );
     }
@@ -104,7 +100,6 @@ mod tests {
 
     #[test]
     fn table_covers_critical_triage_artifacts() {
-        // All Critical triage artifacts should be in the volatility table
         let missing: Vec<&str> = CATALOG
             .for_triage()
             .into_iter()
@@ -119,21 +114,7 @@ mod tests {
     }
 
     #[test]
-    fn all_table_artifact_ids_exist_in_catalog() {
-        let catalog_ids: std::collections::HashSet<&str> =
-            CATALOG.list().iter().map(|d| d.id).collect();
-        for entry in crate::profile::ARTIFACT_PROFILES {
-            assert!(
-                catalog_ids.contains(entry.id),
-                "profile table references unknown catalog id: {}",
-                entry.id
-            );
-        }
-    }
-
-    #[test]
     fn volatility_ordering_is_consistent() {
-        // Volatile > RotatingBuffer > ActivityDriven > Persistent > Residual
         assert!(VolatilityClass::Volatile > VolatilityClass::RotatingBuffer);
         assert!(VolatilityClass::RotatingBuffer > VolatilityClass::ActivityDriven);
         assert!(VolatilityClass::ActivityDriven > VolatilityClass::Persistent);

@@ -532,7 +532,7 @@ pub(crate) static DEFAULT_BROWSER: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["chrome_cookies", "firefox_logins", "edge_webcache"],
     sources: &["https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb"],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
-    evidence_caveats: &[],
+    evidence_caveats: &["ProgID alone does not confirm browser usage — cross-reference with browser history artifacts"],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Registry key; persists until user changes default browser",
 };
@@ -586,7 +586,7 @@ pub(crate) static SYSTEM_TIMEZONE: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["userassist_exe", "bam_user"],
     sources: &["https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb"],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
-    evidence_caveats: &[],
+    evidence_caveats: &["An attacker with SYSTEM privileges can change the timezone to manipulate all subsequent timestamps; cross-validate against NTP sync logs or external sources"],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Registry key; persists until explicit timezone change",
 };
@@ -609,7 +609,7 @@ pub(crate) static COMPUTER_NAME: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["system_timezone", "networklist_profiles"],
     sources: &["https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb"],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
-    evidence_caveats: &[],
+    evidence_caveats: &["Only reflects the current name; prior hostnames are not retained here — check domain join logs or SCCM/Intune records for name history"],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Registry key; persists until explicit rename",
 };
@@ -746,7 +746,7 @@ pub(crate) static USER_ACCOUNT_SID: ArtifactDescriptor = ArtifactDescriptor {
     related_artifacts: &["sam_users", "evtx_security"],
     sources: &["https://github.com/EricZimmerman/RECmd/blob/master/BatchExamples/Kroll_Batch.reb"],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
-    evidence_caveats: &[],
+    evidence_caveats: &["Subkeys linger after account deletion until the profile directory is removed; presence of a SID subkey does not prove the account still exists"],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Registry key; persists for life of user profile",
 };

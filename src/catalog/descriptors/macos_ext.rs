@@ -536,7 +536,7 @@ pub(crate) static MACOS_MDM_ENROLLMENT: ArtifactDescriptor = ArtifactDescriptor 
     related_artifacts: &["macos_tcc_system_db"],
     sources: &["https://www.mac4n6.com/blog/2020/9/15/mdm-forensics"],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
-    evidence_caveats: &[],
+    evidence_caveats: &["Rogue MDM enrollment (T1098 persistence) creates a legitimate-looking plist; cross-validate MDM server URL against known corporate MDM infrastructure"],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Plist persists until MDM unenrollment",
 };

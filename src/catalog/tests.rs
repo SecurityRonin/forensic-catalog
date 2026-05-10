@@ -9555,26 +9555,6 @@ mod tests_profile_merge {
     }
 
     #[test]
-    fn assessed_profiles_match_catalog_fields() {
-        use crate::profile::ARTIFACT_PROFILES;
-        for profile in ARTIFACT_PROFILES.iter() {
-            let desc = CATALOG.list().iter()
-                .find(|d| d.id == profile.id)
-                .unwrap_or_else(|| panic!(
-                    "ARTIFACT_PROFILES entry '{}' has no CATALOG descriptor", profile.id
-                ));
-            assert_eq!(desc.evidence_strength, Some(profile.evidence_strength),
-                "evidence_strength mismatch for {}", profile.id);
-            assert_eq!(desc.volatility, Some(profile.volatility),
-                "volatility mismatch for {}", profile.id);
-            assert_eq!(desc.evidence_caveats, profile.evidence_caveats,
-                "evidence_caveats mismatch for {}", profile.id);
-            assert_eq!(desc.volatility_rationale, profile.volatility_rationale,
-                "volatility_rationale mismatch for {}", profile.id);
-        }
-    }
-
-    #[test]
     fn assessed_entries_have_complete_metadata() {
         for d in CATALOG.list() {
             if d.evidence_strength.is_some() {

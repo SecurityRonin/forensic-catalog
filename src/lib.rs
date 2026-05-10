@@ -11,8 +11,8 @@
 //! when to acquire it, what else to collect alongside it, and which detection
 //! rules apply — all compiled into your binary at zero runtime cost.
 //!
-//! 361 entries are fully curated with all enrichments. The remaining 6,187
-//! are generated from seven authoritative corpora — KAPE targets (2,422),
+//! 415 entries are fully curated with evidence strength, volatility, and caveats.
+//! The remaining 6,133 are generated from seven authoritative corpora — KAPE targets (2,422),
 //! ForensicArtifacts YAML (2,545), EVTX/ETW channels (995), Velociraptor
 //! (122), RECmd batch files (44), browser paths (37), NirSoft (22) — and
 //! carry location, OS scope, decoder, and source citation.
@@ -136,7 +136,6 @@ pub mod mitre;
 pub mod navigator;
 pub mod playbooks;
 pub mod plugin;
-pub mod profile;
 pub mod sigma;
 pub mod sqlite;
 pub mod srum;

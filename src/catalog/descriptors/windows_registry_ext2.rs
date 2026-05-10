@@ -799,7 +799,7 @@ pub(crate) static PROFILE_LIST_USERS: ArtifactDescriptor = ArtifactDescriptor {
         "https://learn.microsoft.com/en-us/windows/win32/sysinfo/profilelist",
     ],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
-    evidence_caveats: &[],
+    evidence_caveats: &["Subkeys may survive account deletion if the profile directory was not cleaned up; absence of a SID does not guarantee the account never existed on this machine"],
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Registry key; persists until profile is deleted",
 };

@@ -8,9 +8,9 @@ Generated from:
 Category counts:
 - directory: 3
 - feed: 62
-- knowledge-base: 36
-- practitioner-blog: 1
-- primary-reference: 9
+- knowledge-base: 37
+- practitioner-blog: 5
+- primary-reference: 8
 
 ## directory
 
@@ -28,8 +28,6 @@ Category counts:
 - 4n6k: https://www.4n6k.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - AboutDFIR: https://aboutdfir.com/
-  update: `rss`; kind: `rss-feed`; sources: `opml`
-- abuse.ch blog: https://abuse.ch/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Amped Software blog: https://blog.ampedsoftware.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
@@ -63,8 +61,6 @@ Category counts:
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - DFIR Science: https://dfir.science/
   update: `rss`; kind: `rss-feed`; sources: `opml`
-- dfir.blog: https://dfir.blog/
-  update: `rss`; kind: `rss-feed`; sources: `opml`
 - Didier Stevens Blog: https://blog.didierstevens.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Digital Forensics Tips: https://www.digitalforensicstips.com/
@@ -75,7 +71,9 @@ Category counts:
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Embee Research: https://embee-research.ghost.io/
   update: `rss`; kind: `rss-feed`; sources: `opml`
-- Forensafe (ArtiFast) Blog: https://www.forensafe.com/
+- Eric Zimmerman WinSearchDbAnalyzer commits: https://github.com/EricZimmerman/WinSearchDbAnalyzer
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- Forensafe (ArtiFast) Blog: https://www.forensafe.com/blogs/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Forensic 4cast: https://forensic4cast.com/blog/
   update: `rss`; kind: `rss-feed`; sources: `opml`
@@ -145,6 +143,8 @@ Category counts:
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Windows Incident Response: https://windowsir.blogspot.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
+- Yamato-Security hayabusa releases: https://github.com/Yamato-Security/hayabusa
+  update: `rss`; kind: `rss-feed`; sources: `opml`
 - Yogesh Khatri's forensic blog: https://www.swiftforensics.com/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 
@@ -152,99 +152,107 @@ Category counts:
 
 - Blue Team Hunting Field Notes (bitbug0x55AA): https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes
   update: `rss`; kind: `github-repository`; sources: `manual, opml`
-- Chainsaw detections: https://github.com/WithSecureLabs/chainsaw
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman AmcacheParser: https://github.com/EricZimmerman/AmcacheParser
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman AppCompatCacheParser: https://github.com/EricZimmerman/AppCompatCacheParser
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman DFIR-SQL-Query-Repo: https://github.com/EricZimmerman/DFIR-SQL-Query-Repo
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman documentation: https://github.com/EricZimmerman/documentation
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman evtx: https://github.com/EricZimmerman/evtx
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman ExtensionBlocks: https://github.com/EricZimmerman/ExtensionBlocks
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman Get-ZimmermanTools: https://github.com/EricZimmerman/Get-ZimmermanTools
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman GuidMapping: https://github.com/EricZimmerman/GuidMapping
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman JLECmd: https://github.com/EricZimmerman/JLECmd
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman JumpList: https://github.com/EricZimmerman/JumpList
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman KapeDocs: https://github.com/EricZimmerman/KapeDocs
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman KapeFiles: https://github.com/EricZimmerman/KapeFiles
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman LECmd: https://github.com/EricZimmerman/LECmd
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman Lnk: https://github.com/EricZimmerman/Lnk
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman MFT: https://github.com/EricZimmerman/MFT
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman MFTECmd: https://github.com/EricZimmerman/MFTECmd
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman OleCf: https://github.com/EricZimmerman/OleCf
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman PECmd: https://github.com/EricZimmerman/PECmd
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman Prefetch: https://github.com/EricZimmerman/Prefetch
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman RBCmd: https://github.com/EricZimmerman/RBCmd
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman RecentFileCacheParser: https://github.com/EricZimmerman/RecentFileCacheParser
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman RECmd: https://github.com/EricZimmerman/RECmd
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman Registry: https://github.com/EricZimmerman/Registry
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman RegistryExplorerBookmarks: https://github.com/EricZimmerman/RegistryExplorerBookmarks
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman RegistryPlugins: https://github.com/EricZimmerman/RegistryPlugins
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman SQLECmd: https://github.com/EricZimmerman/SQLECmd
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman Srum: https://github.com/EricZimmerman/Srum
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman TLEFilePlugins: https://github.com/EricZimmerman/TLEFilePlugins
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman USBDevices: https://github.com/EricZimmerman/USBDevices
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
+- Elastic detection-rules releases: https://github.com/elastic/detection-rules
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman AmcacheParser releases: https://github.com/EricZimmerman/AmcacheParser
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman AppCompatCacheParser releases: https://github.com/EricZimmerman/AppCompatCacheParser
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman DFIR-SQL-Query-Repo commits: https://github.com/EricZimmerman/DFIR-SQL-Query-Repo
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman documentation commits: https://github.com/EricZimmerman/documentation
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman evtx releases: https://github.com/EricZimmerman/evtx
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman ExtensionBlocks commits: https://github.com/EricZimmerman/ExtensionBlocks
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman Get-ZimmermanTools commits: https://github.com/EricZimmerman/Get-ZimmermanTools
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman GuidMapping commits: https://github.com/EricZimmerman/GuidMapping
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman JLECmd releases: https://github.com/EricZimmerman/JLECmd
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman JumpList commits: https://github.com/EricZimmerman/JumpList
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman KapeDocs commits: https://github.com/EricZimmerman/KapeDocs
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman KapeFiles commits: https://github.com/EricZimmerman/KapeFiles
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman LECmd releases: https://github.com/EricZimmerman/LECmd
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman Lnk commits: https://github.com/EricZimmerman/Lnk
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman MFT commits: https://github.com/EricZimmerman/MFT
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman MFTECmd releases: https://github.com/EricZimmerman/MFTECmd
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman OleCf commits: https://github.com/EricZimmerman/OleCf
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman PECmd releases: https://github.com/EricZimmerman/PECmd
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman Prefetch commits: https://github.com/EricZimmerman/Prefetch
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman RBCmd releases: https://github.com/EricZimmerman/RBCmd
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman RecentFileCacheParser commits: https://github.com/EricZimmerman/RecentFileCacheParser
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman RECmd releases: https://github.com/EricZimmerman/RECmd
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman Registry commits: https://github.com/EricZimmerman/Registry
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman RegistryExplorerBookmarks commits: https://github.com/EricZimmerman/RegistryExplorerBookmarks
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman RegistryPlugins commits: https://github.com/EricZimmerman/RegistryPlugins
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman SQLECmd releases: https://github.com/EricZimmerman/SQLECmd
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman Srum commits: https://github.com/EricZimmerman/Srum
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman TLEFilePlugins commits: https://github.com/EricZimmerman/TLEFilePlugins
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Eric Zimmerman USBDevices commits: https://github.com/EricZimmerman/USBDevices
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
 - Eric Zimmerman WinSearchDBAnalyzer: https://github.com/EricZimmerman/WinSearchDBAnalyzer
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Eric Zimmerman WxTCmd: https://github.com/EricZimmerman/WxTCmd
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- Hayabusa rules: https://github.com/Yamato-Security/hayabusa-rules
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- regipy: https://github.com/mkorman90/regipy
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
-- SigmaHQ: https://github.com/SigmaHQ/sigma
-  update: `manual-review`; kind: `github-repository`; sources: `manual`
+  update: `feed-monitored`; kind: `github-repository`; sources: `manual`
+- Eric Zimmerman WxTCmd releases: https://github.com/EricZimmerman/WxTCmd
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- mkorman90 regipy releases: https://github.com/mkorman90/regipy
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- SigmaHQ sigma releases: https://github.com/SigmaHQ/sigma
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- WithSecureLabs chainsaw releases: https://github.com/WithSecureLabs/chainsaw
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
+- Yamato-Security hayabusa-rules commits: https://github.com/Yamato-Security/hayabusa-rules
+  update: `rss`; kind: `github-repository`; sources: `manual, opml`
 
 ## practitioner-blog
 
+- Elastic Security Labs: https://www.elastic.co/security-labs/
+  update: `feed-monitored`; kind: `blog`; sources: `manual`
+- Microsoft Security Blog: https://www.microsoft.com/en-us/security/blog/
+  update: `rss`; kind: `blog`; sources: `manual, opml`
+- SentinelOne Labs: https://www.sentinelone.com/labs/
+  update: `rss`; kind: `blog`; sources: `manual, opml`
 - The DFIR Report: https://thedfirreport.com/
+  update: `rss`; kind: `blog`; sources: `manual, opml`
+- Volexity Blog: https://www.volexity.com/blog/
   update: `rss`; kind: `blog`; sources: `manual, opml`
 
 ## primary-reference
 
 - Apple Platform Security: https://support.apple.com/guide/security/welcome/web
-  update: `manual-review`; kind: `documentation`; sources: `manual`
-- Eric Zimmerman documentation: https://ericzimmerman.github.io/#!index.md
-  update: `manual-review`; kind: `documentation`; sources: `manual`
+  update: `feed-monitored`; kind: `documentation`; sources: `manual`
 - GTFOBins (Linux): https://gtfobins.github.io/
   update: `rss`; kind: `knowledge-base`; sources: `manual, opml`
 - LOLBAS Project (Windows): https://lolbas-project.github.io/
   update: `rss`; kind: `knowledge-base`; sources: `manual, opml`
 - Microsoft Learn: https://learn.microsoft.com/
-  update: `manual-review`; kind: `documentation`; sources: `manual`
-- MITRE ATT&CK: https://attack.mitre.org/
-  update: `manual-review`; kind: `knowledge-base`; sources: `manual`
+  update: `feed-monitored`; kind: `documentation`; sources: `manual`
+- MITRE ATT&CK CTI releases: https://attack.mitre.org/
+  update: `rss`; kind: `knowledge-base`; sources: `manual, opml`
 - Sysinternals documentation: https://learn.microsoft.com/en-us/sysinternals/
-  update: `manual-review`; kind: `documentation`; sources: `manual`
+  update: `feed-monitored`; kind: `documentation`; sources: `manual`
 - Tor Project documentation: https://support.torproject.org/
-  update: `manual-review`; kind: `documentation`; sources: `manual`
-- Velociraptor documentation: https://docs.velociraptor.app/
-  update: `manual-review`; kind: `documentation`; sources: `manual`
+  update: `feed-monitored`; kind: `documentation`; sources: `manual`
+- Velociraptor releases: https://docs.velociraptor.app/
+  update: `rss`; kind: `documentation`; sources: `manual, opml`

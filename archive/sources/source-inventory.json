@@ -4,7 +4,7 @@
     "directories": "archive/sources/catalog-directories.json",
     "manual": "archive/sources/manual-sources.json"
   },
-  "total_sources": 111,
+  "total_sources": 115,
   "sources": [
     {
       "id": "aboutdfir-blogs",
@@ -78,19 +78,6 @@
       "kind": "rss-feed",
       "html_url": "https://aboutdfir.com/",
       "feed_url": "https://aboutdfir.com/feed/",
-      "update_strategy": "rss",
-      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
-      "sources": [
-        "opml"
-      ]
-    },
-    {
-      "id": "abuse-ch-blog",
-      "title": "abuse.ch blog",
-      "category": "feed",
-      "kind": "rss-feed",
-      "html_url": "https://abuse.ch/",
-      "feed_url": "https://abuse.ch/blog/feed/",
       "update_strategy": "rss",
       "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
       "sources": [
@@ -306,19 +293,6 @@
       ]
     },
     {
-      "id": "dfir-blog",
-      "title": "dfir.blog",
-      "category": "feed",
-      "kind": "rss-feed",
-      "html_url": "https://dfir.blog/",
-      "feed_url": "https://dfir.blog/rss/",
-      "update_strategy": "rss",
-      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
-      "sources": [
-        "opml"
-      ]
-    },
-    {
       "id": "didier-stevens-blog",
       "title": "Didier Stevens Blog",
       "category": "feed",
@@ -384,11 +358,24 @@
       ]
     },
     {
+      "id": "eric-zimmerman-winsearchdbanalyzer-commits",
+      "title": "Eric Zimmerman WinSearchDbAnalyzer commits",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://github.com/EricZimmerman/WinSearchDbAnalyzer",
+      "feed_url": "https://github.com/EricZimmerman/WinSearchDbAnalyzer/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
       "id": "forensafe-artifast-blog",
       "title": "Forensafe (ArtiFast) Blog",
       "category": "feed",
       "kind": "rss-feed",
-      "html_url": "https://www.forensafe.com/",
+      "html_url": "https://www.forensafe.com/blogs/",
       "feed_url": "https://www.forensafe.com/rss.xml",
       "update_strategy": "rss",
       "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
@@ -839,6 +826,19 @@
       ]
     },
     {
+      "id": "yamato-security-hayabusa-releases",
+      "title": "Yamato-Security hayabusa releases",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://github.com/Yamato-Security/hayabusa",
+      "feed_url": "https://github.com/Yamato-Security/hayabusa/releases.atom",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
       "id": "yogesh-khatri-s-forensic-blog",
       "title": "Yogesh Khatri's forensic blog",
       "category": "feed",
@@ -859,400 +859,430 @@
       "html_url": "https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes",
       "feed_url": "https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commits/main.atom",
       "update_strategy": "rss",
-      "notes": "Windows event references, artifact maps, detection rules, and DFIR field notes.",
+      "notes": "Windows event references, artifact maps, detection rules, and DFIR field notes. Commit feed in Blue Team Field Notes section of dfir-feeds.opml.",
       "sources": [
         "manual",
         "opml"
       ]
     },
     {
-      "id": "chainsaw-rules",
-      "title": "Chainsaw detections",
+      "id": "elastic-detection-rules-releases",
+      "title": "Elastic detection-rules releases",
       "category": "knowledge-base",
       "kind": "github-repository",
-      "html_url": "https://github.com/WithSecureLabs/chainsaw",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Detection rules and event triage references.",
+      "html_url": "https://github.com/elastic/detection-rules",
+      "feed_url": "https://github.com/elastic/detection-rules/releases.atom",
+      "update_strategy": "rss",
+      "notes": "ATT&CK-mapped EQL/KQL detection rules. Release feed in Detection Rule Repositories section.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-amcacheparser",
-      "title": "Eric Zimmerman AmcacheParser",
+      "id": "eric-zimmerman-amcacheparser-releases",
+      "title": "Eric Zimmerman AmcacheParser releases",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/AmcacheParser",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Amcache parser for application inventory artifacts.",
+      "feed_url": "https://github.com/EricZimmerman/AmcacheParser/releases.atom",
+      "update_strategy": "rss",
+      "notes": "Amcache parser for application inventory artifacts. Release feed in Eric Zimmerman Tool Releases section.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-appcompatcacheparser",
-      "title": "Eric Zimmerman AppCompatCacheParser",
+      "id": "eric-zimmerman-appcompatcacheparser-releases",
+      "title": "Eric Zimmerman AppCompatCacheParser releases",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/AppCompatCacheParser",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "ShimCache parser across multiple Windows versions.",
+      "feed_url": "https://github.com/EricZimmerman/AppCompatCacheParser/releases.atom",
+      "update_strategy": "rss",
+      "notes": "ShimCache parser across multiple Windows versions. Release feed in Eric Zimmerman Tool Releases section.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-dfir-sql-query-repo",
-      "title": "Eric Zimmerman DFIR-SQL-Query-Repo",
+      "id": "eric-zimmerman-dfir-sql-query-repo-commits",
+      "title": "Eric Zimmerman DFIR-SQL-Query-Repo commits",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/DFIR-SQL-Query-Repo",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "SQL query templates for digital forensics use across SQLite and related databases.",
+      "feed_url": "https://github.com/EricZimmerman/DFIR-SQL-Query-Repo/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "SQL query templates for digital forensics. Commit feed in Eric Zimmerman Tool Releases section.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-documentation",
-      "title": "Eric Zimmerman documentation",
+      "id": "eric-zimmerman-documentation-commits",
+      "title": "Eric Zimmerman documentation commits",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/documentation",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Zimmerman documentation repository covering tool usage and workflow guidance.",
+      "feed_url": "https://github.com/EricZimmerman/documentation/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "Zimmerman documentation repository. Commit feed in Eric Zimmerman Tool Releases section.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-evtx",
-      "title": "Eric Zimmerman evtx",
+      "id": "eric-zimmerman-evtx-releases",
+      "title": "Eric Zimmerman evtx releases",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/evtx",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "EVTX parser and supporting event-log processing logic.",
+      "feed_url": "https://github.com/EricZimmerman/evtx/releases.atom",
+      "update_strategy": "rss",
+      "notes": "EVTX parser and supporting event-log processing logic. Release feed in Eric Zimmerman Tool Releases section.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-extensionblocks",
-      "title": "Eric Zimmerman ExtensionBlocks",
+      "id": "eric-zimmerman-extensionblocks-commits",
+      "title": "Eric Zimmerman ExtensionBlocks commits",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/ExtensionBlocks",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Extension block parsing used in ShellBags and related registry artifacts.",
+      "feed_url": "https://github.com/EricZimmerman/ExtensionBlocks/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "Extension block parsing library. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-get-zimmermantools",
-      "title": "Eric Zimmerman Get-ZimmermanTools",
+      "id": "eric-zimmerman-get-zimmermantools-commits",
+      "title": "Eric Zimmerman Get-ZimmermanTools commits",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/Get-ZimmermanTools",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Tool-distribution and acquisition helper for the Zimmerman suite.",
+      "feed_url": "https://github.com/EricZimmerman/Get-ZimmermanTools/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "Tool-distribution helper for the Zimmerman suite. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-guidmapping",
-      "title": "Eric Zimmerman GuidMapping",
+      "id": "eric-zimmerman-guidmapping-commits",
+      "title": "Eric Zimmerman GuidMapping commits",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/GuidMapping",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "GUID resolution data useful for UserAssist, ShellBags, and other shell artifacts.",
+      "feed_url": "https://github.com/EricZimmerman/GuidMapping/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "GUID resolution data for UserAssist, ShellBags, shell artifacts. Commit feed in Eric Zimmerman Tool Releases section.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-jlecmd",
-      "title": "Eric Zimmerman JLECmd",
+      "id": "eric-zimmerman-jlecmd-releases",
+      "title": "Eric Zimmerman JLECmd releases",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/JLECmd",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Automatic and custom destinations Jump List parser.",
+      "feed_url": "https://github.com/EricZimmerman/JLECmd/releases.atom",
+      "update_strategy": "rss",
+      "notes": "Automatic and custom destinations Jump List parser. Release feed in Eric Zimmerman Tool Releases section.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-jumplist",
-      "title": "Eric Zimmerman JumpList",
+      "id": "eric-zimmerman-jumplist-commits",
+      "title": "Eric Zimmerman JumpList commits",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/JumpList",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Jump List parsing library and supporting structures.",
+      "feed_url": "https://github.com/EricZimmerman/JumpList/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "Jump List parsing library. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-kapedocs",
-      "title": "Eric Zimmerman KapeDocs",
+      "id": "eric-zimmerman-kapedocs-commits",
+      "title": "Eric Zimmerman KapeDocs commits",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/KapeDocs",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "KAPE documentation and collection guidance.",
+      "feed_url": "https://github.com/EricZimmerman/KapeDocs/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "KAPE documentation. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-kapefiles",
-      "title": "Eric Zimmerman KapeFiles",
+      "id": "eric-zimmerman-kapefiles-commits",
+      "title": "Eric Zimmerman KapeFiles commits",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/KapeFiles",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Community KAPE targets and modules for DFIR collection and processing.",
+      "feed_url": "https://github.com/EricZimmerman/KapeFiles/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "Community KAPE targets and modules. Commit feed in Eric Zimmerman Tool Releases section (each commit = new target).",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-lecmd",
-      "title": "Eric Zimmerman LECmd",
+      "id": "eric-zimmerman-lecmd-releases",
+      "title": "Eric Zimmerman LECmd releases",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/LECmd",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Shell link parser for recent files and LNK artifacts.",
+      "feed_url": "https://github.com/EricZimmerman/LECmd/releases.atom",
+      "update_strategy": "rss",
+      "notes": "Shell link parser for recent files and LNK artifacts. Release feed in Eric Zimmerman Tool Releases section.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-lnk",
-      "title": "Eric Zimmerman Lnk",
+      "id": "eric-zimmerman-lnk-commits",
+      "title": "Eric Zimmerman Lnk commits",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/Lnk",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Shell link parsing library.",
+      "feed_url": "https://github.com/EricZimmerman/Lnk/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "Shell link parsing library. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-mft",
-      "title": "Eric Zimmerman MFT",
+      "id": "eric-zimmerman-mft-commits",
+      "title": "Eric Zimmerman MFT commits",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/MFT",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "NTFS MFT parsing library underlying Zimmerman MFT-focused tooling.",
+      "feed_url": "https://github.com/EricZimmerman/MFT/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "NTFS MFT parsing library. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-mftecmd",
-      "title": "Eric Zimmerman MFTECmd",
+      "id": "eric-zimmerman-mftecmd-releases",
+      "title": "Eric Zimmerman MFTECmd releases",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/MFTECmd",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "NTFS $MFT and related metadata parsing.",
+      "feed_url": "https://github.com/EricZimmerman/MFTECmd/releases.atom",
+      "update_strategy": "rss",
+      "notes": "NTFS $MFT and related metadata parsing. Release feed in Eric Zimmerman Tool Releases section.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-olecf",
-      "title": "Eric Zimmerman OleCf",
+      "id": "eric-zimmerman-olecf-commits",
+      "title": "Eric Zimmerman OleCf commits",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/OleCf",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "OLE compound file parsing library used for compound container artifacts such as Jump Lists.",
+      "feed_url": "https://github.com/EricZimmerman/OleCf/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "OLE compound file parsing library. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-pecmd",
-      "title": "Eric Zimmerman PECmd",
+      "id": "eric-zimmerman-pecmd-releases",
+      "title": "Eric Zimmerman PECmd releases",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/PECmd",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Prefetch parser and command-line analysis tool.",
+      "feed_url": "https://github.com/EricZimmerman/PECmd/releases.atom",
+      "update_strategy": "rss",
+      "notes": "Prefetch parser and command-line analysis tool. Release feed in Eric Zimmerman Tool Releases section.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-prefetch",
-      "title": "Eric Zimmerman Prefetch",
+      "id": "eric-zimmerman-prefetch-commits",
+      "title": "Eric Zimmerman Prefetch commits",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/Prefetch",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Windows Prefetch parsing library.",
+      "feed_url": "https://github.com/EricZimmerman/Prefetch/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "Windows Prefetch parsing library. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-rbcmd",
-      "title": "Eric Zimmerman RBCmd",
+      "id": "eric-zimmerman-rbcmd-releases",
+      "title": "Eric Zimmerman RBCmd releases",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/RBCmd",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Recycle Bin artifact parser.",
+      "feed_url": "https://github.com/EricZimmerman/RBCmd/releases.atom",
+      "update_strategy": "rss",
+      "notes": "Recycle Bin artifact parser. Release feed in Eric Zimmerman Tool Releases section.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-recentfilecacheparser",
-      "title": "Eric Zimmerman RecentFileCacheParser",
+      "id": "eric-zimmerman-recentfilecacheparser-commits",
+      "title": "Eric Zimmerman RecentFileCacheParser commits",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/RecentFileCacheParser",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Parser for RecentFileCache.bcf execution evidence on legacy Windows systems.",
+      "feed_url": "https://github.com/EricZimmerman/RecentFileCacheParser/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "Parser for RecentFileCache.bcf. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-recmd",
-      "title": "Eric Zimmerman RECmd",
+      "id": "eric-zimmerman-recmd-releases",
+      "title": "Eric Zimmerman RECmd releases",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/RECmd",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Registry command-line access and batch artifact extraction.",
+      "feed_url": "https://github.com/EricZimmerman/RECmd/releases.atom",
+      "update_strategy": "rss",
+      "notes": "Registry command-line access and batch artifact extraction. Release feed in Eric Zimmerman Tool Releases section.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-registry",
-      "title": "Eric Zimmerman Registry",
+      "id": "eric-zimmerman-registry-commits",
+      "title": "Eric Zimmerman Registry commits",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/Registry",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Offline Windows Registry parsing library.",
+      "feed_url": "https://github.com/EricZimmerman/Registry/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "Offline Windows Registry parsing library. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-registryexplorerbookmarks",
-      "title": "Eric Zimmerman RegistryExplorerBookmarks",
+      "id": "eric-zimmerman-registryexplorerbookmarks-commits",
+      "title": "Eric Zimmerman RegistryExplorerBookmarks commits",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/RegistryExplorerBookmarks",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Registry Explorer bookmark definitions covering DFIR-relevant artifact locations.",
+      "feed_url": "https://github.com/EricZimmerman/RegistryExplorerBookmarks/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "Registry Explorer bookmark definitions. Commit feed in Eric Zimmerman Tool Releases section.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-registryplugins",
-      "title": "Eric Zimmerman RegistryPlugins",
+      "id": "eric-zimmerman-registryplugins-commits",
+      "title": "Eric Zimmerman RegistryPlugins commits",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/RegistryPlugins",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Registry artifact plugin definitions used by Zimmerman tooling.",
+      "feed_url": "https://github.com/EricZimmerman/RegistryPlugins/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "Registry artifact plugin definitions used by Zimmerman tooling. Commit feed in Eric Zimmerman Tool Releases section.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-sqlecmd",
-      "title": "Eric Zimmerman SQLECmd",
+      "id": "eric-zimmerman-sqlecmd-releases",
+      "title": "Eric Zimmerman SQLECmd releases",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/SQLECmd",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "SQLite parsing and triage support for DFIR-oriented databases.",
+      "feed_url": "https://github.com/EricZimmerman/SQLECmd/releases.atom",
+      "update_strategy": "rss",
+      "notes": "SQLite parsing and triage support. Release feed in Eric Zimmerman Tool Releases section.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-srum",
-      "title": "Eric Zimmerman Srum",
+      "id": "eric-zimmerman-srum-commits",
+      "title": "Eric Zimmerman Srum commits",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/Srum",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "SRUM parsing logic for application and network usage artifacts.",
+      "feed_url": "https://github.com/EricZimmerman/Srum/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "SRUM parsing library. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-tlefileplugins",
-      "title": "Eric Zimmerman TLEFilePlugins",
+      "id": "eric-zimmerman-tlefileplugins-commits",
+      "title": "Eric Zimmerman TLEFilePlugins commits",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/TLEFilePlugins",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Timeline Explorer file plugins for CSV-oriented DFIR parser outputs.",
+      "feed_url": "https://github.com/EricZimmerman/TLEFilePlugins/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "Timeline Explorer file plugins. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "ericzimmerman-usbdevices",
-      "title": "Eric Zimmerman USBDevices",
+      "id": "eric-zimmerman-usbdevices-commits",
+      "title": "Eric Zimmerman USBDevices commits",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/USBDevices",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Registry-backed USB device extraction and reporting.",
+      "feed_url": "https://github.com/EricZimmerman/USBDevices/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "Registry-backed USB device extraction. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
@@ -1262,62 +1292,121 @@
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/WinSearchDBAnalyzer",
       "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Windows Search ESE database analysis utility.",
+      "update_strategy": "feed-monitored",
+      "notes": "Windows Search ESE database analysis utility. Commit feed (commits/master.atom) in Eric Zimmerman Library Crates section of dfir-feeds.opml.",
       "sources": [
         "manual"
       ]
     },
     {
-      "id": "ericzimmerman-wxtcmd",
-      "title": "Eric Zimmerman WxTCmd",
+      "id": "eric-zimmerman-wxtcmd-releases",
+      "title": "Eric Zimmerman WxTCmd releases",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/EricZimmerman/WxTCmd",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Windows Timeline and activity-cache parsing support.",
+      "feed_url": "https://github.com/EricZimmerman/WxTCmd/releases.atom",
+      "update_strategy": "rss",
+      "notes": "Windows Timeline and activity-cache parser. Release feed in Eric Zimmerman Tool Releases section.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
-      "id": "hayabusa-rules",
-      "title": "Hayabusa rules",
-      "category": "knowledge-base",
-      "kind": "github-repository",
-      "html_url": "https://github.com/Yamato-Security/hayabusa-rules",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Windows event detection rule corpus.",
-      "sources": [
-        "manual"
-      ]
-    },
-    {
-      "id": "regipy",
-      "title": "regipy",
+      "id": "mkorman90-regipy-releases",
+      "title": "mkorman90 regipy releases",
       "category": "knowledge-base",
       "kind": "github-repository",
       "html_url": "https://github.com/mkorman90/regipy",
+      "feed_url": "https://github.com/mkorman90/regipy/releases.atom",
+      "update_strategy": "rss",
+      "notes": "Offline Windows registry parsing library and plugin corpus. Release feed in Detection Rule Repositories section of dfir-feeds.opml.",
+      "sources": [
+        "manual",
+        "opml"
+      ]
+    },
+    {
+      "id": "sigmahq-sigma-releases",
+      "title": "SigmaHQ sigma releases",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/SigmaHQ/sigma",
+      "feed_url": "https://github.com/SigmaHQ/sigma/releases.atom",
+      "update_strategy": "rss",
+      "notes": "Detection rule corpus. Release feed in Detection Rule Repositories section.",
+      "sources": [
+        "manual",
+        "opml"
+      ]
+    },
+    {
+      "id": "withsecurelabs-chainsaw-releases",
+      "title": "WithSecureLabs chainsaw releases",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/WithSecureLabs/chainsaw",
+      "feed_url": "https://github.com/WithSecureLabs/chainsaw/releases.atom",
+      "update_strategy": "rss",
+      "notes": "Windows event triage tool and detection rules. Release feed in Detection Rule Repositories section.",
+      "sources": [
+        "manual",
+        "opml"
+      ]
+    },
+    {
+      "id": "yamato-security-hayabusa-rules-commits",
+      "title": "Yamato-Security hayabusa-rules commits",
+      "category": "knowledge-base",
+      "kind": "github-repository",
+      "html_url": "https://github.com/Yamato-Security/hayabusa-rules",
+      "feed_url": "https://github.com/Yamato-Security/hayabusa-rules/commits/main.atom",
+      "update_strategy": "rss",
+      "notes": "Windows event detection rules. Commit + release feeds in Detection Rule Repositories section.",
+      "sources": [
+        "manual",
+        "opml"
+      ]
+    },
+    {
+      "id": "elastic-security-labs",
+      "title": "Elastic Security Labs",
+      "category": "practitioner-blog",
+      "kind": "blog",
+      "html_url": "https://www.elastic.co/security-labs/",
       "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Offline Windows registry parsing library and plugin corpus covering many DFIR-relevant registry artifacts.",
+      "update_strategy": "feed-monitored",
+      "notes": "Threat research, detection engineering, malware analysis. HTML monitor in DFIR Blogs section (no RSS endpoint available).",
       "sources": [
         "manual"
       ]
     },
     {
-      "id": "sigmahq",
-      "title": "SigmaHQ",
-      "category": "knowledge-base",
-      "kind": "github-repository",
-      "html_url": "https://github.com/SigmaHQ/sigma",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Detection rule corpus used for event and artifact cross-checking.",
+      "id": "microsoft-security-blog",
+      "title": "Microsoft Security Blog",
+      "category": "practitioner-blog",
+      "kind": "blog",
+      "html_url": "https://www.microsoft.com/en-us/security/blog/",
+      "feed_url": "https://www.microsoft.com/en-us/security/blog/feed/",
+      "update_strategy": "rss",
+      "notes": "Windows security, threat intelligence, detection engineering. RSS feed in Vendor and Intel Blogs section.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
+      ]
+    },
+    {
+      "id": "sentinelone-labs",
+      "title": "SentinelOne Labs",
+      "category": "practitioner-blog",
+      "kind": "blog",
+      "html_url": "https://www.sentinelone.com/labs/",
+      "feed_url": "https://www.sentinelone.com/labs/feed/",
+      "update_strategy": "rss",
+      "notes": "Malware research, ransomware analysis, threat intelligence. RSS feed in Vendor and Intel Blogs section.",
+      "sources": [
+        "manual",
+        "opml"
       ]
     },
     {
@@ -1328,7 +1417,21 @@
       "html_url": "https://thedfirreport.com/",
       "feed_url": "https://thedfirreport.com/feed/",
       "update_strategy": "rss",
-      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "notes": "Incident case studies and intrusion-analysis writeups. RSS feed in DFIR Blogs section of dfir-feeds.opml.",
+      "sources": [
+        "manual",
+        "opml"
+      ]
+    },
+    {
+      "id": "volexity-blog",
+      "title": "Volexity Blog",
+      "category": "practitioner-blog",
+      "kind": "blog",
+      "html_url": "https://www.volexity.com/blog/",
+      "feed_url": "https://www.volexity.com/blog/feed/",
+      "update_strategy": "rss",
+      "notes": "Incident response, memory forensics, APT tracking. RSS feed in Vendor and Intel Blogs section.",
       "sources": [
         "manual",
         "opml"
@@ -1341,21 +1444,8 @@
       "kind": "documentation",
       "html_url": "https://support.apple.com/guide/security/welcome/web",
       "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Primary Apple platform security documentation.",
-      "sources": [
-        "manual"
-      ]
-    },
-    {
-      "id": "eric-zimmerman",
-      "title": "Eric Zimmerman documentation",
-      "category": "primary-reference",
-      "kind": "documentation",
-      "html_url": "https://ericzimmerman.github.io/#!index.md",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Parser and forensic tool documentation.",
+      "update_strategy": "feed-monitored",
+      "notes": "Primary Apple platform security documentation. Web monitor in Documentation and Reference Sources section of dfir-feeds.opml.",
       "sources": [
         "manual"
       ]
@@ -1368,7 +1458,7 @@
       "html_url": "https://gtfobins.github.io/",
       "feed_url": "https://github.com/GTFOBins/GTFOBins.github.io/commits/master.atom",
       "update_strategy": "rss",
-      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "notes": "Unix GTFOBins reference. Commit feed (commits/master.atom) in Living Off the Land Datasets section of dfir-feeds.opml.",
       "sources": [
         "manual",
         "opml"
@@ -1382,7 +1472,7 @@
       "html_url": "https://lolbas-project.github.io/",
       "feed_url": "https://github.com/LOLBAS-Project/LOLBAS/commits/master.atom",
       "update_strategy": "rss",
-      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "notes": "Windows LOLBAS reference. Commit feed (commits/master.atom) in Living Off the Land Datasets section of dfir-feeds.opml.",
       "sources": [
         "manual",
         "opml"
@@ -1395,23 +1485,24 @@
       "kind": "documentation",
       "html_url": "https://learn.microsoft.com/",
       "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Primary Windows platform and API documentation.",
+      "update_strategy": "feed-monitored",
+      "notes": "Primary Windows platform and API documentation. Web monitor (Windows What's New) in Documentation and Reference Sources section of dfir-feeds.opml.",
       "sources": [
         "manual"
       ]
     },
     {
-      "id": "mitre-attack",
-      "title": "MITRE ATT&CK",
+      "id": "mitre-att-ck-cti-releases",
+      "title": "MITRE ATT&CK CTI releases",
       "category": "primary-reference",
       "kind": "knowledge-base",
       "html_url": "https://attack.mitre.org/",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "ATT&CK technique and software reference.",
+      "feed_url": "https://github.com/mitre/cti/releases.atom",
+      "update_strategy": "rss",
+      "notes": "ATT&CK technique and software reference. GitHub releases.atom (ATT&CK version bumps) in Documentation and Reference Sources section of dfir-feeds.opml.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     },
     {
@@ -1421,8 +1512,8 @@
       "kind": "documentation",
       "html_url": "https://learn.microsoft.com/en-us/sysinternals/",
       "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Primary Sysinternals documentation and tool references.",
+      "update_strategy": "feed-monitored",
+      "notes": "Primary Sysinternals documentation and tool references. Web monitor (downloads index) in Documentation and Reference Sources section of dfir-feeds.opml.",
       "sources": [
         "manual"
       ]
@@ -1434,23 +1525,24 @@
       "kind": "documentation",
       "html_url": "https://support.torproject.org/",
       "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Tor deployment and network usage documentation.",
+      "update_strategy": "feed-monitored",
+      "notes": "Tor deployment and network usage documentation. Web monitors (tb-manual.torproject.org and spec.torproject.org) in Documentation and Reference Sources section of dfir-feeds.opml.",
       "sources": [
         "manual"
       ]
     },
     {
-      "id": "velociraptor-docs",
-      "title": "Velociraptor documentation",
+      "id": "velociraptor-releases",
+      "title": "Velociraptor releases",
       "category": "primary-reference",
       "kind": "documentation",
       "html_url": "https://docs.velociraptor.app/",
-      "feed_url": "",
-      "update_strategy": "manual-review",
-      "notes": "Velociraptor artifact and VQL documentation.",
+      "feed_url": "https://github.com/Velocidex/velociraptor/releases.atom",
+      "update_strategy": "rss",
+      "notes": "Velociraptor artifact and VQL documentation. GitHub releases.atom in Documentation and Reference Sources section of dfir-feeds.opml.",
       "sources": [
-        "manual"
+        "manual",
+        "opml"
       ]
     }
   ]

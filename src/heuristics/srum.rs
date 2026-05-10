@@ -191,10 +191,10 @@ const SYSTEM_BINARIES: &[&str] = &[
 ];
 
 const SYSTEM_DIRS: &[&str] = &[
-    r"\\windows\\system32",
-    r"\\windows\\syswow64",
-    r"\\windows\\winsxs",
-    r"\\windows\\sysnative",
+    r"\windows\system32",
+    r"\windows\syswow64",
+    r"\windows\winsxs",
+    r"\windows\sysnative",
 ];
 
 /// Inline Levenshtein distance (no external crate).
@@ -230,27 +230,9 @@ fn levenshtein(a: &str, b: &str) -> usize {
 #[must_use]
 pub fn is_process_masquerade(binary_name: &str, dir: &str) -> bool {
     let dir_lower = dir.to_lowercase();
-    // Replace single backslash with double for consistent matching against SYSTEM_DIRS
-    // which use escaped double-backslash strings. We normalise to lowercase and compare
-    // the raw string content.
-    let dir_norm = dir_lower.replace('\\', "\\\\");
 
-    // If dir is a system directory, never flag.
     for sys_dir in SYSTEM_DIRS {
-        if dir_norm.contains(sys_dir) {
-            return false;
-        }
-    }
-    // Also handle the common single-backslash form directly.
-    let dir_lower_single = dir.to_lowercase();
-    let sys_dirs_single = &[
-        r"\windows\system32",
-        r"\windows\syswow64",
-        r"\windows\winsxs",
-        r"\windows\sysnative",
-    ];
-    for sys_dir in sys_dirs_single {
-        if dir_lower_single.contains(sys_dir) {
+        if dir_lower.contains(sys_dir) {
             return false;
         }
     }

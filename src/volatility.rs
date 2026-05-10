@@ -50,8 +50,8 @@ mod delegation_tests {
     }
 
     #[test]
-    fn volatility_for_delegates_to_profile() {
-        let result: Option<&crate::profile::ArtifactProfile> = volatility_for("shimcache");
+    fn volatility_for_returns_descriptor() {
+        let result: Option<&crate::catalog::ArtifactDescriptor> = volatility_for("shimcache");
         assert!(result.is_some());
     }
 }

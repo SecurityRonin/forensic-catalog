@@ -55,10 +55,8 @@ mod delegation_tests {
     }
 
     #[test]
-    fn evidence_for_delegates_to_profile() {
-        // evidence_for should return ArtifactProfile, not EvidenceEntry
-        // This test will fail until evidence_for() return type changes
-        let result: Option<&crate::profile::ArtifactProfile> = evidence_for("shimcache");
+    fn evidence_for_returns_descriptor() {
+        let result: Option<&crate::catalog::ArtifactDescriptor> = evidence_for("shimcache");
         assert!(result.is_some());
     }
 }

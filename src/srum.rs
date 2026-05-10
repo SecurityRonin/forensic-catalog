@@ -35,6 +35,12 @@ pub const TABLE_PUSH_NOTIFICATIONS: &str = "{D10CA2FE-6FCF-4F6D-848E-B2E99266FA8
 /// Available since Windows 10 Anniversary Update (1607).  Maps to `sr app-timeline`.
 pub const TABLE_APP_TIMELINE: &str = "{7ACBBAA3-D029-4BE4-9A7A-0885927F1D8F}";
 
+/// Energy Usage Long-Term — same schema as `TABLE_ENERGY_USAGE`, longer accumulation window.
+///
+/// The ESE table name is the energy GUID with the literal suffix `LT`.
+/// Available since Windows 8.1.  Maps to `sr energy-lt`.
+pub const TABLE_ENERGY_USAGE_LT: &str = "PLACEHOLDER";
+
 /// ID map table — integer ID → process path / SID mapping.
 ///
 /// Present on all SRUM-capable Windows versions.  Maps to `sr idmap`.
@@ -94,5 +100,13 @@ mod tests {
     #[test]
     fn id_map_is_not_a_guid() {
         assert!(!TABLE_ID_MAP.starts_with('{'));
+    }
+
+    #[test]
+    fn energy_usage_lt_guid_is_correct() {
+        assert_eq!(
+            TABLE_ENERGY_USAGE_LT,
+            "{FEE4E14F-02A9-4550-B5CE-5FA2DA202E37}LT"
+        );
     }
 }

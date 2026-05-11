@@ -511,3 +511,122 @@ mod tests {
         assert!(!is_task_com_handler_dll_suspicious(""));
     }
 }
+
+// ── PAM module / exec heuristics (stub — RED phase) ──────────────────────────
+
+/// Returns `true` if a PAM shared-object module path is outside the standard
+/// system PAM module directories.
+///
+/// # Detection
+/// PamDOORa (T1556.003) drops `pam_linux.so` as an additional auth module
+/// loaded via `/etc/pam.d/sshd` instead of replacing `pam_unix.so`. Any `.so`
+/// referenced in PAM config that does not live under a known system path is a
+/// backdoor candidate and warrants immediate hash comparison and analysis.
+#[must_use]
+pub fn is_pam_module_path_suspicious(module_path: &str) -> bool {
+    false // RED stub
+}
+
+/// Returns `true` if a `pam_exec` script path is in a world-writable or
+/// temporary directory.
+///
+/// # Detection
+/// PamDOORa abuses `pam_exec optional /tmp/capture.sh` style lines in
+/// `/etc/pam.d/sshd` to execute attacker scripts during authentication
+/// (T1556.003). Legitimate `pam_exec` scripts live under `/etc/` or
+/// `/usr/local/`. A path under `/tmp/`, `/var/tmp/`, `/dev/shm/`, or a
+/// user home directory is a high-confidence IOC.
+#[must_use]
+pub fn is_pam_exec_script_suspicious(script_path: &str) -> bool {
+    false // RED stub
+}
+
+#[cfg(test)]
+mod tests_pam_heuristics {
+    use super::*;
+
+    // is_pam_module_path_suspicious
+
+    #[test]
+    fn standard_lib_security_so_is_safe() {
+        assert!(!is_pam_module_path_suspicious("/lib/security/pam_unix.so"));
+    }
+
+    #[test]
+    fn debian_security_path_is_safe() {
+        assert!(!is_pam_module_path_suspicious(
+            "/lib/x86_64-linux-gnu/security/pam_sss.so"
+        ));
+    }
+
+    #[test]
+    fn usr_lib_security_is_safe() {
+        assert!(!is_pam_module_path_suspicious(
+            "/usr/lib/x86_64-linux-gnu/security/pam_unix.so"
+        ));
+    }
+
+    #[test]
+    fn tmp_pam_so_is_suspicious() {
+        assert!(is_pam_module_path_suspicious("/tmp/pam_linux.so"));
+    }
+
+    #[test]
+    fn home_dir_pam_so_is_suspicious() {
+        assert!(is_pam_module_path_suspicious("/home/attacker/pam_linux.so"));
+    }
+
+    #[test]
+    fn var_tmp_pam_so_is_suspicious() {
+        assert!(is_pam_module_path_suspicious("/var/tmp/pam_evil.so"));
+    }
+
+    #[test]
+    fn empty_pam_module_path_is_not_suspicious() {
+        assert!(!is_pam_module_path_suspicious(""));
+    }
+
+    // is_pam_exec_script_suspicious
+
+    #[test]
+    fn etc_script_is_not_suspicious() {
+        assert!(!is_pam_exec_script_suspicious("/etc/pam_scripts/notify.sh"));
+    }
+
+    #[test]
+    fn usr_local_script_is_not_suspicious() {
+        assert!(!is_pam_exec_script_suspicious(
+            "/usr/local/bin/pam_check.sh"
+        ));
+    }
+
+    #[test]
+    fn tmp_capture_script_is_suspicious() {
+        assert!(is_pam_exec_script_suspicious("/tmp/capture.sh"));
+    }
+
+    #[test]
+    fn dev_shm_script_is_suspicious() {
+        assert!(is_pam_exec_script_suspicious("/dev/shm/exfil.sh"));
+    }
+
+    #[test]
+    fn home_dir_script_is_suspicious() {
+        assert!(is_pam_exec_script_suspicious("/home/user/.config/run.sh"));
+    }
+
+    #[test]
+    fn var_tmp_script_is_suspicious() {
+        assert!(is_pam_exec_script_suspicious("/var/tmp/backdoor.sh"));
+    }
+
+    #[test]
+    fn root_home_script_is_suspicious() {
+        assert!(is_pam_exec_script_suspicious("/root/.bashrc_extra.sh"));
+    }
+
+    #[test]
+    fn empty_script_path_is_not_suspicious() {
+        assert!(!is_pam_exec_script_suspicious(""));
+    }
+}

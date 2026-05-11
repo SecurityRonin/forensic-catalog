@@ -10008,3 +10008,256 @@ mod tests_usn_journal_related_artifacts {
         );
     }
 }
+
+// ── PamDOORa: PAM module directory (new artifact) ─────────────────────────────
+#[cfg(test)]
+mod tests_linux_pam_module_dir {
+    use super::*;
+
+    #[test]
+    fn linux_pam_module_dir_exists() {
+        assert!(
+            CATALOG.by_id("linux_pam_module_dir").is_some(),
+            "linux_pam_module_dir must exist in catalog"
+        );
+    }
+
+    #[test]
+    fn linux_pam_module_dir_is_linux() {
+        use crate::catalog::OsScope;
+        let d = CATALOG.by_id("linux_pam_module_dir").unwrap();
+        assert_eq!(d.os_scope, OsScope::Linux);
+    }
+
+    #[test]
+    fn linux_pam_module_dir_triage_is_critical() {
+        use crate::catalog::TriagePriority;
+        let d = CATALOG.by_id("linux_pam_module_dir").unwrap();
+        assert_eq!(
+            d.triage_priority,
+            TriagePriority::Critical,
+            "unexpected .so in PAM module dir = active credential backdoor"
+        );
+    }
+
+    #[test]
+    fn linux_pam_module_dir_has_t1556_003() {
+        let d = CATALOG.by_id("linux_pam_module_dir").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1556.003"),
+            "PAM module dir must map to T1556.003"
+        );
+    }
+
+    #[test]
+    fn linux_pam_module_dir_evidence_strength_is_definitive() {
+        use crate::evidence::EvidenceStrength;
+        let d = CATALOG.by_id("linux_pam_module_dir").unwrap();
+        assert_eq!(
+            d.evidence_strength,
+            Some(EvidenceStrength::Definitive),
+            "unexpected .so in PAM module dir directly proves backdoor installation"
+        );
+    }
+
+    #[test]
+    fn linux_pam_module_dir_volatility_is_persistent() {
+        use crate::volatility::VolatilityClass;
+        let d = CATALOG.by_id("linux_pam_module_dir").unwrap();
+        assert_eq!(d.volatility, Some(VolatilityClass::Persistent));
+    }
+
+    #[test]
+    fn linux_pam_module_dir_has_related_pam_d() {
+        let d = CATALOG.by_id("linux_pam_module_dir").unwrap();
+        assert!(
+            d.related_artifacts.iter().any(|r| *r == "linux_pam_d"),
+            "linux_pam_module_dir must relate to linux_pam_d; got: {:?}",
+            d.related_artifacts
+        );
+    }
+
+    #[test]
+    fn linux_pam_module_dir_cites_pamdoora_source() {
+        let d = CATALOG.by_id("linux_pam_module_dir").unwrap();
+        assert!(
+            d.sources.iter().any(|s| s.contains("flare.io")),
+            "must cite flare.io PamDOORa analysis; got: {:?}",
+            d.sources
+        );
+    }
+}
+
+// ── PamDOORa: linux_pam_d enrichment ─────────────────────────────────────────
+#[cfg(test)]
+mod tests_linux_pam_d_pamdoora {
+    use super::*;
+
+    #[test]
+    fn linux_pam_d_evidence_strength_is_definitive() {
+        use crate::evidence::EvidenceStrength;
+        let d = CATALOG.by_id("linux_pam_d").unwrap();
+        assert_eq!(
+            d.evidence_strength,
+            Some(EvidenceStrength::Definitive),
+            "PAM config modification directly proves auth interception"
+        );
+    }
+
+    #[test]
+    fn linux_pam_d_volatility_is_persistent() {
+        use crate::volatility::VolatilityClass;
+        let d = CATALOG.by_id("linux_pam_d").unwrap();
+        assert_eq!(d.volatility, Some(VolatilityClass::Persistent));
+    }
+
+    #[test]
+    fn linux_pam_d_related_includes_pam_module_dir() {
+        let d = CATALOG.by_id("linux_pam_d").unwrap();
+        assert!(
+            d.related_artifacts.iter().any(|r| *r == "linux_pam_module_dir"),
+            "linux_pam_d must relate to linux_pam_module_dir; got: {:?}",
+            d.related_artifacts
+        );
+    }
+
+    #[test]
+    fn linux_pam_d_related_includes_auth_logs() {
+        let d = CATALOG.by_id("linux_pam_d").unwrap();
+        let has_auth_log = d.related_artifacts.iter().any(|r| r.contains("auth_log")
+            || r.contains("wtmp") || r.contains("btmp") || r.contains("lastlog"));
+        assert!(
+            has_auth_log,
+            "linux_pam_d must relate to auth log artifacts; got: {:?}",
+            d.related_artifacts
+        );
+    }
+
+    #[test]
+    fn linux_pam_d_cites_pamdoora_source() {
+        let d = CATALOG.by_id("linux_pam_d").unwrap();
+        assert!(
+            d.sources.iter().any(|s| s.contains("flare.io")),
+            "must cite flare.io PamDOORa analysis"
+        );
+    }
+}
+
+// ── PamDOORa: auth log enrichments ───────────────────────────────────────────
+#[cfg(test)]
+mod tests_linux_auth_logs_pamdoora {
+    use super::*;
+
+    #[test]
+    fn linux_btmp_evidence_strength_is_strong() {
+        use crate::evidence::EvidenceStrength;
+        let d = CATALOG.by_id("linux_btmp").unwrap();
+        assert_eq!(d.evidence_strength, Some(EvidenceStrength::Strong));
+    }
+
+    #[test]
+    fn linux_btmp_volatility_is_rotating_buffer() {
+        use crate::volatility::VolatilityClass;
+        let d = CATALOG.by_id("linux_btmp").unwrap();
+        assert_eq!(d.volatility, Some(VolatilityClass::RotatingBuffer));
+    }
+
+    #[test]
+    fn linux_btmp_has_related_artifacts() {
+        let d = CATALOG.by_id("linux_btmp").unwrap();
+        assert!(
+            !d.related_artifacts.is_empty(),
+            "linux_btmp must list related auth-log artifacts"
+        );
+    }
+
+    #[test]
+    fn linux_btmp_has_tampering_caveat() {
+        let d = CATALOG.by_id("linux_btmp").unwrap();
+        assert!(
+            !d.evidence_caveats.is_empty(),
+            "linux_btmp must have evidence_caveats warning about log tampering"
+        );
+    }
+
+    #[test]
+    fn linux_lastlog_evidence_strength_is_definitive() {
+        use crate::evidence::EvidenceStrength;
+        let d = CATALOG.by_id("linux_lastlog").unwrap();
+        assert_eq!(
+            d.evidence_strength,
+            Some(EvidenceStrength::Definitive),
+            "fixed-offset binary by UID — zeroed UID entry directly proves tampering"
+        );
+    }
+
+    #[test]
+    fn linux_lastlog_volatility_is_persistent() {
+        use crate::volatility::VolatilityClass;
+        let d = CATALOG.by_id("linux_lastlog").unwrap();
+        assert_eq!(d.volatility, Some(VolatilityClass::Persistent));
+    }
+
+    #[test]
+    fn linux_lastlog_has_related_artifacts() {
+        let d = CATALOG.by_id("linux_lastlog").unwrap();
+        assert!(
+            !d.related_artifacts.is_empty(),
+            "linux_lastlog must list related auth-log artifacts"
+        );
+    }
+
+    #[test]
+    fn linux_lastlog_has_tampering_caveat() {
+        let d = CATALOG.by_id("linux_lastlog").unwrap();
+        assert!(
+            !d.evidence_caveats.is_empty(),
+            "linux_lastlog must warn about UID-offset zeroing by PAM backdoors"
+        );
+    }
+
+    #[test]
+    fn linux_utmp_evidence_strength_is_strong() {
+        use crate::evidence::EvidenceStrength;
+        let d = CATALOG.by_id("linux_utmp").unwrap();
+        assert_eq!(d.evidence_strength, Some(EvidenceStrength::Strong));
+    }
+
+    #[test]
+    fn linux_utmp_volatility_is_volatile() {
+        use crate::volatility::VolatilityClass;
+        let d = CATALOG.by_id("linux_utmp").unwrap();
+        assert_eq!(
+            d.volatility,
+            Some(VolatilityClass::Volatile),
+            "utmp lives in /run (tmpfs); lost on reboot"
+        );
+    }
+
+    #[test]
+    fn linux_utmp_has_related_artifacts() {
+        let d = CATALOG.by_id("linux_utmp").unwrap();
+        assert!(
+            !d.related_artifacts.is_empty(),
+            "linux_utmp must list related auth-log artifacts"
+        );
+    }
+
+    #[test]
+    fn linux_wtmp_has_related_artifacts() {
+        let d = CATALOG.by_id("linux_wtmp").unwrap();
+        assert!(
+            !d.related_artifacts.is_empty(),
+            "linux_wtmp must list related auth-log artifacts for correlation"
+        );
+    }
+
+    #[test]
+    fn linux_wtmp_cites_pamdoora_source() {
+        let d = CATALOG.by_id("linux_wtmp").unwrap();
+        assert!(
+            d.sources.iter().any(|s| s.contains("flare.io")),
+            "linux_wtmp must cite flare.io PamDOORa analysis documenting wtmp tampering"
+        );
+    }
+}

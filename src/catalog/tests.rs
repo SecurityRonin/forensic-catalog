@@ -10359,3 +10359,201 @@ mod tests_runonce_indirect_write_enrichment {
         );
     }
 }
+
+// ── RunServices / RunServicesOnce persistence keys ────────────────────────────
+
+#[cfg(test)]
+mod tests_run_services_persistence {
+    use super::*;
+
+    #[test]
+    fn run_services_hklm_exists() {
+        assert!(CATALOG.by_id("run_services_hklm").is_some());
+    }
+
+    #[test]
+    fn run_services_hklm_mitre_t1547_001() {
+        let d = CATALOG.by_id("run_services_hklm").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1547.001"),
+            "run_services_hklm must map T1547.001"
+        );
+    }
+
+    #[test]
+    fn run_services_hklm_triage_is_high() {
+        let d = CATALOG.by_id("run_services_hklm").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::High);
+    }
+
+    #[test]
+    fn run_services_hklm_has_related_run_key() {
+        let d = CATALOG.by_id("run_services_hklm").unwrap();
+        assert!(
+            d.related_artifacts.contains(&"run_key_hklm"),
+            "run_services_hklm should relate to run_key_hklm"
+        );
+    }
+
+    #[test]
+    fn run_services_hkcu_exists() {
+        assert!(CATALOG.by_id("run_services_hkcu").is_some());
+    }
+
+    #[test]
+    fn run_services_hkcu_mitre_t1547_001() {
+        let d = CATALOG.by_id("run_services_hkcu").unwrap();
+        assert!(d.mitre_techniques.contains(&"T1547.001"));
+    }
+
+    #[test]
+    fn run_services_once_hklm_exists() {
+        assert!(CATALOG.by_id("run_services_once_hklm").is_some());
+    }
+
+    #[test]
+    fn run_services_once_hklm_mitre_t1547_001() {
+        let d = CATALOG.by_id("run_services_once_hklm").unwrap();
+        assert!(d.mitre_techniques.contains(&"T1547.001"));
+    }
+
+    #[test]
+    fn run_services_once_hkcu_exists() {
+        assert!(CATALOG.by_id("run_services_once_hkcu").is_some());
+    }
+
+    #[test]
+    fn run_services_once_hkcu_mitre_t1547_001() {
+        let d = CATALOG.by_id("run_services_once_hkcu").unwrap();
+        assert!(d.mitre_techniques.contains(&"T1547.001"));
+    }
+
+    #[test]
+    fn run_services_hklm_meaning_is_substantive() {
+        let d = CATALOG.by_id("run_services_hklm").unwrap();
+        assert!(
+            d.meaning.len() > 80,
+            "run_services_hklm meaning is too brief ({} chars)",
+            d.meaning.len()
+        );
+    }
+}
+
+// ── Windows Firewall Authorized Applications ──────────────────────────────────
+
+#[cfg(test)]
+mod tests_firewall_authorized_apps {
+    use super::*;
+
+    #[test]
+    fn firewall_authorized_apps_exists() {
+        assert!(CATALOG.by_id("firewall_authorized_apps").is_some());
+    }
+
+    #[test]
+    fn firewall_authorized_apps_mitre_t1562_004() {
+        let d = CATALOG.by_id("firewall_authorized_apps").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1562.004"),
+            "must map T1562.004 (Disable or Modify System Firewall)"
+        );
+    }
+
+    #[test]
+    fn firewall_authorized_apps_triage_is_high() {
+        let d = CATALOG.by_id("firewall_authorized_apps").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::High);
+    }
+
+    #[test]
+    fn firewall_authorized_apps_meaning_mentions_emotet() {
+        let d = CATALOG.by_id("firewall_authorized_apps").unwrap();
+        assert!(
+            d.meaning.to_ascii_lowercase().contains("emotet"),
+            "meaning should document Emotet as a known abuser"
+        );
+    }
+
+    #[test]
+    fn firewall_authorized_apps_has_source() {
+        let d = CATALOG.by_id("firewall_authorized_apps").unwrap();
+        assert!(!d.sources.is_empty());
+    }
+}
+
+// ── COM shell persistence: SSODL and SharedTaskScheduler ─────────────────────
+
+#[cfg(test)]
+mod tests_com_persistence_keys {
+    use super::*;
+
+    #[test]
+    fn ssodl_exists() {
+        assert!(CATALOG.by_id("ssodl").is_some());
+    }
+
+    #[test]
+    fn ssodl_mitre_t1546_013() {
+        let d = CATALOG.by_id("ssodl").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1546.013"),
+            "SSODL must map T1546.013"
+        );
+    }
+
+    #[test]
+    fn ssodl_triage_is_high() {
+        let d = CATALOG.by_id("ssodl").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::High);
+    }
+
+    #[test]
+    fn ssodl_meaning_mentions_shell() {
+        let d = CATALOG.by_id("ssodl").unwrap();
+        assert!(
+            d.meaning.to_ascii_lowercase().contains("shell"),
+            "SSODL meaning should describe shell startup invocation"
+        );
+    }
+
+    #[test]
+    fn ssodl_has_source() {
+        let d = CATALOG.by_id("ssodl").unwrap();
+        assert!(!d.sources.is_empty());
+    }
+
+    #[test]
+    fn shared_task_scheduler_exists() {
+        assert!(CATALOG.by_id("shared_task_scheduler").is_some());
+    }
+
+    #[test]
+    fn shared_task_scheduler_mitre_t1546_013() {
+        let d = CATALOG.by_id("shared_task_scheduler").unwrap();
+        assert!(
+            d.mitre_techniques.contains(&"T1546.013"),
+            "SharedTaskScheduler must map T1546.013"
+        );
+    }
+
+    #[test]
+    fn shared_task_scheduler_triage_is_high() {
+        let d = CATALOG.by_id("shared_task_scheduler").unwrap();
+        assert_eq!(d.triage_priority, TriagePriority::High);
+    }
+
+    #[test]
+    fn shared_task_scheduler_meaning_mentions_com() {
+        let d = CATALOG.by_id("shared_task_scheduler").unwrap();
+        assert!(
+            d.meaning.to_ascii_lowercase().contains("com"),
+            "SharedTaskScheduler meaning should describe COM object execution"
+        );
+    }
+
+    #[test]
+    fn shared_task_scheduler_has_source() {
+        let d = CATALOG.by_id("shared_task_scheduler").unwrap();
+        assert!(!d.sources.is_empty());
+    }
+}

@@ -154,6 +154,10 @@ pub fn generate_static(rec: &IngestRecord) -> String {
     triage_priority: TriagePriority::{triage},
     related_artifacts: &[],
     sources: {sources},
+    evidence_strength: None,
+    evidence_caveats: &[],
+    volatility: None,
+    volatility_rationale: "",
 }};
 "#,
         id = rec.id,
@@ -169,7 +173,7 @@ pub fn generate_module_header(source_name: &str, count: usize) -> String {
 // Do not edit manually — re-run `cargo run -p ingest` to regenerate.
 #![allow(clippy::too_many_lines)]
 
-use forensicnomicon::catalog::{{
+use super::super::super::types::{{
     ArtifactDescriptor, ArtifactType, DataScope, Decoder, HiveTarget, OsScope,
     TriagePriority,
 }};

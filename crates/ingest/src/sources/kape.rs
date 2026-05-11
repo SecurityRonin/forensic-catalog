@@ -11,6 +11,7 @@
 
 use std::collections::HashSet;
 
+use crate::github::github_client;
 use crate::normalize::{normalize_file_id, to_snake_case};
 use crate::record::{IngestRecord, IngestType};
 
@@ -95,9 +96,7 @@ pub fn parse_tkape(content: &str, file_name: &str) -> Vec<IngestRecord> {
 
 /// Fetch all KAPE .tkape target files from GitHub and return parsed records.
 pub fn fetch_kape_targets() -> Result<Vec<IngestRecord>, Box<dyn std::error::Error>> {
-    let client = reqwest::blocking::Client::builder()
-        .user_agent("forensicnomicon-ingest/0.1")
-        .build()?;
+    let client = github_client()?;
 
     // Get the file tree
     let tree: serde_json::Value = client.get(KAPE_TREE_URL).send()?.json()?;

@@ -9,6 +9,7 @@
 
 use std::collections::HashSet;
 
+use crate::github::github_client;
 use crate::normalize::to_snake_case;
 use crate::record::{IngestRecord, IngestType};
 
@@ -190,11 +191,7 @@ fn ensure_unique(base: String, seen: &mut HashSet<String>) -> String {
 /// Walks all per-provider CSV files under ETWProvidersCSVs/Internal/,
 /// extracts unique Channel values, and creates one IngestRecord per channel.
 pub fn fetch_evtx_records() -> Vec<IngestRecord> {
-    let client = match reqwest::blocking::Client::builder()
-        .user_agent("forensicnomicon-ingest/0.1")
-        .timeout(std::time::Duration::from_secs(30))
-        .build()
-    {
+    let client = match github_client() {
         Ok(c) => c,
         Err(e) => {
             eprintln!("WARN: evtx: failed to build HTTP client: {e}");

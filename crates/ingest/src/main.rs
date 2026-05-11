@@ -1,5 +1,6 @@
 mod codegen;
 mod dedup;
+mod github;
 mod normalize;
 mod record;
 mod sources;

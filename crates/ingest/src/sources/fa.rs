@@ -9,6 +9,7 @@
 
 use std::collections::HashSet;
 
+use crate::github::github_client;
 use crate::normalize::{normalize_file_id, normalize_registry_id};
 use crate::record::{IngestRecord, IngestType};
 
@@ -66,16 +67,22 @@ fn parse_document(
         .unwrap_or("")
         .to_string();
 
-    let urls: Vec<String> = value
+    // Filter MITRE URLs: they belong in mitre_techniques[], not sources[].
+    // Also add the FA repo as fallback when urls[] is empty after filtering.
+    let mut urls: Vec<String> = value
         .get("urls")
         .and_then(|v| v.as_sequence())
         .map(|seq| {
             seq.iter()
                 .filter_map(|u| u.as_str())
+                .filter(|u| !u.contains("attack.mitre.org"))
                 .map(|s| s.to_string())
                 .collect()
         })
         .unwrap_or_default();
+    if urls.is_empty() {
+        urls.push("https://github.com/forensicartifacts/artifacts".to_string());
+    }
 
     let os_scope = parse_supported_os(value);
 
@@ -194,7 +201,7 @@ fn parse_supported_os(value: &serde_yaml::Value) -> String {
         }
         (true, false, false) => "Win7Plus".to_string(),
         (false, true, false) => "Linux".to_string(),
-        (false, false, true) => "MacOs".to_string(),
+        (false, false, true) => "MacOS".to_string(),
         _ => "Win7Plus".to_string(), // unknown / empty → conservative Windows default
     }
 }
@@ -258,6 +265,8 @@ fn strip_hive_from_path(path: &str) -> String {
 
 fn infer_triage(name: &str, doc: &str) -> &'static str {
     let combined = format!("{} {}", name, doc).to_ascii_lowercase();
+    // Cap at High — generated artifacts lack human-curated evidence assessments.
+    // Critical rating requires a handwritten descriptor with volatility/evidence filled in.
     if combined.contains("credential")
         || combined.contains("password")
         || combined.contains("lsass")
@@ -266,7 +275,7 @@ fn infer_triage(name: &str, doc: &str) -> &'static str {
         || combined.contains("token")
         || combined.contains("privilege")
     {
-        "Critical"
+        "High"
     } else if combined.contains("execution")
         || combined.contains("persistence")
         || combined.contains("run key")
@@ -303,11 +312,7 @@ pub fn fetch_fa_artifacts(url: &str) -> Result<Vec<IngestRecord>, Box<dyn std::e
 pub fn fetch_all_fa_artifacts() -> Vec<IngestRecord> {
     let tree_url =
         "https://api.github.com/repos/forensicartifacts/artifacts/git/trees/main?recursive=1";
-    let client = match reqwest::blocking::Client::builder()
-        .user_agent("forensicnomicon-ingest/0.1")
-        .timeout(std::time::Duration::from_secs(30))
-        .build()
-    {
+    let client = match github_client() {
         Ok(c) => c,
         Err(e) => {
             eprintln!("WARN: fa: failed to build HTTP client: {e}");
@@ -512,7 +517,7 @@ mod tests_os_scope {
     #[test]
     fn darwin_maps_to_macos() {
         let v = make_yaml("[Darwin]");
-        assert_eq!(parse_supported_os(&v), "MacOs");
+        assert_eq!(parse_supported_os(&v), "MacOS");
     }
 
     #[test]

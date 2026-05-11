@@ -99,7 +99,7 @@
     },
     {
       "id": "andrea-fortuna-dfir-malware-analysis",
-      "title": "Andrea Fortuna \u2014 DFIR & Malware Analysis",
+      "title": "Andrea Fortuna — DFIR & Malware Analysis",
       "category": "feed",
       "kind": "rss-feed",
       "html_url": "https://andreafortuna.org/",
@@ -364,6 +364,19 @@
       "kind": "rss-feed",
       "html_url": "https://github.com/EricZimmerman/WinSearchDbAnalyzer",
       "feed_url": "https://github.com/EricZimmerman/WinSearchDbAnalyzer/commits/master.atom",
+      "update_strategy": "rss",
+      "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
+      "sources": [
+        "opml"
+      ]
+    },
+    {
+      "id": "flare-io-threat-research-blog",
+      "title": "Flare.io Threat Research Blog",
+      "category": "feed",
+      "kind": "rss-feed",
+      "html_url": "https://flare.io/learn/resources/blog/",
+      "feed_url": "https://flare.io/learn/resources/blog/feed/",
       "update_strategy": "rss",
       "notes": "Subscribed RSS/Atom feed from the maintained OPML manifest.",
       "sources": [
@@ -1543,19 +1556,6 @@
       "sources": [
         "manual",
         "opml"
-      ]
-    },
-    {
-      "id": "flare-io-blog",
-      "title": "Flare.io Threat Research Blog",
-      "category": "feed",
-      "kind": "rss-feed",
-      "html_url": "https://flare.io/learn/resources/blog/",
-      "feed_url": "https://flare.io/learn/resources/blog/feed/",
-      "update_strategy": "rss",
-      "notes": "Threat exposure management vendor blog. Covers dark web intelligence, malware analysis, credential theft, PAM backdoors (PamDOORa), ransomware TTPs. RSS feed is standard WordPress. Added 2026-05-11 after PamDOORa analysis.",
-      "sources": [
-        "dfir-feeds.opml"
       ]
     }
   ]

@@ -7,7 +7,7 @@ Generated from:
 
 Category counts:
 - directory: 3
-- feed: 62
+- feed: 63
 - knowledge-base: 37
 - practitioner-blog: 5
 - primary-reference: 8
@@ -72,6 +72,8 @@ Category counts:
 - Embee Research: https://embee-research.ghost.io/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Eric Zimmerman WinSearchDbAnalyzer commits: https://github.com/EricZimmerman/WinSearchDbAnalyzer
+  update: `rss`; kind: `rss-feed`; sources: `opml`
+- Flare.io Threat Research Blog: https://flare.io/learn/resources/blog/
   update: `rss`; kind: `rss-feed`; sources: `opml`
 - Forensafe (ArtiFast) Blog: https://www.forensafe.com/blogs/
   update: `rss`; kind: `rss-feed`; sources: `opml`

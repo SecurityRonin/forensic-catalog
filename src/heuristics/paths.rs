@@ -524,7 +524,19 @@ mod tests {
 /// backdoor candidate and warrants immediate hash comparison and analysis.
 #[must_use]
 pub fn is_pam_module_path_suspicious(module_path: &str) -> bool {
-    false // RED stub
+    if module_path.is_empty() {
+        return false;
+    }
+    let lower = module_path.to_ascii_lowercase();
+    let safe_prefixes = [
+        "/lib/security/",
+        "/lib/x86_64-linux-gnu/security/",
+        "/lib/aarch64-linux-gnu/security/",
+        "/usr/lib/security/",
+        "/usr/lib/x86_64-linux-gnu/security/",
+        "/usr/lib64/security/",
+    ];
+    !safe_prefixes.iter().any(|p| lower.starts_with(p))
 }
 
 /// Returns `true` if a `pam_exec` script path is in a world-writable or
@@ -538,7 +550,19 @@ pub fn is_pam_module_path_suspicious(module_path: &str) -> bool {
 /// user home directory is a high-confidence IOC.
 #[must_use]
 pub fn is_pam_exec_script_suspicious(script_path: &str) -> bool {
-    false // RED stub
+    if script_path.is_empty() {
+        return false;
+    }
+    let lower = script_path.to_ascii_lowercase();
+    let suspicious_prefixes = [
+        "/tmp/",
+        "/var/tmp/",
+        "/dev/shm/",
+        "/home/",
+        "/root/",
+        "/run/user/",
+    ];
+    suspicious_prefixes.iter().any(|p| lower.starts_with(p))
 }
 
 #[cfg(test)]

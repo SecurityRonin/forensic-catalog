@@ -4273,6 +4273,44 @@ pub static LINUX_SSH_AUTHORIZED_KEYS: ArtifactDescriptor = ArtifactDescriptor {
 
 // ── Linux persistence: PAM / privilege / kernel ───────────────────────────
 
+/// `/lib/security/` — PAM loadable module directory (T1556.003).
+///
+/// Drop location for PAM shared-object (`.so`) modules loaded by the PAM
+/// framework during authentication. PamDOORa drops `pam_linux.so` here as
+/// an *additional* module referenced via an `auth optional pam_linux.so` line
+/// in `/etc/pam.d/sshd`, avoiding replacement of the standard `pam_unix.so`.
+/// Any `.so` file whose hash does not match a known-good system package is a
+/// backdoor candidate. Also check `/lib/x86_64-linux-gnu/security/` (Debian).
+pub static LINUX_PAM_MODULE_DIR: ArtifactDescriptor = ArtifactDescriptor {
+    id: "linux_pam_module_dir",
+    name: "PAM Modules Directory (/lib/security/)",
+    artifact_type: ArtifactType::Directory,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some("/lib/security"),
+    scope: DataScope::System,
+    os_scope: OsScope::Linux,
+    decoder: Decoder::Identity,
+    meaning: "Drop location for PAM .so modules; PamDOORa adds pam_linux.so here as a credential-harvesting backdoor loaded via pam_exec config — any .so absent from the installed package manifest proves backdoor installation.",
+    mitre_techniques: &["T1556.003", "T1574.006"],
+    fields: DIR_ENTRY_FIELDS,
+    retention: None,
+    triage_priority: TriagePriority::Critical,
+    related_artifacts: &["linux_pam_d", "linux_wtmp", "linux_btmp", "linux_lastlog", "linux_auth_log"],
+    sources: &[
+        "https://flare.io/learn/resources/blog/pamdoora-new-linux-pam-based-backdoor-sale-dark-web",
+        "https://linux.die.net/man/8/pam",
+    ],
+    evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
+    evidence_caveats: &[
+        "Also check /lib/x86_64-linux-gnu/security/ (Debian/Ubuntu) and /usr/lib/x86_64-linux-gnu/security/; verify every .so against dpkg/rpm manifest",
+        "PamDOORa compiles to pam_linux.so — any non-system module name is an immediate IOC",
+    ],
+    volatility: Some(crate::volatility::VolatilityClass::Persistent),
+    volatility_rationale: "Files on disk in /lib/; persist until explicitly removed",
+};
+
 /// `/etc/pam.d/` — PAM module configuration (T1556.003).
 ///
 /// Each file configures authentication for a service (e.g., `sshd`, `sudo`,
@@ -4294,17 +4332,29 @@ pub static LINUX_PAM_D: ArtifactDescriptor = ArtifactDescriptor {
     fields: DIR_ENTRY_FIELDS,
     retention: None,
     triage_priority: TriagePriority::High,
-    related_artifacts: &[],
+    related_artifacts: &[
+        "linux_pam_module_dir",
+        "linux_wtmp",
+        "linux_btmp",
+        "linux_lastlog",
+        "linux_utmp",
+        "linux_auth_log",
+    ],
     sources: &[
         // PAM backdoor: replaces pam_unix.so to exfiltrate credentials via DNS
         "https://x-c3ll.github.io/posts/PAM-backdoor-DNS/",
         // T1556.003 coverage in Elastic persistence primer (PAM modification section)
         "https://www.elastic.co/security-labs/primer-on-persistence-mechanisms",
+        // PamDOORa: pam_exec abuse and log tampering analysis
+        "https://flare.io/learn/resources/blog/pamdoora-new-linux-pam-based-backdoor-sale-dark-web",
     ],
-    evidence_strength: None,
-    evidence_caveats: &[],
-    volatility: None,
-    volatility_rationale: "",
+    evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
+    evidence_caveats: &[
+        "Modification of PAM config proves auth interception capability; correlate with linux_pam_module_dir for dropped .so and auth logs for attacker session timestamps",
+        "PamDOORa uses pam_exec to load scripts rather than replacing pam_unix.so — check for optional/sufficient module lines referencing non-system paths",
+    ],
+    volatility: Some(crate::volatility::VolatilityClass::Persistent),
+    volatility_rationale: "Text files in /etc/pam.d/; persist until explicitly modified or restored",
 };
 
 /// `/etc/sudoers.d/` — drop-in sudoers rules (T1548.003).
@@ -4528,14 +4578,18 @@ pub static LINUX_WTMP: ArtifactDescriptor = ArtifactDescriptor {
     fields: LOG_LINE_FIELDS,
     retention: Some("until rotated by logrotate"),
     triage_priority: TriagePriority::High,
-    related_artifacts: &[],
+    related_artifacts: &["linux_btmp", "linux_lastlog", "linux_utmp", "linux_auth_log", "linux_pam_d"],
     sources: &[
         "https://linux.die.net/man/5/wtmp",
         "https://bromiley.medium.com/torvalds-tuesday-logon-history-in-the-tmp-files-83530b2acc28",
         "https://sandflysecurity.com/blog/using-linux-utmpdump-for-forensics-and-detecting-log-file-tampering",
+        "https://flare.io/learn/resources/blog/pamdoora-new-linux-pam-based-backdoor-sale-dark-web",
     ],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
-    evidence_caveats: &["Binary format; utmpdump needed; can be edited by root"],
+    evidence_caveats: &[
+        "Binary format; utmpdump needed; can be edited by root",
+        "PamDOORa explicitly removes attacker login entries from wtmp; gaps in binary record sequence are a tampering indicator — cross-reference with lastlog and auth.log for timeline gaps",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::RotatingBuffer),
     volatility_rationale: "Rotated by logrotate",
 };
@@ -4559,16 +4613,20 @@ pub static LINUX_BTMP: ArtifactDescriptor = ArtifactDescriptor {
     fields: LOG_LINE_FIELDS,
     retention: Some("until rotated by logrotate"),
     triage_priority: TriagePriority::High,
-    related_artifacts: &[],
+    related_artifacts: &["linux_wtmp", "linux_lastlog", "linux_utmp", "linux_auth_log", "linux_pam_d"],
     sources: &[
         "https://linux.die.net/man/5/wtmp",
         "https://bromiley.medium.com/torvalds-tuesday-logon-history-in-the-tmp-files-83530b2acc28",
         "https://sandflysecurity.com/blog/using-linux-utmpdump-for-forensics-and-detecting-log-file-tampering",
+        "https://flare.io/learn/resources/blog/pamdoora-new-linux-pam-based-backdoor-sale-dark-web",
     ],
-    evidence_strength: None,
-    evidence_caveats: &[],
-    volatility: None,
-    volatility_rationale: "",
+    evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
+    evidence_caveats: &[
+        "Binary format; lastb command needed; can be zeroed by root",
+        "PAM backdoors (PamDOORa) deliberately remove their own btmp entries — absence of failed attempts from a source IP that appears in other logs indicates tampering",
+    ],
+    volatility: Some(crate::volatility::VolatilityClass::RotatingBuffer),
+    volatility_rationale: "Rotated by logrotate",
 };
 
 /// `/var/log/lastlog` — binary last-login-per-UID database.
@@ -4591,15 +4649,19 @@ pub static LINUX_LASTLOG: ArtifactDescriptor = ArtifactDescriptor {
     fields: LOG_LINE_FIELDS,
     retention: None,
     triage_priority: TriagePriority::High,
-    related_artifacts: &[],
+    related_artifacts: &["linux_wtmp", "linux_btmp", "linux_utmp", "linux_auth_log", "linux_pam_d"],
     sources: &[
         "https://linux.die.net/man/5/wtmp",
         "https://bromiley.medium.com/torvalds-tuesday-logon-history-in-the-tmp-files-83530b2acc28",
+        "https://flare.io/learn/resources/blog/pamdoora-new-linux-pam-based-backdoor-sale-dark-web",
     ],
-    evidence_strength: None,
-    evidence_caveats: &[],
-    volatility: None,
-    volatility_rationale: "",
+    evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
+    evidence_caveats: &[
+        "Fixed-offset binary indexed by UID — zeroing an entry with write access is trivial; PamDOORa explicitly zeroes attacker UID entries to erase login history",
+        "A UID whose lastlog entry is all-zeros but appears in auth.log or wtmp is a high-confidence tampering indicator",
+    ],
+    volatility: Some(crate::volatility::VolatilityClass::Persistent),
+    volatility_rationale: "Not rotated; persists until explicitly overwritten; survives reboots",
 };
 
 /// `/var/log/auth.log` — authentication and sudo event log (Debian/Ubuntu).
@@ -5828,16 +5890,20 @@ pub static LINUX_UTMP: ArtifactDescriptor = ArtifactDescriptor {
     fields: LOG_LINE_FIELDS,
     retention: None,
     triage_priority: TriagePriority::Medium,
-    related_artifacts: &[],
+    related_artifacts: &["linux_wtmp", "linux_btmp", "linux_lastlog", "linux_auth_log", "linux_pam_d"],
     sources: &[
         "https://linux.die.net/man/5/utmp",
         "https://bromiley.medium.com/torvalds-tuesday-logon-history-in-the-tmp-files-83530b2acc28",
         "https://sandflysecurity.com/blog/using-linux-utmpdump-for-forensics-and-detecting-log-file-tampering",
+        "https://flare.io/learn/resources/blog/pamdoora-new-linux-pam-based-backdoor-sale-dark-web",
     ],
-    evidence_strength: None,
-    evidence_caveats: &[],
-    volatility: None,
-    volatility_rationale: "",
+    evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
+    evidence_caveats: &[
+        "Lives in /run (tmpfs on most modern distros); lost on reboot",
+        "PAM backdoors can wipe their active session entry — a session visible in network connections (ss/netstat) but absent from utmp is a strong anti-forensics indicator",
+    ],
+    volatility: Some(crate::volatility::VolatilityClass::Volatile),
+    volatility_rationale: "Stored in /run (tmpfs); lost on reboot",
 };
 
 pub static LINUX_GCP_CREDENTIALS: ArtifactDescriptor = ArtifactDescriptor {
@@ -8736,6 +8802,7 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     // Batch D — Linux SSH persistence
     LINUX_SSH_AUTHORIZED_KEYS,
     // Batch D — Linux auth / privilege escalation
+    LINUX_PAM_MODULE_DIR,
     LINUX_PAM_D,
     LINUX_SUDOERS_D,
     LINUX_MODULES_LOAD_D,

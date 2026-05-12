@@ -420,9 +420,8 @@ fn draw_detail_pane(f: &mut Frame, app: &App, theme: &Theme, lines: &[String], a
 }
 
 fn draw_about(f: &mut Frame, theme: &Theme, area: Rect) {
-    // Centre a 60×18 modal
-    let modal_w = 60u16.min(area.width.saturating_sub(4));
-    let modal_h = 32u16.min(area.height.saturating_sub(4));
+    let modal_w = 64u16.min(area.width.saturating_sub(4));
+    let modal_h = 52u16.min(area.height.saturating_sub(4));
     let x = (area.width.saturating_sub(modal_w)) / 2;
     let y = (area.height.saturating_sub(modal_h)) / 2;
     let modal_area = Rect::new(x, y, modal_w, modal_h);
@@ -432,21 +431,27 @@ fn draw_about(f: &mut Frame, theme: &Theme, area: Rect) {
     let block = Block::default()
         .borders(Borders::ALL)
         .border_style(Style::default().fg(theme.border_active))
-        .title(" about ");
+        .title(" about / legend ");
+
+    let hdr = Style::default().add_modifier(Modifier::BOLD);
+    let dim = Style::default().fg(Color::DarkGray);
+    let cyan = Style::default()
+        .fg(Color::Cyan)
+        .add_modifier(Modifier::UNDERLINED);
 
     let text = vec![
         Line::from(""),
-        Line::from(Span::styled(
-            "  forensicnomicon",
-            Style::default().add_modifier(Modifier::BOLD),
-        )),
+        Line::from(Span::styled("  forensicnomicon", hdr)),
         Line::from(format!("  version {VERSION}")),
         Line::from(""),
         Line::from("  DFIR artifact catalog + LOLBin navigator"),
         Line::from("  Offline. Zero I/O at runtime."),
         Line::from(""),
-        Line::from("  Keybindings"),
-        Line::from("  ──────────────────────────────────────"),
+        Line::from(Span::styled("  Keybindings", hdr)),
+        Line::from(Span::styled(
+            "  ──────────────────────────────────────────",
+            dim,
+        )),
         Line::from("  /        search (filter-as-you-type)"),
         Line::from("  j/k ↑↓   navigate list"),
         Line::from("  Tab      toggle list / detail focus"),
@@ -456,21 +461,49 @@ fn draw_about(f: &mut Frame, theme: &Theme, area: Rect) {
         Line::from("  s        cycle severity  (Crit/High/Med/All)"),
         Line::from("  f        fullscreen detail pane"),
         Line::from("  q/Esc    quit / close modal"),
-        Line::from(""),
-        Line::from("  Mouse"),
         Line::from("  scroll   navigate list"),
         Line::from("  click    select item  |  header: toggle filters"),
         Line::from(""),
+        Line::from(Span::styled(
+            "  Volatility  (RFC 3227 — collect highest first)",
+            hdr,
+        )),
+        Line::from(Span::styled(
+            "  ──────────────────────────────────────────",
+            dim,
+        )),
+        Line::from("  [4] Volatile       RAM/tmpfs only — gone on reboot"),
+        Line::from("  [3] RotatingBuffer Fixed-size circular store"),
+        Line::from("  [2] ActivityDriven Overwritten by normal user activity"),
+        Line::from("  [1] Persistent     Present until explicitly deleted"),
+        Line::from("  [0] Residual       Always on any live mounted volume"),
+        Line::from(""),
+        Line::from(Span::styled("  Evidence Strength", hdr)),
+        Line::from(Span::styled(
+            "  ──────────────────────────────────────────",
+            dim,
+        )),
+        Line::from("  [4] Definitive     Proves activity beyond doubt"),
+        Line::from("  [3] Strong         Near-definitive; rare exceptions"),
+        Line::from("  [2] Corroborative  Supports conclusion with other artifacts"),
+        Line::from("  [1] Circumstantial Many innocent explanations exist"),
+        Line::from("  [0] Unreliable     Easily manipulated; heavy caveats"),
+        Line::from(""),
+        Line::from(Span::styled("  Triage Priority", hdr)),
+        Line::from(Span::styled(
+            "  ──────────────────────────────────────────",
+            dim,
+        )),
+        Line::from("  Critical   Credentials / direct compromise — collect first"),
+        Line::from("  High       Execution / persistence / lateral movement"),
+        Line::from("  Medium     Context-building; useful but not decisive"),
+        Line::from("  Low        Supporting detail; low signal-to-noise"),
+        Line::from(""),
         Line::from(vec![
             Span::raw("  "),
-            Span::styled("4n6h4x0r", Style::default().add_modifier(Modifier::BOLD)),
+            Span::styled("4n6h4x0r", hdr),
             Span::raw(" @ Security Ronin  "),
-            Span::styled(
-                "https://securityronin.com",
-                Style::default()
-                    .fg(Color::Cyan)
-                    .add_modifier(Modifier::UNDERLINED),
-            ),
+            Span::styled("https://securityronin.com", cyan),
         ]),
     ];
 

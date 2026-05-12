@@ -1332,3 +1332,55 @@ pub(crate) static SHARED_TASK_SCHEDULER: ArtifactDescriptor = ArtifactDescriptor
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale: "Registry key; persists until explicitly deleted",
 };
+
+// ── Credential Provider Filters (T1556.001) ───────────────────────────────────
+
+/// `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Provider Filters`
+///
+/// COM objects registered here act as filters that intercept credentials passing
+/// through the credential provider pipeline. Unlike credential providers (which
+/// supply credentials), filters see every credential *after* collection and can
+/// log, modify, or block them before authentication completes.
+///
+/// Attackers register malicious DLLs as filters to capture plaintext credentials
+/// for every Windows logon without needing to replace a full credential provider.
+pub(crate) static CREDENTIAL_PROVIDER_FILTERS: ArtifactDescriptor = ArtifactDescriptor {
+    id: "credential_provider_filters",
+    name: "Credential Provider Filters",
+    artifact_type: ArtifactType::RegistryKey,
+    hive: Some(HiveTarget::HklmSoftware),
+    key_path: r"Microsoft\Windows\CurrentVersion\Authentication\Credential Provider Filters",
+    value_name: None,
+    file_path: None,
+    scope: DataScope::System,
+    os_scope: OsScope::Win10Plus,
+    decoder: Decoder::Identity,
+    meaning: "COM objects registered as credential provider filters intercept all credentials \
+        flowing through the Windows authentication pipeline after collection. Unlike credential \
+        providers (which supply credentials), filters receive plaintext credentials from every \
+        provider — including password, smartcard, and biometric — before authentication \
+        completes. A malicious filter DLL captures credentials for every interactive logon, \
+        network authentication, and UAC elevation on the machine. Correlate CLSID with \
+        HKCR\\CLSID\\{<value>}\\InprocServer32 to identify the DLL.",
+    mitre_techniques: &["T1556.001"],
+    fields: &[FieldSchema {
+        name: "filter_clsid",
+        value_type: ValueType::Text,
+        description: "CLSID of the registered credential provider filter COM object",
+        is_uid_component: true,
+    }],
+    retention: Some("Persistent"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["credential_providers", "lsa_auth_pkgs"],
+    sources: &[
+        "https://docs.microsoft.com/en-us/windows/win32/secauthn/credential-providers-in-windows",
+        "https://github.com/forensicartifacts/artifacts",
+    ],
+    evidence_strength: Some(crate::evidence::EvidenceStrength::Definitive),
+    evidence_caveats: &[
+        "Should contain zero or very few entries on a clean system — any unknown CLSID warrants immediate investigation",
+        "Resolve CLSID in HKCR to find the filter DLL; compare DLL hash against known good",
+    ],
+    volatility: Some(crate::volatility::VolatilityClass::Persistent),
+    volatility_rationale: "Registry key; persists until explicitly deleted",
+};

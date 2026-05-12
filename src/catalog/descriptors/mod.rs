@@ -991,7 +991,7 @@ pub static SHIMCACHE: ArtifactDescriptor = ArtifactDescriptor {
     fields: SHIMCACHE_FIELDS,
     retention: Some("written at clean shutdown only; lost on crash/hard-power-off"),
     triage_priority: TriagePriority::Critical,
-    related_artifacts: &["amcache_app_file", "prefetch_dir", "bam_user"],
+    related_artifacts: &["amcache_app_file", "prefetch_dir", "bam_user", "shimcache_memory"],
     sources: &[
         "https://www.sans.org/blog/digital-forensics-shimcache/",
         "https://redcanary.com/blog/threat-detection/appcompatcache/",
@@ -1004,10 +1004,52 @@ pub static SHIMCACHE: ArtifactDescriptor = ArtifactDescriptor {
     evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
     evidence_caveats: &[
         "Presence proves file existed on disk, not necessarily executed",
-        "Written only on reboot; live system shows stale data",
+        "Written only on clean shutdown; live system registry shows entries from last reboot only — use shimcache_memory to capture entries since last reboot",
+    ],
+    volatility: Some(crate::volatility::VolatilityClass::Persistent),
+    volatility_rationale: "Registry value persists until hive is overwritten; see shimcache_memory for the Volatile in-memory counterpart",
+};
+
+/// In-memory AppCompatCache state (ShimCache live buffer).
+///
+/// The Application Compatibility Cache is maintained by the kernel in memory
+/// and flushed to the registry only at clean shutdown. On a live system the
+/// in-memory buffer contains entries from the current boot session that are
+/// NOT yet visible in the registry value — making this the richer artefact
+/// for live triage. Collected with volatility3 `windows.shimcachemem` or
+/// similar memory-forensics tooling.
+pub static SHIMCACHE_MEMORY: crate::catalog::ArtifactDescriptor =
+    crate::catalog::ArtifactDescriptor {
+    id: "shimcache_memory",
+    name: "ShimCache In-Memory Buffer (AppCompatCache live)",
+    artifact_type: ArtifactType::MemoryRegion,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: None,
+    scope: DataScope::System,
+    os_scope: OsScope::All,
+    decoder: Decoder::Identity,
+    meaning: "Live AppCompatCache entries not yet flushed to registry. Richer than the on-disk \
+        registry snapshot on a running system — includes all executables touched since the \
+        last reboot. Collect via memory acquisition before shutdown; flushes to shimcache \
+        (registry) on clean shutdown, lost on crash/power-off.",
+    mitre_techniques: &["T1218", "T1059"],
+    fields: SHIMCACHE_FIELDS,
+    retention: Some("lost on reboot or crash; flushed to registry AppCompatCache on clean shutdown"),
+    triage_priority: TriagePriority::Critical,
+    related_artifacts: &["shimcache", "amcache_app_file", "prefetch_dir"],
+    sources: &[
+        "https://www.sans.org/blog/digital-forensics-shimcache/",
+        "https://www.magnetforensics.com/blog/shimcache-vs-amcache-key-windows-forensic-artifacts/",
+    ],
+    evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
+    evidence_caveats: &[
+        "Requires live memory acquisition; not obtainable from disk image alone",
+        "Presence proves file was loaded by shimming subsystem in current boot session",
     ],
     volatility: Some(crate::volatility::VolatilityClass::Volatile),
-    volatility_rationale: "Written to registry only on shutdown; live state is in memory",
+    volatility_rationale: "In RAM; lost on reboot. Contains entries not visible in registry until shutdown flush.",
 };
 
 // ── BAM / DAM ─────────────────────────────────────────────────────────────────
@@ -8726,6 +8768,7 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     SHELLBAGS_USER,
     AMCACHE_APP_FILE,
     SHIMCACHE,
+    SHIMCACHE_MEMORY,
     BAM_USER,
     DAM_USER,
     SAM_USERS,
@@ -9043,7 +9086,7 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     linux_ext::LINUX_LOGROTATE_D,
     linux_ext::LINUX_SNAP_PACKAGES,
     // Batch I: Linux kernel / live-system artifacts
-    linux_ext::LINUX_DMESG_LOG,
+    linux_ext::LINUX_DMESG_RING_BUFFER,
     linux_ext::LINUX_KERN_LOG,
     linux_ext::LINUX_PROC_KALLSYMS,
     linux_ext::LINUX_PROC_NET_TCP,
@@ -15415,4 +15458,10 @@ pub(crate) static CATALOG_ENTRIES: &[ArtifactDescriptor] = &[
     windows_registry_ext3::FIREWALL_AUTHORIZED_APPS,
     windows_registry_ext3::SSODL,
     windows_registry_ext3::SHARED_TASK_SCHEDULER,
+    // ── FA stub upgrades batch 2: linux/esxi/credential_provider_filters ──────
+    windows_registry_ext3::CREDENTIAL_PROVIDER_FILTERS,
+    // linux_ext::LINUX_ETC_PASSWD removed — duplicate of LINUX_PASSWD in mod.rs
+    linux_ext::ESXI_ATTESTD_LOG,
+    linux_ext::ESXI_ESXTOKEND_LOG,
+    linux_ext::ESXI_KMXA_LOG,
 ];

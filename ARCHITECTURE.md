@@ -264,15 +264,54 @@ AbusableSite
 ### Artifact profile — `ArtifactProfile`
 
 ```
-ArtifactProfile
-├── id: &str
-├── evidence_strength: EvidenceStrength  — Definitive | Strong | Corroborative | Weak
-├── evidence_caveats: &str               — analyst warnings (e.g. "clock skew possible")
-└── volatility: VolatilityClass          — Residual | Persistent | Volatile | LiveOnly
+ArtifactDescriptor (selected fields)
+├── evidence_strength: EvidenceStrength   — see legend below
+├── evidence_caveats: &[&str]             — analyst warnings (e.g. "clock skew possible")
+├── volatility: VolatilityClass           — see legend below
+└── volatility_rationale: &str           — one-line justification
 ```
 
-`ARTIFACT_PROFILES` is the single source of truth for RFC 3227 ordering.
-`evidence_for(id)` and `volatility_for(id)` both return `Option<&ArtifactProfile>`.
+`volatility_for(id)` returns `Option<&ArtifactDescriptor>` filtered to assessed entries.
+
+### Rating Legends
+
+#### VolatilityClass — RFC 3227 acquisition urgency (collect higher numbers first)
+
+| Value | Class | Collect when | Examples |
+|---|---|---|---|
+| 4 | `Volatile` | Before reboot | RAM, `/proc/*`, `/run/*`, ESXi `/var/run/log/*`, in-memory ShimCache |
+| 3 | `RotatingBuffer` | Before buffer fills | EVTX records, Prefetch (128 limit), syslog, `$UsnJrnl` |
+| 2 | `ActivityDriven` | Before more user activity | MRU lists, browser history, shellbags, Chrome Sessions file |
+| 1 | `Persistent` | Standard collection | Run keys, NTDS.dit, registry values, ShimCache registry value |
+| 0 | `Residual` | Last — always present | `$MFT` (always on NTFS), Volume Boot Record |
+
+**On-disk vs in-memory split:** when an artifact has both forms, they are modeled as two
+separate descriptors. The on-disk form carries `Persistent` (or lower); the in-memory form
+carries `Volatile` with `file_path: None`. Both cross-reference each other in
+`related_artifacts`. Example: `shimcache` (registry, Persistent) ↔ `shimcache_memory` (RAM, Volatile).
+
+**`Residual` ≠ "recoverable via VSS/.LOG1/.LOG2".** That applies universally to NTFS artifacts
+and provides no discrimination. Use it only for artifacts structurally present on any live
+mounted volume that cannot be destroyed by normal OS operation.
+
+#### EvidenceStrength — how strongly does this artifact prove the claimed activity?
+
+| Value | Class | Meaning |
+|---|---|---|
+| 4 | `Definitive` | Proves activity beyond reasonable doubt (Prefetch = execution) |
+| 3 | `Strong` | Near-definitive; rare benign explanations exist |
+| 2 | `Corroborative` | Supports a conclusion in combination with other artifacts |
+| 1 | `Circumstantial` | Weak signal; many innocent explanations |
+| 0 | `Unreliable` | Easily manipulated or structurally unreliable; use with heavy caveats |
+
+#### TriagePriority — collection and investigation urgency
+
+| Priority | When to use |
+|---|---|
+| `Critical` | Credential access, direct compromise evidence, must-have for any IR |
+| `High` | Execution evidence, persistence, lateral movement artifacts |
+| `Medium` | Context-building; useful but not decisive alone |
+| `Low` | Supporting detail; low signal-to-noise |
 
 ---
 

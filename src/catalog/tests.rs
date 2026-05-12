@@ -4130,7 +4130,7 @@ mod batch_i_tests {
     #[test]
     fn batch_i_artifacts_all_present() {
         let ids = [
-            "linux_dmesg_log",
+            "linux_dmesg_ring_buffer",
             "linux_kern_log",
             "linux_proc_kallsyms",
             "linux_proc_net_tcp",
@@ -4159,8 +4159,8 @@ mod batch_i_tests {
     }
 
     #[test]
-    fn linux_dmesg_log_is_critical_for_rootkit_detection() {
-        let d = CATALOG.by_id("linux_dmesg_log").unwrap();
+    fn linux_dmesg_ring_buffer_is_critical_for_rootkit_detection() {
+        let d = CATALOG.by_id("linux_dmesg_ring_buffer").unwrap();
         assert_eq!(d.triage_priority, TriagePriority::Critical);
         assert!(d.mitre_techniques.contains(&"T1014"));
     }
@@ -10558,53 +10558,9 @@ mod tests_com_persistence_keys {
     }
 }
 
-// ── Linux /etc/passwd ─────────────────────────────────────────────────────────
-
-#[cfg(test)]
-mod tests_linux_etc_passwd {
-    use super::*;
-
-    #[test]
-    fn linux_etc_passwd_exists() {
-        assert!(CATALOG.by_id("linux_etc_passwd").is_some());
-    }
-
-    #[test]
-    fn linux_etc_passwd_os_scope_is_linux() {
-        let d = CATALOG.by_id("linux_etc_passwd").unwrap();
-        assert_eq!(d.os_scope, OsScope::Linux);
-    }
-
-    #[test]
-    fn linux_etc_passwd_triage_is_high() {
-        let d = CATALOG.by_id("linux_etc_passwd").unwrap();
-        assert_eq!(d.triage_priority, TriagePriority::High);
-    }
-
-    #[test]
-    fn linux_etc_passwd_has_field_schema() {
-        let d = CATALOG.by_id("linux_etc_passwd").unwrap();
-        assert!(!d.fields.is_empty(), "must document the colon-delimited field schema");
-    }
-
-    #[test]
-    fn linux_etc_passwd_meaning_mentions_shell() {
-        let d = CATALOG.by_id("linux_etc_passwd").unwrap();
-        assert!(
-            d.meaning.to_ascii_lowercase().contains("shell"),
-            "meaning should note login shell as a forensic indicator"
-        );
-    }
-
-    #[test]
-    fn linux_etc_passwd_mitre_includes_t1136() {
-        let d = CATALOG.by_id("linux_etc_passwd").unwrap();
-        assert!(
-            d.mitre_techniques.iter().any(|t| t.starts_with("T1136")),
-            "must map T1136 (Create Account) family"
-        );
-    }
-}
+// ── Linux /etc/passwd — merged into linux_passwd (mod.rs) ───────────────────
+// linux_etc_passwd was a duplicate of linux_passwd. Tests for /etc/passwd
+// coverage are on the linux_passwd descriptor in the main test suite.
 
 // ── Windows Credential Provider Filters ──────────────────────────────────────
 
@@ -10729,7 +10685,10 @@ mod tests_volatility_corrections {
     #[test]
     fn shimcache_memory_has_no_file_path() {
         let d = CATALOG.by_id("shimcache_memory").unwrap();
-        assert!(d.file_path.is_none(), "shimcache_memory is in RAM — no file path");
+        assert!(
+            d.file_path.is_none(),
+            "shimcache_memory is in RAM — no file path"
+        );
     }
 
     #[test]
@@ -10748,8 +10707,10 @@ mod tests_volatility_corrections {
     fn shimcache_evidence_caveat_mentions_memory() {
         let d = CATALOG.by_id("shimcache").unwrap();
         let combined = d.evidence_caveats.join(" ").to_ascii_lowercase();
-        assert!(combined.contains("memory") || combined.contains("live"),
-            "shimcache caveat must note the in-memory counterpart is richer");
+        assert!(
+            combined.contains("memory") || combined.contains("live"),
+            "shimcache caveat must note the in-memory counterpart is richer"
+        );
     }
 
     // linux_dmesg_ring_buffer: live kernel ring buffer is Volatile (not the /var/log/dmesg file)
@@ -10767,21 +10728,28 @@ mod tests_volatility_corrections {
     #[test]
     fn linux_dmesg_ring_buffer_has_no_file_path() {
         let d = CATALOG.by_id("linux_dmesg_ring_buffer").unwrap();
-        assert!(d.file_path.is_none(), "ring buffer is in RAM — no file path");
+        assert!(
+            d.file_path.is_none(),
+            "ring buffer is in RAM — no file path"
+        );
     }
 
     #[test]
     fn linux_dmesg_ring_buffer_related_includes_linux_dmesg() {
         let d = CATALOG.by_id("linux_dmesg_ring_buffer").unwrap();
-        assert!(d.related_artifacts.iter().any(|&r| r == "linux_dmesg"),
-            "ring buffer should cross-reference the persisted dmesg file");
+        assert!(
+            d.related_artifacts.iter().any(|&r| r == "linux_dmesg"),
+            "ring buffer should cross-reference the persisted dmesg file"
+        );
     }
 
     // linux_etc_passwd is a duplicate of linux_passwd — must not be in catalog
     #[test]
     fn linux_etc_passwd_not_in_catalog() {
-        assert!(CATALOG.by_id("linux_etc_passwd").is_none(),
-            "linux_etc_passwd is a duplicate of linux_passwd and must be removed");
+        assert!(
+            CATALOG.by_id("linux_etc_passwd").is_none(),
+            "linux_etc_passwd is a duplicate of linux_passwd and must be removed"
+        );
     }
 
     // browser_chrome_session: Sessions file is on disk (ActivityDriven), not Volatile

@@ -87,6 +87,67 @@ Catalog errors like the UserAssist "Folder GUID" misnomer (the `{F4E57C4B-...}` 
 
 ---
 
+## Rating Systems — Classification Rules
+
+These rules govern how to assign `VolatilityClass`, `TriagePriority`, and `EvidenceStrength`
+when writing or reviewing `ArtifactDescriptor` entries. They are enforced by tests. The
+canonical definitions live in `src/volatility.rs`, `src/catalog/types.rs`, `src/evidence.rs`.
+
+### VolatilityClass (RFC 3227 acquisition urgency, 4 = collect first)
+
+| Class | Collect when | Archetypal examples |
+|---|---|---|
+| `Volatile` (4) | Before reboot — exists only in RAM or tmpfs | RAM image, process list, network connections, in-memory ShimCache, `/proc/net/*`, ESXi `/var/run/log/*` |
+| `RotatingBuffer` (3) | Before buffer fills | EVTX records, Prefetch (128-entry limit), `/var/log/syslog` (logrotate), `$UsnJrnl` |
+| `ActivityDriven` (2) | Before more user activity | MRU lists, browser history, shellbags, Chrome Sessions file |
+| `Persistent` (1) | Standard scheduled collection | Run keys, NTDS.dit, registry values, config files, ShimCache registry value |
+| `Residual` (0) | Last — always present on any live mounted volume | `$MFT` (always present on NTFS), Volume Boot Record |
+
+**`Residual` does NOT mean "recoverable via .LOG1/.LOG2 or VSS after deletion."**
+That property applies to virtually every NTFS artifact — it provides no discrimination.
+A deleted registry key that *could* be recovered from a transaction log is `Persistent`
+while it exists.
+
+**tmpfs / RAM-backed filesystems are `Volatile`.** ESXi `/var/run/`, Linux `/proc/`,
+Linux `/run/` — even though they look like files, they vanish on reboot. `Volatile`
+overrides `RotatingBuffer` when the backing store is RAM.
+
+#### On-disk vs in-memory split rule
+
+When an artifact has both an on-disk/registry form AND a richer in-memory form:
+
+1. **Create two separate descriptors** — one for the persistent form, one for the memory form.
+2. The **on-disk descriptor** gets `Persistent` (or `ActivityDriven`/`RotatingBuffer` as appropriate).
+3. The **memory descriptor** gets `Volatile`, `artifact_type: MemoryRegion` or `LiveResponse`, `file_path: None`.
+4. Both descriptors **cross-reference each other** in `related_artifacts`.
+5. The on-disk descriptor's `evidence_caveats` **mentions the memory counterpart** is richer/more recent.
+
+Examples: `shimcache` (Persistent registry) ↔ `shimcache_memory` (Volatile RAM buffer).
+
+Do NOT apply `Volatile` to a registry value or file artifact just because its in-memory
+counterpart is volatile. The volatility class describes the artifact itself, not its counterpart.
+
+### TriagePriority
+
+| Priority | When to use |
+|---|---|
+| `Critical` | Credential access, direct evidence of compromise, must-have for any IR |
+| `High` | Execution evidence, persistence mechanisms, network lateral movement artifacts |
+| `Medium` | Context-building artifacts, useful but not decisive alone |
+| `Low` | Supporting detail, low signal-to-noise, rarely dispositive |
+
+### EvidenceStrength
+
+| Strength | Meaning |
+|---|---|
+| `Definitive` (4) | Proves the claimed activity beyond reasonable doubt (e.g. Prefetch = execution occurred) |
+| `Strong` (3) | Near-definitive; rare edge cases exist (e.g. shimcache = file on disk, probably ran) |
+| `Corroborative` (2) | Supports a conclusion when combined with other artifacts; alone is insufficient |
+| `Circumstantial` (1) | Weak signal; many innocent explanations exist |
+| `Unreliable` (0) | Easily manipulated, clock-skewed, or structurally unreliable — use with heavy caveats |
+
+---
+
 ## GitHub Pages Road Map
 
 A read-only search widget for analysts who prefer a browser to a CLI is in scope:

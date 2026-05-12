@@ -686,30 +686,47 @@ pub(crate) static LINUX_SNAP_PACKAGES: ArtifactDescriptor = ArtifactDescriptor {
 
 // ── Batch I: Linux kernel / live-system artifacts ──────────────────────────
 
-pub(crate) static LINUX_DMESG_LOG: ArtifactDescriptor = ArtifactDescriptor {
-    id: "linux_dmesg_log",
-    name: "Kernel Ring Buffer Log",
-    artifact_type: ArtifactType::File,
+/// Live kernel ring buffer — the in-memory circular buffer read via `dmesg` or `/dev/kmsg`.
+///
+/// Distinct from `linux_dmesg` (/var/log/dmesg file written at boot): this is the
+/// live buffer holding all messages since boot, not yet written to any file. On a
+/// running system this contains more recent messages than the file. Lost on reboot.
+pub(crate) static LINUX_DMESG_RING_BUFFER: ArtifactDescriptor = ArtifactDescriptor {
+    id: "linux_dmesg_ring_buffer",
+    name: "Kernel Ring Buffer (live, dmesg command)",
+    artifact_type: ArtifactType::LiveResponse,
     hive: None,
     key_path: "",
     value_name: None,
-    file_path: Some("/var/log/dmesg"),
+    file_path: None,
     scope: DataScope::System,
     os_scope: OsScope::Linux,
     decoder: Decoder::Identity,
-    meaning: "Kernel ring buffer dump from boot. Records driver load errors, hardware detection, and module initialization. In the Father rootkit CTF case, boot messages showed 'libymv.so.3 is too short' at 23:16 — 8 minutes before the file's MFT born time — proving the rootkit existed before filesystem timestamps claimed.",
+    meaning: "Live kernel ring buffer — all messages since boot, including those not yet \
+        written to /var/log/dmesg. Records driver load errors, hardware detection, LKM load \
+        events, and module initialization in real time. Richer than the boot-time snapshot \
+        in linux_dmesg. In rootkit investigations, compare against /var/log/dmesg to detect \
+        messages that appeared after boot (indicating post-boot LKM injection).",
     mitre_techniques: &["T1014", "T1547.006"],
-    fields: &[],
-    retention: Some("Rotated on next boot; may have .0/.1 rotations"),
+    fields: &[
+        FieldSchema { name: "timestamp", value_type: ValueType::Timestamp, description: "Seconds since boot (monotonic, e.g. [    1.234567])", is_uid_component: false },
+        FieldSchema { name: "subsystem", value_type: ValueType::Text, description: "Kernel subsystem prefix", is_uid_component: false },
+        FieldSchema { name: "message", value_type: ValueType::Text, description: "Kernel ring buffer message text", is_uid_component: false },
+    ],
+    retention: Some("Lost on reboot; ring buffer wraps when full (default 512KB–16MB depending on kernel config)"),
     triage_priority: TriagePriority::Critical,
-    related_artifacts: &["linux_kern_log", "linux_proc_modules", "linux_chkrootkit_output"],
+    related_artifacts: &["linux_dmesg", "linux_kern_log", "linux_proc_modules", "linux_chkrootkit_output"],
     sources: &[
         "https://man7.org/linux/man-pages/man1/dmesg.1.html",
     ],
     evidence_strength: Some(crate::evidence::EvidenceStrength::Strong),
-    evidence_caveats: &["Kernel ring buffer wraps; grab early in live response"],
+    evidence_caveats: &[
+        "Ring buffer wraps when full; collect early in live response",
+        "Root can clear the ring buffer with dmesg --clear (T1070); absence of boot messages is suspicious",
+        "See linux_dmesg for the persisted file snapshot written at boot",
+    ],
     volatility: Some(crate::volatility::VolatilityClass::Volatile),
-    volatility_rationale: "Ring buffer — overwritten as kernel emits new messages",
+    volatility_rationale: "In-memory circular buffer; lost on reboot",
 };
 
 pub(crate) static LINUX_KERN_LOG: ArtifactDescriptor = ArtifactDescriptor {
@@ -728,7 +745,7 @@ pub(crate) static LINUX_KERN_LOG: ArtifactDescriptor = ArtifactDescriptor {
     fields: &[],
     retention: Some("Rotated by logrotate; typically 4 weeks retained"),
     triage_priority: TriagePriority::High,
-    related_artifacts: &["linux_dmesg_log", "linux_proc_modules", "linux_syslog"],
+    related_artifacts: &["linux_dmesg_ring_buffer", "linux_proc_modules", "linux_syslog"],
     sources: &[
         // syslog(3) — kernel logging facility LOG_KERN feeds kern.log
         "https://man7.org/linux/man-pages/man3/syslog.3.html",
@@ -760,7 +777,7 @@ pub(crate) static LINUX_PROC_KALLSYMS: ArtifactDescriptor = ArtifactDescriptor {
     fields: &[],
     retention: Some("Live /proc interface; reflects current kernel state"),
     triage_priority: TriagePriority::Critical,
-    related_artifacts: &["linux_proc_modules", "linux_dmesg_log"],
+    related_artifacts: &["linux_proc_modules", "linux_dmesg_ring_buffer"],
     sources: &[
         "https://man7.org/linux/man-pages/man5/proc.5.html",
     ],
@@ -942,7 +959,7 @@ pub(crate) static LINUX_CHKROOTKIT_OUTPUT: ArtifactDescriptor = ArtifactDescript
     fields: &[],
     retention: Some("UAC live response collection: chkrootkit/"),
     triage_priority: TriagePriority::Critical,
-    related_artifacts: &["linux_lsof_output", "linux_rkhunter_log", "linux_dmesg_log"],
+    related_artifacts: &["linux_lsof_output", "linux_rkhunter_log", "linux_dmesg_ring_buffer"],
     sources: &[
         "https://www.chkrootkit.org/",
     ],
@@ -968,7 +985,7 @@ pub(crate) static LINUX_RKHUNTER_LOG: ArtifactDescriptor = ArtifactDescriptor {
     fields: &[],
     retention: Some("Retained until manually cleared or logrotated"),
     triage_priority: TriagePriority::High,
-    related_artifacts: &["linux_chkrootkit_output", "linux_dmesg_log"],
+    related_artifacts: &["linux_chkrootkit_output", "linux_dmesg_ring_buffer"],
     sources: &[
         "https://rkhunter.sourceforge.net/",
     ],
@@ -1029,7 +1046,7 @@ pub(crate) static LINUX_DMESG: ArtifactDescriptor = ArtifactDescriptor {
     ],
     retention: Some("Overwritten at each boot; in-memory ring buffer is volatile"),
     triage_priority: TriagePriority::High,
-    related_artifacts: &["linux_kern_log", "linux_proc_modules", "linux_dmesg_log"],
+    related_artifacts: &["linux_kern_log", "linux_proc_modules", "linux_dmesg_ring_buffer"],
     sources: &[
         "https://man7.org/linux/man-pages/man1/dmesg.1.html",
         "https://www.kernel.org/doc/html/latest/admin-guide/tainted-kernels.html",
@@ -1210,4 +1227,129 @@ pub(crate) static LAN_TURTLE_LOOT: ArtifactDescriptor = ArtifactDescriptor {
     volatility: Some(crate::volatility::VolatilityClass::Persistent),
     volatility_rationale:
         "Stored on 16 MB flash; persists until manually deleted or device is reflashed",
+};
+
+// ── /etc/passwd — local user account database ────────────────────────────────
+
+/// Linux `/etc/passwd` — local user account database (world-readable).
+///
+/// Contains username, UID, GID, GECOS full name, home directory, and login shell
+
+// ── ESXi vSphere Trust Authority service logs ─────────────────────────────────
+
+/// ESXi `/var/run/log/attestd.log` — vSphere Trust Authority Attestation Service.
+///
+/// Records attestation events for ESXi Trusted Hosts in a vSphere Trust Authority
+/// deployment. Relevant in environments using vTA; anomalies here may indicate
+/// tampering with the ESXi TPM attestation chain.
+pub(crate) static ESXI_ATTESTD_LOG: ArtifactDescriptor = ArtifactDescriptor {
+    id: "esxi_attestd_log",
+    name: "ESXi Attestation Service Log (attestd.log)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some("/var/run/log/attestd.log"),
+    scope: DataScope::System,
+    os_scope: OsScope::Linux,
+    decoder: Decoder::Identity,
+    meaning: "Records attestation events for the ESXi vSphere Trust Authority service. \
+        Attestation failures or repeated retries may indicate hypervisor integrity tampering, \
+        unauthorized firmware changes, or a host being removed from a trusted cluster. \
+        Relevant in vTA deployments; cross-reference with esxtokend.log and kmxa.log for \
+        full Trust Authority chain visibility.",
+    mitre_techniques: &["T1562"],
+    fields: &[FieldSchema {
+        name: "log_entry",
+        value_type: ValueType::Text,
+        description: "Timestamped syslog-format log line from the attestation daemon",
+        is_uid_component: false,
+    }],
+    retention: Some("Rotated; check /var/run/log/ for .gz rotations"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["esxi_esxtokend_log", "esxi_kmxa_log"],
+    sources: &["https://github.com/forensicartifacts/artifacts"],
+    evidence_strength: Some(crate::evidence::EvidenceStrength::Corroborative),
+    evidence_caveats: &[
+        "Only present on ESXi hosts configured as vSphere Trust Authority Trusted Hosts",
+    ],
+    volatility: Some(crate::volatility::VolatilityClass::Volatile),
+    volatility_rationale: "/var/run/log/ on ESXi is RAM-backed (tmpfs); lost on reboot",
+};
+
+/// ESXi `/var/run/log/esxtokend.log` — vSphere Trust Authority ESX Token Service.
+///
+/// Records token issuance events for authenticated workloads in a vTA deployment.
+/// Unexpected token requests or failures can indicate credential harvesting against
+/// the ESXi token service.
+pub(crate) static ESXI_ESXTOKEND_LOG: ArtifactDescriptor = ArtifactDescriptor {
+    id: "esxi_esxtokend_log",
+    name: "ESXi Token Service Log (esxtokend.log)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some("/var/run/log/esxtokend.log"),
+    scope: DataScope::System,
+    os_scope: OsScope::Linux,
+    decoder: Decoder::Identity,
+    meaning: "Records token issuance events for the ESXi vSphere Trust Authority Token Service. \
+        Unexpected or high-volume token requests, authentication failures, or service restarts \
+        may indicate credential harvesting against the ESXi trust chain. \
+        Correlate with attestd.log and kmxa.log for full vTA event reconstruction.",
+    mitre_techniques: &["T1552", "T1562"],
+    fields: &[FieldSchema {
+        name: "log_entry",
+        value_type: ValueType::Text,
+        description: "Timestamped syslog-format log line from the token service daemon",
+        is_uid_component: false,
+    }],
+    retention: Some("Rotated; check /var/run/log/ for .gz rotations"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["esxi_attestd_log", "esxi_kmxa_log"],
+    sources: &["https://github.com/forensicartifacts/artifacts"],
+    evidence_strength: Some(crate::evidence::EvidenceStrength::Corroborative),
+    evidence_caveats: &["Only present on ESXi hosts in a vSphere Trust Authority deployment"],
+    volatility: Some(crate::volatility::VolatilityClass::Volatile),
+    volatility_rationale: "/var/run/log/ on ESXi is RAM-backed (tmpfs); lost on reboot",
+};
+
+/// ESXi `/var/run/log/kmxa.log` — vSphere Trust Authority Key Provider Client Service.
+///
+/// Records activities of the ESXi Key Management Agent (Client Service) on a
+/// Trusted Host. Key provider failures can indicate encryption bypass attempts
+/// or infrastructure-level attacks on a vTA cluster.
+pub(crate) static ESXI_KMXA_LOG: ArtifactDescriptor = ArtifactDescriptor {
+    id: "esxi_kmxa_log",
+    name: "ESXi Key Provider Agent Log (kmxa.log)",
+    artifact_type: ArtifactType::File,
+    hive: None,
+    key_path: "",
+    value_name: None,
+    file_path: Some("/var/run/log/kmxa.log"),
+    scope: DataScope::System,
+    os_scope: OsScope::Linux,
+    decoder: Decoder::Identity,
+    meaning: "Records activities of the Key Management Agent (Client Service) on an ESXi \
+        Trusted Host in a vSphere Trust Authority deployment. Key provider errors, \
+        unexpected key requests, or service restarts may indicate encryption bypass attempts \
+        or infrastructure attacks targeting VM encryption keys. \
+        Correlate with attestd.log and esxtokend.log.",
+    mitre_techniques: &["T1552", "T1486"],
+    fields: &[FieldSchema {
+        name: "log_entry",
+        value_type: ValueType::Text,
+        description: "Timestamped syslog-format log line from the key management agent",
+        is_uid_component: false,
+    }],
+    retention: Some("Rotated; check /var/run/log/ for .gz rotations"),
+    triage_priority: TriagePriority::High,
+    related_artifacts: &["esxi_attestd_log", "esxi_esxtokend_log"],
+    sources: &["https://github.com/forensicartifacts/artifacts"],
+    evidence_strength: Some(crate::evidence::EvidenceStrength::Corroborative),
+    evidence_caveats: &[
+        "Only present on ESXi Trusted Hosts in a vSphere Trust Authority deployment",
+    ],
+    volatility: Some(crate::volatility::VolatilityClass::Volatile),
+    volatility_rationale: "/var/run/log/ on ESXi is RAM-backed (tmpfs); lost on reboot",
 };

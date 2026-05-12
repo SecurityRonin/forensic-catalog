@@ -248,8 +248,9 @@ pub(crate) static BROWSER_CHROME_SESSION: ArtifactDescriptor = ArtifactDescripto
         "Tab state reflects last browser close; unreliable if crash occurred",
         "SNSS format is binary and partially documented",
     ],
-    volatility: Some(crate::volatility::VolatilityClass::Volatile),
-    volatility_rationale: "Overwritten on every browser launch; lost on clean exit without restore",
+    volatility: Some(crate::volatility::VolatilityClass::ActivityDriven),
+    volatility_rationale:
+        "Sessions file on disk; overwritten on every browser launch by normal Chrome activity",
 };
 
 pub(crate) static BROWSER_FIREFOX_HISTORY: ArtifactDescriptor = ArtifactDescriptor {

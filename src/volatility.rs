@@ -110,7 +110,8 @@ mod tests {
 
     #[test]
     fn shimcache_memory_is_volatile() {
-        let entry = volatility_for("shimcache_memory").expect("shimcache_memory should be assessed");
+        let entry =
+            volatility_for("shimcache_memory").expect("shimcache_memory should be assessed");
         assert_eq!(entry.volatility, Some(VolatilityClass::Volatile));
     }
 

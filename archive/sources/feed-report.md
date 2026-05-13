@@ -1,6 +1,6 @@
 # Feed Update Report
 
-Generated: 2026-05-12T06:24:47Z
+Generated: 2026-05-13T06:35:05Z
 
 ## Windows Incident Response
 
@@ -61,9 +61,9 @@ Generated: 2026-05-12T06:24:47Z
 - Site: https://andreafortuna.org/
 - Feed: https://andreafortuna.org/feed.xml
 - Entries checked: 10
-- New since last snapshot: 1
+- New since last snapshot: 0
 
-- 2026-05-11T09:00:00+00:00 — [DFIR from break glass to always-on: how incident response is becoming a permanent service](https://andreafortuna.org/2026/05/11/dfir-always-on/)
+- No new entries detected
 
 ## Salt Forensics
 
@@ -160,9 +160,9 @@ Generated: 2026-05-12T06:24:47Z
 - Site: https://brettshavers.com/brett-s-blog
 - Feed: https://feeds.feedburner.com/brettshavers/oSyq
 - Entries checked: 3
-- New since last snapshot: 1
+- New since last snapshot: 0
 
-- 2026-05-11T14:07:55-07:00 — [That Time I Bought Coke on a Skateboard](https://brettshavers.com/brett-s-blog/entry/that-time-i-bought-coke-on-a-skateboard)
+- No new entries detected
 
 ## Yogesh Khatri's forensic blog
 
@@ -178,10 +178,9 @@ Generated: 2026-05-12T06:24:47Z
 - Site: https://www.forensicfocus.com/
 - Feed: https://www.forensicfocus.com/rss/news2.php
 - Entries checked: 10
-- New since last snapshot: 2
+- New since last snapshot: 0
 
-- 2026-05-11T15:27:02+00:00 — [Digital Forensics Jobs Round-Up, May 11 2026](https://www.forensicfocus.com/jobs/digital-forensics-jobs-round-up-may-11-2026/)
-- 2026-05-11T11:42:30+00:00 — [Eric Fookes, Founder & CEO, Fookes Software](https://www.forensicfocus.com/interviews/eric-fookes-founder-ceo-fookes-software/)
+- No new entries detected
 
 ## Forensic Multimedia Analysis Blog
 
@@ -197,53 +196,64 @@ Generated: 2026-05-12T06:24:47Z
 - Site: https://www.magnetforensics.com/
 - Feed: https://www.magnetforensics.com/feed/
 - Entries checked: 10
-- New since last snapshot: 0
+- New since last snapshot: 1
 
-- No new entries detected
+- 2026-05-12T20:32:10+00:00 — [Route View: Not just dots on a map anymore](https://www.magnetforensics.com/blog/route-view-not-just-dots-on-a-map-anymore/)
 
 ## The DFIR Report
 
 - Site: https://thedfirreport.com/
 - Feed: https://thedfirreport.com/feed/
 - Entries checked: 10
-- New since last snapshot: 1
+- New since last snapshot: 0
 
-- 2026-05-11T14:05:04+00:00 — [Flash Alert: EtherRat and TukTuk C2 End in The Gentleman Ransomware](https://thedfirreport.com/2026/05/11/flash-alert-etherrat-and-tuktuk-c2-end-in-the-gentleman-ransomware/)
+- No new entries detected
 
 ## 13cubed (YouTube)
 
 - Site: https://www.youtube.com/@13cubed
 - Feed: https://www.youtube.com/feeds/videos.xml?channel_id=UCy8ntxFEudOCRZYT1f7ya9Q
-- Status: error: HTTP 404
+- Status: error: HTTP 500
 
 ## SANS Internet Storm Center
 
 - Site: https://isc.sans.edu/
 - Feed: https://isc.sans.edu/rssfeed_full.xml
 - Entries checked: 10
-- New since last snapshot: 3
+- New since last snapshot: 4
 
-- 2026-05-12T03:15:10+00:00 — [ISC Stormcast For Tuesday, May 12th, 2026 https://isc.sans.edu/podcastdetail/9928, (Tue, May 12th)](https://isc.sans.edu/diary/rss/32978)
-- 2026-05-11T22:19:13+00:00 — [Apple Patches Everything, (Mon, May 11th)](https://isc.sans.edu/diary/rss/32976)
-- 2026-05-11T14:20:16+00:00 — [Why we use CAPTCHAs, (Mon, May 11th)](https://isc.sans.edu/diary/rss/32974)
+- 2026-05-13T06:29:07+00:00 — [&#x5b;GUEST DIARY&#x5d; Tearing apart website fraud to see how it works., (Wed, May 13th)](https://isc.sans.edu/diary/rss/32958)
+- 2026-05-13T03:05:02+00:00 — [ISC Stormcast For Wednesday, May 13th, 2026 https://isc.sans.edu/podcastdetail/9930, (Wed, May 13th)](https://isc.sans.edu/diary/rss/32984)
+- 2026-05-13T01:20:35+00:00 — [Proxying the Unproxyable&#x3f; Sending EXE traffic to a Proxy, (Wed, May 13th)](https://isc.sans.edu/diary/rss/32982)
+- 2026-05-12T18:29:36+00:00 — [Microsoft May 2026 Patch Tuesday, (Tue, May 12th)](https://isc.sans.edu/diary/rss/32980)
 
 ## DFIR Training Blog
 
 - Site: https://www.dfir.training/blog
 - Feed: https://www.dfir.training/blog
-- Entries checked: 0
-- New since last snapshot: 0
+- Entries checked: 10
+- New since last snapshot: 10
 
-- No new entries detected
+- unknown date — [Training](https://www.dfir.training/training)
+- unknown date — [In-PersonOn-site](https://www.dfir.training/training/all-in-person-events)
+- unknown date — [Live OnlineInstructor-led](https://www.dfir.training/training/live-online-training)
+- unknown date — [WebinarsLive sessions](https://www.dfir.training/all-upcoming-webinars)
+- unknown date — [On-DemandSelf-paced](https://www.dfir.training/training/ondemand)
+- unknown date — [ProviderTraining Orgs](https://www.dfir.training/training/providers)
+- unknown date — [TopicsSubject areas](https://www.dfir.training/training/topics)
+- unknown date — [Events by LocationIn-person locations](https://www.dfir.training/training/events-location)
+- unknown date — [Tools](https://www.dfir.training/dfir-tools)
+- unknown date — [Library](https://www.dfir.training/resources)
 
 ## MSAB
 
 - Site: https://www.msab.com/
 - Feed: https://www.msab.com/feed/
 - Entries checked: 10
-- New since last snapshot: 0
+- New since last snapshot: 2
 
-- No new entries detected
+- 2026-05-12T17:00:00+00:00 — [Bulletin from the Annual General Meeting of Micro Systemation AB (publ)](https://www.msab.com/updates/bulletin-from-the-annual-general-meeting-of-micro-systemation-ab-publ-2/)
+- 2026-05-12T13:00:00+00:00 — [MSAB Secures Contract Worth SEK 12,7 Million with Australian Law Enforcement Agency](https://www.msab.com/updates/msab-secures-contract-worth-sek-127-million-with-australian-law-enforcement-agency/)
 
 ## AboutDFIR
 
@@ -252,7 +262,7 @@ Generated: 2026-05-12T06:24:47Z
 - Entries checked: 10
 - New since last snapshot: 1
 
-- 2026-05-11T11:54:18+00:00 — [InfoSec News Nuggets 05/11/2026](https://aboutdfir.com/infosec-news-nuggets-05-11-2026/)
+- 2026-05-12T11:33:42+00:00 — [InfoSec News Nuggets 05/12/2026](https://aboutdfir.com/infosec-news-nuggets-05-12-2026/)
 
 ## Forensic 4cast
 
@@ -369,10 +379,10 @@ Generated: 2026-05-12T06:24:47Z
 - Entries checked: 10
 - New since last snapshot: 4
 
-- 2026-05-11T20:27:00+00:00 — [What has changed in macOS Tahoe 26.5?](https://eclecticlight.co/2026/05/11/what-has-changed-in-macos-tahoe-26-5/)
-- 2026-05-11T17:21:35+00:00 — [Apple has released macOS Tahoe 26.5, and security updates 15.7.7 and 14.8.7](https://eclecticlight.co/2026/05/11/apple-has-released-macos-tahoe-26-5-and-security-updates-15-7-6-and-14-8-6/)
-- 2026-05-11T11:30:00+00:00 — [Hero or hooligan: Perseus 2](https://eclecticlight.co/2026/05/11/hero-or-hooligan-perseus-2/)
-- 2026-05-11T08:00:00+00:00 — [Solutions to Saturday Mac riddles 359](https://eclecticlight.co/2026/05/11/solutions-to-saturday-mac-riddles-359/)
+- 2026-05-13T06:30:00+00:00 — [How to preserve versions, and how to create versioned PDFs](https://eclecticlight.co/2026/05/13/how-to-preserve-versions-and-how-to-create-versioned-pdfs/)
+- 2026-05-12T18:22:48+00:00 — [Apple has released an update to XProtect for all macOS](https://eclecticlight.co/2026/05/12/apple-has-released-an-update-to-xprotect-for-all-macos-32/)
+- 2026-05-12T11:30:00+00:00 — [Medium and message: Sculpture](https://eclecticlight.co/2026/05/12/medium-and-message-sculpture/)
+- 2026-05-12T06:30:00+00:00 — [What gets synced in iCloud Drive?](https://eclecticlight.co/2026/05/12/what-gets-synced-in-icloud-drive/)
 
 ## JPCERT/CC
 
@@ -397,9 +407,9 @@ Generated: 2026-05-12T06:24:47Z
 - Site: https://blog.elcomsoft.com/
 - Feed: https://blog.elcomsoft.com/feed/
 - Entries checked: 10
-- New since last snapshot: 1
+- New since last snapshot: 0
 
-- 2026-05-11T11:00:07+00:00 — [Using the Extraction Agent in 2026: Compatibility, Signing, Firewall, and Extraction Tips](https://blog.elcomsoft.com/2026/05/using-the-extraction-agent-in-2026-compatibility-signing-firewall-and-extraction-tips/)
+- No new entries detected
 
 ## Huntress Blog
 
@@ -424,27 +434,28 @@ Generated: 2026-05-12T06:24:47Z
 - Site: https://unit42.paloaltonetworks.com/
 - Feed: https://unit42.paloaltonetworks.com/feed/
 - Entries checked: 10
-- New since last snapshot: 1
+- New since last snapshot: 0
 
-- 2026-05-11T22:00:43+00:00 — [Inside AD CS Escalation: Unpacking Advanced Misuse Techniques and Tools](https://unit42.paloaltonetworks.com/active-directory-certificate-services-exploitation/)
+- No new entries detected
 
 ## Mandiant Threat Intelligence
 
 - Site: https://cloud.google.com/blog/topics/threat-intelligence
 - Feed: https://feeds.feedburner.com/threatintelligence/pvexyqv7v0v
 - Entries checked: 10
-- New since last snapshot: 1
+- New since last snapshot: 0
 
-- 2026-05-11T14:00:00+00:00 — [GTIG AI Threat Tracker: Adversaries Leverage AI for Vulnerability Exploitation, Augmented Operations, and Initial Access](https://cloud.google.com/blog/topics/threat-intelligence/ai-vulnerability-exploitation-initial-access/)
+- No new entries detected
 
 ## Cisco Talos Blog
 
 - Site: https://blog.talosintelligence.com/
 - Feed: https://blog.talosintelligence.com/rss/
 - Entries checked: 10
-- New since last snapshot: 0
+- New since last snapshot: 2
 
-- No new entries detected
+- 2026-05-12T19:57:04+00:00 — [Microsoft Patch Tuesday for May 2026 — Snort rules and prominent vulnerabilities](https://blog.talosintelligence.com/microsoft-patch-tuesday-may-2026/)
+- 2026-05-12T10:00:54+00:00 — [State-sponsored actors, better known as the friends you don’t want](https://blog.talosintelligence.com/state-sponsored-actors-better-known-as-the-friends-you-dont-want/)
 
 ## SANS Blog
 
@@ -460,18 +471,18 @@ Generated: 2026-05-12T06:24:47Z
 - Site: https://www.elastic.co/security-labs/
 - Feed: https://www.elastic.co/security-labs/
 - Entries checked: 10
-- New since last snapshot: 1
+- New since last snapshot: 0
 
-- unknown date — [Elastic Security MCP App: Interactive security operations inside your AI Tools](https://www.elastic.co/security-labs/elastic-security-mcp-app)
+- No new entries detected
 
 ## Flare.io Threat Research Blog
 
 - Site: https://flare.io/learn/resources/blog/
 - Feed: https://flare.io/learn/resources/blog/feed/
 - Entries checked: 10
-- New since last snapshot: 1
+- New since last snapshot: 0
 
-- 2026-05-11T13:50:38+00:00 — [One Out of Four Infostealer Victims Have Corporate Infrastructure Access](https://flare.io/learn/resources/blog/one-out-of-four-infostealer-victims-corporate-infrastructure-access)
+- No new entries detected
 
 ## Binalyze Blog
 
@@ -505,10 +516,9 @@ Generated: 2026-05-12T06:24:47Z
 - Site: https://cellebrite.com/en/blog/
 - Feed: https://cellebrite.com/en/feed/
 - Entries checked: 5
-- New since last snapshot: 2
+- New since last snapshot: 0
 
-- 2026-05-11T13:29:45+00:00 — [Mobile Evidence in Crash and Workplace Investigations: Practical Tips for Seizure, Processing, and Review](https://cellebrite.com/en/resources/webinars/mobile-evidence-in-crash-and-workplace-investigations-practical-tips-for-seizure-processing-and-review/)
-- 2026-05-11T13:08:13+00:00 — [Ask Your Evidence: 10 AI Prompts That Move Cases Forward](https://cellebrite.com/en/blog/ask-your-evidence-10-ai-prompts-that-move-cases-forward/)
+- No new entries detected
 
 ## DFIR Science
 
@@ -526,55 +536,57 @@ Generated: 2026-05-12T06:24:47Z
 - Entries checked: 10
 - New since last snapshot: 1
 
-- 2026-05-11T00:00:00-05:00 — [Inside CrowdStrike Automated Leads: A Transformative Approach to Threat Detections](https://www.crowdstrike.com/en-us/blog/ai-threat-detection-with-automated-leads/)
+- 2026-05-12T00:00:00-05:00 — [May 2026 Patch Tuesday: 30 Critical Vulnerabilities Among 130 CVEs](https://www.crowdstrike.com/en-us/blog/patch-tuesday-analysis-may-2026/)
 
 ## Malwarebytes Labs
 
 - Site: https://blog.malwarebytes.com/
 - Feed: https://blog.malwarebytes.com/feed/
 - Entries checked: 10
-- New since last snapshot: 2
+- New since last snapshot: 3
 
-- 2026-05-11T13:21:57+00:00 — [Yarbo responds to robot flaws that could mow down their owners](https://www.malwarebytes.com/blog/news/2026/05/yarbo-responds-to-robot-flaws-that-could-mow-down-their-owners)
-- 2026-05-11T07:04:00+00:00 — [A week in security (May 4 &#8211; May 10)](https://www.malwarebytes.com/blog/news/2026/05/a-week-in-security-may-4-may-10-2)
+- 2026-05-12T15:46:55+00:00 — [Fake Claude search results lure Mac users into ClickFix attack](https://www.malwarebytes.com/blog/news/2026/05/fake-claude-search-results-lure-mac-users-into-clickfix-attack)
+- 2026-05-12T09:21:39+00:00 — [1 in 8 employees have sold company logins or know someone who has](https://www.malwarebytes.com/blog/news/2026/05/1-in-8-employees-have-sold-company-logins-or-know-someone-who-has)
+- 2026-05-12T08:41:07+00:00 — [Stolen Canvas data was “returned” after hacker agreement, Instructure says](https://www.malwarebytes.com/blog/news/2026/05/stolen-canvas-data-was-returned-after-hacker-agreement-instructure-says)
 
 ## Krebs on Security
 
 - Site: https://krebsonsecurity.com/
 - Feed: https://krebsonsecurity.com/feed/
 - Entries checked: 10
-- New since last snapshot: 0
+- New since last snapshot: 1
 
-- No new entries detected
+- 2026-05-12T21:46:45+00:00 — [Patch Tuesday, May 2026 Edition](https://krebsonsecurity.com/2026/05/patch-tuesday-may-2026-edition/)
 
 ## BleepingComputer
 
 - Site: https://www.bleepingcomputer.com/
 - Feed: https://www.bleepingcomputer.com/feed/
 - Entries checked: 10
-- New since last snapshot: 8
+- New since last snapshot: 10
 
-- 2026-05-11T18:40:34-04:00 — [GM agrees to $12.75M California settlement over sale of drivers’ data](https://www.bleepingcomputer.com/news/legal/gm-agrees-to-1275m-california-settlement-over-sale-of-drivers-data/)
-- 2026-05-11T18:03:06-04:00 — [Official CheckMarx Jenkins package compromised with infostealer](https://www.bleepingcomputer.com/news/security/official-checkmarx-jenkins-package-compromised-with-infostealer/)
-- 2026-05-11T18:02:00-04:00 — [New GhostLock tool abuses Windows API to block file access](https://www.bleepingcomputer.com/news/security/new-ghostlock-tool-abuses-windows-api-to-block-file-access/)
-- 2026-05-11T11:26:26-04:00 — [Instructure confirms hackers used Canvas flaw to deface portals](https://www.bleepingcomputer.com/news/security/instructure-confirms-hackers-used-canvas-flaw-to-deface-portals/)
-- 2026-05-11T09:53:56-04:00 — [Why Changing Passwords Doesn’t End an Active Directory Breach](https://www.bleepingcomputer.com/news/security/why-changing-passwords-doesnt-end-an-active-directory-breach/)
-- 2026-05-11T09:02:30-04:00 — [Google: Hackers used AI to develop zero-day exploit for web admin tool](https://www.bleepingcomputer.com/news/security/google-hackers-used-ai-to-develop-zero-day-exploit-for-web-admin-tool/)
-- 2026-05-11T08:30:00-04:00 — [Webinar this week: Prevention alone is not enough against modern attacks](https://www.bleepingcomputer.com/news/security/webinar-this-week-prevention-alone-is-not-enough-against-modern-attacks/)
-- 2026-05-11T05:03:02-04:00 — [TrickMo Android banker adopts TON blockchain for covert comms](https://www.bleepingcomputer.com/news/security/trickmo-android-banker-adopts-ton-blockchain-for-covert-comms/)
+- 2026-05-12T19:09:55-04:00 — [US govt seeks Instructure testimony on massive Canvas cyberattack](https://www.bleepingcomputer.com/news/security/us-govt-seeks-instructure-testimony-on-massive-canvas-cyberattack/)
+- 2026-05-12T16:17:19-04:00 — [UK fines water supplier $1.3M for exposing data of 664k customers](https://www.bleepingcomputer.com/news/security/uk-fines-water-supplier-13m-for-exposing-data-of-664k-customers/)
+- 2026-05-12T15:46:04-04:00 — [Webinar: Fixing the gaps in network incident response](https://www.bleepingcomputer.com/news/security/webinar-fixing-the-gaps-in-network-incident-response/)
+- 2026-05-12T15:40:31-04:00 — [Signal adds security warnings for social engineering, phishing attacks](https://www.bleepingcomputer.com/news/security/signal-adds-security-warnings-for-social-engineering-phishing-attacks/)
+- 2026-05-12T14:58:34-04:00 — [Microsoft releases Windows 10 KB5087544 extended security update](https://www.bleepingcomputer.com/news/microsoft/microsoft-releases-windows-10-kb5087544-extended-security-update/)
+- 2026-05-12T14:23:09-04:00 — [Fortinet warns of critical RCE flaws in FortiSandbox and FortiAuthenticator](https://www.bleepingcomputer.com/news/security/fortinet-warns-of-critical-rce-flaws-in-fortisandbox-and-fortiauthenticator/)
+- 2026-05-12T14:09:12-04:00 — [Windows 11 KB5089549 & KB5087420 cumulative updates released](https://www.bleepingcomputer.com/news/microsoft/windows-11-kb5089549-and-kb5087420-cumulative-updates-released/)
+- 2026-05-12T14:08:06-04:00 — [Microsoft May 2026 Patch Tuesday fixes 120 flaws, no zero-days](https://www.bleepingcomputer.com/news/microsoft/microsoft-may-2026-patch-tuesday-fixes-120-flaws-no-zero-days/)
+- 2026-05-12T13:07:01-04:00 — [Škoda warns of customer data breach after online shop hack](https://www.bleepingcomputer.com/news/security/skoda-warns-of-customer-data-breach-after-online-shop-hack/)
+- 2026-05-12T13:00:00-04:00 — [Android 17 to expand banking scam call and privacy protections](https://www.bleepingcomputer.com/news/security/android-17-to-expand-banking-scam-call-and-privacy-protections/)
 
 ## Dark Reading
 
 - Site: https://www.darkreading.com/
 - Feed: https://www.darkreading.com/rss.xml
 - Entries checked: 10
-- New since last snapshot: 5
+- New since last snapshot: 4
 
-- 2026-05-11T21:15:48+00:00 — [FCC Softens Ban on Foreign-Made Routers](https://www.darkreading.com/endpoint-security/fcc-softens-foreign-router-ban)
-- 2026-05-11T19:50:20+00:00 — [Tech Can't Stop These Threats — Your People Can](https://www.darkreading.com/cyberattacks-data-breaches/tech-cant-stop-these-threats-people-can)
-- 2026-05-11T15:05:45+00:00 — ['Dirty Frag' Exploit Poised to Blow Up on Enterprise Linux Distros](https://www.darkreading.com/vulnerabilities-threats/dirty-frag-exploit-blow-up-enterprise-linux-distros)
-- 2026-05-11T13:00:00+00:00 — [Hackers Use AI for Exploit Development, Attack Automation](https://www.darkreading.com/cloud-security/hackers-ai-exploit-dev-attack-automation)
-- 2026-05-11T12:00:00+00:00 — [Cyber Espionage Group Targets Aviation Firms to Steal Map Data](https://www.darkreading.com/vulnerabilities-threats/cyber-espionage-group-aviation-firms-steal-map-data)
+- 2026-05-12T21:03:04+00:00 — [It's Patch Tuesday for Microsoft and Not a Zero-Day In Sight](https://www.darkreading.com/application-security/patch-tuesday-microsoft-zero-day-sight)
+- 2026-05-12T14:00:00+00:00 — [Hugging Face Packages Weaponized With a Single File Tweak](https://www.darkreading.com/cloud-security/hugging-face-packages-weaponized-single-file-tweak)
+- 2026-05-12T12:00:00+00:00 — [20 Leaders Who Built the CISO Era: 2 Decades of Change](https://www.darkreading.com/cybersecurity-operations/20-leaders-ciso-era-2-decades-change)
+- 2026-05-12T11:07:43+00:00 — [Worm Redux: Fresh Mini Shai-Hulud Infections Bite Supply Chain](https://www.darkreading.com/application-security/worm-redux-fresh-mini-shai-hulud-infections-bite-supply-chain)
 
 ## Volexity Blog
 
@@ -596,9 +608,12 @@ Generated: 2026-05-12T06:24:47Z
 - Site: https://www.microsoft.com/en-us/security/blog/
 - Feed: https://www.microsoft.com/en-us/security/blog/feed/
 - Entries checked: 10
-- New since last snapshot: 0
+- New since last snapshot: 4
 
-- No new entries detected
+- 2026-05-12T22:53:09+00:00 — [Accelerating detection engineering using AI-assisted synthetic attack logs generation](https://www.microsoft.com/en-us/security/blog/2026/05/12/accelerating-detection-engineering-using-ai-assisted-synthetic-attack-logs-generation/)
+- 2026-05-12T22:00:00+00:00 — [Defense at AI speed: Microsoft’s new multi-model agentic security system tops leading industry benchmark](https://www.microsoft.com/en-us/security/blog/2026/05/12/defense-at-ai-speed-microsofts-new-multi-model-agentic-security-system-tops-leading-industry-benchmark/)
+- 2026-05-12T16:00:00+00:00 — [Defending consumer web properties against modern DDoS attacks](https://www.microsoft.com/en-us/security/blog/2026/05/12/defending-consumer-web-properties-against-modern-ddos-attacks/)
+- 2026-05-12T15:00:00+00:00 — [Undermining the trust boundary: Investigating a stealthy intrusion through third-party compromise](https://www.microsoft.com/en-us/security/blog/2026/05/12/undermining-the-trust-boundary-investigating-a-stealthy-intrusion-through-third-party-compromise/)
 
 ## LOLBAS Project (Windows)
 
@@ -857,9 +872,9 @@ Generated: 2026-05-12T06:24:47Z
 - Site: https://github.com/elastic/detection-rules
 - Feed: https://github.com/elastic/detection-rules/releases.atom
 - Entries checked: 10
-- New since last snapshot: 0
+- New since last snapshot: 1
 
-- No new entries detected
+- 2026-05-12T15:03:52+00:00 — [dev-v1.6.39](https://github.com/elastic/detection-rules/releases/tag/dev-v1.6.39)
 
 ## regipy releases
 
@@ -974,10 +989,9 @@ Generated: 2026-05-12T06:24:47Z
 - Site: https://github.com/EricZimmerman/TLEFilePlugins
 - Feed: https://github.com/EricZimmerman/TLEFilePlugins/commits/master.atom
 - Entries checked: 10
-- New since last snapshot: 2
+- New since last snapshot: 0
 
-- 2026-05-11T17:42:56+00:00 — [Merge pull request #19 from reece394/master](https://github.com/EricZimmerman/TLEFilePlugins/commit/0740b72b6a99b7f8dc36093c2f7764226d15dadc)
-- 2026-02-08T15:19:07+00:00 — [Add MFT Resident Data Support to TLE](https://github.com/EricZimmerman/TLEFilePlugins/commit/3d75518ae1dcfc0c135fffdd61a4094a53c062da)
+- No new entries detected
 
 ## EZ Get-ZimmermanTools commits
 
@@ -1002,9 +1016,9 @@ Generated: 2026-05-12T06:24:47Z
 - Site: https://attack.mitre.org/
 - Feed: https://github.com/mitre/cti/releases.atom
 - Entries checked: 10
-- New since last snapshot: 0
+- New since last snapshot: 1
 
-- No new entries detected
+- 2026-05-12T17:49:00+00:00 — [ATT&CK version 19.1](https://github.com/mitre/cti/releases/tag/ATT%26CK-v19.1)
 
 ## Velociraptor releases
 

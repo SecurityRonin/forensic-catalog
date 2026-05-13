@@ -337,3 +337,7 @@ $ 4n6query certutil.exe --format json      # JSON output for any query
 
 - [`RapidTriage`](https://github.com/SecurityRonin/RapidTriage) — live incident response triage tool
 - [`blazehash`](https://github.com/SecurityRonin/blazehash) — high-speed forensic hash verification
+
+---
+
+[Privacy Policy](https://securityronin.github.io/forensicnomicon/privacy/) · [Terms of Service](https://securityronin.github.io/forensicnomicon/terms/) · © 2026 Security Ronin Ltd

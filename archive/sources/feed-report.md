@@ -1,6 +1,6 @@
 # Feed Update Report
 
-Generated: 2026-05-16T06:09:12Z
+Generated: 2026-05-17T06:31:52Z
 
 ## Windows Incident Response
 
@@ -61,9 +61,9 @@ Generated: 2026-05-16T06:09:12Z
 - Site: https://andreafortuna.org/
 - Feed: https://andreafortuna.org/feed.xml
 - Entries checked: 10
-- New since last snapshot: 1
+- New since last snapshot: 0
 
-- 2026-05-15T00:00:00+00:00 — [Why Italian cybersecurity is structurally behind (and it’s not the CISOs’ fault)](https://andreafortuna.org/2026/05/15/italy-cyber-structural-gap/)
+- No new entries detected
 
 ## Salt Forensics
 
@@ -213,19 +213,7 @@ Generated: 2026-05-16T06:09:12Z
 
 - Site: https://www.youtube.com/@13cubed
 - Feed: https://www.youtube.com/feeds/videos.xml?channel_id=UCy8ntxFEudOCRZYT1f7ya9Q
-- Entries checked: 10
-- New since last snapshot: 10
-
-- 2026-05-05T00:49:41+00:00 — [Hunting Copy Fail: 732 Bytes to Root](https://www.youtube.com/watch?v=ZVmpK-9rP0Q)
-- 2026-04-24T09:44:12+00:00 — [The AI Conversation I've Been Avoiding](https://www.youtube.com/watch?v=wKn-9sKBqX8)
-- 2026-03-22T00:50:58+00:00 — [Mac Imaging Made Easy with Fuji](https://www.youtube.com/watch?v=9ZkLdFodhzM)
-- 2026-04-23T00:04:55+00:00 — [Tracking Program Execution with a Little Known Registry Key](https://www.youtube.com/watch?v=yoFkF-NHZvo)
-- 2026-05-05T15:31:05+00:00 — [The Truth About Windows Explorer Timestamps](https://www.youtube.com/watch?v=PdyVkmhMcOA)
-- 2026-05-01T22:55:06+00:00 — [Major Update to 13Cubed Courses: Chaos at Cobalt](https://www.youtube.com/watch?v=CzF6DFhSfHw)
-- 2026-04-30T06:35:14+00:00 — [13Cubed AMA - Answering Your Questions!](https://www.youtube.com/watch?v=duz5BoZUly8)
-- 2026-04-22T18:55:48+00:00 — [The Easy Way to Analyze Linux Memory](https://www.youtube.com/watch?v=W40gdWNdwUI)
-- 2026-04-13T16:01:10+00:00 — [Will AI Replace Digital Forensics Experts?](https://www.youtube.com/watch?v=lvkBtIhvThk)
-- 2026-04-28T19:45:58+00:00 — [Behind the Book: Threat Hunting macOS with Jaron Bradley](https://www.youtube.com/watch?v=8Uj2NbWnU6M)
+- Status: error: HTTP 404
 
 ## SANS Internet Storm Center
 
@@ -259,9 +247,9 @@ Generated: 2026-05-16T06:09:12Z
 - Site: https://aboutdfir.com/
 - Feed: https://aboutdfir.com/feed/
 - Entries checked: 10
-- New since last snapshot: 1
+- New since last snapshot: 0
 
-- 2026-05-15T14:08:00+00:00 — [InfoSec News Nuggets 05/15/2026](https://aboutdfir.com/infosec-news-nuggets-05-15-2026/)
+- No new entries detected
 
 ## Forensic 4cast
 
@@ -376,9 +364,11 @@ Generated: 2026-05-16T06:09:12Z
 - Site: https://eclecticlight.co/
 - Feed: https://eclecticlight.co/feed/
 - Entries checked: 10
-- New since last snapshot: 1
+- New since last snapshot: 3
 
-- 2026-05-15T11:30:00+00:00 — [Naturalists: Sorolla and Zorn](https://eclecticlight.co/2026/05/15/naturalists-sorolla-and-zorn/)
+- 2026-05-16T11:30:00+00:00 — [Paintings of visits to India 1778-1877](https://eclecticlight.co/2026/05/16/paintings-of-visits-to-india-1778-1877/)
+- 2026-05-16T08:00:00+00:00 — [Saturday Mac riddles 360](https://eclecticlight.co/2026/05/16/saturday-mac-riddles-360/)
+- 2026-05-16T07:00:00+00:00 — [Explainer: QuickLook](https://eclecticlight.co/2026/05/16/explainer-quicklook/)
 
 ## JPCERT/CC
 
@@ -430,18 +420,18 @@ Generated: 2026-05-16T06:09:12Z
 - Site: https://unit42.paloaltonetworks.com/
 - Feed: https://unit42.paloaltonetworks.com/feed/
 - Entries checked: 10
-- New since last snapshot: 1
+- New since last snapshot: 0
 
-- 2026-05-15T10:00:52+00:00 — [Gremlin Stealer's Evolved Tactics: Hiding in Plain Sight With Resource Files](https://unit42.paloaltonetworks.com/gremlin-stealer-evolution/)
+- No new entries detected
 
 ## Mandiant Threat Intelligence
 
 - Site: https://cloud.google.com/blog/topics/threat-intelligence
 - Feed: https://feeds.feedburner.com/threatintelligence/pvexyqv7v0v
 - Entries checked: 10
-- New since last snapshot: 1
+- New since last snapshot: 0
 
-- 2026-05-15T14:00:00+00:00 — [Welcome to BlackFile: Inside a Vishing Extortion Operation](https://cloud.google.com/blog/topics/threat-intelligence/blackfile-vishing-extortion-operation/)
+- No new entries detected
 
 ## Cisco Talos Blog
 
@@ -538,10 +528,9 @@ Generated: 2026-05-16T06:09:12Z
 - Site: https://blog.malwarebytes.com/
 - Feed: https://blog.malwarebytes.com/feed/
 - Entries checked: 10
-- New since last snapshot: 2
+- New since last snapshot: 0
 
-- 2026-05-15T12:45:47+00:00 — [Attackers replaced JDownloader installer downloads with malware](https://www.malwarebytes.com/blog/news/2026/05/attackers-replaced-jdownloader-installer-downloads-with-malware)
-- 2026-05-15T12:34:15+00:00 — [Meta’s confusing new approach to chat privacy](https://www.malwarebytes.com/blog/news/2026/05/metas-confusing-new-approach-to-chat-privacy)
+- No new entries detected
 
 ## Krebs on Security
 
@@ -557,27 +546,19 @@ Generated: 2026-05-16T06:09:12Z
 - Site: https://www.bleepingcomputer.com/
 - Feed: https://www.bleepingcomputer.com/feed/
 - Entries checked: 10
-- New since last snapshot: 8
+- New since last snapshot: 2
 
-- 2026-05-15T15:30:33-04:00 — [Funnel Builder WordPress plugin bug exploited to steal credit cards](https://www.bleepingcomputer.com/news/security/funnel-builder-wordpress-plugin-bug-exploited-to-steal-credit-cards/)
-- 2026-05-15T13:47:25-04:00 — [Microsoft Exchange, Windows 11 hacked on second day of Pwn2Own](https://www.bleepingcomputer.com/news/security/pwn2own-day-two-hackers-demo-microsoft-exchange-windows-11-red-had-enterprise-linux-zero-days/)
-- 2026-05-15T13:10:42-04:00 — [Popular node-ipc npm package compromised to steal credentials](https://www.bleepingcomputer.com/news/security/popular-node-ipc-npm-package-compromised-to-steal-credentials/)
-- 2026-05-15T11:56:56-04:00 — [Avada Builder WordPress plugin flaws allow site credential theft](https://www.bleepingcomputer.com/news/security/avada-builder-wordpress-plugin-flaws-allow-site-credential-theft/)
-- 2026-05-15T10:49:39-04:00 — [Microsoft backpedals: Edge to stop loading passwords into memory](https://www.bleepingcomputer.com/news/microsoft/microsoft-edge-to-stop-loading-cleartext-passwords-in-memory-on-startup/)
-- 2026-05-15T10:02:12-04:00 — [Inside the REMUS Infostealer: Session Theft, MaaS, and Rapid Evolution](https://www.bleepingcomputer.com/news/security/inside-the-remus-infostealer-session-theft-maas-and-rapid-evolution/)
-- 2026-05-15T08:29:48-04:00 — [Microsoft to automatically roll back faulty Windows drivers](https://www.bleepingcomputer.com/news/microsoft/microsoft-to-automatically-roll-back-faulty-windows-drivers/)
-- 2026-05-15T05:40:42-04:00 — [Microsoft warns of Exchange zero-day flaw exploited in attacks](https://www.bleepingcomputer.com/news/microsoft/microsoft-warns-of-exchange-zero-day-flaw-exploited-in-attacks/)
+- 2026-05-16T16:55:44-04:00 — [Microsoft rejects critical Azure vulnerability report, no CVE issued](https://www.bleepingcomputer.com/news/security/microsoft-rejects-critical-azure-vulnerability-report-no-cve-issued/)
+- 2026-05-16T10:15:37-04:00 — [Russian hackers turn Kazuar backdoor into modular P2P botnet](https://www.bleepingcomputer.com/news/security/russian-hackers-turn-kazuar-backdoor-into-modular-p2p-botnet/)
 
 ## Dark Reading
 
 - Site: https://www.darkreading.com/
 - Feed: https://www.darkreading.com/rss.xml
 - Entries checked: 10
-- New since last snapshot: 3
+- New since last snapshot: 0
 
-- 2026-05-18T13:00:00+00:00 — [The Boring Stuff is Dangerous Now](https://www.darkreading.com/cyber-risk/ai-code-and-agents-forces-defenders-adapt)
-- 2026-05-15T12:00:00+00:00 — [Cyber Pioneers Ponder Past as Prologue](https://www.darkreading.com/cyberattacks-data-breaches/cybersecurity-pioneers-ponder-past-prologue)
-- 2026-05-14T20:19:20+00:00 — [Congress Puts Heat on Instructure After Canvas Outage](https://www.darkreading.com/cyberattacks-data-breaches/congress-instructure-shinyhunters-attacks)
+- No new entries detected
 
 ## Volexity Blog
 
@@ -653,10 +634,9 @@ Generated: 2026-05-16T06:09:12Z
 - Site: https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes
 - Feed: https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commits/main.atom
 - Entries checked: 10
-- New since last snapshot: 2
+- New since last snapshot: 0
 
-- 2026-05-16T03:14:23+00:00 — [Update 3.2.01_Memory_Forensics.md](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/b461f32ea56ea8a146c72a78d6ca458e941c9010)
-- 2026-05-16T00:07:52+00:00 — [Playbooks Update](https://github.com/bitbug0x55AA/Blue_Team_Hunting_Field_Notes/commit/3e18679e7e86a1292a04b7ce860cda1ffeae91ef)
+- No new entries detected
 
 ## kacos2000_Win10
 
@@ -1068,6 +1048,9 @@ Generated: 2026-05-16T06:09:12Z
 - Site: https://www.misp-project.org/
 - Feed: https://github.com/MISP/misp-taxonomies/commits/main.atom
 - Entries checked: 10
-- New since last snapshot: 0
+- New since last snapshot: 4
 
-- No new entries detected
+- 2026-05-16T06:12:46+00:00 — [Merge pull request #324 from h4ck32n4u75/add-mytaxonomy](https://github.com/MISP/misp-taxonomies/commit/16a45709ac766d1a3b381dd73faf69984003c8a9)
+- 2026-05-16T05:08:35+00:00 — [Update MANIFEST.json](https://github.com/MISP/misp-taxonomies/commit/1d14793ade21c5415c8f4f3f4e3639a84b1ed50a)
+- 2026-05-16T05:02:56+00:00 — [Merge branch 'main' into add-mytaxonomy](https://github.com/MISP/misp-taxonomies/commit/9f45cb41fa00a8ae1d0514c3e82a9c9e460a2d70)
+- 2026-05-16T05:00:46+00:00 — [Modify descriptions in machinetag.json](https://github.com/MISP/misp-taxonomies/commit/59666134c4ee3e769f498ca11e03b7a324ec679f)

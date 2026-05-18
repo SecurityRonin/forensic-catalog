@@ -1,6 +1,6 @@
 # Feed Update Report
 
-Generated: 2026-05-17T06:31:52Z
+Generated: 2026-05-18T07:07:42Z
 
 ## Windows Incident Response
 
@@ -61,9 +61,9 @@ Generated: 2026-05-17T06:31:52Z
 - Site: https://andreafortuna.org/
 - Feed: https://andreafortuna.org/feed.xml
 - Entries checked: 10
-- New since last snapshot: 0
+- New since last snapshot: 1
 
-- No new entries detected
+- 2026-05-18T00:00:00+00:00 — [Bridging memory and network forensics with XFRM inspection](https://andreafortuna.org/2026/05/18/xfrm-memory-network-bridge/)
 
 ## Salt Forensics
 
@@ -213,7 +213,19 @@ Generated: 2026-05-17T06:31:52Z
 
 - Site: https://www.youtube.com/@13cubed
 - Feed: https://www.youtube.com/feeds/videos.xml?channel_id=UCy8ntxFEudOCRZYT1f7ya9Q
-- Status: error: HTTP 404
+- Entries checked: 10
+- New since last snapshot: 10
+
+- 2026-05-05T00:49:41+00:00 — [Hunting Copy Fail: 732 Bytes to Root](https://www.youtube.com/watch?v=ZVmpK-9rP0Q)
+- 2026-04-24T09:44:12+00:00 — [The AI Conversation I've Been Avoiding](https://www.youtube.com/watch?v=wKn-9sKBqX8)
+- 2026-03-22T00:50:58+00:00 — [Mac Imaging Made Easy with Fuji](https://www.youtube.com/watch?v=9ZkLdFodhzM)
+- 2026-04-23T00:04:55+00:00 — [Tracking Program Execution with a Little Known Registry Key](https://www.youtube.com/watch?v=yoFkF-NHZvo)
+- 2026-05-05T15:31:05+00:00 — [The Truth About Windows Explorer Timestamps](https://www.youtube.com/watch?v=PdyVkmhMcOA)
+- 2026-05-01T22:55:06+00:00 — [Major Update to 13Cubed Courses: Chaos at Cobalt](https://www.youtube.com/watch?v=CzF6DFhSfHw)
+- 2026-04-30T06:35:14+00:00 — [13Cubed AMA - Answering Your Questions!](https://www.youtube.com/watch?v=duz5BoZUly8)
+- 2026-04-22T18:55:48+00:00 — [The Easy Way to Analyze Linux Memory](https://www.youtube.com/watch?v=W40gdWNdwUI)
+- 2026-04-13T16:01:10+00:00 — [Will AI Replace Digital Forensics Experts?](https://www.youtube.com/watch?v=lvkBtIhvThk)
+- 2026-04-28T19:45:58+00:00 — [Behind the Book: Threat Hunting macOS with Jaron Bradley](https://www.youtube.com/watch?v=8Uj2NbWnU6M)
 
 ## SANS Internet Storm Center
 
@@ -228,7 +240,7 @@ Generated: 2026-05-17T06:31:52Z
 
 - Site: https://www.dfir.training/blog
 - Feed: https://www.dfir.training/blog
-- Entries checked: 10
+- Entries checked: 0
 - New since last snapshot: 0
 
 - No new entries detected
@@ -265,9 +277,9 @@ Generated: 2026-05-17T06:31:52Z
 - Site: https://thisweekin4n6.com/
 - Feed: https://thisweekin4n6.wordpress.com/feed/
 - Entries checked: 10
-- New since last snapshot: 0
+- New since last snapshot: 1
 
-- No new entries detected
+- 2026-05-17T12:26:43+00:00 — [Week 20 – 2026](https://thisweekin4n6.com/2026/05/17/week-20-2026/)
 
 ## The Sleuth Kit updates
 
@@ -366,9 +378,9 @@ Generated: 2026-05-17T06:31:52Z
 - Entries checked: 10
 - New since last snapshot: 3
 
-- 2026-05-16T11:30:00+00:00 — [Paintings of visits to India 1778-1877](https://eclecticlight.co/2026/05/16/paintings-of-visits-to-india-1778-1877/)
-- 2026-05-16T08:00:00+00:00 — [Saturday Mac riddles 360](https://eclecticlight.co/2026/05/16/saturday-mac-riddles-360/)
-- 2026-05-16T07:00:00+00:00 — [Explainer: QuickLook](https://eclecticlight.co/2026/05/16/explainer-quicklook/)
+- 2026-05-18T06:30:00+00:00 — [How QuickLook provides thumbnails and previews](https://eclecticlight.co/2026/05/18/how-quicklook-provides-thumbnails-and-previews/)
+- 2026-05-17T11:30:00+00:00 — [Paintings of visits to India 1878-1944](https://eclecticlight.co/2026/05/17/paintings-of-visits-to-india-1878-1944/)
+- 2026-05-17T07:00:00+00:00 — [Last Week on My Mac: Syncing metadata in iCloud Drive](https://eclecticlight.co/2026/05/17/last-week-on-my-mac-syncing-metadata-in-icloud-drive/)
 
 ## JPCERT/CC
 
@@ -528,9 +540,9 @@ Generated: 2026-05-17T06:31:52Z
 - Site: https://blog.malwarebytes.com/
 - Feed: https://blog.malwarebytes.com/feed/
 - Entries checked: 10
-- New since last snapshot: 0
+- New since last snapshot: 1
 
-- No new entries detected
+- 2026-05-18T01:51:37+00:00 — [AI is distorting the Holocaust (Lock and Code S07E10)](https://www.malwarebytes.com/blog/podcast/2026/05/ai-is-distorting-the-holocaust-lock-and-code-s07e10)
 
 ## Krebs on Security
 
@@ -546,19 +558,20 @@ Generated: 2026-05-17T06:31:52Z
 - Site: https://www.bleepingcomputer.com/
 - Feed: https://www.bleepingcomputer.com/feed/
 - Entries checked: 10
-- New since last snapshot: 2
+- New since last snapshot: 3
 
-- 2026-05-16T16:55:44-04:00 — [Microsoft rejects critical Azure vulnerability report, no CVE issued](https://www.bleepingcomputer.com/news/security/microsoft-rejects-critical-azure-vulnerability-report-no-cve-issued/)
-- 2026-05-16T10:15:37-04:00 — [Russian hackers turn Kazuar backdoor into modular P2P botnet](https://www.bleepingcomputer.com/news/security/russian-hackers-turn-kazuar-backdoor-into-modular-p2p-botnet/)
+- 2026-05-18T01:33:20-04:00 — [Hackers earn $1,298,250 for 47 zero-days at Pwn2Own Berlin 2026](https://www.bleepingcomputer.com/news/security/hackers-earn-1-298-250-for-47-zero-days-at-pwn2own-berlin-2026/)
+- 2026-05-17T18:30:08-04:00 — [New Windows 'MiniPlasma' zero-day exploit gives SYSTEM access, PoC released](https://www.bleepingcomputer.com/news/microsoft/new-windows-miniplasma-zero-day-exploit-gives-system-access-poc-released/)
+- 2026-05-17T10:43:10-04:00 — [Tycoon2FA hijacks Microsoft 365 accounts via device-code phishing](https://www.bleepingcomputer.com/news/security/tycoon2fa-hijacks-microsoft-365-accounts-via-device-code-phishing/)
 
 ## Dark Reading
 
 - Site: https://www.darkreading.com/
 - Feed: https://www.darkreading.com/rss.xml
 - Entries checked: 10
-- New since last snapshot: 0
+- New since last snapshot: 1
 
-- No new entries detected
+- 2026-05-18T01:00:00+00:00 — [Can Laws Stop Deepfakes? South Korea Aims to Find Out](https://www.darkreading.com/vulnerabilities-threats/can-laws-stop-deepfakes-south-korea)
 
 ## Volexity Blog
 
@@ -1048,9 +1061,6 @@ Generated: 2026-05-17T06:31:52Z
 - Site: https://www.misp-project.org/
 - Feed: https://github.com/MISP/misp-taxonomies/commits/main.atom
 - Entries checked: 10
-- New since last snapshot: 4
+- New since last snapshot: 0
 
-- 2026-05-16T06:12:46+00:00 — [Merge pull request #324 from h4ck32n4u75/add-mytaxonomy](https://github.com/MISP/misp-taxonomies/commit/16a45709ac766d1a3b381dd73faf69984003c8a9)
-- 2026-05-16T05:08:35+00:00 — [Update MANIFEST.json](https://github.com/MISP/misp-taxonomies/commit/1d14793ade21c5415c8f4f3f4e3639a84b1ed50a)
-- 2026-05-16T05:02:56+00:00 — [Merge branch 'main' into add-mytaxonomy](https://github.com/MISP/misp-taxonomies/commit/9f45cb41fa00a8ae1d0514c3e82a9c9e460a2d70)
-- 2026-05-16T05:00:46+00:00 — [Modify descriptions in machinetag.json](https://github.com/MISP/misp-taxonomies/commit/59666134c4ee3e769f498ca11e03b7a324ec679f)
+- No new entries detected
